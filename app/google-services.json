@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "365193487318",
+    "project_id": "mystory-f1ec9",
+    "storage_bucket": "mystory-f1ec9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:365193487318:android:fa1a3ceed05b1542d47a77",
+        "android_client_info": {
+          "package_name": "com.mystory"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "365193487318-dr4t1cspar26d2c39v874oic46tif8oa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAO_BSitxBQK_QWCia-sUbGnInQ4AdxQzo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "365193487318-dr4t1cspar26d2c39v874oic46tif8oa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:365193487318:android:7809e25308aaf21fd47a77",
+        "android_client_info": {
+          "package_name": "com.peterchege.blogger"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "365193487318-dr4t1cspar26d2c39v874oic46tif8oa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAO_BSitxBQK_QWCia-sUbGnInQ4AdxQzo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "365193487318-dr4t1cspar26d2c39v874oic46tif8oa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
