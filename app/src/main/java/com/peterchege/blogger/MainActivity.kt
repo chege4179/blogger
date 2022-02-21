@@ -18,6 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @ExperimentalCoilApi
 
 class MainActivity : ComponentActivity() {
+    // My blogger app
 
     @OptIn(ExperimentalMaterialApi::class)
 
