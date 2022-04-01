@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -12,6 +13,7 @@ import com.peterchege.blogger.api.requests.CommentBody
 import com.peterchege.blogger.api.requests.FollowUser
 import com.peterchege.blogger.api.requests.LikePost
 import com.peterchege.blogger.api.requests.Viewer
+import com.peterchege.blogger.api.responses.Comment
 import com.peterchege.blogger.api.responses.Like
 import com.peterchege.blogger.api.responses.Post
 import com.peterchege.blogger.api.responses.toPostRecord
@@ -53,6 +55,10 @@ class PostViewModel @Inject constructor(
     private var _commentResponseState = mutableStateOf(CommentResponseState())
     var commentResponseState : State<CommentResponseState> = _commentResponseState
 
+    private val _comments = mutableStateOf<List<Comment>>(emptyList())
+    var comments : State<List<Comment>> = _comments
+
+
     private var _isLiked = mutableStateOf(false)
     var isLiked :State<Boolean> = _isLiked
 
@@ -78,7 +84,6 @@ class PostViewModel @Inject constructor(
         val isLoading:Boolean = false,
         val success:Boolean = false,
     )
-
     init {
         savedStateHandle.get<String>("postId")?.let { postId ->
             savedStateHandle.get<String>("source")?.let { source ->
@@ -89,8 +94,6 @@ class PostViewModel @Inject constructor(
                     getPost(postId = postId)
                     getSavedPostState(postId = postId)
                     addViewCount()
-
-
 
                 }else if (source == Constants.ROOM_SOURCE){
                     getPostFromRoom(postId = postId)
@@ -105,6 +108,7 @@ class PostViewModel @Inject constructor(
             when(result){
                 is Resource.Success -> {
                     _state.value = PostDetailState(post = result.data)
+                    _comments.value = result.data!!.comments
                     checkIsMyPost()
                     _isLiked.value = getIsLikedState(result.data!!.likes)
 
@@ -120,8 +124,6 @@ class PostViewModel @Inject constructor(
 
         }.launchIn(viewModelScope)
     }
-
-
     fun onDialogConfirm(scaffoldState: ScaffoldState) {
         _openDialogState.value = false
         savedStateHandle.get<String>("postId")?.let { postId->
@@ -153,13 +155,10 @@ class PostViewModel @Inject constructor(
     fun onDialogDismiss() {
         _openDialogState.value = false
     }
-
     fun deletePost(scaffoldState: ScaffoldState){
 
 
     }
-
-
     fun onDialogDeleteConfirm(scaffoldState: ScaffoldState) {
         _openDeleteDialogState.value = false
         viewModelScope.launch {
@@ -209,8 +208,6 @@ class PostViewModel @Inject constructor(
     fun onDialogDeleteDismiss() {
         _openDeleteDialogState.value = false
     }
-
-
     fun OnChangeComment(text:String){
         _commentInputState.value = text
     }
@@ -247,7 +244,6 @@ class PostViewModel @Inject constructor(
             }
         }
     }
-
     private fun getSavedPostState(postId: String){
         viewModelScope.launch {
             try {
@@ -429,9 +425,11 @@ class PostViewModel @Inject constructor(
                         scaffoldState.snackbarHostState.showSnackbar(
                             message = result.data!!.msg
                         )
-                        savedStateHandle.get<String>("postId")?.let { postId ->
-                            getPost(postId = postId)
-                        }
+                        val newComment = result.data.comment
+                        var oldcomments = _state.value.post?.comments
+                        oldcomments = oldcomments?.plus(newComment)
+                        _comments.value = oldcomments?: emptyList()
+
                     }
 
                 }

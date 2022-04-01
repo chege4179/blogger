@@ -124,10 +124,9 @@ fun AddPostScreen(
                     Column(
                         modifier= Modifier.fillMaxSize()
                     ){
-                        TextField(
+                        OutlinedTextField(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .height(70.dp),
+                                .fillMaxWidth(),
                             value = postTitle.text  ,
                             maxLines = 3,
                             label= {
@@ -137,7 +136,7 @@ fun AddPostScreen(
                                 viewModel.onChangePostTitle(it)
                             })
                         Spacer(modifier = Modifier.height(10.dp))
-                        TextField(
+                        OutlinedTextField(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(430.dp),
@@ -153,25 +152,16 @@ fun AddPostScreen(
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
-
-
                         ) {
                             Button(
-
                                 onClick = {
                                 navController.navigate(Screens.DRAFT_SCREEN)
-
-
                             }) {
                                 Text("Go To Drafts")
                             }
                             Button(
-
                                 onClick = {
-                                viewModel.postArticle(bottomNavController,scaffoldState)
-
-
-
+                                viewModel.postArticle(bottomNavController,scaffoldState,context)
                             }) {
                                 Text("Post")
                             }

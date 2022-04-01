@@ -1,5 +1,6 @@
 package com.peterchege.blogger.components
 
+import android.widget.Space
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -42,14 +43,17 @@ fun ProfileCard(
     ){
         Row(
             modifier = Modifier
+                .padding(horizontal = 10.dp)
                 .fillMaxWidth()
                 .fillMaxHeight(),
-            horizontalArrangement = Arrangement.Start
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically,
         ){
+            Spacer(modifier = Modifier.width(10.dp))
             Image(
                 modifier = Modifier
-                    .fillMaxWidth(0.2f)
-                    .height(60.dp),
+                    .width(48.dp)
+                    .height(48.dp),
                 painter = rememberImagePainter(
                     data = user.imageUrl,
                     builder = {
@@ -58,8 +62,11 @@ fun ProfileCard(
                     },
                 ),
                 contentDescription = "")
+            Spacer(modifier = Modifier.width(10.dp))
             Column(
-                modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.Center
             ) {

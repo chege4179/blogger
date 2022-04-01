@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.peterchege.blogger.api.responses.Post
@@ -30,16 +31,16 @@ import com.peterchege.blogger.api.responses.Post
 
 @ExperimentalCoilApi
 @Composable
-fun ArticleCard (
-    post:Post,
-    onItemClick:(Post) -> Unit,
-    onProfileNavigate:(String) -> Unit,
-    onDeletePost:(Post) ->Unit,
-    profileImageUrl:String,
-    isLiked:Boolean,
-    isSaved:Boolean,
-    isProfile:Boolean,
-){
+fun ArticleCard(
+    post: Post,
+    onItemClick: (Post) -> Unit,
+    onProfileNavigate: (String) -> Unit,
+    onDeletePost: (Post) -> Unit,
+    profileImageUrl: String,
+    isLiked: Boolean,
+    isSaved: Boolean,
+    isProfile: Boolean,
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -48,8 +49,10 @@ fun ArticleCard (
         backgroundColor = Color.White,
         shape = RoundedCornerShape(15.dp),
 
-    ){
-        Column(modifier = Modifier.fillMaxWidth().background(Color.LightGray)) {
+        ) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.LightGray)) {
             post.let {
                 Image(
                     painter = rememberImagePainter(
@@ -67,9 +70,11 @@ fun ArticleCard (
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(
-                    modifier = Modifier.padding(10.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
-                ){
+                ) {
                     Column(
                         modifier = Modifier.fillMaxWidth(0.8f)
 
@@ -77,15 +82,33 @@ fun ArticleCard (
                         Text(
                             modifier = Modifier.fillMaxWidth(),
                             text = post.postTitle,
-                            textAlign= TextAlign.Start,
+                            textAlign = TextAlign.Start,
                             fontWeight = FontWeight.Bold,
 
 
                             )
-                        TextButton(onClick = {
-                            onProfileNavigate(post.postAuthor)
-                        }) {
-                            Text(text ="By :" +post.postAuthor)
+                        Row(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "By : ",
+                                modifier = Modifier
+                                    .padding(vertical = 7.dp)
+//                                    .clickable {
+//                                        onProfileNavigate(post.postAuthor)
+//                                    }
+                            )
+                            Text(
+                                text = post.postAuthor,
+                                modifier = Modifier
+                                    .padding(vertical = 7.dp)
+                                    .clickable {
+                                        onProfileNavigate(post.postAuthor)
+                                    },
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp
+
+                            )
                         }
 
 
@@ -93,9 +116,11 @@ fun ArticleCard (
                     Row(
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(end = 15.dp).fillMaxHeight()
-                    ){
-                        if (isProfile){
+                        modifier = Modifier
+                            .padding(end = 15.dp)
+                            .fillMaxHeight()
+                    ) {
+                        if (isProfile) {
                             Icon(
                                 Icons.Filled.Share,
                                 contentDescription = "Share",
@@ -103,8 +128,8 @@ fun ArticleCard (
 
                                 }
                             )
-                        }else{
-                            if (isLiked){
+                        } else {
+                            if (isLiked) {
                                 Icon(
                                     Icons.Default.Favorite,
                                     contentDescription = "Like",
@@ -112,7 +137,7 @@ fun ArticleCard (
 
                                     }
                                 )
-                            }else{
+                            } else {
                                 Icon(
                                     Icons.Default.FavoriteBorder,
                                     contentDescription = "Like",
@@ -121,7 +146,7 @@ fun ArticleCard (
                                     }
                                 )
                             }
-                            if (isSaved){
+                            if (isSaved) {
                                 Icon(
                                     Icons.Default.Bookmark,
                                     contentDescription = "Saved",
@@ -129,7 +154,7 @@ fun ArticleCard (
 
                                     }
                                 )
-                            }else{
+                            } else {
                                 Icon(
                                     Icons.Default.BookmarkBorder,
                                     contentDescription = "Saved",

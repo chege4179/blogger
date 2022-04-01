@@ -1,8 +1,10 @@
 package com.peterchege.blogger.util
 
 object Constants {
-    const val BASE_URL="http://192.168.1.5:9001"
+    const val LOCAL_URL="http://192.168.1.3:9000"
     const val REMOTE_URL = "https://androidbloggerapp.herokuapp.com"
+
+    const val BASE_URL = REMOTE_URL
 
     const val LOGIN_ID = "LOGIN_ID"
     const val LOGIN_USERNAME = "LOGIN_USERNAME"

@@ -153,8 +153,6 @@ class AddPostScreenViewModel @Inject constructor(
 
             }
         }
-
-
         _imageUrlState.value = uri
     }
     fun onChangePhotoBitmap(bitmap: Bitmap){
@@ -187,66 +185,71 @@ class AddPostScreenViewModel @Inject constructor(
         }
     }
 
-    fun postArticle(navController: NavController,scaffoldState: ScaffoldState){
+    fun postArticle(navController: NavController,scaffoldState: ScaffoldState,context: Context){
         _state.value = AddPostScreenState(isLoading = true)
-        Log.e("Post body",_postBody.value.text)
-        Log.e("Post body",_postTitle.value.text)
-        Log.e("Post body",_bitmapState.value.toString())
+
         if (_postBody.value.text === "" || _postTitle.value.text ==="" || _bitmapState.value === null){
             _state.value = AddPostScreenState(isLoading = false, msg="Please fill in all the fields")
 
         }else{
-            val postedOn = SimpleDateFormat("dd/MM/yyyy").format(Date())
-            val postedAt = SimpleDateFormat("hh:mm:ss").format(Date())
-            val postBody = PostBody(
-                postTitle = _postTitle.value.text,
-                postBody = _postBody.value.text,
-                postedBy = sharedPreferences.getString(Constants.LOGIN_USERNAME,null)!!,
-                postedOn = postedOn,
-                postedAt = postedAt,
-                photo = _bitmapState.value!!.toByteArray().toBase64()
-            )
-
-
-            addPostUseCase(postBody = postBody).onEach { result ->
-                when(result){
-                    is Resource.Success -> {
-                        _state.value = AddPostScreenState(
-                            msg = result.data!!.msg,
-                            isLoading = false,
-                            success = result.data.success
-                        )
-                        if (result.data.success){
-                            scaffoldState.snackbarHostState.showSnackbar(
-                                message = result.data.msg
+            if(hasInternetConnection(context = context)){
+                val postedOn = SimpleDateFormat("dd/MM/yyyy").format(Date())
+                val postedAt = SimpleDateFormat("hh:mm:ss").format(Date())
+                val postBody = PostBody(
+                    postTitle = _postTitle.value.text,
+                    postBody = _postBody.value.text,
+                    postedBy = sharedPreferences.getString(Constants.LOGIN_USERNAME,null)!!,
+                    postedOn = postedOn,
+                    postedAt = postedAt,
+                    photo = _bitmapState.value!!.toByteArray().toBase64()
+                )
+                addPostUseCase(postBody = postBody).onEach { result ->
+                    when(result){
+                        is Resource.Success -> {
+                            _state.value = AddPostScreenState(
+                                msg = result.data!!.msg,
+                                isLoading = false,
+                                success = result.data.success
                             )
-                            navController.navigate(Screens.DASHBOARD_SCREEN)
+                            if (result.data.success){
+                                scaffoldState.snackbarHostState.showSnackbar(
+                                    message = result.data.msg
+                                )
+                                navController.navigate(Screens.DASHBOARD_SCREEN)
+                            }
+
+                            sendUiEvent(UiEvent.ShowSnackbar(
+                                message = result.data!!.msg
+                            ))
+
                         }
+                        is Resource.Error -> {
+                            Log.d("error","error")
+                            _state.value = AddPostScreenState(
+                                msg = result.message ?: "An error occurred"
+                            )
+                            sendUiEvent(UiEvent.ShowSnackbar(
+                                message = result.message ?: "An error occurred"
+                            ))
 
-                        sendUiEvent(UiEvent.ShowSnackbar(
-                            message = result.data!!.msg
-                        ))
+                        }
+                        is Resource.Loading -> {
+                            Log.d("loading","loading")
+                            _state.value = AddPostScreenState(isLoading = true)
 
+
+                        }
                     }
-                    is Resource.Error -> {
-                        Log.d("error","error")
-                        _state.value = AddPostScreenState(
-                            msg = result.message ?: "An error occurred"
-                        )
-                        sendUiEvent(UiEvent.ShowSnackbar(
-                            message = result.message ?: "An error occurred"
-                        ))
 
-                    }
-                    is Resource.Loading -> {
-                        Log.d("loading","loading")
-                        _state.value = AddPostScreenState(isLoading = true)
-
-
-                    }
+                }.launchIn(viewModelScope)
+            }else{
+                viewModelScope.launch {
+                    _state.value = AddPostScreenState(isLoading = false)
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        message = "No internet connection was found.... Please check your internet Connection"
+                    )
                 }
-
-            }.launchIn(viewModelScope)
+            }
 
         }
 

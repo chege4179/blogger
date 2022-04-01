@@ -1,5 +1,6 @@
 package com.peterchege.blogger.ui.login
 
+import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import android.widget.Toast
@@ -49,6 +50,13 @@ class LoginViewModel @Inject constructor(
     private var _LoginResponseState = mutableStateOf(LoginResponse())
     var LoginResponseState: State<LoginResponse> =  _LoginResponseState
 
+    private val _passwordVisibility = mutableStateOf(true)
+    var passwordVisibility: State<Boolean> =  _passwordVisibility
+
+    fun onChangePasswordVisibility(){
+        _passwordVisibility.value = !_passwordVisibility.value
+    }
+
     private val _uiEvent =  Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
@@ -81,7 +89,7 @@ class LoginViewModel @Inject constructor(
 
     }
 
-    fun initiateLogin(navController: NavController,scaffoldState: ScaffoldState){
+    fun initiateLogin(navController: NavController,scaffoldState: ScaffoldState,context: Context){
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.w("fcm error", "Fetching FCM registration token failed", task.exception)
@@ -97,77 +105,50 @@ class LoginViewModel @Inject constructor(
                         message = "Credentials should be atleast 5 characters long",
                     )
                 }else{
-                    val loginUser = LoginUser(_usernameState.value.text.trim(),_passwordState.value.text.trim(), token = token!!)
-                    try {
-                        val response = repository.loginUser(loginUser)
-                        _isLoading.value = false
-                        scaffoldState.snackbarHostState.showSnackbar(
-                            message = response.msg,
-                        )
-                        if (response.success){
-                            val userInfoEditor = sharedPreferences.edit()
-                            userInfoEditor.apply{
-                                putString(Constants.LOGIN_USERNAME,response.user?.username)
-                                putString(Constants.LOGIN_PASSWORD, response.user?.password)
-                                putString(Constants.LOGIN_FULLNAME, response.user?.fullname)
-                                putString(Constants.LOGIN_IMAGEURL, response.user?.imageUrl)
-                                putString(Constants.LOGIN_EMAIL,response.user?.email)
-                                putString(Constants.LOGIN_ID, response.user?._id)
-                                putString(Constants.FCM_TOKEN,token)
-                                apply()
+                    if(hasInternetConnection(context)){
+                        val loginUser = LoginUser(_usernameState.value.text.trim(),_passwordState.value.text.trim(), token = token!!)
+                        try {
+                            val response = repository.loginUser(loginUser)
+                            _isLoading.value = false
+                            scaffoldState.snackbarHostState.showSnackbar(
+                                message = response.msg,
+                            )
+                            if (response.success){
+                                val userInfoEditor = sharedPreferences.edit()
+                                userInfoEditor.apply{
+                                    putString(Constants.LOGIN_USERNAME,response.user?.username)
+                                    putString(Constants.LOGIN_PASSWORD, response.user?.password)
+                                    putString(Constants.LOGIN_FULLNAME, response.user?.fullname)
+                                    putString(Constants.LOGIN_IMAGEURL, response.user?.imageUrl)
+                                    putString(Constants.LOGIN_EMAIL,response.user?.email)
+                                    putString(Constants.LOGIN_ID, response.user?._id)
+                                    putString(Constants.FCM_TOKEN,token)
+                                    apply()
+                                }
+                                navController.navigate(Screens.DASHBOARD_SCREEN)
                             }
-                            navController.navigate(Screens.DASHBOARD_SCREEN)
+                        }catch (e:HttpException){
+                            _isLoading.value = false
+                            Log.e("http error",e.localizedMessage?:"Server error")
+                            scaffoldState.snackbarHostState.showSnackbar(
+                                message = "Server error...Please again later",
+                            )
+                        }catch (e:IOException){
+                            _isLoading.value = false
+                            Log.e("io error",e.localizedMessage?:"io error")
+                            scaffoldState.snackbarHostState.showSnackbar(
+                                message = "Could not connect to the server... Please try again",
+                            )
                         }
-                    }catch (e:HttpException){
+                    }else{
                         _isLoading.value = false
-                        Log.e("http error",e.localizedMessage?:"Server error")
                         scaffoldState.snackbarHostState.showSnackbar(
-                            message = "Server error...Please again later",
-                        )
-                    }catch (e:IOException){
-                        _isLoading.value = false
-                        Log.e("io error",e.localizedMessage?:"io error")
-                        scaffoldState.snackbarHostState.showSnackbar(
-                            message = "Could not connect to the internet",
+                            message = "No internet connection was found",
                         )
                     }
+
                 }
             }
-//            loginUseCase(LoginUser(username = _usernameState.value.text, password = _passwordState.value.text, token = token!!)).onEach { result ->
-//                when(result){
-//                    is Resource.Success -> {
-//
-//                        _state.value = LoginScreenState(msg=result.data!!.msg,isLoading = false,success = result.data.success)
-//                        _LoginResponseState.value = LoginResponse(msg= result.data.msg,success = result.data.success)
-//                        sharedPreferences.edit().apply{
-//                            putString(Constants.FCM_TOKEN,token)
-//                            apply()
-//
-//                        }
-//                        scaffoldState.snackbarHostState.showSnackbar(
-//                            message = result.data.msg,
-//                        )
-//                        if (result.data.success){
-//                            navController.navigate(Screens.DASHBOARD_SCREEN)
-//                        }
-//                        Log.d("Success","success")
-//
-//
-//                    }
-//                    is Resource.Error -> {
-//                        Log.d("error","error")
-//                        _state.value = LoginScreenState(msg = result.message ?: "An error occurred")
-//                        _LoginResponseState.value = LoginResponse(msg=result.message ?: "An error occurred",success =false)
-//                    }
-//                    is Resource.Loading -> {
-//                        Log.d("loading","loading")
-//                        _state.value = LoginScreenState(isLoading = true, success = false)
-//
-//
-//                    }
-//                }
-//
-//            }.launchIn(viewModelScope)
         })
     }
 }

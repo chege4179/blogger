@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
-
+        android:usesCleartextTraffic="true"
         android:name=".BloggerApp"
         android:allowBackup="true"
         android:icon="@mipmap/blogger"
@@ -15,7 +15,6 @@
         android:roundIcon="@mipmap/blogger_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Blogger"
-
         >
         <activity
             android:name=".MainActivity"

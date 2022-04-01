@@ -1,5 +1,6 @@
 package com.peterchege.blogger.ui.signup
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.State
@@ -12,6 +13,7 @@ import com.peterchege.blogger.util.Resource
 import com.peterchege.blogger.util.Screens
 
 import com.peterchege.blogger.util.TextFieldState
+import com.peterchege.blogger.util.hasInternetConnection
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.launchIn
@@ -55,6 +57,13 @@ class SignUpViewModel @Inject constructor(
     private var _confirmPasswordState = mutableStateOf(TextFieldState())
     var confirmPasswordState: State<TextFieldState> =  _confirmPasswordState
 
+    private val _passwordVisibility = mutableStateOf(true)
+    var passwordVisibility: State<Boolean> =  _passwordVisibility
+
+    fun onChangePasswordVisibility(){
+        _passwordVisibility.value = !_passwordVisibility.value
+    }
+
 
     fun OnChangeUsername(text:String){
         _usernameState.value = TextFieldState(text = text)
@@ -75,7 +84,7 @@ class SignUpViewModel @Inject constructor(
         _fullnameState.value = TextFieldState(text = text)
 
     }
-    fun signUpUser(navController: NavController,scaffoldState: ScaffoldState){
+    fun signUpUser(navController: NavController,scaffoldState: ScaffoldState,context: Context){
         viewModelScope.launch {
             _isLoading.value = true
 
@@ -85,28 +94,36 @@ class SignUpViewModel @Inject constructor(
                     message = "Passwords do not match",
                 )
             }else{
-                val signUpUser = SignUpUser(_usernameState.value.text.trim(),_fullnameState.value.text.trim(),_passwordState.value.text.trim(),_emailState.value.text.trim())
-                try {
-                    val signUpResponse = signUpRepository.signUpUser(signUpUser = signUpUser)
-                    _isLoading.value = false
-                    scaffoldState.snackbarHostState.showSnackbar(
-                        message = signUpResponse.msg
-                    )
-                    if (signUpResponse.success){
-                        navController.navigate(Screens.LOGIN_SCREEN)
+                if (hasInternetConnection(context)){
+                    val signUpUser = SignUpUser(_usernameState.value.text.trim(),_fullnameState.value.text.trim(),_passwordState.value.text.trim(),_emailState.value.text.trim())
+                    try {
+                        val signUpResponse = signUpRepository.signUpUser(signUpUser = signUpUser)
+                        _isLoading.value = false
+                        scaffoldState.snackbarHostState.showSnackbar(
+                            message = signUpResponse.msg
+                        )
+                        if (signUpResponse.success){
+                            navController.navigate(Screens.LOGIN_SCREEN)
+                        }
+                    }catch (e:HttpException){
+                        _isLoading.value = false
+                        Log.e("http error",e.localizedMessage ?: "Server error...Please try again later")
+                        scaffoldState.snackbarHostState.showSnackbar(
+                            message =   "Server error...Please try again later"
+                        )
+                    }catch (e:IOException){
+                        _isLoading.value = false
+                        scaffoldState.snackbarHostState.showSnackbar(
+                            message =  "Could not connect to the server...Please try again later"
+                        )
                     }
-                }catch (e:HttpException){
-                    _isLoading.value = false
-                    Log.e("http error",e.localizedMessage ?: "Server error...Please try again later")
-                    scaffoldState.snackbarHostState.showSnackbar(
-                        message =   "Server error...Please try again later"
-                    )
-                }catch (e:IOException){
+                }else{
                     _isLoading.value = false
                     scaffoldState.snackbarHostState.showSnackbar(
-                        message =  "Could not reach the internet... Check your internet connection"
+                        message =  "No internet connection was found"
                     )
                 }
+
             }
         }
     }

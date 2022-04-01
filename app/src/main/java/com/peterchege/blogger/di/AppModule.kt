@@ -23,7 +23,7 @@ object AppModule {
     fun provideUserApi():BloggerApi{
         return Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl(Constants.REMOTE_URL)
+            .baseUrl(Constants.BASE_URL)
             .build()
             .create(BloggerApi::class.java)
     }

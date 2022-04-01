@@ -47,7 +47,7 @@ fun ProfileFollowerFollowingScreen(
         ){
 
             if (viewModel.type.value == Constants.FOLLOWER){
-                profileViewModel.state.value.user?.let { user ->
+                profileViewModel.user.value?.let { user ->
                     items(user.followers){ follower ->
                         FollowerCard(
                             navController =navController ,
@@ -66,7 +66,7 @@ fun ProfileFollowerFollowingScreen(
                     }
                 }
             }else if (viewModel.type.value == Constants.FOLLOWING){
-                profileViewModel.state.value.user?.let { user ->
+                profileViewModel.user.value?.let { user ->
                     items(user.following){ following ->
                         FollowingCard(
                             navController =navController ,

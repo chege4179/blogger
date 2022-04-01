@@ -39,7 +39,7 @@ fun ProfileScreen(
 ){
     val scaffoldState = rememberScaffoldState()
 
-    val state = viewModel.state.value
+    //val state = viewModel.state.value
     Scaffold(
         scaffoldState=scaffoldState,
         modifier = Modifier
@@ -49,7 +49,7 @@ fun ProfileScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    state.user?.let {
+                    viewModel.user.value?.let {
                         Text(
                             text= it.username,
                             )
@@ -67,169 +67,178 @@ fun ProfileScreen(
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
         }else{
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White)) {
-                LazyColumn(
-                    modifier = Modifier
+            if (viewModel.isError.value){
+                Box(modifier = Modifier.fillMaxSize()){
+                    Text(
+                        modifier =Modifier.align(Alignment.Center),
+                        text = viewModel.msg.value
+                    )
+
+                }
+            }else{
+                viewModel.user.value?.let { user ->
+                    Box(modifier = Modifier
                         .fillMaxSize()
-                        .padding(10.dp)
+                        .background(Color.White)) {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(10.dp)
 
-                    ,
+                            ,
 
-                    ){
-                    item{
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
+                            ){
+                            item{
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
 
-                            ) {
-                            Image(
-                                modifier = Modifier
-                                    .fillMaxWidth(0.3f)
-                                    .height(60.dp),
-                                painter = rememberImagePainter(
-                                    data = state.user?.imageUrl,
-                                    builder = {
-                                        crossfade(true)
+                                    ) {
+                                    Image(
+                                        modifier = Modifier
+                                            .fillMaxWidth(0.3f)
+                                            .height(60.dp),
+                                        painter = rememberImagePainter(
+                                            data = user.imageUrl,
+                                            builder = {
+                                                crossfade(true)
+
+                                            },
+                                        ),
+
+                                        contentDescription = "")
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceEvenly
+                                    ) {
+                                        Column(
+                                            verticalArrangement = Arrangement.Center,
+                                            horizontalAlignment = Alignment.CenterHorizontally
+
+                                        ) {
+                                            Text(
+                                                text = "${viewModel.posts.value.size}",
+                                                fontSize = 20.sp,
+                                                fontWeight = FontWeight.Bold,
+                                            )
+                                            Text(
+                                                text = "Posts",
+                                                fontSize = 17.sp,
+
+
+                                                )
+                                        }
+                                        Column(
+                                            modifier = Modifier.clickable {
+                                                navController.navigate(Screens.PROFILE_FOLLOWER_FOLLOWING_SCREEN + "/${Constants.FOLLOWER}")
+
+                                            },
+                                            verticalArrangement = Arrangement.Center,
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            Text(
+                                                fontSize = 20.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                text = "${viewModel.user.value?.followers?.size}"
+                                            )
+                                            Text(
+                                                text = "Followers",
+                                                fontSize = 17.sp,
+
+                                                )
+                                        }
+                                        Column(
+                                            modifier = Modifier.clickable {
+                                                navController.navigate(Screens.PROFILE_FOLLOWER_FOLLOWING_SCREEN + "/${Constants.FOLLOWING}")
+                                            },
+                                            verticalArrangement = Arrangement.Center,
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            Text(
+                                                text = "${viewModel.user.value?.following?.size}",
+                                                fontSize = 20.sp,
+                                                fontWeight = FontWeight.Bold,
+                                            )
+                                            Text(
+                                                text = "Following",
+                                                fontSize = 17.sp,
+
+                                                )
+                                        }
+
+
+                                    }
+
+
+                                }
+                            }
+                            item{
+                                Column(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(text = user.username)
+                                    Spacer(modifier = Modifier.padding(5.dp))
+                                    Text(text = user.fullname)
+                                    Spacer(modifier = Modifier.padding(5.dp))
+                                    Text(text = user.email)
+                                    Spacer(modifier = Modifier.padding(5.dp))
+                                }
+                            }
+                            item {
+                                Box(modifier =  Modifier.fillMaxWidth()){
+                                    Text(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(5.dp),
+                                        textAlign = TextAlign.Center,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 20.sp,
+                                        textDecoration = TextDecoration.Underline,
+                                        text = "My Posts"
+                                    )
+                                }
+                            }
+                            items(viewModel.posts.value){ post ->
+                                ArticleCard(
+                                    post = post,
+                                    onItemClick = {
+                                        navHostController.navigate(Screens.POST_SCREEN +"/${post._id}/${Constants.API_SOURCE}")
 
                                     },
-                                ),
+                                    onProfileNavigate ={ username ->
 
-                                contentDescription = "")
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceEvenly
-                            ) {
-                                Column(
-                                    verticalArrangement = Arrangement.Center,
-                                    horizontalAlignment = Alignment.CenterHorizontally
-
-                                ) {
-                                    Text(
-                                        text = "${state.posts.size}",
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Bold,
-                                    )
-                                    Text(
-                                        text = "Posts",
-                                        fontSize = 17.sp,
-
-
-                                        )
-                                }
-                                Column(
-                                    modifier = Modifier.clickable {
-                                         navController.navigate(Screens.PROFILE_FOLLOWER_FOLLOWING_SCREEN + "/${Constants.FOLLOWER}")
+                                    } ,
+                                    onDeletePost ={
 
                                     },
-                                    verticalArrangement = Arrangement.Center,
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text(
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        text = "${state.user?.followers?.size}"
-                                    )
-                                    Text(
-                                        text = "Followers",
-                                        fontSize = 17.sp,
 
-                                    )
-                                }
-                                Column(
-                                    modifier = Modifier.clickable {
-                                        navController.navigate(Screens.PROFILE_FOLLOWER_FOLLOWING_SCREEN + "/${Constants.FOLLOWING}")
-                                    },
-                                    verticalArrangement = Arrangement.Center,
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text(
-                                        text = "${state.user?.following?.size}",
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Bold,
-                                    )
-                                    Text(
-                                        text = "Following",
-                                        fontSize = 17.sp,
-
-                                    )
-                                }
-
+                                    profileImageUrl = user.imageUrl ,
+                                    isLiked = false,
+                                    isSaved = false,
+                                    isProfile = true
+                                )
+                                Spacer(modifier = Modifier.padding(5.dp))
 
                             }
+                            item{
+                                Column(modifier = Modifier.fillMaxSize()) {
+                                    Text(text = "Profile Screen")
+                                    Button(onClick = {
+                                        viewModel.logoutUser(navHostController)
+                                    }) {
+                                        Text("Log out")
 
+                                    }
 
-                        }
-                    }
-                    item{
-                        Column(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(text = state.user!!.username)
-                            Spacer(modifier = Modifier.padding(5.dp))
-                            Text(text = state.user.fullname)
-                            Spacer(modifier = Modifier.padding(5.dp))
-                            Text(text = state.user.email)
-                            Spacer(modifier = Modifier.padding(5.dp))
-                        }
-                    }
-                    item {
-                        Box(modifier =  Modifier.fillMaxWidth()){
-                            Text(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(5.dp),
-                                textAlign = TextAlign.Center,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 20.sp,
-                                textDecoration = TextDecoration.Underline,
-                                text = "My Posts"
-                            )
-                        }
-                    }
-                    items(state.posts){ post ->
-                        ArticleCard(
-                            post = post,
-                            onItemClick = {
-                                navHostController.navigate(Screens.POST_SCREEN +"/${post._id}/${Constants.API_SOURCE}")
-
-                            },
-                            onProfileNavigate ={ username ->
-
-                            } ,
-                            onDeletePost ={
-
-                            },
-
-                            profileImageUrl = state.user!!.imageUrl ,
-                            isLiked = false,
-                            isSaved = false,
-                            isProfile = true
-                        )
-                        Spacer(modifier = Modifier.padding(5.dp))
-
-                    }
-                    item{
-                        Column(modifier = Modifier.fillMaxSize()) {
-                            Text(text = "Profile Screen")
-                            Button(onClick = {
-                                viewModel.logoutUser(navHostController)
-                            }) {
-                                Text("Log out")
+                                }
 
                             }
-
                         }
-
                     }
                 }
+
             }
 
         }
-
-
-
-
     }
 
 }

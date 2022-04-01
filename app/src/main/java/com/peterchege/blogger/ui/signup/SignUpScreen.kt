@@ -1,15 +1,24 @@
 package com.peterchege.blogger.ui.signup
 
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.peterchege.blogger.util.Screens
@@ -44,7 +53,19 @@ fun SignUpScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                TextField(
+                Text(
+                    text = "Blogger App",
+                    fontSize = 30.sp,
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    text = "Sign Up",
+                    fontSize = 24.sp,
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold,
+                )
+                OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = usernameState.text ,
                     onValueChange ={
@@ -54,7 +75,7 @@ fun SignUpScreen(
                     label = { Text("Username") }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                TextField(
+                OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = fullnameState.text ,
                     onValueChange ={
@@ -64,7 +85,7 @@ fun SignUpScreen(
                     label = { Text("Full Name") }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                TextField(
+                OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = emailState.text ,
                     onValueChange ={
@@ -74,30 +95,80 @@ fun SignUpScreen(
                     label = { Text("Email Address") }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                TextField(
+                OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = passwordState.text ,
                     onValueChange ={
-                        keyboardController?.hide()
+
                         viewModel.OnChangePassword(it)
 
                     },
+                    trailingIcon = {
+                        if(viewModel.passwordVisibility.value){
+                            Icon(
+                                Icons.Filled.Visibility,
+                                contentDescription = "Visibility on",
+                                Modifier
+                                    .size(26.dp)
+                                    .clickable {
+                                        viewModel.onChangePasswordVisibility()
+                                    }
+                            )
+                        }else{
+                            Icon(
+                                Icons.Filled.VisibilityOff,
+                                contentDescription = "Visibility Off",
+                                Modifier
+                                    .size(26.dp)
+                                    .clickable {
+                                        viewModel.onChangePasswordVisibility()
+                                    }
+                            )
+                        }
+                    },
+                    visualTransformation = if (viewModel.passwordVisibility.value) VisualTransformation.None else PasswordVisualTransformation(),
+
                     label = { Text("Password") }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                TextField(
+                OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = confirmPasswordState.text ,
                     onValueChange ={
                         viewModel.OnChangeConfirmPassword(it)
 
                     },
+                    trailingIcon = {
+                        if(viewModel.passwordVisibility.value){
+                            Icon(
+                                Icons.Filled.Visibility,
+                                contentDescription = "Visibility on",
+                                Modifier
+                                    .size(26.dp)
+                                    .clickable {
+                                        viewModel.onChangePasswordVisibility()
+                                    }
+                            )
+                        }else{
+                            Icon(
+                                Icons.Filled.VisibilityOff,
+                                contentDescription = "Visibility Off",
+                                Modifier
+                                    .size(26.dp)
+                                    .clickable {
+                                        viewModel.onChangePasswordVisibility()
+                                    }
+                            )
+                        }
+                    },
+                    visualTransformation = if (viewModel.passwordVisibility.value) VisualTransformation.None else PasswordVisualTransformation(),
+
                     label = { Text("Confirm Password") }
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Button(
                     onClick = {
-                        viewModel.signUpUser(navController,scaffoldState)
+                        viewModel.signUpUser(navController,scaffoldState,context = context)
                     }
                 )
                 {

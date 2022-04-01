@@ -4,6 +4,8 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/User/AndroidStudioProjects/Blogger/app/src/main/res/drawable/ic_baseline_bookmark_24.xml" value="0.1" />
+        <entry key="..\:/Users/User/AndroidStudioProjects/Blogger/app/src/main/res/drawable/ic_baseline_favorite_24.xml" value="0.1" />
+        <entry key="..\:/Users/User/AndroidStudioProjects/Blogger/app/src/main/res/drawable/ic_baseline_message_24.xml" value="0.1" />
       </map>
     </option>
   </component>

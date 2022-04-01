@@ -56,7 +56,6 @@ class MyFirebaseMessagingService  : FirebaseMessagingService() {
         // Check if message contains a notification payload.
         remoteMessage.notification?.let {
 
-
             sendNotification(it.body!!,it.title!!)
         }
     }

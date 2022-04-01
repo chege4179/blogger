@@ -14,6 +14,7 @@ import com.peterchege.blogger.api.requests.LogoutUser
 import com.peterchege.blogger.api.responses.Post
 import com.peterchege.blogger.api.responses.ProfileResponse
 import com.peterchege.blogger.api.responses.User
+import com.peterchege.blogger.ui.author_profile.AuthorProfileViewModel
 import com.peterchege.blogger.util.Constants
 import com.peterchege.blogger.util.Resource
 import com.peterchege.blogger.util.Screens
@@ -34,14 +35,32 @@ class ProfileViewModel @Inject constructor(
 ):ViewModel() {
     val username = sharedPreferences.getString(Constants.LOGIN_USERNAME,null)
 
-    private var _state = mutableStateOf<ProfileResponseState>(ProfileResponseState())
-    var state : State<ProfileResponseState> = _state
+//    private var _state = mutableStateOf<AuthorProfileViewModel.ProfileResponseState>(
+//        AuthorProfileViewModel.ProfileResponseState()
+//    )
+//    var state : State<AuthorProfileViewModel.ProfileResponseState> = _state
 
     private var _isLoading = mutableStateOf(false)
     var isLoading :State<Boolean> = _isLoading
 
     private var _openDialogState =  mutableStateOf(false)
     var openDialogState :State<Boolean> = _openDialogState
+
+    private var _success = mutableStateOf(false)
+    var success :State<Boolean> = _success
+
+    private var _isError = mutableStateOf(false)
+    var isError :State<Boolean> = _isError
+
+    private var _msg = mutableStateOf("")
+    var msg :State<String> = _msg
+
+    private var _user = mutableStateOf<User?>(null)
+    var user :State<User?> = _user
+
+    private var _posts = mutableStateOf<List<Post>>(emptyList())
+    var posts :State<List<Post>> = _posts
+
 
     data class ProfileResponseState(
         val msg:String = "",
@@ -108,16 +127,35 @@ class ProfileViewModel @Inject constructor(
             when(result){
                 is Resource.Success -> {
                     _isLoading.value = false
-                    _state.value = ProfileResponseState(
-                        msg= result.data!!.msg,
-                        success = result.data.success,
-                        posts = result.data.posts,
-                        user = result.data.user,
-                    )
+                    _msg.value = result.data!!.msg
+                    _success.value = result.data.success
+                    _posts.value = result.data.posts
+                    _user.value = result.data.user
+                    _isError.value = false
+
+
+//                    _state.value = AuthorProfileViewModel.ProfileResponseState(
+//                        msg = result.data!!.msg,
+//                        success = result.data.success,
+//                        posts = result.data.posts,
+//                        user = result.data.user,
+//                    )
 
                 }
                 is Resource.Error -> {
                     _isLoading.value = false
+                    result.message?.let {
+                        Log.e("Profile error", it)
+                        _isLoading.value = false
+                        _msg.value = it
+                        _success.value = false
+                        _posts.value = emptyList()
+                        _isError.value = true
+
+//                        _state.value = AuthorProfileViewModel.ProfileResponseState(
+//                            msg = it
+//                        )
+                    }
                 }
                 is Resource.Loading -> {
                     _isLoading.value = true

@@ -250,7 +250,7 @@ fun PostScreen(
                 }
 
                 state.post?.let { it1 ->
-                    items(it1.comments){ comment ->
+                    items(viewModel.comments.value){ comment ->
                         Column(modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 15.dp)) {

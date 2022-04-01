@@ -33,7 +33,7 @@ class GetProfileUseCase @Inject constructor(
             emit(Resource.Error<ProfileResponse>(e.localizedMessage ?: "Server error"))
 
         }catch (e: IOException){
-            emit(Resource.Error<ProfileResponse>("Could not reach server... Please check your internet connection"))
+            emit(Resource.Error<ProfileResponse>("Could not reach server"))
 
         }
 
