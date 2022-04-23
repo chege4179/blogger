@@ -93,22 +93,31 @@ fun ProfileScreen(
                                     modifier = Modifier.fillMaxWidth(),
 
                                     ) {
-                                    Image(
+                                    Box(
                                         modifier = Modifier
                                             .fillMaxWidth(0.3f)
-                                            .height(60.dp),
-                                        painter = rememberImagePainter(
-                                            data = user.imageUrl,
-                                            builder = {
-                                                crossfade(true)
 
-                                            },
-                                        ),
+                                    ){
+                                        Image(
+                                            modifier = Modifier
+                                                .width(80.dp)
+                                                .height(80.dp)
+                                                .align(Alignment.Center)
+                                            ,
+                                            painter = rememberImagePainter(
+                                                data = user.imageUrl,
+                                                builder = {
+                                                    crossfade(true)
 
-                                        contentDescription = "")
+                                                },
+                                            ),
+                                            contentDescription = "Profile Image")
+                                    }
+
                                     Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceEvenly
+                                        modifier = Modifier.fillMaxWidth().height(70.dp),
+                                        horizontalArrangement = Arrangement.SpaceEvenly,
+                                        verticalAlignment = Alignment.CenterVertically,
                                     ) {
                                         Column(
                                             verticalArrangement = Arrangement.Center,

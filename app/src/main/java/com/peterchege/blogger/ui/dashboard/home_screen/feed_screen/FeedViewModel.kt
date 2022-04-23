@@ -40,6 +40,7 @@ class FeedViewModel @Inject constructor(
         val error:String = "",
         val isLoading:Boolean = false,
 
+
     )
     private val _state = mutableStateOf(FeedListState())
     val state : State<FeedListState> = _state
@@ -49,6 +50,12 @@ class FeedViewModel @Inject constructor(
 
     private val _isFound = mutableStateOf(true)
     val isFound :State<Boolean> = _isFound
+
+    private val _isError = mutableStateOf(true)
+    val isError :State<Boolean> = _isError
+
+    private val _errorMsg = mutableStateOf("")
+    val errorMsg :State<String> = _errorMsg
 
     private var searchJob :Job? = null
 
@@ -121,6 +128,8 @@ class FeedViewModel @Inject constructor(
                 }
                 is Resource.Error -> {
                     _state.value = FeedListState(error = result.message ?: "An error occurred", isLoading = false)
+                    _isError.value = true
+                    _errorMsg.value = result.message ?: "An unexpected error occurred"
                 }
                 is Resource.Loading -> {
                     _state.value = FeedListState(isLoading = true )

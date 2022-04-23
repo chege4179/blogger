@@ -139,11 +139,11 @@ fun AddPostScreen(
                         OutlinedTextField(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(430.dp),
+                                .height(400.dp),
                             value = postBody.text,
                             maxLines = 70,
                             label = {
-                                Text("Body")
+                                Text("Write your own story")
                             },
                             onValueChange = {
                                 viewModel.onChangePostBody(it)

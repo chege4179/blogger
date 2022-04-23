@@ -8,6 +8,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,11 +32,20 @@ fun FeedScreen(
     navHostController: NavHostController,
     viewModel: FeedViewModel = hiltViewModel()
 ){
+    val scaffoldState = rememberScaffoldState()
+    LaunchedEffect(key1 = viewModel.errorMsg.value){
+        if (viewModel.isError.value){
+            scaffoldState.snackbarHostState.showSnackbar(
+                message = viewModel.errorMsg.value
+            )
+        }
+    }
     val state = viewModel.state.value
     Scaffold(
         Modifier
             .fillMaxSize()
             .background(Color.DarkGray),
+        scaffoldState = scaffoldState,
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {

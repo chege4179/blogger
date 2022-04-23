@@ -95,22 +95,29 @@ fun AuthorProfileScreen(
                                     modifier = Modifier.fillMaxWidth(),
 
                                     ) {
-                                    Image(
-                                        modifier = Modifier
-                                            .fillMaxWidth(0.3f)
-                                            .height(60.dp),
-                                        painter = rememberImagePainter(
-                                            data = state.user?.imageUrl,
-                                            builder = {
-                                                crossfade(true)
+                                    Box(
+                                        modifier = Modifier.fillMaxWidth(0.3f)
+                                    ){
+                                        Image(
+                                            modifier = Modifier
+                                                .width(80.dp)
+                                                .height(80.dp),
+                                            painter = rememberImagePainter(
+                                                data = state.user?.imageUrl,
+                                                builder = {
+                                                    crossfade(true)
 
-                                            },
-                                        ),
+                                                },
+                                            ),
 
-                                        contentDescription = "")
+                                            contentDescription = "Author Profile Image URL")
+                                    }
+
                                     Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceEvenly
+                                        modifier = Modifier.fillMaxWidth().height(70.dp),
+                                        horizontalArrangement = Arrangement.SpaceEvenly,
+                                        verticalAlignment = Alignment.CenterVertically,
+
                                     ) {
                                         Column(
                                             verticalArrangement = Arrangement.Center,

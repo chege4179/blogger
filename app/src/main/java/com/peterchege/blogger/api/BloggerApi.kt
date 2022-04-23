@@ -6,6 +6,7 @@ import androidx.room.Delete
 import com.peterchege.blogger.api.requests.*
 import com.peterchege.blogger.api.responses.*
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.*
 
 
@@ -25,6 +26,10 @@ interface BloggerApi {
     @POST("/post/upload")
     suspend fun uploadPost(@Body postBody: PostBody):UploadPostResponse
 
+    @POST("/post/add")
+    suspend fun postImage(
+        @Body body: RequestBody
+    ): UploadPostResponse
 
     @GET("/post/single/{postId}")
     suspend fun getPostById(@Path("postId") postId:String):PostResponse

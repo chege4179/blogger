@@ -15,6 +15,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.peterchege.blogger.api.BloggerApi
 import com.peterchege.blogger.api.requests.PostBody
 import com.peterchege.blogger.room.entities.DraftRecord
 import com.peterchege.blogger.ui.dashboard.draft_screen.DraftRepository
@@ -25,6 +26,11 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import retrofit2.HttpException
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -37,8 +43,9 @@ class AddPostScreenViewModel @Inject constructor(
     private val sharedPreferences: SharedPreferences,
     private val draftRepository: DraftRepository,
     private val savedStateHandle: SavedStateHandle,
+    private val api: BloggerApi
 
-):ViewModel() {
+) : ViewModel() {
     private var _imageUrlState = mutableStateOf<Uri?>(null)
     var imageUrlState: State<Uri?> = _imageUrlState
 
@@ -54,14 +61,14 @@ class AddPostScreenViewModel @Inject constructor(
     private var _state = mutableStateOf(AddPostScreenState())
     var state: State<AddPostScreenState> = _state
 
-    private val _uiEvent =  Channel<UiEvent>()
+    private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
-    private val  _isContent = mutableStateOf(false)
-    var isContent:State<Boolean> = _isContent
+    private val _isContent = mutableStateOf(false)
+    var isContent: State<Boolean> = _isContent
 
-    private val  _openSaveDraftModal = mutableStateOf(false)
-    var openSaveDraftModal:State<Boolean> = _openSaveDraftModal
+    private val _openSaveDraftModal = mutableStateOf(false)
+    var openSaveDraftModal: State<Boolean> = _openSaveDraftModal
 
     init {
         val postBodyDraft = savedStateHandle.get<String>("postTitle")
@@ -72,7 +79,7 @@ class AddPostScreenViewModel @Inject constructor(
             }
         }
         postTitleDraft.let {
-            if (it != null){
+            if (it != null) {
                 _postTitle.value.text = it
             }
         }
@@ -81,37 +88,40 @@ class AddPostScreenViewModel @Inject constructor(
 
     data class AddPostScreenState(
         val isLoading: Boolean = false,
-        val msg:String = "",
-        val success:Boolean= false,
+        val msg: String = "",
+        val success: Boolean = false,
     )
-    fun onBackPress(scaffoldState: ScaffoldState,navController: NavController){
+
+    fun onBackPress(scaffoldState: ScaffoldState, navController: NavController) {
         if (_imageUrlState.value != null || _bitmapState.value != null ||
-            _postBody.value.text != "" || _postTitle.value.text != ""){
+            _postBody.value.text != "" || _postTitle.value.text != ""
+        ) {
 
             _openSaveDraftModal.value = true
 
 
-        }else{
+        } else {
             navController.navigate(Screens.DASHBOARD_SCREEN)
 
 
         }
     }
-    fun inputPostBodyFromDraft(postBodyDraft:String?){
-        if (postBodyDraft ==null){
+
+    fun inputPostBodyFromDraft(postBodyDraft: String?) {
+        if (postBodyDraft == null) {
             postBody.value.text = ""
 
-        }else{
+        } else {
             postBody.value.text = postBodyDraft
 
         }
     }
 
-    fun inputPostTitleFromDraft(postTitleDraft:String?){
-        if (postTitleDraft ==null){
+    fun inputPostTitleFromDraft(postTitleDraft: String?) {
+        if (postTitleDraft == null) {
             postTitle.value.text = ""
 
-        }else{
+        } else {
             postTitle.value.text = postTitleDraft
 
         }
@@ -132,20 +142,22 @@ class AddPostScreenViewModel @Inject constructor(
     }
 
 
-    fun onChangePostTitle(text:String){
+    fun onChangePostTitle(text: String) {
         _postTitle.value = TextFieldState(text = text)
     }
-    fun onChangePostBody(text:String){
+
+    fun onChangePostBody(text: String) {
         _postBody.value = TextFieldState(text = text)
     }
-    fun onChangePhotoUri(uri: Uri?,context: Context){
-        if (uri != null){
-            if (Build.VERSION.SDK_INT < 28){
-                Log.e("Less than API 28","Less than API 28 ")
-                onChangePhotoBitmap(MediaStore.Images.Media.getBitmap(context.contentResolver,uri))
 
-            }else{
-                Log.e("More than API  28","More than API  28")
+    fun onChangePhotoUri(uri: Uri?, context: Context) {
+        if (uri != null) {
+            if (Build.VERSION.SDK_INT < 28) {
+                Log.e("Less than API 28", "Less than API 28 ")
+                onChangePhotoBitmap(MediaStore.Images.Media.getBitmap(context.contentResolver, uri))
+
+            } else {
+                Log.e("More than API  28", "More than API  28")
                 val source = ImageDecoder.createSource(context.contentResolver, uri)
                 val decodedBitmap = ImageDecoder.decodeBitmap(source)
 
@@ -155,94 +167,130 @@ class AddPostScreenViewModel @Inject constructor(
         }
         _imageUrlState.value = uri
     }
-    fun onChangePhotoBitmap(bitmap: Bitmap){
-        val compresedbitmap = compressBitmap(ImageResizer.reduceBitmapSize(bitmap,100000),100)
+
+    fun updateUserProfile(
+        uri: Uri,
+        postBody: PostBody,
+        context: Context,
+        scaffoldState: ScaffoldState,
+        navController: NavController
+    ) {
+
+        val file = UriToFile(context = context).getImageBody(uri)
+        val requestFile: RequestBody = file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
+
+        val builder: MultipartBody.Builder = MultipartBody.Builder().setType(MultipartBody.FORM)
+
+        builder
+            .addFormDataPart("postTitle", postBody.postTitle)
+            .addFormDataPart("postBody", postBody.postBody)
+            .addFormDataPart("postedBy", postBody.postedBy)
+            .addFormDataPart("postedAt", postBody.postedAt)
+            .addFormDataPart("postedOn", postBody.postedOn)
+            .addFormDataPart("photo", file.name, requestFile)
+
+        val requestBody: RequestBody = builder.build()
+
+        viewModelScope.launch {
+            try {
+                val response = api.postImage(body = requestBody)
+                _state.value = AddPostScreenState(
+                    msg = response.msg,
+                    isLoading = false,
+                    success = response.success
+                )
+                if (response.success){
+                    navController.navigate(Screens.DASHBOARD_SCREEN)
+                }
+                scaffoldState.snackbarHostState.showSnackbar(
+                    message = response.msg
+                )
+            } catch (e: HttpException) {
+                _state.value = AddPostScreenState(
+                    msg = "Could not reach server at the moment",
+                    isLoading = false,
+                    success = false
+                )
+                scaffoldState.snackbarHostState.showSnackbar(
+                    message = "Server down....(HTTP error)"
+                )
+            } catch (e: IOException) {
+                _state.value = AddPostScreenState(
+                    msg = "The server is down ....Please try again later",
+                    isLoading = false,
+                    success = false
+                )
+                scaffoldState.snackbarHostState.showSnackbar(
+                    message = "The server is down ....Please try again later"
+                )
+            }
+        }
+
+
+    }
+
+    fun onChangePhotoBitmap(bitmap: Bitmap) {
+        val compresedbitmap = compressBitmap(ImageResizer.reduceBitmapSize(bitmap, 100000), 100)
         _bitmapState.value = bitmap
     }
-    fun onSaveDraftDismiss(navController: NavController){
+
+    fun onSaveDraftDismiss(navController: NavController) {
         _openSaveDraftModal.value = false
         navController.navigate(Screens.DASHBOARD_SCREEN)
     }
+
     data class InternalStoragePhoto(
         val name: String,
         val bmp: Bitmap
     )
-    fun onSaveDraftConfirm(scaffoldState: ScaffoldState,navController: NavController){
+
+    fun onSaveDraftConfirm(scaffoldState: ScaffoldState, navController: NavController) {
         _openSaveDraftModal.value = false
         viewModelScope.launch {
             try {
-                draftRepository.insertDraft(DraftRecord(
-                    postTitle = _postTitle.value.text,
-                    postBody = _postBody.value.text
-                ))
+                draftRepository.insertDraft(
+                    DraftRecord(
+                        postTitle = _postTitle.value.text,
+                        postBody = _postBody.value.text
+                    )
+                )
                 scaffoldState.snackbarHostState.showSnackbar(
                     message = "Your draft has been saved"
                 )
                 navController.navigate(Screens.DASHBOARD_SCREEN)
-            }catch (e:IOException){
+            } catch (e: IOException) {
 
             }
         }
     }
 
-    fun postArticle(navController: NavController,scaffoldState: ScaffoldState,context: Context){
+    fun postArticle(navController: NavController, scaffoldState: ScaffoldState, context: Context) {
         _state.value = AddPostScreenState(isLoading = true)
 
-        if (_postBody.value.text === "" || _postTitle.value.text ==="" || _bitmapState.value === null){
-            _state.value = AddPostScreenState(isLoading = false, msg="Please fill in all the fields")
+        if (_postBody.value.text === "" || _postTitle.value.text === "" || _bitmapState.value === null) {
+            _state.value =
+                AddPostScreenState(isLoading = false, msg = "Please fill in all the fields")
 
-        }else{
-            if(hasInternetConnection(context = context)){
+        } else {
+            if (hasInternetConnection(context = context)) {
                 val postedOn = SimpleDateFormat("dd/MM/yyyy").format(Date())
                 val postedAt = SimpleDateFormat("hh:mm:ss").format(Date())
                 val postBody = PostBody(
                     postTitle = _postTitle.value.text,
                     postBody = _postBody.value.text,
-                    postedBy = sharedPreferences.getString(Constants.LOGIN_USERNAME,null)!!,
+                    postedBy = sharedPreferences.getString(Constants.LOGIN_USERNAME, null)!!,
                     postedOn = postedOn,
                     postedAt = postedAt,
                     photo = _bitmapState.value!!.toByteArray().toBase64()
                 )
-                addPostUseCase(postBody = postBody).onEach { result ->
-                    when(result){
-                        is Resource.Success -> {
-                            _state.value = AddPostScreenState(
-                                msg = result.data!!.msg,
-                                isLoading = false,
-                                success = result.data.success
-                            )
-                            if (result.data.success){
-                                scaffoldState.snackbarHostState.showSnackbar(
-                                    message = result.data.msg
-                                )
-                                navController.navigate(Screens.DASHBOARD_SCREEN)
-                            }
-
-                            sendUiEvent(UiEvent.ShowSnackbar(
-                                message = result.data!!.msg
-                            ))
-
-                        }
-                        is Resource.Error -> {
-                            Log.d("error","error")
-                            _state.value = AddPostScreenState(
-                                msg = result.message ?: "An error occurred"
-                            )
-                            sendUiEvent(UiEvent.ShowSnackbar(
-                                message = result.message ?: "An error occurred"
-                            ))
-
-                        }
-                        is Resource.Loading -> {
-                            Log.d("loading","loading")
-                            _state.value = AddPostScreenState(isLoading = true)
-
-
-                        }
-                    }
-
-                }.launchIn(viewModelScope)
-            }else{
+                updateUserProfile(
+                    context = context,
+                    uri = _imageUrlState.value!!,
+                    postBody = postBody,
+                    scaffoldState = scaffoldState,
+                    navController=navController
+                )
+            } else {
                 viewModelScope.launch {
                     _state.value = AddPostScreenState(isLoading = false)
                     scaffoldState.snackbarHostState.showSnackbar(
@@ -250,20 +298,6 @@ class AddPostScreenViewModel @Inject constructor(
                     )
                 }
             }
-
-        }
-
-    }
-    private fun sendUiEvent(event: UiEvent) {
-        viewModelScope.launch {
-            _uiEvent.send(event)
         }
     }
-
-
-
-
-
-
-
 }
