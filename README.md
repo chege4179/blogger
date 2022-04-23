@@ -13,6 +13,7 @@ The app there might be an old version
 5. Room Library for offline saved posts
 6. Push notifications for likes and comments (Firebase messaging)
 7. Cloudinary for storing images and retrieving them via url
+8. 
 
 
 ## Backend Application
@@ -20,7 +21,7 @@ The backend application is built on node.js with the express.js framework to sto
 information of the application.The database used is Mongo DB
 
 The backend is deployed on heroku and the code is on a private github repository
-Ps(You will find the deployed API endpoint in the source code so the code should run smoothly)
+Ps (You will find the deployed API endpoint in the source code so the code should run smoothly)
 
 ## Features
 1. Ability to create posts 
@@ -30,10 +31,11 @@ Ps(You will find the deployed API endpoint in the source code so the code should
 5. ABility to view viewer counts on posts
 6. CRUD operations on your posts
 
-##Features to come
+## Features to come
 1. Comment mentions
 2. Ability to upload profile photos
-3. 
+3. Make the UI more appealing
+4. Chat Feature possibly
 
 ## Known bugs (Working on them in future commits)
 
