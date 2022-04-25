@@ -51,7 +51,7 @@ class FeedViewModel @Inject constructor(
     private val _isFound = mutableStateOf(true)
     val isFound :State<Boolean> = _isFound
 
-    private val _isError = mutableStateOf(true)
+    private val _isError = mutableStateOf(false)
     val isError :State<Boolean> = _isError
 
     private val _errorMsg = mutableStateOf("")

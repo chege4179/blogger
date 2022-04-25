@@ -100,9 +100,6 @@ class AuthorProfileViewModel @Inject constructor(
         }catch (e: IOException){
             Log.e("io error",e.localizedMessage?:"An io error occurred")
         }
-
-
-
     }
     fun unfollowUser(){
         try {

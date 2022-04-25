@@ -33,7 +33,7 @@ fun FeedScreen(
     viewModel: FeedViewModel = hiltViewModel()
 ){
     val scaffoldState = rememberScaffoldState()
-    LaunchedEffect(key1 = viewModel.errorMsg.value){
+    LaunchedEffect(key1 = viewModel.isError.value){
         if (viewModel.isError.value){
             scaffoldState.snackbarHostState.showSnackbar(
                 message = viewModel.errorMsg.value

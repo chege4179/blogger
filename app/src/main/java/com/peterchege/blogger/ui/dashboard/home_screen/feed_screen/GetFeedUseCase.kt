@@ -20,7 +20,7 @@ class GetFeedUseCase @Inject constructor(
             emit(Resource.Error<List<Post>>(e.localizedMessage ?: "An unexpected error occurred"))
 
         }catch (e: IOException){
-            emit(Resource.Error<List<Post>>("Server down....Please try again"))
+            emit(Resource.Error<List<Post>>("Could not reach the internet...Please check your internet connection"))
         }
 
 
