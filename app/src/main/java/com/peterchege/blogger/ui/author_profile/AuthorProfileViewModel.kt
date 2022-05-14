@@ -67,11 +67,7 @@ class AuthorProfileViewModel @Inject constructor(
         val followers = _state.value.user?.followers
         val username = sharedPreferences.getString(Constants.LOGIN_USERNAME,null)
         val followerUsernames = followers?.map { it.followerUsername }
-        if (followerUsernames!!.contains(username)){
-            _isFollowing.value = true
-        }else{
-            _isFollowing.value = false
-        }
+        _isFollowing.value = followerUsernames!!.contains(username)
 
     }
 

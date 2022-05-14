@@ -9,7 +9,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Message
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,11 +29,14 @@ import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.peterchege.blogger.api.requests.CommentBody
 import com.peterchege.blogger.components.ArticleCard
+import com.peterchege.blogger.components.BottomSheetItem
 import com.peterchege.blogger.util.Constants
 import com.peterchege.blogger.util.Screens
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
+@OptIn(ExperimentalMaterialApi::class)
 @ExperimentalCoilApi
 @Composable
 fun ProfileScreen(
@@ -37,22 +44,69 @@ fun ProfileScreen(
     navHostController: NavController,
     viewModel: ProfileViewModel = hiltViewModel()
 ){
-    val scaffoldState = rememberScaffoldState()
+    val sheetState = rememberBottomSheetState(
+        initialValue = BottomSheetValue.Collapsed
+    )
+    val scaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = sheetState
+    )
+    val scope = rememberCoroutineScope()
 
     //val state = viewModel.state.value
-    Scaffold(
+    BottomSheetScaffold(
         scaffoldState=scaffoldState,
         modifier = Modifier
             .fillMaxSize()
             .background(Color.LightGray)
         ,
+        sheetContent = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    BottomSheetItem(name = "Log Out", onClick = {
+                        viewModel.logoutUser(navHostController)
+                    })
+
+                }
+            }
+        },
+        sheetBackgroundColor = Color.White,
+        sheetPeekHeight = 0.dp,
         topBar = {
             TopAppBar(
                 title = {
                     viewModel.user.value?.let {
-                        Text(
-                            text= it.username,
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 20.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ){
+                            Text(
+                                text= it.username,
                             )
+                            Icon(
+                                Icons.Filled.Settings,
+                                contentDescription = "Settings",
+                                Modifier
+                                    .size(26.dp)
+                                    .clickable {
+                                        scope.launch {
+                                            if (sheetState.isCollapsed) {
+                                                sheetState.expand()
+                                            } else {
+                                                sheetState.collapse()
+                                            }
+                                        }
+                                    }
+                            )
+                        }
+
                     }
                 }
                 ,
@@ -115,7 +169,9 @@ fun ProfileScreen(
                                     }
 
                                     Row(
-                                        modifier = Modifier.fillMaxWidth().height(70.dp),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(70.dp),
                                         horizontalArrangement = Arrangement.SpaceEvenly,
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
@@ -228,19 +284,19 @@ fun ProfileScreen(
                                 Spacer(modifier = Modifier.padding(5.dp))
 
                             }
-                            item{
-                                Column(modifier = Modifier.fillMaxSize()) {
-                                    Text(text = "Profile Screen")
-                                    Button(onClick = {
-                                        viewModel.logoutUser(navHostController)
-                                    }) {
-                                        Text("Log out")
-
-                                    }
-
-                                }
-
-                            }
+//                            item{
+//                                Column(modifier = Modifier.fillMaxSize()) {
+//                                    Text(text = "Profile Screen")
+//                                    Button(onClick = {
+//
+//                                    }) {
+//                                        Text("Log out")
+//
+//                                    }
+//
+//                                }
+//
+//                            }
                         }
                     }
                 }
