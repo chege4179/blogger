@@ -13,7 +13,7 @@ The app there might be an old version
 5. Room Library for offline saved posts
 6. Push notifications for likes and comments (Firebase messaging)
 7. Cloudinary for storing images and retrieving them via url
-8. 
+8. MVVM architecture
 
 
 ## Backend Application
