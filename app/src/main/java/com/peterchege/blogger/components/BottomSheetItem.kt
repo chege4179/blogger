@@ -14,8 +14,6 @@ import androidx.compose.ui.unit.sp
 fun BottomSheetItem(
     name:String,
     onClick:() -> Unit,
-
-
 ) {
     Column(
         modifier = Modifier

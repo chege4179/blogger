@@ -30,13 +30,6 @@ class SignUpViewModel @Inject constructor(
     private val signUpRepository: SignUpRepository,
 
 ):ViewModel() {
-//    data class SignUpResponseState(
-//        val msg:String = "",
-//        val success:Boolean = false,
-//        val isLoading:Boolean = false
-//    )
-//    private val _state = mutableStateOf(SignUpResponseState())
-//    var state: State<SignUpResponseState> = _state
 
     private var _isLoading = mutableStateOf(false)
     var isLoading :State<Boolean> = _isLoading
@@ -57,7 +50,7 @@ class SignUpViewModel @Inject constructor(
     private var _confirmPasswordState = mutableStateOf(TextFieldState())
     var confirmPasswordState: State<TextFieldState> =  _confirmPasswordState
 
-    private val _passwordVisibility = mutableStateOf(true)
+    private val _passwordVisibility = mutableStateOf(false)
     var passwordVisibility: State<Boolean> =  _passwordVisibility
 
     fun onChangePasswordVisibility(){

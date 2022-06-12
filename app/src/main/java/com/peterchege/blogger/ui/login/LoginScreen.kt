@@ -111,8 +111,9 @@ fun LoginScreen(
                     visualTransformation = if (viewModel.passwordVisibility.value) VisualTransformation.None else PasswordVisualTransformation(),
                     label = { Text("Password") }
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(10.dp))
                 Button(
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
                     onClick = {
                         keyboardController?.hide()
                         viewModel.initiateLogin(navController,scaffoldState, context = context)
@@ -121,8 +122,10 @@ fun LoginScreen(
                 {
                     Text("Login")
                 }
-                Spacer(modifier = Modifier.height(30.dp))
-                TextButton(onClick = {
+                Spacer(modifier = Modifier.height(20.dp))
+                TextButton(
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                    onClick = {
                     navController.navigate(Screens.SIGNUP_SCREEN)
 
                 }) {

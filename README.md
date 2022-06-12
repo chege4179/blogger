@@ -28,7 +28,7 @@ Ps (You will find the deployed API endpoint in the source code so the code shoul
 2. Abiity to like a post
 3. Ability to comment on posts
 4. Follower and Following system
-5. ABility to view viewer counts on posts
+5. Ability to view viewer counts on posts
 6. CRUD operations on your posts
 
 ## Features to come

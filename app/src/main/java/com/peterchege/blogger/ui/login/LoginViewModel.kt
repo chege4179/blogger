@@ -50,7 +50,7 @@ class LoginViewModel @Inject constructor(
     private var _LoginResponseState = mutableStateOf(LoginResponse())
     var LoginResponseState: State<LoginResponse> =  _LoginResponseState
 
-    private val _passwordVisibility = mutableStateOf(true)
+    private val _passwordVisibility = mutableStateOf(false)
     var passwordVisibility: State<Boolean> =  _passwordVisibility
 
     fun onChangePasswordVisibility(){

@@ -167,6 +167,7 @@ fun SignUpScreen(
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Button(
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
                     onClick = {
                         viewModel.signUpUser(navController,scaffoldState,context = context)
                     }
@@ -175,7 +176,9 @@ fun SignUpScreen(
                     Text("Sign Up")
                 }
                 Spacer(modifier = Modifier.height(30.dp))
-                TextButton(onClick = {
+                TextButton(
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                    onClick = {
                     navController.navigate(Screens.LOGIN_SCREEN)
 
                 }) {
