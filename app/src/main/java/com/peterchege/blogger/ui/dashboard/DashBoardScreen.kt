@@ -132,7 +132,10 @@ fun DashBoardScreen(
         }
     ) { innerPadding ->
             // Apply the padding globally to the whole BottomNavScreensController
-            Box(modifier = Modifier.background(Color.LightGray).padding(innerPadding)) {
+            Box(modifier = Modifier
+                .background(Color.LightGray)
+                .padding(innerPadding)
+            ) {
                 DashboardNavigation(navController = navController, navHostController = navHostController)
             }
 

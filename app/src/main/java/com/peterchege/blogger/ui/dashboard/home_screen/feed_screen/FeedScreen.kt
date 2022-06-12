@@ -1,12 +1,16 @@
 package com.peterchege.blogger.ui.dashboard.home_screen.feed_screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -63,11 +67,10 @@ fun FeedScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(15.dp)
+                    .padding(5.dp)
                 ,
             ) {
-
-                TextField(
+                OutlinedTextField(
                     value = viewModel.searchTerm.value,
                     onValueChange ={
                         viewModel.onChangeSearchTerm(it)
@@ -75,7 +78,16 @@ fun FeedScreen(
                     label ={
                         Text(text="Search posts or users")
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    trailingIcon = {
+                        Icon(
+                            Icons.Filled.Search,
+                            contentDescription = "Visibility on",
+                            Modifier
+                                .size(26.dp)
+
+                        )
+                    },
 
                 )
                 if (!viewModel.isFound.value){
@@ -91,9 +103,11 @@ fun FeedScreen(
                     }
                     
                 }else{
-                    LazyColumn(modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 5.dp)){
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top= 5.dp)
+                            ){
 
                         items(state.posts){ post ->
                             ArticleCard(
@@ -125,16 +139,7 @@ fun FeedScreen(
                         }
                     }
                 }
-                
-
-
             }
         }
-
-
-
-
     }
-
-
 }
