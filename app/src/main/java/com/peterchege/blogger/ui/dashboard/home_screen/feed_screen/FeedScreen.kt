@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -24,10 +25,12 @@ import androidx.navigation.NavHostController
 import coil.annotation.ExperimentalCoilApi
 import com.peterchege.blogger.api.responses.Post
 import com.peterchege.blogger.components.ArticleCard
+import com.peterchege.blogger.components.CategoryCard
 import com.peterchege.blogger.components.ProfileCard
 import com.peterchege.blogger.ui.dashboard.home_screen.feed_screen.FeedViewModel
 import com.peterchege.blogger.util.Constants
 import com.peterchege.blogger.util.Screens
+import com.peterchege.blogger.util.categories
 
 @Composable
 @ExperimentalCoilApi
@@ -90,6 +93,17 @@ fun FeedScreen(
                     },
 
                 )
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp)
+                ){
+                    items(categories){ category ->
+                        CategoryCard(navController = navHostController, categoryItem = category)
+                        Spacer(modifier = Modifier.width(10.dp))
+
+                    }
+                }
                 if (!viewModel.isFound.value){
                     Box(
                         modifier = Modifier.fillMaxSize(),

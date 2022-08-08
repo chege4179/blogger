@@ -32,7 +32,6 @@ import com.peterchege.blogger.util.Screens
 fun AuthorProfileNavigation(
 
 ){
-
     val navController  = rememberNavController()
     NavHost(navController =navController, startDestination =Screens.AUTHOR_PROFILE_SCREEN +"/{username}" ){
         composable(Screens.AUTHOR_PROFILE_SCREEN + "/{username}"){
