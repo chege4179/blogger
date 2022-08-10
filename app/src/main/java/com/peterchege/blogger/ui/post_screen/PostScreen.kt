@@ -226,7 +226,7 @@ fun PostScreen(
                                 Divider(color = Color.Blue , thickness = 1.dp, modifier = Modifier.padding(10.dp))
                                 Text(
                                     text = state.post.postBody,
-                                    textAlign= TextAlign.Center,
+                                    textAlign= TextAlign.Left,
                                     modifier = Modifier
                                         .padding(10.dp)
 

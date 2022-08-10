@@ -63,7 +63,9 @@ fun ProfileScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(300.dp),
+                    .height(300.dp)
+                    .background(Color.LightGray)
+                ,
                 contentAlignment = Alignment.Center
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
@@ -76,42 +78,42 @@ fun ProfileScreen(
         },
         sheetBackgroundColor = Color.White,
         sheetPeekHeight = 0.dp,
-        topBar = {
-            TopAppBar(
-                title = {
-                    viewModel.user.value?.let {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 20.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ){
-                            Text(
-                                text= it.username,
-                            )
-                            Icon(
-                                Icons.Filled.Settings,
-                                contentDescription = "Settings",
-                                Modifier
-                                    .size(26.dp)
-                                    .clickable {
-                                        scope.launch {
-                                            if (sheetState.isCollapsed) {
-                                                sheetState.expand()
-                                            } else {
-                                                sheetState.collapse()
-                                            }
-                                        }
-                                    }
-                            )
-                        }
-
-                    }
-                }
-                ,
-                backgroundColor = MaterialTheme.colors.primary)
-        }
+//        topBar = {
+//            TopAppBar(
+//                title = {
+//                    viewModel.user.value?.let {
+//                        Row(
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .padding(horizontal = 20.dp),
+//                            horizontalArrangement = Arrangement.SpaceBetween,
+//                            verticalAlignment = Alignment.CenterVertically,
+//                        ){
+//                            Text(
+//                                text= it.username,
+//                            )
+//                            Icon(
+//                                Icons.Filled.Settings,
+//                                contentDescription = "Settings",
+//                                Modifier
+//                                    .size(26.dp)
+//                                    .clickable {
+//                                        scope.launch {
+//                                            if (sheetState.isCollapsed) {
+//                                                sheetState.expand()
+//                                            } else {
+//                                                sheetState.collapse()
+//                                            }
+//                                        }
+//                                    }
+//                            )
+//                        }
+//
+//                    }
+//                }
+//                ,
+//                backgroundColor = MaterialTheme.colors.primary)
+//        }
 
     ) {
 
@@ -143,9 +145,10 @@ fun ProfileScreen(
 
                             ){
                             item{
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-
+                                Column(
+                                    modifier = Modifier.fillMaxWidth().height(200.dp),
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally,
                                     ) {
                                     Box(
                                         modifier = Modifier
@@ -166,100 +169,97 @@ fun ProfileScreen(
                                                 },
                                             ),
                                             contentDescription = "Profile Image")
-                                    }
 
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(70.dp),
-                                        horizontalArrangement = Arrangement.SpaceEvenly,
-                                        verticalAlignment = Alignment.CenterVertically,
+                                    }
+                                    Spacer(modifier = Modifier.height(5.dp))
+                                    Column(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally,
                                     ) {
-                                        Column(
-                                            verticalArrangement = Arrangement.Center,
-                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        Text(
+                                            text = user.fullname,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            fontSize = 20.sp
+                                        )
+                                        Spacer(modifier = Modifier.padding(3.dp))
+                                        Text(
+                                            text = "@"+user.username,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 18.sp
+                                        )
+                                        Spacer(modifier = Modifier.height(3.dp))
 
-                                        ) {
-                                            Text(
-                                                text = "${viewModel.posts.value.size}",
-                                                fontSize = 20.sp,
-                                                fontWeight = FontWeight.Bold,
-                                            )
-                                            Text(
-                                                text = "Posts",
-                                                fontSize = 17.sp,
-
-
-                                                )
-                                        }
-                                        Column(
-                                            modifier = Modifier.clickable {
-                                                navController.navigate(Screens.PROFILE_FOLLOWER_FOLLOWING_SCREEN + "/${Constants.FOLLOWER}")
-
-                                            },
-                                            verticalArrangement = Arrangement.Center,
-                                            horizontalAlignment = Alignment.CenterHorizontally
-                                        ) {
-                                            Text(
-                                                fontSize = 20.sp,
-                                                fontWeight = FontWeight.Bold,
-                                                text = "${viewModel.user.value?.followers?.size}"
-                                            )
-                                            Text(
-                                                text = "Followers",
-                                                fontSize = 17.sp,
-
-                                                )
-                                        }
-                                        Column(
-                                            modifier = Modifier.clickable {
-                                                navController.navigate(Screens.PROFILE_FOLLOWER_FOLLOWING_SCREEN + "/${Constants.FOLLOWING}")
-                                            },
-                                            verticalArrangement = Arrangement.Center,
-                                            horizontalAlignment = Alignment.CenterHorizontally
-                                        ) {
-                                            Text(
-                                                text = "${viewModel.user.value?.following?.size}",
-                                                fontSize = 20.sp,
-                                                fontWeight = FontWeight.Bold,
-                                            )
-                                            Text(
-                                                text = "Following",
-                                                fontSize = 17.sp,
-
-                                                )
-                                        }
 
 
                                     }
-
-
                                 }
                             }
                             item{
-                                Column(
-                                    modifier = Modifier.fillMaxWidth()
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(70.dp),
+                                    horizontalArrangement = Arrangement.SpaceEvenly,
+                                    verticalAlignment = Alignment.CenterVertically,
                                 ) {
-                                    Text(text = user.username)
-                                    Spacer(modifier = Modifier.padding(5.dp))
-                                    Text(text = user.fullname)
-                                    Spacer(modifier = Modifier.padding(5.dp))
-                                    Text(text = user.email)
-                                    Spacer(modifier = Modifier.padding(5.dp))
-                                }
-                            }
-                            item {
-                                Box(modifier =  Modifier.fillMaxWidth()){
-                                    Text(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(5.dp),
-                                        textAlign = TextAlign.Center,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 20.sp,
-                                        textDecoration = TextDecoration.Underline,
-                                        text = "My Posts"
-                                    )
+                                    Column(
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+
+                                    ) {
+                                        Text(
+                                            text = "${viewModel.posts.value.size}",
+                                            fontSize = 20.sp,
+                                            fontWeight = FontWeight.Bold,
+                                        )
+                                        Text(
+                                            text = "Posts",
+                                            fontSize = 17.sp,
+                                            )
+                                    }
+                                    Divider(color = Color.LightGray, thickness = 2.dp, modifier = Modifier.fillMaxHeight(0.7f).width(1.dp))
+
+                                    Column(
+                                        modifier = Modifier.clickable {
+                                            navController.navigate(Screens.PROFILE_FOLLOWER_FOLLOWING_SCREEN + "/${Constants.FOLLOWER}")
+
+                                        },
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Text(
+                                            fontSize = 20.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            text = "${viewModel.user.value?.followers?.size}"
+                                        )
+                                        Text(
+                                            text = "Followers",
+                                            fontSize = 17.sp,
+
+                                            )
+                                    }
+                                    Divider(color = Color.LightGray, thickness = 2.dp, modifier = Modifier.fillMaxHeight(0.7f).width(1.dp))
+
+                                    Column(
+                                        modifier = Modifier.clickable {
+                                            navController.navigate(Screens.PROFILE_FOLLOWER_FOLLOWING_SCREEN + "/${Constants.FOLLOWING}")
+                                        },
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Text(
+                                            text = "${viewModel.user.value?.following?.size}",
+                                            fontSize = 20.sp,
+                                            fontWeight = FontWeight.Bold,
+                                        )
+                                        Text(
+                                            text = "Following",
+                                            fontSize = 17.sp,
+
+                                            )
+                                    }
+
                                 }
                             }
                             items(viewModel.posts.value){ post ->
@@ -275,34 +275,17 @@ fun ProfileScreen(
                                     onDeletePost ={
 
                                     },
-
                                     profileImageUrl = user.imageUrl ,
                                     isLiked = false,
                                     isSaved = false,
                                     isProfile = true
                                 )
                                 Spacer(modifier = Modifier.padding(5.dp))
-
                             }
-//                            item{
-//                                Column(modifier = Modifier.fillMaxSize()) {
-//                                    Text(text = "Profile Screen")
-//                                    Button(onClick = {
-//
-//                                    }) {
-//                                        Text("Log out")
-//
-//                                    }
-//
-//                                }
-//
-//                            }
                         }
                     }
                 }
-
             }
-
         }
     }
 
