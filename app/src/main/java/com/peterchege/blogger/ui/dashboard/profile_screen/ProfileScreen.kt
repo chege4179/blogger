@@ -2,9 +2,7 @@ package com.peterchege.blogger.ui.dashboard.profile_screen
 
 import android.content.res.Resources
 import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,6 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -51,7 +51,7 @@ fun ProfileScreen(
         bottomSheetState = sheetState
     )
     val scope = rememberCoroutineScope()
-
+    val gradient = Brush.linearGradient(0.0f to Color.White,0.0f to Color.White,start = Offset(0.0f, 200.0f),end = Offset(0.0f, 600.0f))
     //val state = viewModel.state.value
     BottomSheetScaffold(
         scaffoldState=scaffoldState,
@@ -139,14 +139,14 @@ fun ProfileScreen(
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(10.dp)
-
-                            ,
-
+                                .background(gradient)
+                                .padding(10.dp),
                             ){
                             item{
                                 Column(
-                                    modifier = Modifier.fillMaxWidth().height(200.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(160.dp),
                                     verticalArrangement = Arrangement.Center,
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     ) {
@@ -214,11 +214,13 @@ fun ProfileScreen(
                                             fontWeight = FontWeight.Bold,
                                         )
                                         Text(
-                                            text = "Posts",
+                                            text = "Articles",
                                             fontSize = 17.sp,
                                             )
                                     }
-                                    Divider(color = Color.LightGray, thickness = 2.dp, modifier = Modifier.fillMaxHeight(0.7f).width(1.dp))
+                                    Divider(color = Color.LightGray, thickness = 2.dp, modifier = Modifier
+                                        .fillMaxHeight(0.7f)
+                                        .width(1.dp))
 
                                     Column(
                                         modifier = Modifier.clickable {
@@ -239,7 +241,9 @@ fun ProfileScreen(
 
                                             )
                                     }
-                                    Divider(color = Color.LightGray, thickness = 2.dp, modifier = Modifier.fillMaxHeight(0.7f).width(1.dp))
+                                    Divider(color = Color.LightGray, thickness = 2.dp, modifier = Modifier
+                                        .fillMaxHeight(0.7f)
+                                        .width(1.dp))
 
                                     Column(
                                         modifier = Modifier.clickable {
@@ -258,6 +262,32 @@ fun ProfileScreen(
                                             fontSize = 17.sp,
 
                                             )
+                                    }
+
+                                }
+                            }
+                            item{
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(60.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceEvenly,
+                                ){
+                                    Button(
+                                        modifier = Modifier.fillMaxWidth(0.5f),
+                                        onClick = {
+
+                                        }) {
+                                        Text(text = "Edit Profile")
+                                    }
+                                    Spacer(modifier = Modifier.width(5.dp))
+                                    Button(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        onClick = {
+
+                                        }) {
+                                        Text(text = "Settings")
                                     }
 
                                 }
