@@ -168,7 +168,7 @@ class AddPostScreenViewModel @Inject constructor(
         _imageUrlState.value = uri
     }
 
-    fun updateUserProfile(
+    private fun updateUserProfile(
         uri: Uri,
         postBody: PostBody,
         context: Context,
@@ -281,7 +281,7 @@ class AddPostScreenViewModel @Inject constructor(
                     postedBy = sharedPreferences.getString(Constants.LOGIN_USERNAME, null)!!,
                     postedOn = postedOn,
                     postedAt = postedAt,
-                    photo = _bitmapState.value!!.toByteArray().toBase64()
+                    photo = _postTitle.value.text,
                 )
                 updateUserProfile(
                     context = context,
