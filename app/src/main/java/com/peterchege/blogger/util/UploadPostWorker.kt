@@ -1,0 +1,166 @@
+package com.peterchege.blogger.util
+
+import android.app.Notification
+import android.content.Context
+import android.net.Uri
+import androidx.compose.material.ScaffoldState
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat.startForegroundService
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
+import androidx.work.CoroutineWorker
+import androidx.work.ForegroundInfo
+import androidx.work.WorkerParameters
+import androidx.work.workDataOf
+import com.peterchege.blogger.R
+import com.peterchege.blogger.api.BloggerApi
+import com.peterchege.blogger.api.requests.PostBody
+import com.peterchege.blogger.ui.dashboard.addpost_screen.AddPostScreenViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import retrofit2.HttpException
+import java.io.IOException
+import javax.inject.Inject
+import kotlin.random.Random
+
+@Suppress("BlockingMethodInNonBlockingContext")
+class UploadPostWorker @Inject constructor(
+    private val context: Context,
+    private val workerParams:WorkerParameters,
+) :  CoroutineWorker(context,workerParams) {
+
+    override suspend fun doWork(): Result {
+        val uri = inputData.getString("uri")
+        val postTitle = inputData.getString("postTitle")
+        val postBody = inputData.getString("postBody")
+        val postedBy = inputData.getString("postedBy")
+        val postedAt = inputData.getString("postedAt")
+        val postedOn = inputData.getString("postedOn")
+        startForegroundService()
+
+
+        val file = UriToFile(context = context).getImageBody(Uri.parse(uri))
+        val requestFile: RequestBody = file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
+        val builder: MultipartBody.Builder = MultipartBody.Builder().setType(MultipartBody.FORM)
+        builder
+            .addFormDataPart("postTitle", postTitle!!)
+            .addFormDataPart("postBody", postBody!!)
+            .addFormDataPart("postedBy", postedBy!!)
+            .addFormDataPart("postedAt", postedAt!!)
+            .addFormDataPart("postedOn", postedOn!!)
+            .addFormDataPart("photo", file.name, requestFile)
+
+        val requestBody: RequestBody = builder.build()
+
+        try {
+            val response = BloggerApi.instance.postImage(body = requestBody)
+            if (response.success){
+                Result.success(workDataOf(
+                    WorkerKeys.MSG to response.msg,
+                    WorkerKeys.IS_LOADING to false,
+                    WorkerKeys.SUCCESS to response.success
+
+                ))
+
+            }
+
+        } catch (e: HttpException) {
+
+            Result.failure(workDataOf(
+                WorkerKeys.MSG to "Could not reach server at the moment",
+                WorkerKeys.IS_LOADING to false,
+                WorkerKeys.SUCCESS to false
+
+            ))
+
+        } catch (e: IOException) {
+
+            Result.failure(
+                workDataOf(
+                    WorkerKeys.MSG to "The server is down ....Please try again later",
+                    WorkerKeys.IS_LOADING to false,
+                    WorkerKeys.SUCCESS to false
+
+                ))
+
+        }
+        return Result.failure(
+            workDataOf(WorkerKeys.MSG to "Unknown error")
+        )
+
+
+    }
+
+    private suspend fun updateUserProfile(
+        uri: Uri,
+        postBody: PostBody,
+
+    ) {
+        val file = UriToFile(context = context).getImageBody(uri)
+        val requestFile: RequestBody = file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
+        val builder: MultipartBody.Builder = MultipartBody.Builder().setType(MultipartBody.FORM)
+        builder
+            .addFormDataPart("postTitle", postBody.postTitle)
+            .addFormDataPart("postBody", postBody.postBody)
+            .addFormDataPart("postedBy", postBody.postedBy)
+            .addFormDataPart("postedAt", postBody.postedAt)
+            .addFormDataPart("postedOn", postBody.postedOn)
+            .addFormDataPart("photo", file.name, requestFile)
+
+        val requestBody: RequestBody = builder.build()
+
+        try {
+            val response = BloggerApi.instance.postImage(body = requestBody)
+            if (response.success){
+                Result.success(workDataOf(
+                    WorkerKeys.MSG to response.msg,
+                    WorkerKeys.IS_LOADING to false,
+                    WorkerKeys.SUCCESS to response.success
+
+                ))
+
+            }
+
+        } catch (e: HttpException) {
+
+            Result.failure(workDataOf(
+                WorkerKeys.MSG to "Could not reach server at the moment",
+                WorkerKeys.IS_LOADING to false,
+                WorkerKeys.SUCCESS to false
+
+            ))
+
+        } catch (e: IOException) {
+
+            Result.failure(
+                workDataOf(
+                WorkerKeys.MSG to "The server is down ....Please try again later",
+                WorkerKeys.IS_LOADING to false,
+                WorkerKeys.SUCCESS to false
+
+            ))
+
+        }
+
+
+    }
+    private suspend fun startForegroundService(){
+        setForeground(
+            ForegroundInfo(
+                Random.nextInt(),
+                NotificationCompat.Builder(context,Constants.NOTIFICATION_CHANNEL)
+                    .setSmallIcon(R.drawable.ic_launcher_background)
+                    .setContentText("Uploading...")
+                    .setContentTitle("Your post is being uploaded")
+                    .build()
+
+            )
+        )
+
+    }
+
+}

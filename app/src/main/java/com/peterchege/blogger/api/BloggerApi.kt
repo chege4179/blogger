@@ -5,8 +5,11 @@ import android.net.Uri
 import androidx.room.Delete
 import com.peterchege.blogger.api.requests.*
 import com.peterchege.blogger.api.responses.*
+import com.peterchege.blogger.util.Constants
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
 
 
@@ -64,6 +67,15 @@ interface BloggerApi {
     @POST("/view/add")
     suspend fun addView(@Body viewer:Viewer):ViewResponse
 
+    companion object {
+        val instance by lazy {
+            Retrofit.Builder()
+                .addConverterFactory(GsonConverterFactory.create())
+                .baseUrl(Constants.BASE_URL)
+                .build()
+                .create(BloggerApi::class.java)
+        }
+    }
 
 }
 

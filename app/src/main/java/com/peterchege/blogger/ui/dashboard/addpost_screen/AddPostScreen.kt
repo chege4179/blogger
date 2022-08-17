@@ -17,7 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-
+//import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.work.*
 import coil.annotation.ExperimentalCoilApi
 import com.peterchege.blogger.util.*
 import com.skydoves.landscapist.glide.GlideImage
@@ -40,27 +41,40 @@ fun AddPostScreen(
     viewModel: AddPostScreenViewModel = hiltViewModel(),
 
 ){
-    val state = viewModel.state.value
-    var imageUrlState = viewModel.imageUrlState.value
-    var postTitle = viewModel.postTitle.value
-    var postBody = viewModel.postBody.value
-    var bitmapState = viewModel.bitmapState.value
     val context  = LocalContext.current
-
+    val state = viewModel.state.value
+    val imageUrlState = viewModel.imageUrlState.value
+    val postTitle = viewModel.postTitle.value
+    val postBody = viewModel.postBody.value
+    var bitmapState = viewModel.bitmapState.value
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()){ uri: Uri? ->
-        Log.e("Uri",uri.toString())
-
         if (uri != null) {
             viewModel.onChangePhotoUri(uri, context = context)
         }
 
     }
     val scaffoldState = rememberScaffoldState()
+    val postArticleRequest = OneTimeWorkRequestBuilder<UploadPostWorker>()
+        .setConstraints(
+            Constraints.Builder()
+                .setRequiredNetworkType(
+                    NetworkType.CONNECTED
+                )
+                .build()
+        )
+        .build()
+
+    val workManager = WorkManager.getInstance(context)
+//    val workInfos = workManager
+//        .getWorkInfosForUniqueWorkLiveData("post_article")
+//        .observeAsState()
+//        .value
     Scaffold(
         scaffoldState = scaffoldState
 
     ) {
+
         BackHandler() {
             viewModel.onBackPress(scaffoldState, navController = navController)
         }
@@ -161,7 +175,7 @@ fun AddPostScreen(
                             }
                             Button(
                                 onClick = {
-                                viewModel.postArticle(bottomNavController,scaffoldState,context)
+                                    viewModel.postArticle(bottomNavController,scaffoldState,context)
                             }) {
                                 Text("Post")
                             }

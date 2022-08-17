@@ -15,6 +15,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import androidx.work.*
 import com.peterchege.blogger.api.BloggerApi
 import com.peterchege.blogger.api.requests.PostBody
 import com.peterchege.blogger.room.entities.DraftRecord
@@ -43,8 +44,7 @@ class AddPostScreenViewModel @Inject constructor(
     private val sharedPreferences: SharedPreferences,
     private val draftRepository: DraftRepository,
     private val savedStateHandle: SavedStateHandle,
-    private val api: BloggerApi
-
+    private val api: BloggerApi,
 ) : ViewModel() {
     private var _imageUrlState = mutableStateOf<Uri?>(null)
     var imageUrlState: State<Uri?> = _imageUrlState
@@ -69,6 +69,7 @@ class AddPostScreenViewModel @Inject constructor(
 
     private val _openSaveDraftModal = mutableStateOf(false)
     var openSaveDraftModal: State<Boolean> = _openSaveDraftModal
+
 
     init {
         val postBodyDraft = savedStateHandle.get<String>("postTitle")
@@ -116,7 +117,6 @@ class AddPostScreenViewModel @Inject constructor(
 
         }
     }
-
     fun inputPostTitleFromDraft(postTitleDraft: String?) {
         if (postTitleDraft == null) {
             postTitle.value.text = ""
@@ -126,22 +126,6 @@ class AddPostScreenViewModel @Inject constructor(
 
         }
     }
-
-    fun getResizedBitmap(image: Bitmap, maxSize: Int): Bitmap? {
-        var width = image.width
-        var height = image.height
-        val bitmapRatio = width.toFloat() / height.toFloat()
-        if (bitmapRatio > 1) {
-            width = maxSize
-            height = (width / bitmapRatio).toInt()
-        } else {
-            height = maxSize
-            width = (height * bitmapRatio).toInt()
-        }
-        return Bitmap.createScaledBitmap(image, width, height, true)
-    }
-
-
     fun onChangePostTitle(text: String) {
         _postTitle.value = TextFieldState(text = text)
     }
@@ -175,12 +159,9 @@ class AddPostScreenViewModel @Inject constructor(
         scaffoldState: ScaffoldState,
         navController: NavController
     ) {
-
         val file = UriToFile(context = context).getImageBody(uri)
         val requestFile: RequestBody = file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
-
         val builder: MultipartBody.Builder = MultipartBody.Builder().setType(MultipartBody.FORM)
-
         builder
             .addFormDataPart("postTitle", postBody.postTitle)
             .addFormDataPart("postBody", postBody.postBody)
@@ -229,7 +210,7 @@ class AddPostScreenViewModel @Inject constructor(
 
     }
 
-    fun onChangePhotoBitmap(bitmap: Bitmap) {
+    private fun onChangePhotoBitmap(bitmap: Bitmap) {
         val compresedbitmap = compressBitmap(ImageResizer.reduceBitmapSize(bitmap, 100000), 100)
         _bitmapState.value = bitmap
     }
@@ -238,11 +219,6 @@ class AddPostScreenViewModel @Inject constructor(
         _openSaveDraftModal.value = false
         navController.navigate(Screens.DASHBOARD_SCREEN)
     }
-
-    data class InternalStoragePhoto(
-        val name: String,
-        val bmp: Bitmap
-    )
 
     fun onSaveDraftConfirm(scaffoldState: ScaffoldState, navController: NavController) {
         _openSaveDraftModal.value = false
@@ -264,6 +240,7 @@ class AddPostScreenViewModel @Inject constructor(
         }
     }
 
+
     fun postArticle(navController: NavController, scaffoldState: ScaffoldState, context: Context) {
         _state.value = AddPostScreenState(isLoading = true)
 
@@ -272,32 +249,50 @@ class AddPostScreenViewModel @Inject constructor(
                 AddPostScreenState(isLoading = false, msg = "Please fill in all the fields")
 
         } else {
-            if (hasInternetConnection(context = context)) {
-                val postedOn = SimpleDateFormat("dd/MM/yyyy").format(Date())
-                val postedAt = SimpleDateFormat("hh:mm:ss").format(Date())
-                val postBody = PostBody(
-                    postTitle = _postTitle.value.text,
-                    postBody = _postBody.value.text,
-                    postedBy = sharedPreferences.getString(Constants.LOGIN_USERNAME, null)!!,
-                    postedOn = postedOn,
-                    postedAt = postedAt,
-                    photo = _postTitle.value.text,
+            val postedOn = SimpleDateFormat("dd/MM/yyyy").format(Date())
+            val postedAt = SimpleDateFormat("hh:mm:ss").format(Date())
+            val postBody = PostBody(
+                postTitle = _postTitle.value.text,
+                postBody = _postBody.value.text,
+                postedBy = sharedPreferences.getString(Constants.LOGIN_USERNAME, null)!!,
+                postedOn = postedOn,
+                postedAt = postedAt,
+                photo = _postTitle.value.text,
+            )
+            val postArticleParams = workDataOf(
+                "uri" to _imageUrlState.value!!.toString(),
+                "postBody" to _postBody.value.text,
+                "postTitle" to _postTitle.value.text,
+                "postedBy" to sharedPreferences.getString(Constants.LOGIN_USERNAME, null)!!,
+                "postedAt" to postedAt,
+                "photo" to _postTitle.value.text,
+                "postedOn" to postedOn
                 )
-                updateUserProfile(
-                    context = context,
-                    uri = _imageUrlState.value!!,
-                    postBody = postBody,
-                    scaffoldState = scaffoldState,
-                    navController=navController
+            val postArticleRequest = OneTimeWorkRequestBuilder<UploadPostWorker>()
+                .setInputData(postArticleParams)
+                .setConstraints(
+                    Constraints.Builder()
+                        .setRequiredNetworkType(
+                            NetworkType.CONNECTED
+                        )
+                        .build()
                 )
-            } else {
-                viewModelScope.launch {
-                    _state.value = AddPostScreenState(isLoading = false)
-                    scaffoldState.snackbarHostState.showSnackbar(
-                        message = "No internet connection was found.... Please check your internet Connection"
-                    )
-                }
-            }
+                .build()
+            val workManager = WorkManager.getInstance(context)
+            workManager
+                .beginUniqueWork(
+                    "post_article",
+                    ExistingWorkPolicy.KEEP,
+                    postArticleRequest
+                )
+                .enqueue()
+
+            _state.value = AddPostScreenState(
+                msg = "Posting",
+                isLoading = false,
+                success = false
+            )
+            navController.navigate(Screens.DASHBOARD_SCREEN)
         }
     }
 }

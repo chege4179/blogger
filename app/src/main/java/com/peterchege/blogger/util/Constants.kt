@@ -24,4 +24,6 @@ object Constants {
 
     const val FOLLOWER="FOLLOWER"
     const val FOLLOWING="FOLLOWING"
+
+    const val NOTIFICATION_CHANNEL = "upload_channel"
 }
