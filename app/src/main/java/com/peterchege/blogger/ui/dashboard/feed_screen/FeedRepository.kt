@@ -1,4 +1,4 @@
-package com.peterchege.blogger.ui.dashboard.home_screen.feed_screen
+package com.peterchege.blogger.ui.dashboard.feed_screen
 
 import com.peterchege.blogger.api.BloggerApi
 import com.peterchege.blogger.api.responses.Post

@@ -103,7 +103,7 @@ fun DashBoardScreen(
                 items = listOf(
                     BottomNavItem(
                         name="Home",
-                        route = Screens.HOME_SCREEN  ,
+                        route = Screens.FEED_SCREEN  ,
                         icon = Icons.Default.Home
                     ),
                     BottomNavItem(

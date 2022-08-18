@@ -78,42 +78,7 @@ fun ProfileScreen(
         },
         sheetBackgroundColor = Color.White,
         sheetPeekHeight = 0.dp,
-//        topBar = {
-//            TopAppBar(
-//                title = {
-//                    viewModel.user.value?.let {
-//                        Row(
-//                            modifier = Modifier
-//                                .fillMaxWidth()
-//                                .padding(horizontal = 20.dp),
-//                            horizontalArrangement = Arrangement.SpaceBetween,
-//                            verticalAlignment = Alignment.CenterVertically,
-//                        ){
-//                            Text(
-//                                text= it.username,
-//                            )
-//                            Icon(
-//                                Icons.Filled.Settings,
-//                                contentDescription = "Settings",
-//                                Modifier
-//                                    .size(26.dp)
-//                                    .clickable {
-//                                        scope.launch {
-//                                            if (sheetState.isCollapsed) {
-//                                                sheetState.expand()
-//                                            } else {
-//                                                sheetState.collapse()
-//                                            }
-//                                        }
-//                                    }
-//                            )
-//                        }
-//
-//                    }
-//                }
-//                ,
-//                backgroundColor = MaterialTheme.colors.primary)
-//        }
+
 
     ) {
 
@@ -285,7 +250,13 @@ fun ProfileScreen(
                                     Button(
                                         modifier = Modifier.fillMaxWidth(),
                                         onClick = {
-
+                                            scope.launch {
+                                                if (sheetState.isCollapsed) {
+                                                    sheetState.expand()
+                                                } else {
+                                                    sheetState.collapse()
+                                                }
+                                            }
                                         }) {
                                         Text(text = "Settings")
                                     }

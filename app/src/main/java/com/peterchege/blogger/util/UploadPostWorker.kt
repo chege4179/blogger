@@ -95,59 +95,6 @@ class UploadPostWorker @Inject constructor(
 
     }
 
-    private suspend fun updateUserProfile(
-        uri: Uri,
-        postBody: PostBody,
-
-    ) {
-        val file = UriToFile(context = context).getImageBody(uri)
-        val requestFile: RequestBody = file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
-        val builder: MultipartBody.Builder = MultipartBody.Builder().setType(MultipartBody.FORM)
-        builder
-            .addFormDataPart("postTitle", postBody.postTitle)
-            .addFormDataPart("postBody", postBody.postBody)
-            .addFormDataPart("postedBy", postBody.postedBy)
-            .addFormDataPart("postedAt", postBody.postedAt)
-            .addFormDataPart("postedOn", postBody.postedOn)
-            .addFormDataPart("photo", file.name, requestFile)
-
-        val requestBody: RequestBody = builder.build()
-
-        try {
-            val response = BloggerApi.instance.postImage(body = requestBody)
-            if (response.success){
-                Result.success(workDataOf(
-                    WorkerKeys.MSG to response.msg,
-                    WorkerKeys.IS_LOADING to false,
-                    WorkerKeys.SUCCESS to response.success
-
-                ))
-
-            }
-
-        } catch (e: HttpException) {
-
-            Result.failure(workDataOf(
-                WorkerKeys.MSG to "Could not reach server at the moment",
-                WorkerKeys.IS_LOADING to false,
-                WorkerKeys.SUCCESS to false
-
-            ))
-
-        } catch (e: IOException) {
-
-            Result.failure(
-                workDataOf(
-                WorkerKeys.MSG to "The server is down ....Please try again later",
-                WorkerKeys.IS_LOADING to false,
-                WorkerKeys.SUCCESS to false
-
-            ))
-
-        }
-
-
-    }
     private suspend fun startForegroundService(){
         setForeground(
             ForegroundInfo(

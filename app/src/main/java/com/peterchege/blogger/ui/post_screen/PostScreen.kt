@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.annotation.ExperimentalCoilApi
+import coil.compose.SubcomposeAsyncImage
 import coil.compose.rememberImagePainter
 import com.peterchege.blogger.components.CommentBox
 import com.peterchege.blogger.ui.dashboard.profile_screen.DeleteBox
@@ -81,21 +82,33 @@ fun PostScreen(
                             .fillMaxWidth()
                         ) {
                             state.post?.let {
-
-                                Image(
-                                    painter = rememberImagePainter(
-                                        data = state.post.imageUrl,
-                                        builder = {
-                                            crossfade(true)
-
+                                SubcomposeAsyncImage(
+                                    model = state.post.imageUrl,
+                                    loading = {
+                                        Box(modifier = Modifier.fillMaxSize()) {
+                                            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                                         }
-                                    ),
-                                    contentDescription = "Post Image",
+                                    },
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(300.dp)
+                                        .fillMaxSize()
+                                        .height(300.dp),
+                                    contentDescription = "Post Image"
                                 )
+//                                Image(
+//                                    painter = rememberImagePainter(
+//                                        data = state.post.imageUrl,
+//                                        builder = {
+//                                            crossfade(true)
+//
+//                                        }
+//                                    ),
+//                                    contentDescription = "Post Image",
+//                                    contentScale = ContentScale.Crop,
+//                                    modifier = Modifier
+//                                        .fillMaxWidth()
+//                                        .height(300.dp)
+//                                )
                                 Spacer(modifier = Modifier
                                     .height(8.dp)
                                     .padding(15.dp))

@@ -1,4 +1,4 @@
-package com.peterchege.blogger.ui.dashboard.home_screen.feed_screen
+package com.peterchege.blogger.ui.dashboard.feed_screen
 
 import android.content.SharedPreferences
 import android.util.Log
@@ -16,7 +16,6 @@ import com.peterchege.blogger.util.Resource
 import com.peterchege.blogger.util.Screens
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach

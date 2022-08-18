@@ -6,10 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Delete
@@ -21,12 +18,14 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.annotation.ExperimentalCoilApi
+import coil.compose.SubcomposeAsyncImage
 import coil.compose.rememberImagePainter
 import com.peterchege.blogger.api.responses.Post
 
@@ -56,20 +55,35 @@ fun ArticleCard(
             .fillMaxWidth()
             .background(Color.LightGray)) {
             post.let {
-                Image(
-                    painter = rememberImagePainter(
-                        data = post.imageUrl,
-                        builder = {
-                            crossfade(true)
-
+                SubcomposeAsyncImage(
+                    model = post.imageUrl,
+                    loading = {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                         }
-                    ),
-                    contentDescription = "Post Image",
+                    },
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxSize()
-                        .height(150.dp)
+                        .height(150.dp),
+                    contentDescription = "Post Image"
                 )
+
+//                Image(
+//                    painter = rememberImagePainter(
+//                        data = post.imageUrl,
+//                        builder = {
+//                            crossfade(true)
+//
+//                        },
+//                        imageLoader =
+//                    ),
+//                    contentDescription = "Post Image",
+//                    contentScale = ContentScale.Crop,
+//                    modifier = Modifier
+//                        .fillMaxSize()
+//                        .height(150.dp)
+//                )
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(
                     modifier = Modifier

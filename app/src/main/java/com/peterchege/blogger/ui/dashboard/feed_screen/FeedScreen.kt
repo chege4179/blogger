@@ -1,7 +1,6 @@
-package com.peterchege.blogger.ui.dashboard.home_screen.feed_screen
+package com.peterchege.blogger.ui.dashboard.feed_screen
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -10,8 +9,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -23,11 +20,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.annotation.ExperimentalCoilApi
-import com.peterchege.blogger.api.responses.Post
 import com.peterchege.blogger.components.ArticleCard
 import com.peterchege.blogger.components.CategoryCard
 import com.peterchege.blogger.components.ProfileCard
-import com.peterchege.blogger.ui.dashboard.home_screen.feed_screen.FeedViewModel
 import com.peterchege.blogger.util.Constants
 import com.peterchege.blogger.util.Screens
 import com.peterchege.blogger.util.categories

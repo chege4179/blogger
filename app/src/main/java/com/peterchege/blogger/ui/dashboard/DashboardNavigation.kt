@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.peterchege.blogger.ui.dashboard.addpost_screen.AddPostScreen
 import com.peterchege.blogger.ui.dashboard.addpost_screen.AddPostScreenNavigation
+import com.peterchege.blogger.ui.dashboard.feed_screen.FeedScreen
 import com.peterchege.blogger.ui.dashboard.home_screen.HomeScreen
 import com.peterchege.blogger.ui.dashboard.notifcations_screen.NotificationScreen
 import com.peterchege.blogger.ui.dashboard.profile_screen.ProfileNavigation
@@ -27,12 +28,12 @@ fun DashboardNavigation(
     NavHost(
 
         navController = navController,
-        startDestination = Screens.HOME_SCREEN ){
+        startDestination = Screens.FEED_SCREEN ){
 
         composable(
-            route = Screens.HOME_SCREEN
+            route = Screens.FEED_SCREEN
         ){
-            HomeScreen(bottomNavController = navController, navHostController = navHostController)
+            FeedScreen(bottomNavController = navController, navHostController = navHostController)
         }
         composable(
             route = Screens.SAVED_POST_SCREEN
