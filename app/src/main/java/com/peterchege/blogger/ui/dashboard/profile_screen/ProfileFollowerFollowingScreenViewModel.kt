@@ -32,6 +32,9 @@ class ProfileFollowerFollowingScreenViewModel @Inject constructor(
 ):ViewModel() {
     private var _type = mutableStateOf<String>("")
     var type: State<String> = _type
+
+    private var _isLoading = mutableStateOf<Boolean>(false)
+    var isLoading: State<Boolean> = _isLoading
     init {
         getType()
         getProfile()
@@ -107,18 +110,20 @@ class ProfileFollowerFollowingScreenViewModel @Inject constructor(
 
 
     private fun getProfile(){
+        _isLoading.value = true
         val username = sharedPreferences.getString(Constants.LOGIN_USERNAME,null)
         profileUseCase(username = username!!).onEach { result ->
             when(result){
                 is Resource.Success -> {
+                    _isLoading.value = false
                     _userFollowers.value = result.data?.user?.followers ?: emptyList()
                     _userFollowing.value = result.data?.user?.following ?: emptyList()
                 }
                 is Resource.Error -> {
-
+                    _isLoading.value = false
                 }
                 is Resource.Loading -> {
-
+                    _isLoading.value = false
                 }
             }
 

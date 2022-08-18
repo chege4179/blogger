@@ -6,8 +6,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.peterchege.blogger.ui.author_profile.AuthorFollowerFollowingScreen
 import com.peterchege.blogger.ui.author_profile.AuthorProfileScreen
-import com.peterchege.blogger.ui.author_profile.FollowerFollowingScreen
 import com.peterchege.blogger.util.Screens
 
 @Composable
@@ -27,8 +27,8 @@ fun ProfileNavigation(
         composable(Screens.AUTHOR_PROFILE_SCREEN + "/{username}"){
             AuthorProfileScreen(navController = navController)
         }
-        composable(Screens.FOLLOWER_FOLLOWING_SCREEN + "/{type}"){
-            FollowerFollowingScreen(navController = navController)
+        composable(Screens.AUTHOR_FOLLOWER_FOLLOWING_SCREEN + "/{username}" + "/{type}"){
+            AuthorFollowerFollowingScreen(navController = navController)
         }
 
     }

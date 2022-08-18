@@ -18,8 +18,8 @@ fun BottomSheetItem(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp)
             .height(60.dp)
+            .padding(12.dp)
             .clickable{
                 onClick()
             }

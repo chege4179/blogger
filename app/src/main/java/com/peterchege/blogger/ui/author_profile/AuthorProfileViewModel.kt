@@ -55,10 +55,7 @@ class AuthorProfileViewModel @Inject constructor(
         val posts: List<Post> = emptyList()
     )
     init {
-        val username = savedStateHandle.get<String>("username")
-        Log.e("username",username!!)
         savedStateHandle.get<String>("username")?.let { username ->
-            Log.e("author",username)
             getProfile(username = username)
         }
 

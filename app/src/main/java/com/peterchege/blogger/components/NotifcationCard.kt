@@ -36,7 +36,8 @@ fun NotificationCard(
 
                 }
 
-            }
+            },
+        elevation = 3.dp
 
     ) {
         Row(

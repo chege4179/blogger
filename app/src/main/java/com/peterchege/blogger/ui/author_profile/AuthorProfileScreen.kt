@@ -14,8 +14,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -30,6 +28,7 @@ import com.peterchege.blogger.components.ArticleCard
 import com.peterchege.blogger.util.Constants
 import com.peterchege.blogger.util.Screens
 import kotlinx.coroutines.launch
+import java.util.*
 
 
 @Composable
@@ -41,8 +40,8 @@ fun AuthorProfileNavigation(
         composable(Screens.AUTHOR_PROFILE_SCREEN + "/{username}"){
             AuthorProfileScreen(navController = navController)
         }
-        composable(Screens.FOLLOWER_FOLLOWING_SCREEN + "/{type}"){
-            FollowerFollowingScreen(navController = navController)
+        composable(Screens.AUTHOR_FOLLOWER_FOLLOWING_SCREEN + "/{username}" + "/{type}"){
+            AuthorFollowerFollowingScreen(navController = navController)
         }
 
 
@@ -74,7 +73,7 @@ fun AuthorProfileScreen(
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(gradient)
+                            .background(Color.White)
                             .padding(10.dp),
                     ){
                         item{
@@ -119,7 +118,8 @@ fun AuthorProfileScreen(
                                     )
                                     Spacer(modifier = Modifier.padding(3.dp))
                                     Text(
-                                        text = "@"+ (state.user?.username ?: ""),
+                                        text = "@"+ (state.user?.username?.toLowerCase(Locale.ROOT)
+                                            ?: ""),
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 18.sp
                                     )
@@ -159,8 +159,7 @@ fun AuthorProfileScreen(
 
                                 Column(
                                     modifier = Modifier.clickable {
-                                        navController.navigate(Screens.FOLLOWER_FOLLOWING_SCREEN + "/${Constants.FOLLOWER}")
-
+                                        navController.navigate(Screens.AUTHOR_FOLLOWER_FOLLOWING_SCREEN + "/${state.user?.username}"+ "/${Constants.FOLLOWER}")
                                     },
                                     verticalArrangement = Arrangement.Center,
                                     horizontalAlignment = Alignment.CenterHorizontally
@@ -182,7 +181,7 @@ fun AuthorProfileScreen(
 
                                 Column(
                                     modifier = Modifier.clickable {
-                                        navController.navigate(Screens.FOLLOWER_FOLLOWING_SCREEN + "/${Constants.FOLLOWING}")
+                                        navController.navigate(Screens.AUTHOR_FOLLOWER_FOLLOWING_SCREEN + "/${state.user?.username}"+ "/${Constants.FOLLOWING}")
                                     },
                                     verticalArrangement = Arrangement.Center,
                                     horizontalAlignment = Alignment.CenterHorizontally
@@ -209,13 +208,25 @@ fun AuthorProfileScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceEvenly,
                             ){
-                                Button(
-                                    modifier = Modifier.fillMaxWidth(0.5f),
-                                    onClick = {
+                                if(viewModel.isFollowing.value){
+                                    Button(
+                                        modifier = Modifier.fillMaxWidth(0.5f),
+                                        onClick = {
+                                            viewModel.unfollowUser()
 
-                                    }) {
-                                    Text(text = "Follow")
+                                        }) {
+                                        Text(text = "Un Follow")
+                                    }
+                                }else{
+                                    Button(
+                                        modifier = Modifier.fillMaxWidth(0.5f),
+                                        onClick = {
+                                            viewModel.followUser()
+                                        }) {
+                                        Text(text = "Follow")
+                                    }
                                 }
+
                                 Spacer(modifier = Modifier.width(5.dp))
                                 Button(
                                     modifier = Modifier.fillMaxWidth(),

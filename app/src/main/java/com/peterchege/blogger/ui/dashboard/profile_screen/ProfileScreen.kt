@@ -30,11 +30,12 @@ import coil.compose.rememberImagePainter
 import com.peterchege.blogger.api.requests.CommentBody
 import com.peterchege.blogger.components.ArticleCard
 import com.peterchege.blogger.components.BottomSheetItem
+import com.peterchege.blogger.ui.theme.LightIndigo
 import com.peterchege.blogger.util.Constants
 import com.peterchege.blogger.util.Screens
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.*
+
+
 
 @OptIn(ExperimentalMaterialApi::class)
 @ExperimentalCoilApi
@@ -51,8 +52,6 @@ fun ProfileScreen(
         bottomSheetState = sheetState
     )
     val scope = rememberCoroutineScope()
-    val gradient = Brush.linearGradient(0.0f to Color.White,0.0f to Color.White,start = Offset(0.0f, 200.0f),end = Offset(0.0f, 600.0f))
-    //val state = viewModel.state.value
     BottomSheetScaffold(
         scaffoldState=scaffoldState,
         modifier = Modifier
@@ -64,11 +63,15 @@ fun ProfileScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(300.dp)
-                    .background(Color.LightGray)
+                    .background(LightIndigo)
                 ,
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
+
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
+                    BottomSheetItem(name = "Share", onClick = {
+
+                    })
                     BottomSheetItem(name = "Log Out", onClick = {
                         viewModel.logoutUser(navHostController)
                     })
@@ -104,7 +107,7 @@ fun ProfileScreen(
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(gradient)
+                                .background(Color.White)
                                 .padding(10.dp),
                             ){
                             item{

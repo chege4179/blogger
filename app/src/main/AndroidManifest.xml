@@ -11,9 +11,9 @@
         android:usesCleartextTraffic="true"
         android:name=".BloggerApp"
         android:allowBackup="true"
-        android:icon="@mipmap/blogger"
+        android:icon="@mipmap/blogger_app_icon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/blogger_round"
+        android:roundIcon="@mipmap/blogger_app_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Blogger"
         >

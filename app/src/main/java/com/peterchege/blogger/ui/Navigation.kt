@@ -11,9 +11,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.peterchege.blogger.ui.author_profile.AuthorFollowerFollowingScreen
 import com.peterchege.blogger.ui.author_profile.AuthorProfileNavigation
 import com.peterchege.blogger.ui.author_profile.AuthorProfileScreen
-import com.peterchege.blogger.ui.author_profile.FollowerFollowingScreen
+
 import com.peterchege.blogger.ui.category_screen.CategoryScreen
 import com.peterchege.blogger.ui.dashboard.DashBoardScreen
 import com.peterchege.blogger.ui.dashboard.NavigationViewModel
@@ -58,8 +59,8 @@ fun Navigation(
         composable(Screens.AUTHOR_PROFILE_SCREEN + "/{username}"){
             AuthorProfileScreen(navController = navController)
         }
-        composable(Screens.FOLLOWER_FOLLOWING_SCREEN + "/{type}"){
-            FollowerFollowingScreen(navController = navController)
+        composable(Screens.AUTHOR_FOLLOWER_FOLLOWING_SCREEN + "/{username}" + "/{type}"){
+            AuthorFollowerFollowingScreen(navController = navController)
         }
         composable(Screens.CATEGORY_SCREEN + "/{category}"){
             CategoryScreen(navController = navController)

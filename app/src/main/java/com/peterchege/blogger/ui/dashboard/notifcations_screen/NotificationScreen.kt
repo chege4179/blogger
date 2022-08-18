@@ -9,6 +9,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -29,14 +30,16 @@ fun NotificationScreen(
     val notifications = viewModel.notifications.value
     Scaffold(
         modifier = Modifier
+
             .fillMaxSize()
             .background(Color.LightGray)
+
         ,
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text= "Notifications",
+                        text= "My Notifications",
                     )
                 }
                 ,
@@ -45,14 +48,28 @@ fun NotificationScreen(
     ) {
         LazyColumn(modifier = Modifier
             .fillMaxSize()
-            .padding(5.dp)){
-            items(notifications.reversed()){ notification ->
-                NotificationCard(
-                    navController = navHostController,
-                    notification =notification
-                )
-                Spacer(modifier = Modifier.padding(10.dp))
+            .padding(15.dp)){
+            if (notifications.isEmpty()){
+                item{
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+
+                        ){
+                        Text(text = "You have no notifications yet")
+                    }
+                }
+            }else{
+                items(notifications.reversed()){ notification ->
+                    NotificationCard(
+                        navController = navHostController,
+                        notification =notification
+                    )
+                    Spacer(modifier = Modifier.padding(10.dp))
+                }
             }
+
         }
     }
 }

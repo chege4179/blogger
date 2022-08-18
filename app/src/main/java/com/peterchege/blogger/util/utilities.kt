@@ -6,13 +6,9 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.net.Uri
 import android.os.Build
-import android.os.Environment
-import android.util.Log
+import androidx.compose.ui.text.capitalize
 import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
 import java.util.*
 
 
@@ -112,3 +108,28 @@ fun hasInternetConnection(context: Context): Boolean {
     }
     return result
 }
+
+fun randomColorCode(): String {
+
+    // create random object - reuse this as often as possible
+    val random = Random()
+
+    // create a big random number - maximum is ffffff (hex) = 16777215 (dez)
+    val nextInt = random.nextInt(0xffffff + 1)
+
+    // format it as hexadecimal string (with hashtag and leading zeros)
+
+    return String.format("#%06x", nextInt).drop(1).capitalize(Locale.ROOT)
+}
+
+fun randomID(): String = List(6) {
+    (('a'..'z') + ('A'..'Z') + ('0'..'9')).random()
+}.joinToString("")
+fun generateAvatarURL(name:String):String{
+    var splitname = name.split(" ").joinToString("+")
+    var color = randomColorCode()
+    return "https://ui-avatars.com/api/?background=${color}&color=fff&name=${splitname}&bold=true&fontsize=0.6&rounded=true"
+
+}
+
+
