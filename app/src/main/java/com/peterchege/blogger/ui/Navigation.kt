@@ -14,6 +14,7 @@ import androidx.navigation.navArgument
 import com.peterchege.blogger.ui.author_profile.AuthorProfileNavigation
 import com.peterchege.blogger.ui.author_profile.AuthorProfileScreen
 import com.peterchege.blogger.ui.author_profile.FollowerFollowingScreen
+import com.peterchege.blogger.ui.category_screen.CategoryScreen
 import com.peterchege.blogger.ui.dashboard.DashBoardScreen
 import com.peterchege.blogger.ui.dashboard.NavigationViewModel
 import com.peterchege.blogger.ui.dashboard.addpost_screen.AddPostScreen
@@ -59,6 +60,9 @@ fun Navigation(
         }
         composable(Screens.FOLLOWER_FOLLOWING_SCREEN + "/{type}"){
             FollowerFollowingScreen(navController = navController)
+        }
+        composable(Screens.CATEGORY_SCREEN + "/{category}"){
+            CategoryScreen(navController = navController)
         }
         composable(
             route = Screens.ADD_NEW_POST_SCREEN + "?postTitle={postTitle}&postBody={postBody}",

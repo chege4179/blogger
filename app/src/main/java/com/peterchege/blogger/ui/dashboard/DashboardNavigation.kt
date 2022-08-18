@@ -7,16 +7,14 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.peterchege.blogger.ui.dashboard.addpost_screen.AddPostScreen
-import com.peterchege.blogger.ui.dashboard.addpost_screen.AddPostScreenNavigation
+
 import com.peterchege.blogger.ui.dashboard.feed_screen.FeedScreen
-import com.peterchege.blogger.ui.dashboard.home_screen.HomeScreen
+
 import com.peterchege.blogger.ui.dashboard.notifcations_screen.NotificationScreen
 import com.peterchege.blogger.ui.dashboard.profile_screen.ProfileNavigation
-import com.peterchege.blogger.ui.dashboard.profile_screen.ProfileScreen
 import com.peterchege.blogger.ui.dashboard.savedposts_screen.SavedPostScreen
 import com.peterchege.blogger.util.Screens
-import java.lang.reflect.Modifier
+
 
 
 @Composable

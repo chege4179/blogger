@@ -39,7 +39,7 @@ fun CategoryCard(
             )
             .padding(6.dp)
             .clickable{
-                navController.navigate(Screens.CATEGORY_SCREEN)
+                navController.navigate(Screens.CATEGORY_SCREEN + "/${categoryItem.name}")
 
             }
     ) {
