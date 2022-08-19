@@ -8,7 +8,7 @@ The app there might be an old version
 ## Screenshots of the app
 <img src="screenshots/login_page.png" width="250"/> <img src="screenshots/sign_up_page.png" width="250"/> <img src="screenshots/feed_screen.png" width="250"/>
 
- <img src="screenshots/post_screen.png" width="250"/> <img src="screenshots/search_screen.png" width="250"/> <img src="screenshots/saerch_screen.png" width="250"/>
+ <img src="screenshots/post_screen.png" width="250"/>  <img src="screenshots/saerch_screen.png" width="250"/><img src="screenshots/notifications_screen.png" width="250"/>
 
 <img src="screenshots/profile_screen.png" width="250"/> <img src="screenshots/following_screen.png" width="250"/><img src="screenshots/create_post_screen.png" width="250"/> 
 
