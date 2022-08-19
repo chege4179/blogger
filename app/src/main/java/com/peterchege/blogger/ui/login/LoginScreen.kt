@@ -1,6 +1,7 @@
 package com.peterchege.blogger.ui.login
 
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -14,6 +15,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -22,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.peterchege.blogger.R
 import com.peterchege.blogger.util.Screens
 import com.peterchege.blogger.util.UiEvent
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -55,6 +58,10 @@ fun LoginScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Image(
+                    painter = painterResource(id = R.mipmap.blogger_app_icon_foreground),
+                    modifier = Modifier.width(80.dp).height(80.dp),
+                    contentDescription = "App Icon")
                 Text(
                     text = "Blogger App",
                     fontSize = 30.sp,
@@ -113,7 +120,9 @@ fun LoginScreen(
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Button(
-                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
                     onClick = {
                         keyboardController?.hide()
                         viewModel.initiateLogin(navController,scaffoldState, context = context)
@@ -124,7 +133,9 @@ fun LoginScreen(
                 }
                 Spacer(modifier = Modifier.height(20.dp))
                 TextButton(
-                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
                     onClick = {
                     navController.navigate(Screens.SIGNUP_SCREEN)
 

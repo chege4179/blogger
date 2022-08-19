@@ -80,7 +80,7 @@ fun FollowerCard(
             Spacer(modifier = Modifier.width(10.dp))
             Column(
                 modifier = Modifier
-                    .fillMaxWidth(0.5f)
+                    .fillMaxWidth(if (isYourProfile)  0.5f else 0.9f)
                     .fillMaxHeight(),
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.Center
@@ -93,11 +93,11 @@ fun FollowerCard(
                 Text(text=follower.followerFullname)
 
             }
-            Row(
-                modifier = Modifier.fillMaxHeight(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                if (isYourProfile){
+            if (isYourProfile){
+                Row(
+                    modifier = Modifier.fillMaxHeight(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     if (isFollowing){
                         Button(onClick = {
                             removeFollower(follower)
@@ -112,12 +112,10 @@ fun FollowerCard(
                             Text(text = "Follow")
                         }
                     }
+
                 }
-
             }
-
         }
-
     }
 }
 
@@ -169,7 +167,7 @@ fun FollowingCard(
             Spacer(modifier = Modifier.width(10.dp))
             Column(
                 modifier = Modifier
-                    .fillMaxWidth(0.5f)
+                    .fillMaxWidth(if (isYourProfile)  0.5f else 0.9f )
                     .fillMaxHeight(),
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.Center
@@ -180,11 +178,11 @@ fun FollowingCard(
                 Text(text=following.followedFullname)
 
             }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxHeight()
-            ) {
-                if (isYourProfile){
+            if (isYourProfile){
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxHeight()
+                ) {
                     Button(
 
                         onClick = {
@@ -192,9 +190,10 @@ fun FollowingCard(
                         }) {
                         Text(text = "Un Follow")
                     }
-                }
 
+                }
             }
+
 
         }
 

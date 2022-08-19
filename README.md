@@ -5,6 +5,18 @@ The app is available for download [here](https://mystory-f1ec9.web.app/) for now
 it to the play store soon
 The app there might be an old version
 
+## Screenshots of the app
+<img src="screenshots/login_screen.png" width="250"/> <img src="screenshots/sign_up_screen.png" width="250"/>
+
+<img src="screenshots/feed_screen.png" width="250"/> <img src="screenshots/post_screen.png" width="250"/> 
+
+<img src="screenshots/search_screen.png" width="250"/> <img src="screenshots/saerch_screen.png" width="250"/>
+
+<img src="screenshots/profile_screen.png" width="250"/> <img src="screenshots/following_screen.png" width="250"/> 
+
+<img src="screenshots/create_post_screen.png" width="250"/> <img src="screenshots/comments_screen.png" width="250"/>
+
+
 ## Technologies Used
 1. Jetpack Compose
 2. Dagger Hilt for Dependency Injection
