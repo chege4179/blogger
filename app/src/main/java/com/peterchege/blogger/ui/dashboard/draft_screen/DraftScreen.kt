@@ -1,5 +1,6 @@
 package com.peterchege.blogger.ui.dashboard.draft_screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -16,7 +17,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.peterchege.blogger.components.DraftCard
 
-
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun DraftScreen(
     navController: NavController,

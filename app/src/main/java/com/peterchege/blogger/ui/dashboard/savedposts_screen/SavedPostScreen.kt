@@ -1,5 +1,6 @@
 package com.peterchege.blogger.ui.dashboard.savedposts_screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,7 +23,7 @@ import com.peterchege.blogger.room.entities.toPost
 import com.peterchege.blogger.util.Constants
 import com.peterchege.blogger.util.Screens
 
-
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun SavedPostScreen(
     navHostController: NavHostController,

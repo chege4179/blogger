@@ -22,6 +22,7 @@ import com.peterchege.blogger.ui.dashboard.addpost_screen.AddPostScreen
 import com.peterchege.blogger.ui.dashboard.draft_screen.DraftScreen
 import com.peterchege.blogger.ui.post_screen.PostScreen
 import com.peterchege.blogger.ui.login.LoginScreen
+import com.peterchege.blogger.ui.search_screen.SearchScreen
 import com.peterchege.blogger.ui.signup.SignUpScreen
 import com.peterchege.blogger.util.Screens
 
@@ -49,6 +50,9 @@ fun Navigation(
         }
         composable(Screens.SIGNUP_SCREEN){
             SignUpScreen(navController = navController)
+        }
+        composable(Screens.SEARCH_SCREEN){
+            SearchScreen(navController = navController)
         }
         composable(Screens.POST_SCREEN + "/{postId}/{source}"){
             PostScreen(navController = navController)

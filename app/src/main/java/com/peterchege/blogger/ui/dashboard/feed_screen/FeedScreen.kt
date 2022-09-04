@@ -1,5 +1,6 @@
 package com.peterchege.blogger.ui.dashboard.feed_screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Message
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,6 +29,7 @@ import com.peterchege.blogger.util.Constants
 import com.peterchege.blogger.util.Screens
 import com.peterchege.blogger.util.categories
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 @ExperimentalCoilApi
 fun FeedScreen(
@@ -48,6 +51,44 @@ fun FeedScreen(
             .fillMaxSize()
             .background(Color.DarkGray),
         scaffoldState = scaffoldState,
+        topBar = {
+            TopAppBar(
+                title = {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .fillMaxHeight(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+
+                        ) {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(0.75f),
+                            text = "Blogger"
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    navHostController.navigate(Screens.SEARCH_SCREEN)
+                                }) {
+                                Icon(
+                                    Icons.Filled.Search,
+                                    contentDescription = "Chats",
+                                    Modifier.size(26.dp)
+
+                                )
+                            }
+                        }
+                    }
+
+                },
+                backgroundColor = MaterialTheme.colors.primary
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
@@ -68,26 +109,6 @@ fun FeedScreen(
                     .padding(5.dp)
                 ,
             ) {
-                OutlinedTextField(
-                    value = viewModel.searchTerm.value,
-                    onValueChange ={
-                        viewModel.onChangeSearchTerm(it)
-                    },
-                    label ={
-                        Text(text="Search posts or users")
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    trailingIcon = {
-                        Icon(
-                            Icons.Filled.Search,
-                            contentDescription = "Visibility on",
-                            Modifier
-                                .size(26.dp)
-
-                        )
-                    },
-
-                )
                 LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()

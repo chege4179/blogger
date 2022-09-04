@@ -1,6 +1,7 @@
 package com.peterchege.blogger.ui.post_screen
 
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -34,7 +35,7 @@ import coil.compose.rememberImagePainter
 import com.peterchege.blogger.components.CommentBox
 import com.peterchege.blogger.ui.dashboard.profile_screen.DeleteBox
 import com.peterchege.blogger.util.Screens
-
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @ExperimentalCoilApi
 @Composable
 fun PostScreen(

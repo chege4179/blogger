@@ -1,5 +1,6 @@
 package com.peterchege.blogger.ui.dashboard.addpost_screen
 
+import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.graphics.ImageDecoder.decodeBitmap
@@ -32,7 +33,7 @@ import coil.annotation.ExperimentalCoilApi
 import com.peterchege.blogger.util.*
 import com.skydoves.landscapist.glide.GlideImage
 
-
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @ExperimentalCoilApi
 @Composable
 fun AddPostScreen(

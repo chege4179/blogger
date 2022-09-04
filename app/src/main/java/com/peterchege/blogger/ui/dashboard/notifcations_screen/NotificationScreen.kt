@@ -1,5 +1,6 @@
 package com.peterchege.blogger.ui.dashboard.notifcations_screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,7 +21,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.peterchege.blogger.components.NotificationCard
 
-
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun NotificationScreen(
     navController: NavController,

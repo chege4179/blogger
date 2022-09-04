@@ -1,5 +1,6 @@
 package com.peterchege.blogger.ui.login
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -29,6 +30,7 @@ import com.peterchege.blogger.util.Screens
 import com.peterchege.blogger.util.UiEvent
 import kotlinx.coroutines.InternalCoroutinesApi
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @ExperimentalComposeUiApi
 @Composable
 fun LoginScreen(

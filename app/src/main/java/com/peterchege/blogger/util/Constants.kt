@@ -26,4 +26,7 @@ object Constants {
     const val FOLLOWING="FOLLOWING"
 
     const val NOTIFICATION_CHANNEL = "upload_channel"
+
+    const val SEARCH_TYPE_POSTS = "Posts"
+    const val SEARCH_TYPE_USERS = "Users"
 }

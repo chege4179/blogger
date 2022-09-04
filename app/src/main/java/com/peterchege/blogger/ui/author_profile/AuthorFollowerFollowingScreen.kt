@@ -1,5 +1,6 @@
 package com.peterchege.blogger.ui.author_profile
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +22,7 @@ import com.peterchege.blogger.components.FollowingCard
 import com.peterchege.blogger.util.Constants
 import java.util.*
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun AuthorFollowerFollowingScreen(
     navController: NavController,

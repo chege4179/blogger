@@ -1,5 +1,6 @@
 package com.peterchege.blogger.ui.dashboard.profile_screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,7 +19,7 @@ import com.peterchege.blogger.components.FollowingCard
 import com.peterchege.blogger.util.Constants
 import java.util.*
 
-
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ProfileFollowerFollowingScreen(
     navController: NavController,

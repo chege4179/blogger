@@ -1,5 +1,6 @@
 package com.peterchege.blogger.ui.author_profile
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -47,6 +48,7 @@ fun AuthorProfileNavigation(
 
     }
 }
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @OptIn(ExperimentalCoilApi::class)
 @Composable
 fun AuthorProfileScreen(
