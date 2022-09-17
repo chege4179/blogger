@@ -110,9 +110,11 @@ class LoginViewModel @Inject constructor(
                         try {
                             val response = repository.loginUser(loginUser)
                             _isLoading.value = false
-                            scaffoldState.snackbarHostState.showSnackbar(
-                                message = response.msg,
-                            )
+                            if(!response.success){
+                                scaffoldState.snackbarHostState.showSnackbar(
+                                    message = response.msg,
+                                )
+                            }
                             if (response.success){
                                 val userInfoEditor = sharedPreferences.edit()
                                 userInfoEditor.apply{

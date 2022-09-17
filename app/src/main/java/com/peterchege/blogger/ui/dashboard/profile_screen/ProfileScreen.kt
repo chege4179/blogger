@@ -6,14 +6,15 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Message
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -31,10 +32,11 @@ import com.peterchege.blogger.api.requests.CommentBody
 import com.peterchege.blogger.components.ArticleCard
 import com.peterchege.blogger.components.BottomSheetItem
 import com.peterchege.blogger.ui.theme.LightIndigo
+import com.peterchege.blogger.ui.theme.MainWhiteColor
+import com.peterchege.blogger.ui.theme.lightGrayColor
 import com.peterchege.blogger.util.Constants
 import com.peterchege.blogger.util.Screens
 import kotlinx.coroutines.launch
-
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -44,7 +46,7 @@ fun ProfileScreen(
     navController: NavController,
     navHostController: NavController,
     viewModel: ProfileViewModel = hiltViewModel()
-){
+) {
     val sheetState = rememberBottomSheetState(
         initialValue = BottomSheetValue.Collapsed
     )
@@ -53,28 +55,56 @@ fun ProfileScreen(
     )
     val scope = rememberCoroutineScope()
     BottomSheetScaffold(
-        scaffoldState=scaffoldState,
+        scaffoldState = scaffoldState,
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.LightGray)
-        ,
+            .background(Color.LightGray),
         sheetContent = {
             Box(
                 modifier = Modifier
+                    .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
                     .fillMaxWidth()
                     .height(300.dp)
-                    .background(LightIndigo)
-                ,
+                    .background(lightGrayColor),
                 contentAlignment = Alignment.Center,
 
-            ) {
+                ) {
                 Column(modifier = Modifier.fillMaxSize()) {
-                    BottomSheetItem(name = "Share", onClick = {
+                    BottomSheetItem(
+                        name = "Account",
+                        onClick = {
 
-                    })
-                    BottomSheetItem(name = "Log Out", onClick = {
-                        viewModel.logoutUser(navHostController)
-                    })
+                        },
+                        icon = Icons.Filled.Person
+                    )
+                    BottomSheetItem(
+                        name = "Notification Settings",
+                        onClick = {
+
+                        },
+                        icon = Icons.Filled.Settings
+                    )
+                    BottomSheetItem(
+                        name = "Help",
+                        onClick = {
+
+                        },
+                        icon = Icons.Filled.Help
+                    )
+                    BottomSheetItem(
+                        name = "Share",
+                        onClick = {
+
+                        },
+                        icon = Icons.Filled.Share
+                    )
+                    BottomSheetItem(
+                        name = "Log Out",
+                        onClick = {
+                            viewModel.logoutUser(navHostController)
+                        },
+                        icon = Icons.Filled.Logout
+                    )
 
                 }
             }
@@ -83,52 +113,53 @@ fun ProfileScreen(
         sheetPeekHeight = 0.dp,
 
 
-    ) {
+        ) {
 
 
-        if (viewModel.isLoading.value){
+        if (viewModel.isLoading.value) {
             Box(modifier = Modifier.fillMaxSize()) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
-        }else{
-            if (viewModel.isError.value){
-                Box(modifier = Modifier.fillMaxSize()){
+        } else {
+            if (viewModel.isError.value) {
+                Box(modifier = Modifier.fillMaxSize()) {
                     Text(
-                        modifier =Modifier.align(Alignment.Center),
+                        modifier = Modifier.align(Alignment.Center),
                         text = viewModel.msg.value
                     )
 
                 }
-            }else{
+            } else {
                 viewModel.user.value?.let { user ->
-                    Box(modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.White)) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.White)
+                    ) {
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .background(Color.White)
                                 .padding(10.dp),
-                            ){
-                            item{
+                        ) {
+                            item {
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(160.dp),
                                     verticalArrangement = Arrangement.Center,
                                     horizontalAlignment = Alignment.CenterHorizontally,
-                                    ) {
+                                ) {
                                     Box(
                                         modifier = Modifier
                                             .fillMaxWidth(0.3f)
 
-                                    ){
+                                    ) {
                                         Image(
                                             modifier = Modifier
                                                 .width(80.dp)
                                                 .height(80.dp)
-                                                .align(Alignment.Center)
-                                            ,
+                                                .align(Alignment.Center),
                                             painter = rememberImagePainter(
                                                 data = user.imageUrl,
                                                 builder = {
@@ -136,7 +167,8 @@ fun ProfileScreen(
 
                                                 },
                                             ),
-                                            contentDescription = "Profile Image")
+                                            contentDescription = "Profile Image"
+                                        )
 
                                     }
                                     Spacer(modifier = Modifier.height(5.dp))
@@ -152,18 +184,17 @@ fun ProfileScreen(
                                         )
                                         Spacer(modifier = Modifier.padding(3.dp))
                                         Text(
-                                            text = "@"+user.username,
+                                            text = "@" + user.username,
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 18.sp
                                         )
                                         Spacer(modifier = Modifier.height(3.dp))
 
 
-
                                     }
                                 }
                             }
-                            item{
+                            item {
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -184,11 +215,15 @@ fun ProfileScreen(
                                         Text(
                                             text = "Articles",
                                             fontSize = 17.sp,
-                                            )
+                                        )
                                     }
-                                    Divider(color = Color.LightGray, thickness = 2.dp, modifier = Modifier
-                                        .fillMaxHeight(0.7f)
-                                        .width(1.dp))
+                                    Divider(
+                                        color = Color.LightGray,
+                                        thickness = 2.dp,
+                                        modifier = Modifier
+                                            .fillMaxHeight(0.7f)
+                                            .width(1.dp)
+                                    )
 
                                     Column(
                                         modifier = Modifier.clickable {
@@ -209,9 +244,13 @@ fun ProfileScreen(
 
                                             )
                                     }
-                                    Divider(color = Color.LightGray, thickness = 2.dp, modifier = Modifier
-                                        .fillMaxHeight(0.7f)
-                                        .width(1.dp))
+                                    Divider(
+                                        color = Color.LightGray,
+                                        thickness = 2.dp,
+                                        modifier = Modifier
+                                            .fillMaxHeight(0.7f)
+                                            .width(1.dp)
+                                    )
 
                                     Column(
                                         modifier = Modifier.clickable {
@@ -234,14 +273,14 @@ fun ProfileScreen(
 
                                 }
                             }
-                            item{
+                            item {
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(60.dp),
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.SpaceEvenly,
-                                ){
+                                ) {
                                     Button(
                                         modifier = Modifier.fillMaxWidth(0.5f),
                                         onClick = {
@@ -266,20 +305,20 @@ fun ProfileScreen(
 
                                 }
                             }
-                            items(viewModel.posts.value){ post ->
+                            items(viewModel.posts.value) { post ->
                                 ArticleCard(
                                     post = post,
                                     onItemClick = {
-                                        navHostController.navigate(Screens.POST_SCREEN +"/${post._id}/${Constants.API_SOURCE}")
+                                        navHostController.navigate(Screens.POST_SCREEN + "/${post._id}/${Constants.API_SOURCE}")
 
                                     },
-                                    onProfileNavigate ={ username ->
-
-                                    } ,
-                                    onDeletePost ={
+                                    onProfileNavigate = { username ->
 
                                     },
-                                    profileImageUrl = user.imageUrl ,
+                                    onDeletePost = {
+
+                                    },
+                                    profileImageUrl = user.imageUrl,
                                     isLiked = false,
                                     isSaved = false,
                                     isProfile = true
