@@ -20,7 +20,7 @@ import com.peterchege.blogger.ui.dashboard.DashBoardScreen
 import com.peterchege.blogger.ui.dashboard.NavigationViewModel
 import com.peterchege.blogger.ui.dashboard.addpost_screen.AddPostScreen
 import com.peterchege.blogger.ui.dashboard.draft_screen.DraftScreen
-import com.peterchege.blogger.ui.dashboard.settings_screen.SettingsScreen
+
 import com.peterchege.blogger.ui.post_screen.PostScreen
 import com.peterchege.blogger.ui.login.LoginScreen
 import com.peterchege.blogger.ui.search_screen.SearchScreen
@@ -70,9 +70,7 @@ fun Navigation(
         composable(Screens.CATEGORY_SCREEN + "/{category}"){
             CategoryScreen(navController = navController)
         }
-        composable(Screens.SETTINGS_SCREEN ){
-            SettingsScreen(navController = navController)
-        }
+
 
         composable(
             route = Screens.ADD_NEW_POST_SCREEN + "?postTitle={postTitle}&postBody={postBody}",
