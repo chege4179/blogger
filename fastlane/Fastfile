@@ -36,8 +36,8 @@ platform :android do
               android_artifact_type:"APK",
               debug:true,
               firebase_cli_token:"1//031gtnPQJBCtpCgYIARAAGAMSNwF-L9Irj2eO8cqb7v5EiCCxIMWSr4YfGttLCD4R47u05mxXZcctLw6zdf5r3ytXBK1l_AhZRlI",
-              service_credentials_file:"C:/Users/User/AndroidStudioProjects/Blogger/fastlane/firebase_distribution_key.json",
-              testers_file:"C:/Users/User/AndroidStudioProjects/Blogger/fastlane/testers.txt",
+              service_credentials_file:"fastlane/firebase_distribution_key.json",
+              testers_file:"fastlane/testers.txt",
           )
       end
 
