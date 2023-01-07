@@ -13,3 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+/fastlane/firebase_distribution_key.json
+

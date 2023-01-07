@@ -1,0 +1,20 @@
+name: Distribute Android App
+
+name: Distribute Android App
+
+on: [push]
+
+jobs:
+  distribute_android_app:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Ruby
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: 2.7
+      - name: Install fastlane
+        run: gem install fastlane
+      - name: Distribute Android App
+        run: |
+          fastlane distribute

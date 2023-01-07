@@ -23,12 +23,21 @@ platform :android do
 
   desc "My awesome app"
       lane :distribute do
-          build_android_app(...)
+
+          build_android_app(
+            task: "clean assemble",
+            build_type: "Debug"
+          )
           # build_android_app is a built-in fastlane action.
           firebase_app_distribution(
-              app: "1:123456789:android:abcd1234",
-              testers: "tester1@company.com, tester2@company.com",
-              release_notes: "Lots of amazing new features to test out!"
+              app: "1:365193487318:android:7809e25308aaf21fd47a77",
+              release_notes: "Lots of amazing new features to test out!",
+              groups:"trusted-testers",
+              android_artifact_type:"APK",
+              debug:true,
+              firebase_cli_token:"1//031gtnPQJBCtpCgYIARAAGAMSNwF-L9Irj2eO8cqb7v5EiCCxIMWSr4YfGttLCD4R47u05mxXZcctLw6zdf5r3ytXBK1l_AhZRlI",
+              service_credentials_file:"C:/Users/User/AndroidStudioProjects/Blogger/fastlane/firebase_distribution_key.json",
+              testers_file:"C:/Users/User/AndroidStudioProjects/Blogger/fastlane/testers.txt",
           )
       end
 
