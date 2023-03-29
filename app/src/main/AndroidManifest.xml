@@ -9,7 +9,7 @@
 
     <application
         android:usesCleartextTraffic="true"
-        android:name=".BloggerApp"
+        android:name=".core.di.BloggerApp"
         android:allowBackup="true"
         android:icon="@mipmap/blogger_app_icon"
         android:label="@string/app_name"
@@ -18,7 +18,7 @@
         android:theme="@style/Theme.Blogger"
         >
         <activity
-            android:name=".MainActivity"
+            android:name=".presentation.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Blogger.NoActionBar">
@@ -31,7 +31,7 @@
         </activity>
 
         <service
-            android:name=".messaging.MyFirebaseMessagingService"
+            android:name=".core.messaging.MyFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

@@ -4,6 +4,7 @@ plugins {
     id ("kotlin-kapt")
     id ("dagger.hilt.android.plugin")
     id ("com.google.gms.google-services")
+    id ("com.google.firebase.crashlytics")
 }
 
 android {
@@ -129,10 +130,17 @@ dependencies {
 
     implementation("androidx.work:work-runtime-ktx:2.8.1")
 
+    implementation ("com.google.firebase:firebase-crashlytics-ktx:18.3.6")
+    implementation ("com.google.firebase:firebase-analytics-ktx:21.2.1")
+    //timber
+    implementation("com.jakewharton.timber:timber:5.0.1")
+
     debugImplementation ("com.squareup.leakcanary:leakcanary-android:2.10")
 
 
     debugImplementation ("com.github.chuckerteam.chucker:library:3.5.2")
     releaseImplementation("com.github.chuckerteam.chucker:library-no-op:3.5.2")
+
+
 }
 
