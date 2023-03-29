@@ -24,7 +24,8 @@ import com.peterchege.blogger.room.entities.PostRecord
 
 @Database(
     entities = [PostRecord::class,DraftRecord::class],
-    version = 1
+    version = 1,
+    exportSchema = true
 )
 abstract class BloggerDatabase: RoomDatabase() {
 

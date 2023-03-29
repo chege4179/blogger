@@ -29,6 +29,11 @@ android {
             proguardFiles (getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
+    kapt {
+        arguments {
+            arg("room.schemaLocation", "$projectDir/schemas")
+        }
+    }
     compileOptions {
         sourceCompatibility= JavaVersion.VERSION_1_8
         targetCompatibility= JavaVersion.VERSION_1_8
@@ -41,7 +46,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.3.0"
+        kotlinCompilerExtensionVersion = "1.4.3"
         kotlinCompilerVersion = "1.5.21"
     }
     packagingOptions {
@@ -54,18 +59,18 @@ android {
 dependencies {
 
     implementation ("androidx.core:core-ktx:1.9.0")
-    implementation ("androidx.appcompat:appcompat:1.5.1")
-    implementation ("com.google.android.material:material:1.7.0")
-    implementation ("androidx.compose.ui:ui:1.4.0-alpha03")
-    implementation ("androidx.compose.material:material:1.4.0-alpha03")
-    implementation ("androidx.compose.ui:ui-tooling-preview:1.4.0-alpha03")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
-    implementation ("androidx.activity:activity-compose:1.6.1")
+    implementation ("androidx.appcompat:appcompat:1.6.1")
+    implementation ("com.google.android.material:material:1.8.0")
+    implementation ("androidx.compose.ui:ui:1.5.0-alpha01")
+    implementation ("androidx.compose.material:material:1.5.0-alpha01")
+    implementation ("androidx.compose.ui:ui-tooling-preview:1.5.0-alpha01")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+    implementation ("androidx.activity:activity-compose:1.7.0")
     testImplementation ("junit:junit:4.13.2")
-    androidTestImplementation ("androidx.test.ext:junit:1.1.4")
-    androidTestImplementation ("androidx.test.espresso:espresso-core:3.5.0")
-    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:1.4.0-alpha03")
-    debugImplementation ("androidx.compose.ui:ui-tooling:1.4.0-alpha03")
+    androidTestImplementation ("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation ("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:1.5.0-alpha01")
+    debugImplementation ("androidx.compose.ui:ui-tooling:1.5.0-alpha01")
 
 
 
@@ -76,16 +81,16 @@ dependencies {
     implementation ("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2")
 
     // view model
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
 
     //coroutines
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
 
     // dagger hilt
-    implementation ("com.google.dagger:hilt-android:2.44.2")
-    kapt ("com.google.dagger:hilt-android-compiler:2.44.2")
+    implementation ("com.google.dagger:hilt-android:2.45")
+    kapt ("com.google.dagger:hilt-android-compiler:2.45")
 //    implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03"
     kapt ("androidx.hilt:hilt-compiler:1.0.0")
     implementation ("androidx.hilt:hilt-navigation-compose:1.0.0")
@@ -94,26 +99,26 @@ dependencies {
     implementation ("io.coil-kt:coil-compose:2.2.2")
 
     //fcm
-    implementation ("com.google.firebase:firebase-messaging:23.1.1")
+    implementation ("com.google.firebase:firebase-messaging:23.1.2")
 
     // room 
-    implementation ("androidx.room:room-runtime:2.4.3")
-    kapt ("androidx.room:room-compiler:2.4.3")
+    implementation ("androidx.room:room-runtime:2.5.1")
+    kapt ("androidx.room:room-compiler:2.5.1")
 
     // Kotlin Extensions and Coroutines support for Room
-    implementation ("androidx.room:room-ktx:2.4.3")
+    implementation ("androidx.room:room-ktx:2.5.1")
 
 //    implementation "androidx.compose.runtime:runtime-livedata:1.3.0-alpha03"
-    implementation ("androidx.compose.material:material-icons-extended:1.4.0-alpha03")
+    implementation ("androidx.compose.material:material-icons-extended:1.5.0-alpha01")
 
     //glide
     implementation ("dev.chrisbanes.accompanist:accompanist-glide:0.5.1")
 
     //pager
-    implementation ("com.google.accompanist:accompanist-pager:0.24.3-alpha")
-    implementation ("com.google.accompanist:accompanist-pager-indicators:0.24.3-alpha")
+    implementation ("com.google.accompanist:accompanist-pager:0.28.0")
+    implementation ("com.google.accompanist:accompanist-pager-indicators:0.28.0")
     // swipe refresh
-    implementation ("com.google.accompanist:accompanist-swiperefresh:0.24.2-alpha")
+    implementation ("com.google.accompanist:accompanist-swiperefresh:0.27.1")
     // landscapist
     implementation ("com.github.skydoves:landscapist-glide:1.4.8")
 
@@ -122,6 +127,12 @@ dependencies {
     implementation ("com.github.skydoves:landscapist-glide:1.4.8")
 
 
-    implementation("androidx.work:work-runtime-ktx:2.7.1")
+    implementation("androidx.work:work-runtime-ktx:2.8.1")
+
+    debugImplementation ("com.squareup.leakcanary:leakcanary-android:2.10")
+
+
+    debugImplementation ("com.github.chuckerteam.chucker:library:3.5.2")
+    releaseImplementation("com.github.chuckerteam.chucker:library-no-op:3.5.2")
 }
 

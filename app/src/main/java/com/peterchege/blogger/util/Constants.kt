@@ -19,7 +19,7 @@ object Constants {
     const val LOCAL_URL="http://10.0.2.2:9000"
     const val REMOTE_URL = "https://bloggerserver-production.up.railway.app"
 
-    const val BASE_URL = REMOTE_URL
+    const val BASE_URL = LOCAL_URL
 
     const val LOGIN_ID = "LOGIN_ID"
     const val LOGIN_USERNAME = "LOGIN_USERNAME"
