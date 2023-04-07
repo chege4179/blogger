@@ -18,6 +18,7 @@ package com.peterchege.blogger.presentation.screens.dashboard.savedposts_screen
 import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.peterchege.blogger.core.util.Constants
@@ -25,6 +26,8 @@ import com.peterchege.blogger.core.util.Screens
 
 import com.peterchege.blogger.domain.repository.PostRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 
@@ -35,6 +38,12 @@ class SavedPostScreenViewModel @Inject constructor(
 
 ) : ViewModel() {
     val posts = repository.getAllPostsFromRoom()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = emptyList()
+
+        )
 
     fun onProfileNavigate(
         username: String,

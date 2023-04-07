@@ -24,20 +24,20 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import coil.annotation.ExperimentalCoilApi
 import com.peterchege.blogger.presentation.components.ArticleCard
-import com.peterchege.blogger.core.room.entities.toPost
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.Screens
+import com.peterchege.blogger.domain.mappers.toExternalModel
 
+@OptIn(ExperimentalCoilApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun SavedPostScreen(
@@ -45,7 +45,11 @@ fun SavedPostScreen(
     bottomNavController: NavController,
     viewModel: SavedPostScreenViewModel = hiltViewModel()
 ){
-    val posts = viewModel.posts.collectAsState(initial = emptyList())
+    val posts = viewModel.posts
+        .collectAsStateWithLifecycle()
+        .value
+        .map { it.toExternalModel() }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
@@ -70,7 +74,7 @@ fun SavedPostScreen(
                     modifier = Modifier
                         .fillMaxSize()
                 ) {
-                    if (posts.value.isEmpty()){
+                    if (posts.isEmpty()){
                         Text(
                             text = "You have no saved posts",
                             fontWeight = FontWeight.Bold,
@@ -80,11 +84,11 @@ fun SavedPostScreen(
                 }
             }
 
-            items(items = posts.value){ post ->
+            items(items = posts){ post ->
                 ArticleCard(
-                    post = post.toPost(),
+                    post = post,
                     onItemClick = {
-                        navHostController.navigate(Screens.POST_SCREEN + "/${post.toPost()._id}/${Constants.ROOM_SOURCE}")
+                        navHostController.navigate(Screens.POST_SCREEN + "/${post._id}/${Constants.ROOM_SOURCE}")
                     },
                     onProfileNavigate = {
                         viewModel.onProfileNavigate(it,bottomNavController,navHostController)

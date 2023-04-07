@@ -24,6 +24,7 @@ import com.peterchege.blogger.core.api.requests.Viewer
 import com.peterchege.blogger.core.api.responses.*
 import com.peterchege.blogger.core.room.database.BloggerDatabase
 import com.peterchege.blogger.core.room.entities.PostRecord
+import com.peterchege.blogger.core.room.entities.PostRecordWithCommentsLikesViews
 import com.peterchege.blogger.domain.repository.PostRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -67,7 +68,7 @@ class PostRepositoryImpl @Inject constructor(
         return api.unfollowUser(followUser = followUser)
     }
 
-    override suspend fun insertPost(post: PostRecord) {
+    override suspend fun insertPost(post: Post) {
         return db.postDao.insertPost(post)
 
     }
@@ -81,11 +82,11 @@ class PostRepositoryImpl @Inject constructor(
         return db.postDao.deletePostById(id)
     }
 
-    override suspend fun getPostFromRoom(postId: String): PostRecord? {
+    override suspend fun getPostFromRoom(postId: String): PostRecordWithCommentsLikesViews? {
         return db.postDao.getPostById(postId)
     }
 
-    override fun getAllPostsFromRoom(): Flow<List<PostRecord>> {
-        return db.postDao.getPosts()
+    override fun getAllPostsFromRoom(): Flow<List<PostRecordWithCommentsLikesViews>> {
+        return db.postDao.getAllLocalPosts()
     }
 }

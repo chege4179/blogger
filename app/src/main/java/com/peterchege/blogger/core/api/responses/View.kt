@@ -16,8 +16,8 @@
 package com.peterchege.blogger.core.api.responses
 
 data class View(
-    val username:String,
-    val userId:String,
-    val id:String
+    val viewerUsername:String,
+    val viewerFullname:String,
+    val viewerId:String
 
 )

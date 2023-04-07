@@ -29,7 +29,6 @@ data class Post(
     val comments:List<Comment>,
     val views:List<View>,
     val likes:List<Like>
-
     )
 
 fun Post.toPostRecord(): PostRecord {
