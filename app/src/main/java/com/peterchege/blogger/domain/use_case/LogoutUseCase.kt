@@ -19,7 +19,7 @@ import android.util.Log
 import com.peterchege.blogger.core.api.requests.LogoutUser
 import com.peterchege.blogger.core.api.responses.LogoutResponse
 import com.peterchege.blogger.core.util.Resource
-import com.peterchege.blogger.data.LoginRepository
+import com.peterchege.blogger.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
@@ -27,9 +27,9 @@ import java.io.IOException
 import javax.inject.Inject
 
 class LogoutUseCase @Inject constructor(
-    private val repository: LoginRepository,
+    private val repository: AuthRepository
 
-    ) {
+) {
     operator fun invoke(logoutUser: LogoutUser): Flow<Resource<LogoutResponse>> = flow {
         try {
             emit(Resource.Loading<LogoutResponse>())

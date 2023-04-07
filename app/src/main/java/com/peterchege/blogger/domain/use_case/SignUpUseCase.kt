@@ -18,7 +18,7 @@ package com.peterchege.blogger.domain.use_case
 import com.peterchege.blogger.core.api.requests.SignUpUser
 import com.peterchege.blogger.core.api.responses.SignUpResponse
 import com.peterchege.blogger.core.util.Resource
-import com.peterchege.blogger.data.SignUpRepository
+import com.peterchege.blogger.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
@@ -26,7 +26,7 @@ import java.io.IOException
 import javax.inject.Inject
 
 class SignUpUseCase @Inject constructor(
-    private val repository: SignUpRepository
+    private val repository: AuthRepository
 ) {
     operator fun invoke(signUpUser: SignUpUser): Flow<Resource<SignUpResponse>> = flow {
         try {

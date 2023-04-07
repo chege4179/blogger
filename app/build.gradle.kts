@@ -84,6 +84,7 @@ dependencies {
     // view model
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+    implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.6.1")
 
     //coroutines
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
@@ -121,11 +122,11 @@ dependencies {
     // swipe refresh
     implementation ("com.google.accompanist:accompanist-swiperefresh:0.27.1")
     // landscapist
-    implementation ("com.github.skydoves:landscapist-glide:1.4.8")
+    implementation ("com.github.skydoves:landscapist-glide:2.1.8")
 
     implementation ("com.google.accompanist:accompanist-flowlayout:0.28.0")
 
-    implementation ("com.github.skydoves:landscapist-glide:1.4.8")
+
 
 
     implementation("androidx.work:work-runtime-ktx:2.8.1")

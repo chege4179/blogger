@@ -13,18 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.presentation.screens.dashboard.feed_screen
+package com.peterchege.blogger.domain.repository
 
-import com.peterchege.blogger.core.api.BloggerApi
-import com.peterchege.blogger.core.api.responses.Post
-import javax.inject.Inject
+import com.peterchege.blogger.core.api.requests.CommentBody
+import com.peterchege.blogger.core.api.responses.CommentResponse
 
-class FeedRepository @Inject constructor(
-    private val api: BloggerApi
-) {
-    suspend fun getFeedPosts(): List<Post> {
-        return api.getAllPosts().posts
-    }
+interface CommentRepository {
 
-
+    suspend fun postComment(commentBody: CommentBody): CommentResponse
 }

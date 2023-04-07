@@ -33,7 +33,7 @@ import com.peterchege.blogger.core.api.responses.Post
 import com.peterchege.blogger.core.api.responses.toPostRecord
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.Resource
-import com.peterchege.blogger.data.PostRepository
+import com.peterchege.blogger.domain.repository.PostRepository
 import com.peterchege.blogger.domain.use_case.GetPostUseCase
 import com.peterchege.blogger.domain.use_case.PostCommentUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel

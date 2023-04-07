@@ -35,7 +35,8 @@ import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.api.requests.PostBody
 import com.peterchege.blogger.core.room.entities.DraftRecord
 import com.peterchege.blogger.core.util.*
-import com.peterchege.blogger.data.DraftRepository
+import com.peterchege.blogger.data.DraftRepositoryImpl
+import com.peterchege.blogger.domain.repository.DraftRepository
 import com.peterchege.blogger.domain.use_case.AddPostUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel

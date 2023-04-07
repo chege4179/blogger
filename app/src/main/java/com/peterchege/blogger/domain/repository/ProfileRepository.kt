@@ -13,18 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.data
+package com.peterchege.blogger.domain.repository
 
-import com.peterchege.blogger.core.api.BloggerApi
-import com.peterchege.blogger.core.api.requests.CommentBody
-import com.peterchege.blogger.core.api.responses.CommentResponse
-import javax.inject.Inject
+import com.peterchege.blogger.core.api.responses.ProfileResponse
 
-class CommentRepository @Inject constructor (
-    private val api: BloggerApi
-) {
-    suspend fun postComment(commentBody: CommentBody): CommentResponse {
-        return api.postComment(commentbody = commentBody)
-    }
+interface ProfileRepository {
 
+    suspend fun getProfile(username: String): ProfileResponse
 }

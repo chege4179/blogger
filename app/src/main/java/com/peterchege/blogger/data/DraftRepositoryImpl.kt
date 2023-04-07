@@ -15,32 +15,33 @@
  */
 package com.peterchege.blogger.data
 
-import com.peterchege.blogger.core.room.dao.DraftDao
 import com.peterchege.blogger.core.room.database.BloggerDatabase
 import com.peterchege.blogger.core.room.entities.DraftRecord
+import com.peterchege.blogger.domain.repository.DraftRepository
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 
-class DraftRepository @Inject constructor(
+class DraftRepositoryImpl @Inject constructor(
     private val db: BloggerDatabase
-) {
+):DraftRepository {
 
-    suspend fun insertDraft(draft: DraftRecord){
+    override suspend fun insertDraft(draft: DraftRecord){
         return db.draftDao.insertDraft(draft)
     }
-    suspend fun getAllDrafts():List<DraftRecord>{
+    override fun getAllDrafts(): Flow<List<DraftRecord>> {
         return db.draftDao.getAllDrafts()
     }
 
-    suspend fun getDraftById(id:Int): DraftRecord {
+    override suspend fun getDraftById(id:Int): DraftRecord {
         return db.draftDao.getDraftById(id)
     }
 
-    suspend fun deleteAllDrafts(){
+    override suspend fun deleteAllDrafts(){
         return db.draftDao.deleteAllDrafts()
     }
 
-    suspend fun deleteDraftById(id: Int){
+    override suspend fun deleteDraftById(id: Int){
         return db.draftDao.deleteDraftById(id)
     }
 

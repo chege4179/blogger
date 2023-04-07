@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.data
+package com.peterchege.blogger.domain.repository
 
-import com.peterchege.blogger.core.api.BloggerApi
-import com.peterchege.blogger.core.api.requests.PostBody
-import com.peterchege.blogger.core.api.responses.UploadPostResponse
-import javax.inject.Inject
+import com.peterchege.blogger.core.room.entities.DraftRecord
+import kotlinx.coroutines.flow.Flow
 
-class AddPostRepository @Inject constructor(
-    private val api: BloggerApi
+interface DraftRepository {
 
-) {
-    suspend fun uploadPost(postBody: PostBody): UploadPostResponse {
-        return api.uploadPost(postBody = postBody)
-    }
+    suspend fun insertDraft(draft: DraftRecord)
 
+    fun getAllDrafts(): Flow<List<DraftRecord>>
+
+    suspend fun getDraftById(id:Int): DraftRecord
+
+    suspend fun deleteAllDrafts()
+
+    suspend fun deleteDraftById(id: Int)
 }

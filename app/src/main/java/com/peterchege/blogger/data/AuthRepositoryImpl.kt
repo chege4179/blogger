@@ -18,19 +18,26 @@ package com.peterchege.blogger.data
 import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.api.requests.LoginUser
 import com.peterchege.blogger.core.api.requests.LogoutUser
+import com.peterchege.blogger.core.api.requests.SignUpUser
 import com.peterchege.blogger.core.api.responses.LoginResponse
 import com.peterchege.blogger.core.api.responses.LogoutResponse
+import com.peterchege.blogger.core.api.responses.SignUpResponse
+import com.peterchege.blogger.domain.repository.AuthRepository
 import javax.inject.Inject
 
-class LoginRepository @Inject constructor(
-    private val api: BloggerApi,
+class AuthRepositoryImpl  @Inject constructor(
+    private val api: BloggerApi
+): AuthRepository {
 
-    ) {
-    suspend fun loginUser(loginUser: LoginUser): LoginResponse {
+    override suspend fun signUpUser(signUpUser: SignUpUser): SignUpResponse {
+        return api.signUpUser(signUpUser)
+    }
+
+    override suspend fun loginUser(loginUser: LoginUser): LoginResponse {
         return api.loginUser(loginUser)
     }
 
-    suspend fun logoutUser(logoutUser: LogoutUser): LogoutResponse {
+    override suspend fun logoutUser(logoutUser: LogoutUser): LogoutResponse {
         return api.logoutUser(logoutUser)
     }
 }

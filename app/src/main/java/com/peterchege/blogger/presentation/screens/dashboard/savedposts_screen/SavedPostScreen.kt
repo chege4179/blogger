@@ -80,7 +80,7 @@ fun SavedPostScreen(
                 }
             }
 
-            items(posts.value){ post ->
+            items(items = posts.value){ post ->
                 ArticleCard(
                     post = post.toPost(),
                     onItemClick = {

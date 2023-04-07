@@ -20,8 +20,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.peterchege.blogger.core.room.entities.DraftRecord
-import com.peterchege.blogger.data.DraftRepository
+import com.peterchege.blogger.data.DraftRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.IOException
 import javax.inject.Inject
@@ -29,30 +31,20 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DraftScreenViewModel @Inject constructor(
-    private val draftRepository: DraftRepository
+    private val draftRepository: DraftRepositoryImpl
 ):ViewModel() {
-    private val _drafts = mutableStateOf<List<DraftRecord>>(emptyList())
-    val drafts :State<List<DraftRecord>> = _drafts
-    init {
-        getDrafts()
-    }
 
+    val drafts  = draftRepository.getAllDrafts()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = emptyList(),
+        )
 
-    private fun getDrafts(){
-        viewModelScope.launch {
-            try {
-                val draftslist = draftRepository.getAllDrafts()
-                _drafts.value = draftslist
-            }catch (e:IOException){
-
-            }
-        }
-    }
     fun deleteDraft(id:Int){
         viewModelScope.launch {
             try {
                 draftRepository.deleteDraftById(id)
-                getDrafts()
             }catch (e:IOException){
 
             }

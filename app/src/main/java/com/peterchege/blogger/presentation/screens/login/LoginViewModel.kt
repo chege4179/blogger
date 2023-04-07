@@ -29,7 +29,8 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.peterchege.blogger.core.api.requests.LoginUser
 import com.peterchege.blogger.core.util.*
-import com.peterchege.blogger.data.LoginRepository
+import com.peterchege.blogger.domain.repository.AuthRepository
+import com.peterchege.blogger.domain.use_case.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -42,7 +43,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
-    private val repository: LoginRepository,
+    private val repository: AuthRepository,
     private val savedStateHandle: SavedStateHandle,
     private val sharedPreferences: SharedPreferences
 ) : ViewModel() {

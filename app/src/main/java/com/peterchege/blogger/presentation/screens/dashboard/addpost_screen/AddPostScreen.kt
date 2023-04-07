@@ -110,11 +110,11 @@ fun AddPostScreen(
                     ) {
                         imageUrlState?.let {
                             GlideImage(
-                                imageModel = it,
+                                imageModel = { it },
                                 modifier = Modifier
                                     .fillMaxWidth(0.7f)
                                     .height(135.dp),
-                                contentScale = ContentScale.Crop
+
                             )
                         }
                         Column(

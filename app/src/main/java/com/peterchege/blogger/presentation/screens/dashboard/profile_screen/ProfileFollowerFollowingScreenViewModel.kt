@@ -27,7 +27,7 @@ import com.peterchege.blogger.core.api.responses.Follower
 import com.peterchege.blogger.core.api.responses.Following
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.Resource
-import com.peterchege.blogger.data.PostRepository
+import com.peterchege.blogger.domain.repository.PostRepository
 import com.peterchege.blogger.domain.use_case.GetProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn

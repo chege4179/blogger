@@ -19,7 +19,7 @@ import android.util.Log
 import com.peterchege.blogger.core.api.requests.PostBody
 import com.peterchege.blogger.core.api.responses.UploadPostResponse
 import com.peterchege.blogger.core.util.Resource
-import com.peterchege.blogger.data.AddPostRepository
+import com.peterchege.blogger.domain.repository.PostRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
@@ -27,7 +27,7 @@ import java.io.IOException
 import javax.inject.Inject
 
 class AddPostUseCase @Inject constructor(
-    private val repository: AddPostRepository
+    private val repository: PostRepository
 
 ) {
     operator fun invoke(postBody: PostBody): Flow<Resource<UploadPostResponse>> = flow {

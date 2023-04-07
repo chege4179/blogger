@@ -16,16 +16,16 @@
 package com.peterchege.blogger.data
 
 import com.peterchege.blogger.core.api.BloggerApi
-import com.peterchege.blogger.core.api.requests.SignUpUser
-import com.peterchege.blogger.core.api.responses.SignUpResponse
+import com.peterchege.blogger.core.api.responses.ProfileResponse
+import com.peterchege.blogger.domain.repository.ProfileRepository
 import javax.inject.Inject
 
-class SignUpRepository @Inject constructor(
-    private val api: BloggerApi
-) {
-    suspend fun signUpUser(signUpUser: SignUpUser): SignUpResponse {
-        return api.signUpUser(signUpUser)
-    }
+class ProfileRepositoryImpl @Inject constructor(
+    private val api: BloggerApi,
 
+    ):ProfileRepository {
+    override suspend fun getProfile(username: String): ProfileResponse {
+        return api.getUserProfile(username = username)
+    }
 
 }

@@ -24,6 +24,8 @@ import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.room.database.BloggerDatabase
 import com.peterchege.blogger.core.util.Constants
+import com.peterchege.blogger.data.*
+import com.peterchege.blogger.domain.repository.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -40,9 +42,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideHttpClient(
-        @ApplicationContext context: Context,
-    ): OkHttpClient {
+    fun provideHttpClient(@ApplicationContext context: Context, ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(
                 ChuckerInterceptor.Builder(context = context)
@@ -80,5 +80,35 @@ object AppModule {
             BloggerDatabase::class.java,
             Constants.DATABASE_NAME
         ).build()
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideAuthRepository(api:BloggerApi):AuthRepository{
+        return AuthRepositoryImpl(api = api)
+    }
+    @Provides
+    @Singleton
+    fun provideCommentRepository(api:BloggerApi):CommentRepository{
+        return CommentRepositoryImpl(api = api)
+    }
+
+    @Provides
+    @Singleton
+    fun provideProfileRepository(api:BloggerApi):ProfileRepository{
+        return ProfileRepositoryImpl(api = api)
+    }
+
+    @Provides
+    @Singleton
+    fun providePostRepository(api:BloggerApi,db:BloggerDatabase):PostRepository{
+        return PostRepositoryImpl(api = api,db = db)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDraftRepository(db:BloggerDatabase):DraftRepository{
+        return DraftRepositoryImpl(db = db)
     }
 }

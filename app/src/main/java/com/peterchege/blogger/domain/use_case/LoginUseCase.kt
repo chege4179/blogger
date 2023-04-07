@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.presentation.screens.login
+package com.peterchege.blogger.domain.use_case
 
 import android.content.SharedPreferences
 import com.peterchege.blogger.core.api.requests.LoginUser
 import com.peterchege.blogger.core.api.responses.LoginResponse
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.Resource
-import com.peterchege.blogger.data.LoginRepository
+import com.peterchege.blogger.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
@@ -28,7 +28,7 @@ import java.io.IOException
 import javax.inject.Inject
 
 class LoginUseCase @Inject constructor(
-    private val repository: LoginRepository,
+    private val repository: AuthRepository,
     private val sharedPreferences: SharedPreferences
 
 ) {

@@ -18,7 +18,8 @@ package com.peterchege.blogger.domain.use_case
 import com.peterchege.blogger.core.api.requests.CommentBody
 import com.peterchege.blogger.core.api.responses.CommentResponse
 import com.peterchege.blogger.core.util.Resource
-import com.peterchege.blogger.data.CommentRepository
+import com.peterchege.blogger.data.CommentRepositoryImpl
+import com.peterchege.blogger.domain.repository.CommentRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException

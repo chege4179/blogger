@@ -27,7 +27,7 @@ import com.peterchege.blogger.core.api.requests.SignUpUser
 import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.core.util.TextFieldState
 import com.peterchege.blogger.core.util.hasInternetConnection
-import com.peterchege.blogger.data.SignUpRepository
+import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.use_case.SignUpUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -39,7 +39,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
     private val signUpUseCase: SignUpUseCase,
-    private val signUpRepository: SignUpRepository,
+    private val signUpRepository: AuthRepository,
 
     ) : ViewModel() {
 

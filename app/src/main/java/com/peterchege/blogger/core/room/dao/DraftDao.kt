@@ -17,12 +17,13 @@ package com.peterchege.blogger.core.room.dao
 
 import androidx.room.*
 import com.peterchege.blogger.core.room.entities.DraftRecord
+import kotlinx.coroutines.flow.Flow
 
 
 @Dao
 interface DraftDao {
     @Query("SELECT * FROM draft")
-    suspend fun getAllDrafts():List<DraftRecord>
+    fun getAllDrafts(): Flow<List<DraftRecord>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDraft(draft: DraftRecord)

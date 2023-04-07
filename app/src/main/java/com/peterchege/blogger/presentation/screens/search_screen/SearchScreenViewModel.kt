@@ -28,7 +28,7 @@ import com.peterchege.blogger.core.api.responses.Post
 import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.Screens
-import com.peterchege.blogger.data.PostRepository
+import com.peterchege.blogger.domain.repository.PostRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

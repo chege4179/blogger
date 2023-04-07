@@ -22,7 +22,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.Screens
-import com.peterchege.blogger.data.PostRepository
+
+import com.peterchege.blogger.domain.repository.PostRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
