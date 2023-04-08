@@ -51,7 +51,7 @@ import com.peterchege.blogger.presentation.screens.dashboard.profile_screen.Dele
 @Composable
 fun PostScreen(
     navController: NavController,
-    viewModel: PostViewModel = hiltViewModel()
+    viewModel: PostScreenViewModel = hiltViewModel()
 
 ) {
     val state = viewModel.state.value
@@ -322,7 +322,7 @@ fun PostScreen(
 @Composable
 fun CommentDialog(
     modifier: Modifier = Modifier,
-    viewModel: PostViewModel = hiltViewModel(),
+    viewModel: PostScreenViewModel = hiltViewModel(),
     scaffoldState: ScaffoldState,
 ) {
     val commentInputState = viewModel.commentInputState.value

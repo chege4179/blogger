@@ -37,7 +37,7 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class SignUpViewModel @Inject constructor(
+class SignUpScreenViewModel @Inject constructor(
     private val signUpUseCase: SignUpUseCase,
     private val signUpRepository: AuthRepository,
 

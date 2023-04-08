@@ -30,19 +30,20 @@ import com.peterchege.blogger.core.api.requests.Viewer
 import com.peterchege.blogger.core.api.responses.Comment
 import com.peterchege.blogger.core.api.responses.Like
 import com.peterchege.blogger.core.api.responses.Post
-import com.peterchege.blogger.core.api.responses.toPostRecord
+import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.Resource
 import com.peterchege.blogger.domain.mappers.toExternalModel
+import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.PostRepository
 import com.peterchege.blogger.domain.use_case.GetPostUseCase
 import com.peterchege.blogger.domain.use_case.PostCommentUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -50,13 +51,16 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class PostViewModel @Inject constructor(
+class PostScreenViewModel @Inject constructor(
     private val getPostUseCase: GetPostUseCase,
     private val postCommentUseCase: PostCommentUseCase,
     private val savedStateHandle: SavedStateHandle,
-    private val sharedPreferences: SharedPreferences,
+    private val authRepository: AuthRepository,
     private val repository: PostRepository
 ) : ViewModel() {
+
+    private var _user = MutableStateFlow<User?>(null)
+    var user: StateFlow<User?> = _user
 
     private val _state = mutableStateOf(PostDetailState())
     val state: State<PostDetailState> = _state
@@ -105,6 +109,7 @@ class PostViewModel @Inject constructor(
     )
 
     init {
+        loadUser()
         savedStateHandle.get<String>("postId")?.let { postId ->
             savedStateHandle.get<String>("source")?.let { source ->
                 _source.value = source
@@ -147,27 +152,27 @@ class PostViewModel @Inject constructor(
 
         }.launchIn(viewModelScope)
     }
+    private fun loadUser(){
+        viewModelScope.launch {
+            authRepository.getLoggedInUser().collectLatest {
+                _user.value = it
+            }
+        }
+    }
 
     fun onDialogConfirm(scaffoldState: ScaffoldState) {
         _openDialogState.value = false
         savedStateHandle.get<String>("postId")?.let { postId ->
-            Log.d("Comment value", _commentInputState.value)
-            Log.d("Comment id", postId)
-            Log.d(
-                "Comment Logged In",
-                sharedPreferences.getString(Constants.LOGIN_USERNAME, null)!!
-            )
-            Log.d("Comment postedBy", _state.value.post!!.postAuthor)
             val postedOn = SimpleDateFormat("dd/MM/yyyy").format(Date())
             val postedAt = SimpleDateFormat("hh:mm:ss").format(Date())
             postComment(
                 CommentBody(
                     comment = _commentInputState.value,
-                    username = sharedPreferences.getString(Constants.LOGIN_USERNAME, null)!!,
+                    username = _user.value?.username ?: "",
                     postedAt = postedAt,
                     postedOn = postedOn,
-                    userId = sharedPreferences.getString(Constants.LOGIN_ID, null)!!,
-                    imageUrl = sharedPreferences.getString(Constants.LOGIN_IMAGEURL, null)!!,
+                    userId = _user.value?._id ?: "",
+                    imageUrl = _user.value?.imageUrl ?: "",
                     postId = _state.value.post!!._id,
                     postAuthor = _state.value.post!!.postAuthor
 
@@ -214,24 +219,24 @@ class PostViewModel @Inject constructor(
     private fun addViewCount() {
         viewModelScope.launch {
             delay(3000L)
-            val username = sharedPreferences.getString(Constants.LOGIN_USERNAME, null)
-            val fullname = sharedPreferences.getString(Constants.LOGIN_FULLNAME, null)
-            val userId = sharedPreferences.getString(Constants.LOGIN_ID, null)
+            val username = _user.value?.username ?: ""
+            val fullname = _user.value?.fullname ?: ""
+            val userId = _user.value?._id ?: ""
             try {
                 val response = repository.addView(
                     Viewer(
-                        viewerFullname = fullname!!,
-                        viewerUsername = username!!,
-                        viewerId = userId!!,
+                        viewerFullname = fullname,
+                        viewerUsername = username,
+                        viewerId = userId,
                         postId = _state.value.post!!._id,
                     )
                 )
-                Log.e("view response", response.msg)
+
 
             } catch (e: HttpException) {
-                Log.e("view http error", e.localizedMessage ?: "Server error")
+
             } catch (e: IOException) {
-                Log.e("view io error", e.localizedMessage ?: "internet issue")
+
             }
         }
 
@@ -252,7 +257,7 @@ class PostViewModel @Inject constructor(
     fun savePostToRoom(scaffoldState: ScaffoldState) {
         viewModelScope.launch {
             try {
-                Log.e("insert", "inserted")
+
                 _state.value.post?.let {
                     repository.insertPost(it)
                     scaffoldState.snackbarHostState.showSnackbar(
@@ -270,7 +275,7 @@ class PostViewModel @Inject constructor(
     fun deletePostFromRoom(scaffoldState: ScaffoldState) {
         viewModelScope.launch {
             try {
-                Log.e("deleted", "deleted")
+
                 _state.value.post?.let {
                     repository.deletePostById(_state.value.post!!._id)
                     scaffoldState.snackbarHostState.showSnackbar(
@@ -299,26 +304,26 @@ class PostViewModel @Inject constructor(
     }
 
     fun getIsLikedState(likes: List<Like>): Boolean {
-        val userId = sharedPreferences.getString(Constants.LOGIN_ID, null)
+        val userId = _user.value?._id ?: ""
         val IdLikes = likes.map { it.userId }
         return IdLikes.contains(userId)
     }
 
     private fun checkIsMyPost() {
-        val username = sharedPreferences.getString(Constants.LOGIN_USERNAME, null)
+        val username = _user.value?.username ?: ""
 
         _state.value.post?.let {
             _isMyPost.value = it.postAuthor == username
-            Log.e("postAUTHOR", _state.value.post!!.postAuthor)
+
         }
 
     }
 
     fun followUser() {
         try {
-            val username = sharedPreferences.getString(Constants.LOGIN_USERNAME, null)
-            val fullname = sharedPreferences.getString(Constants.LOGIN_FULLNAME, null)
-            val userId = sharedPreferences.getString(Constants.LOGIN_ID, null)
+            val username = _user.value?.username ?: ""
+            val fullname = _user.value?.fullname ?: ""
+            val userId = _user.value?._id ?: ""
             viewModelScope.launch {
                 val followResponse = repository.followUser(
                     FollowUser(
@@ -344,15 +349,15 @@ class PostViewModel @Inject constructor(
 
     fun unfollowUser() {
         try {
-            val username = sharedPreferences.getString(Constants.LOGIN_USERNAME, null)
-            val fullname = sharedPreferences.getString(Constants.LOGIN_FULLNAME, null)
-            val userId = sharedPreferences.getString(Constants.LOGIN_ID, null)
+            val username = _user.value?.username ?: ""
+            val fullname = _user.value?.fullname ?: ""
+            val userId = _user.value?._id ?: ""
             viewModelScope.launch {
                 val followResponse = repository.unfollowUser(
                     FollowUser(
-                        followerUsername = username!!,
-                        followerFullname = fullname!!,
-                        followerId = userId!!,
+                        followerUsername = username,
+                        followerFullname = fullname,
+                        followerId = userId,
                         followedUsername = _state.value.post!!.postAuthor,
                     )
                 )
@@ -362,9 +367,9 @@ class PostViewModel @Inject constructor(
             }
 
         } catch (e: HttpException) {
-            Log.e("http error", e.localizedMessage ?: "A http error occurred")
+
         } catch (e: IOException) {
-            Log.e("io error", e.localizedMessage ?: "An io error occurred")
+
         }
 
     }
@@ -385,22 +390,22 @@ class PostViewModel @Inject constructor(
                 }
             }
         } catch (e: IOException) {
-            Log.e("io error", e.localizedMessage ?: "An error occurred")
+
         }
     }
 
     fun likePost(scaffoldState: ScaffoldState) {
         _isLiked.value = true
-        val userId = sharedPreferences.getString(Constants.LOGIN_ID, null)
-        val username = sharedPreferences.getString(Constants.LOGIN_USERNAME, null)
-        val fullname = sharedPreferences.getString(Constants.LOGIN_FULLNAME, null)
+        val userId = _user.value?._id ?: ""
+        val username = _user.value?.username ?: ""
+        val fullname = _user.value?.fullname ?: ""
         viewModelScope.launch {
             try {
                 val likeResponse = repository.likePost(
                     LikePost(
-                        userId = userId!!,
-                        username = username!!,
-                        fullname = fullname!!,
+                        userId = userId,
+                        username = username,
+                        fullname = fullname,
                         postAuthor = _state.value.post!!.postAuthor,
                         postId = _state.value.post!!._id
 
@@ -414,9 +419,9 @@ class PostViewModel @Inject constructor(
                 }
 
             } catch (e: HttpException) {
-                Log.e("http error", e.localizedMessage ?: "An error occurred")
+
             } catch (e: IOException) {
-                Log.e("io error", e.localizedMessage ?: "An error occurred")
+
             }
 
         }
@@ -424,16 +429,16 @@ class PostViewModel @Inject constructor(
 
     fun unlikePost(scaffoldState: ScaffoldState) {
         _isLiked.value = false
-        val userId = sharedPreferences.getString(Constants.LOGIN_ID, null)
-        val username = sharedPreferences.getString(Constants.LOGIN_USERNAME, null)
-        val fullname = sharedPreferences.getString(Constants.LOGIN_FULLNAME, null)
+        val userId = _user.value?._id ?: ""
+        val username =_user.value?.username ?: ""
+        val fullname = _user.value?.fullname ?: ""
         viewModelScope.launch {
             try {
                 val likeResponse = repository.unlikePost(
                     LikePost(
-                        userId = userId!!,
-                        username = username!!,
-                        fullname = fullname!!,
+                        userId = userId,
+                        username = username,
+                        fullname = fullname,
                         postAuthor = _state.value.post!!.postAuthor,
                         postId = _state.value.post!!._id
 
@@ -447,9 +452,9 @@ class PostViewModel @Inject constructor(
                 }
 
             } catch (e: HttpException) {
-                Log.e("http error", e.localizedMessage ?: "An error occurred")
+
             } catch (e: IOException) {
-                Log.e("io error", e.localizedMessage ?: "An error occurred")
+
             }
 
         }

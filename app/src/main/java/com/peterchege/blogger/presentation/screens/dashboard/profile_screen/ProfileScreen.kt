@@ -50,7 +50,7 @@ import kotlinx.coroutines.launch
 fun ProfileScreen(
     navController: NavController,
     navHostController: NavController,
-    viewModel: ProfileViewModel = hiltViewModel()
+    viewModel: ProfileScreenViewModel = hiltViewModel()
 ) {
     val sheetState = rememberBottomSheetState(
         initialValue = BottomSheetValue.Collapsed

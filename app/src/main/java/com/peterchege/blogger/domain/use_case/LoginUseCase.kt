@@ -29,8 +29,6 @@ import javax.inject.Inject
 
 class LoginUseCase @Inject constructor(
     private val repository: AuthRepository,
-    private val sharedPreferences: SharedPreferences
-
 ) {
 
     operator fun invoke(loginUser: LoginUser): Flow<Resource<LoginResponse>> = flow {
@@ -38,17 +36,8 @@ class LoginUseCase @Inject constructor(
             emit(Resource.Loading<LoginResponse>())
 
             val loginResponse = repository.loginUser(loginUser)
-            val userInfoEditor = sharedPreferences.edit()
+
             emit(Resource.Success(loginResponse))
-            userInfoEditor.apply {
-                putString(Constants.LOGIN_USERNAME, loginResponse.user?.username)
-                putString(Constants.LOGIN_PASSWORD, loginResponse.user?.password)
-                putString(Constants.LOGIN_FULLNAME, loginResponse.user?.fullname)
-                putString(Constants.LOGIN_IMAGEURL, loginResponse.user?.imageUrl)
-                putString(Constants.LOGIN_EMAIL, loginResponse.user?.email)
-                putString(Constants.LOGIN_ID, loginResponse.user?._id)
-                apply()
-            }
         } catch (e: HttpException) {
             emit(
                 Resource.Error<LoginResponse>(

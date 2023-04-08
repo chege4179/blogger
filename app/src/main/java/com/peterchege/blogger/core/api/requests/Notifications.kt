@@ -15,6 +15,9 @@
  */
 package com.peterchege.blogger.core.api.requests
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Notification(
     val notificationType:String,
     val notificationSender:String,

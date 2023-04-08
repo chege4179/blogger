@@ -31,14 +31,14 @@ import androidx.navigation.NavHostController
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.presentation.components.ArticleCard
-import com.peterchege.blogger.presentation.screens.search_screen.SearchProductScreenViewModel
+import com.peterchege.blogger.presentation.screens.search_screen.SearchScreenViewModel
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun SearchPostsTab(
     navHostController: NavHostController,
 
-    viewModel: SearchProductScreenViewModel = hiltViewModel()
+    viewModel: SearchScreenViewModel = hiltViewModel()
 ) {
     Scaffold(
         modifier = Modifier

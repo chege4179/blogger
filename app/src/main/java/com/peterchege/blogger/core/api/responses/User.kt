@@ -16,8 +16,9 @@
 package com.peterchege.blogger.core.api.responses
 
 import com.peterchege.blogger.core.api.requests.Notification
+import kotlinx.serialization.Serializable
 
-
+@Serializable
 data class User(
     val _id: String,
     val email: String,
@@ -31,3 +32,4 @@ data class User(
     val notifications:List<Notification>,
     val __v: Int,
 )
+

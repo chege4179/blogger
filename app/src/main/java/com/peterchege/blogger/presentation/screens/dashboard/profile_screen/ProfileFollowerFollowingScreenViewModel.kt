@@ -15,7 +15,6 @@
  */
 package com.peterchege.blogger.presentation.screens.dashboard.profile_screen
 
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -25,13 +24,13 @@ import androidx.lifecycle.viewModelScope
 import com.peterchege.blogger.core.api.requests.FollowUser
 import com.peterchege.blogger.core.api.responses.Follower
 import com.peterchege.blogger.core.api.responses.Following
-import com.peterchege.blogger.core.util.Constants
+import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.Resource
+import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.PostRepository
 import com.peterchege.blogger.domain.use_case.GetProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -42,17 +41,32 @@ import javax.inject.Inject
 class ProfileFollowerFollowingScreenViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val profileUseCase: GetProfileUseCase,
-    private val sharedPreferences: SharedPreferences,
+    private val authRepository: AuthRepository,
     private val repository: PostRepository,
 
     ) : ViewModel() {
+    
     private var _type = mutableStateOf<String>("")
     var type: State<String> = _type
 
     private var _isLoading = mutableStateOf<Boolean>(false)
     var isLoading: State<Boolean> = _isLoading
 
+    private var _user = MutableStateFlow<User?>(null)
+    var user: StateFlow<User?> = _user
+
+
+
+    private fun loadUser(){
+        viewModelScope.launch {
+            authRepository.getLoggedInUser().collectLatest {
+                _user.value = it
+            }
+        }
+    }
+
     init {
+        loadUser()
         getType()
         getProfile()
     }
@@ -78,15 +92,15 @@ class ProfileFollowerFollowingScreenViewModel @Inject constructor(
 
     fun followUser(followedUsername: String) {
         try {
-            val username = sharedPreferences.getString(Constants.LOGIN_USERNAME, null)
-            val fullname = sharedPreferences.getString(Constants.LOGIN_FULLNAME, null)
-            val userId = sharedPreferences.getString(Constants.LOGIN_ID, null)
+            val username = _user.value?.username ?: ""
+            val fullname = _user.value?.fullname ?: ""
+            val userId = _user.value?._id ?: ""
             viewModelScope.launch {
                 val followResponse = repository.followUser(
                     FollowUser(
-                        followerUsername = username!!,
-                        followerFullname = fullname!!,
-                        followerId = userId!!,
+                        followerUsername = username,
+                        followerFullname = fullname,
+                        followerId = userId,
                         followedUsername = followedUsername,
                     )
                 )
@@ -104,14 +118,14 @@ class ProfileFollowerFollowingScreenViewModel @Inject constructor(
 
     fun unfollowUser(followedUsername: String) {
         try {
-            val username = sharedPreferences.getString(Constants.LOGIN_USERNAME, null)
-            val fullname = sharedPreferences.getString(Constants.LOGIN_FULLNAME, null)
-            val userId = sharedPreferences.getString(Constants.LOGIN_ID, null)
+            val username = _user.value?.username ?: ""
+            val fullname = _user.value?.fullname ?: ""
+            val userId = _user.value?._id ?: ""
             viewModelScope.launch {
                 val followResponse = repository.unfollowUser(
                     FollowUser(
-                        followerUsername = username!!,
-                        followerFullname = fullname!!,
+                        followerUsername = username,
+                        followerFullname = fullname,
                         followerId = userId!!,
                         followedUsername = followedUsername,
                     )
@@ -128,8 +142,9 @@ class ProfileFollowerFollowingScreenViewModel @Inject constructor(
 
     private fun getProfile() {
         _isLoading.value = true
-        val username = sharedPreferences.getString(Constants.LOGIN_USERNAME, null)
-        profileUseCase(username = username!!).onEach { result ->
+        val username = _user.value?.username ?: ""
+
+        profileUseCase(username = username).onEach { result ->
             when (result) {
                 is Resource.Success -> {
                     _isLoading.value = false

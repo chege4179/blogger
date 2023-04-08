@@ -13,25 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.presentation.screens.dashboard
+package com.peterchege.blogger.presentation.navigation
 
 import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
-import com.peterchege.blogger.core.util.Constants
-import com.peterchege.blogger.core.util.Screens
+import com.peterchege.blogger.domain.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class NavigationViewModel @Inject constructor(
-    private val sharedPreferences: SharedPreferences
-):ViewModel() {
-    fun getInitialRoute():String {
-        val username = sharedPreferences.getString(Constants.LOGIN_USERNAME,null)
-        if (username === null){
-            return Screens.LOGIN_SCREEN
-        }else{
-            return Screens.DASHBOARD_SCREEN
-        }
-    }
+
+    private val authRepository: AuthRepository,
+) : ViewModel() {
+
+    val user = authRepository.getLoggedInUser()
+
 }

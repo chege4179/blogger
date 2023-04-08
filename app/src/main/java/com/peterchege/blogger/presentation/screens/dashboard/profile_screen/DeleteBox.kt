@@ -25,13 +25,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.peterchege.blogger.presentation.screens.post_screen.PostViewModel
-import java.util.*
+import com.peterchege.blogger.presentation.screens.post_screen.PostScreenViewModel
 
 @Composable
 fun DeleteBox(
     modifier: Modifier = Modifier,
-    viewModel: PostViewModel = hiltViewModel(),
+    viewModel: PostScreenViewModel = hiltViewModel(),
     scaffoldState: ScaffoldState,
 
     ) {

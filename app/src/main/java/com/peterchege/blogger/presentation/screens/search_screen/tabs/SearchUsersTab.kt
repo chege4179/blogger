@@ -30,7 +30,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.annotation.ExperimentalCoilApi
 import com.peterchege.blogger.presentation.components.ProfileCard
-import com.peterchege.blogger.presentation.screens.search_screen.SearchProductScreenViewModel
+import com.peterchege.blogger.presentation.screens.search_screen.SearchScreenViewModel
 
 @OptIn(ExperimentalCoilApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -38,7 +38,7 @@ import com.peterchege.blogger.presentation.screens.search_screen.SearchProductSc
 fun SearchUsersTab(
     navHostController: NavHostController,
 
-    viewModel: SearchProductScreenViewModel = hiltViewModel()
+    viewModel: SearchScreenViewModel = hiltViewModel()
 ) {
 
     Scaffold(

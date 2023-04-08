@@ -43,14 +43,16 @@ import androidx.navigation.NavController
 import com.peterchege.blogger.R
 import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.core.util.UiEvent
+import com.peterchege.blogger.core.util.hasInternetConnection
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.flow.collectLatest
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @ExperimentalComposeUiApi
 @Composable
 fun LoginScreen(
     navController: NavController,
-    viewModel: LoginViewModel = hiltViewModel()
+    viewModel: LoginScreenViewModel = hiltViewModel()
 
 ){
     val context = LocalContext.current
@@ -59,6 +61,21 @@ fun LoginScreen(
     val passwordState = viewModel.passwordState.value
     val scaffoldState = rememberScaffoldState()
     val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(key1 = true){
+        viewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is UiEvent.ShowSnackbar -> {
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        message = event.message
+                    )
+                }
+                is UiEvent.Navigate -> {
+                    navController.navigate(route = event.route)
+                }
+            }
+        }
+    }
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -142,7 +159,12 @@ fun LoginScreen(
                         .height(50.dp),
                     onClick = {
                         keyboardController?.hide()
-                        viewModel.initiateLogin(navController,scaffoldState, context = context)
+                        if(hasInternetConnection(context)){
+                            viewModel.initiateLogin()
+                        }else{
+                            Toast.makeText(context,"No Internet found",Toast.LENGTH_SHORT).show()
+                        }
+
                     }
                 )
                 {

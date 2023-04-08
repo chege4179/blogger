@@ -15,28 +15,28 @@
  */
 package com.peterchege.blogger.presentation.screens.dashboard.savedposts_screen
 
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.Screens
-
+import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.PostRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
 @HiltViewModel
 class SavedPostScreenViewModel @Inject constructor(
     private val repository: PostRepository,
-    private val sharedPreferences: SharedPreferences
+    private val authRepository: AuthRepository,
 
-) : ViewModel() {
+    ) : ViewModel() {
     val posts = repository.getAllPostsFromRoom()
         .stateIn(
             scope = viewModelScope,
@@ -44,13 +44,28 @@ class SavedPostScreenViewModel @Inject constructor(
             initialValue = emptyList()
 
         )
+    private var _user = MutableStateFlow<User?>(null)
+    var user: StateFlow<User?> = _user
+
+    init {
+        loadUser()
+    }
+
+    private fun loadUser(){
+        viewModelScope.launch {
+            authRepository.getLoggedInUser().collectLatest {
+                _user.value = it
+            }
+        }
+    }
+
 
     fun onProfileNavigate(
         username: String,
         bottomNavController: NavController,
         navHostController: NavHostController
     ) {
-        val loginUsername = sharedPreferences.getString(Constants.LOGIN_USERNAME, null)
+        val loginUsername = _user.value?.username ?: ""
         Log.e("Post author", username)
         if (loginUsername != null) {
             Log.e("Login Username", loginUsername)

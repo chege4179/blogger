@@ -15,7 +15,6 @@
  */
 package com.peterchege.blogger.presentation.screens.dashboard.feed_screen
 
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -26,15 +25,14 @@ import androidx.navigation.NavHostController
 import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.api.responses.Post
 import com.peterchege.blogger.core.api.responses.User
-import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.Resource
 import com.peterchege.blogger.core.util.Screens
+import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.use_case.GetFeedUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -43,9 +41,23 @@ import javax.inject.Inject
 @HiltViewModel
 class FeedViewModel @Inject constructor(
     private val getFeedUseCase: GetFeedUseCase,
-    private val sharedPreferences: SharedPreferences,
+    private val authRepository: AuthRepository,
     private val api: BloggerApi
 ) : ViewModel() {
+
+    private var _user = MutableStateFlow<User?>(null)
+    var user: StateFlow<User?> = _user
+
+
+
+    private fun loadUser(){
+        viewModelScope.launch {
+            authRepository.getLoggedInUser().collectLatest {
+                _user.value = it
+            }
+        }
+    }
+
 
     data class FeedListState(
         val msg: String = "",
@@ -73,67 +85,20 @@ class FeedViewModel @Inject constructor(
     private val _errorMsg = mutableStateOf("")
     val errorMsg: State<String> = _errorMsg
 
-    private var searchJob: Job? = null
-
-
-    fun onChangeSearchTerm(searchTerm: String) {
-        _searchTerm.value = searchTerm
-        if (searchTerm.length > 3) {
-            _state.value = FeedListState(isLoading = true)
-            searchJob?.cancel()
-            searchJob = viewModelScope.launch {
-                try {
-                    val response = api.searchPost(searchTerm = searchTerm)
-                    _state.value = FeedListState(
-                        msg = response.msg,
-                        posts = response.posts,
-                        success = response.success,
-                        users = response.users,
-                        error = "",
-                        isLoading = false
-                    )
-                    if (response.posts.isEmpty() && response.users.isEmpty()) {
-                        _isFound.value = false
-                    }
-                } catch (e: HttpException) {
-                    Log.e("http error", e.localizedMessage ?: "a http error occurred")
-                    _state.value = FeedListState(
-                        msg = "A http error ocurred",
-                        isLoading = false
-                    )
-                } catch (e: IOException) {
-                    Log.e("io error", e.localizedMessage ?: "a http error occurred")
-                    _state.value = FeedListState(
-                        msg = "A io error occurred",
-                        isLoading = false
-                    )
-                }
-
-            }
-        } else if (searchTerm.length < 2) {
-            viewModelScope.launch {
-                delay(500L)
-                _isFound.value = true
-                getFeedPosts()
-            }
-
-        }
-    }
-
     init {
+        loadUser()
         getFeedPosts()
     }
+
+
+
 
     fun onProfileNavigate(
         username: String,
         bottomNavController: NavController,
         navHostController: NavHostController
     ) {
-        val loginUsername = sharedPreferences.getString(Constants.LOGIN_USERNAME, null)
-        Log.e("Post author", username)
-        if (loginUsername != null) {
-            Log.e("Login Username", loginUsername)
-        }
+        val loginUsername = _user.value?.username ?: ""
         if (loginUsername == username) {
             bottomNavController.navigate(Screens.PROFILE_NAVIGATION)
         } else {

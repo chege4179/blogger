@@ -44,7 +44,7 @@ import com.peterchege.blogger.core.util.Screens
 @Composable
 fun SignUpScreen(
     navController: NavController,
-    viewModel: SignUpViewModel = hiltViewModel()
+    viewModel: SignUpScreenViewModel = hiltViewModel()
 ){
     val context  = LocalContext.current
     val isLoading =  viewModel.isLoading.value

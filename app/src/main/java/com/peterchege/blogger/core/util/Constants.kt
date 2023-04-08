@@ -44,4 +44,6 @@ object Constants {
 
     const val SEARCH_TYPE_POSTS = "Posts"
     const val SEARCH_TYPE_USERS = "Users"
+
+    const val USER_PREFERENCES = "USER_PREFERENCES"
 }

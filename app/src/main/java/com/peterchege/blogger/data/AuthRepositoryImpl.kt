@@ -22,11 +22,19 @@ import com.peterchege.blogger.core.api.requests.SignUpUser
 import com.peterchege.blogger.core.api.responses.LoginResponse
 import com.peterchege.blogger.core.api.responses.LogoutResponse
 import com.peterchege.blogger.core.api.responses.SignUpResponse
+import com.peterchege.blogger.core.api.responses.User
+import com.peterchege.blogger.core.datastore.repository.UserDataStoreRepository
+import com.peterchege.blogger.core.di.IoDispatcher
 import com.peterchege.blogger.domain.repository.AuthRepository
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class AuthRepositoryImpl  @Inject constructor(
-    private val api: BloggerApi
+    private val api: BloggerApi,
+    private val userDataStoreRepository: UserDataStoreRepository,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ): AuthRepository {
 
     override suspend fun signUpUser(signUpUser: SignUpUser): SignUpResponse {
@@ -40,4 +48,18 @@ class AuthRepositoryImpl  @Inject constructor(
     override suspend fun logoutUser(logoutUser: LogoutUser): LogoutResponse {
         return api.logoutUser(logoutUser)
     }
+
+    override fun getLoggedInUser(): Flow<User?> {
+        return userDataStoreRepository.getLoggedInUser()
+    }
+
+    override suspend fun setLoggedInUser(user: User) = withContext(context = ioDispatcher) {
+        return@withContext userDataStoreRepository.setLoggedInUser(user = user)
+    }
+
+    override suspend fun unsetLoggedInUser()= withContext(context = ioDispatcher) {
+        return@withContext userDataStoreRepository.unsetLoggedInUser()
+    }
+
+
 }

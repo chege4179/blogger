@@ -33,14 +33,16 @@ import androidx.navigation.NavController
 import androidx.work.*
 import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.api.requests.PostBody
+import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.room.entities.DraftRecord
 import com.peterchege.blogger.core.util.*
 import com.peterchege.blogger.data.DraftRepositoryImpl
+import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.DraftRepository
 import com.peterchege.blogger.domain.use_case.AddPostUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -56,11 +58,16 @@ import javax.inject.Inject
 @HiltViewModel
 class AddPostScreenViewModel @Inject constructor(
     private val addPostUseCase: AddPostUseCase,
-    private val sharedPreferences: SharedPreferences,
+    private val authRepository: AuthRepository,
     private val draftRepository: DraftRepository,
     private val savedStateHandle: SavedStateHandle,
     private val api: BloggerApi,
 ) : ViewModel() {
+
+    private var _user = MutableStateFlow<User?>(null)
+    var user: StateFlow<User?> = _user
+
+
     private var _imageUrlState = mutableStateOf<Uri?>(null)
     var imageUrlState: State<Uri?> = _imageUrlState
 
@@ -87,6 +94,7 @@ class AddPostScreenViewModel @Inject constructor(
 
 
     init {
+        loadUser()
         val postBodyDraft = savedStateHandle.get<String>("postTitle")
         val postTitleDraft = savedStateHandle.get<String>("postBody")
         postBodyDraft.let {
@@ -107,6 +115,14 @@ class AddPostScreenViewModel @Inject constructor(
         val msg: String = "",
         val success: Boolean = false,
     )
+    private fun loadUser(){
+        viewModelScope.launch {
+            authRepository.getLoggedInUser().collectLatest {
+                _user.value = it
+            }
+        }
+    }
+
 
     fun onBackPress(scaffoldState: ScaffoldState, navController: NavController) {
         if (_imageUrlState.value != null || _bitmapState.value != null ||
@@ -268,10 +284,11 @@ class AddPostScreenViewModel @Inject constructor(
         } else {
             val postedOn = SimpleDateFormat("dd/MM/yyyy").format(Date())
             val postedAt = SimpleDateFormat("hh:mm:ss").format(Date())
+            val username = _user.value?.username ?:""
             val postBody = PostBody(
                 postTitle = _postTitle.value.text,
                 postBody = _postBody.value.text,
-                postedBy = sharedPreferences.getString(Constants.LOGIN_USERNAME, null)!!,
+                postedBy = username,
                 postedOn = postedOn,
                 postedAt = postedAt,
                 photo = _postTitle.value.text,
@@ -280,7 +297,7 @@ class AddPostScreenViewModel @Inject constructor(
                 "uri" to _imageUrlState.value!!.toString(),
                 "postBody" to _postBody.value.text,
                 "postTitle" to _postTitle.value.text,
-                "postedBy" to sharedPreferences.getString(Constants.LOGIN_USERNAME, null)!!,
+                "postedBy" to username,
                 "postedAt" to postedAt,
                 "photo" to _postTitle.value.text,
                 "postedOn" to postedOn

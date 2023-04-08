@@ -19,20 +19,24 @@ import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import coil.annotation.ExperimentalCoilApi
+import com.peterchege.blogger.core.api.responses.User
+import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.presentation.screens.author_profile.AuthorFollowerFollowingScreen
 import com.peterchege.blogger.presentation.screens.author_profile.AuthorProfileNavigation
 import com.peterchege.blogger.presentation.screens.author_profile.AuthorProfileScreen
 import com.peterchege.blogger.presentation.screens.category_screen.CategoryScreen
 import com.peterchege.blogger.presentation.screens.dashboard.DashBoardScreen
-import com.peterchege.blogger.presentation.screens.dashboard.NavigationViewModel
 import com.peterchege.blogger.presentation.screens.dashboard.addpost_screen.AddPostScreen
 import com.peterchege.blogger.presentation.screens.dashboard.draft_screen.DraftScreen
 import com.peterchege.blogger.presentation.screens.login.LoginScreen
@@ -41,7 +45,7 @@ import com.peterchege.blogger.presentation.screens.search_screen.SearchScreen
 import com.peterchege.blogger.presentation.screens.signup.SignUpScreen
 
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalCoilApi::class)
 @ExperimentalMaterialApi
 @Composable
 fun Navigation(
@@ -49,37 +53,50 @@ fun Navigation(
     viewModel: NavigationViewModel = hiltViewModel(),
 ) {
     val activity = (LocalContext.current as? Activity)
+    val user = viewModel.user.
+    collectAsStateWithLifecycle(initialValue = null)
+
+
+    fun getInitialRoute(user: State<User?>):String {
+        if (user.value === null){
+            return Screens.LOGIN_SCREEN
+        }
+        return if (user.value!!.username != ""){
+            Screens.DASHBOARD_SCREEN
+        }else{
+            Screens.LOGIN_SCREEN
+        }
+    }
     NavHost(
         navController = navController,
-        startDestination = viewModel.getInitialRoute()
+        startDestination = getInitialRoute(user = user)
     ) {
-        composable(Screens.LOGIN_SCREEN) {
+        composable(route = Screens.LOGIN_SCREEN) {
             LoginScreen(navController = navController)
-            BackHandler(true) {
-                // Or do nothing
+            BackHandler(enabled = true) {
                 activity?.finish()
 
             }
         }
-        composable(Screens.SIGNUP_SCREEN) {
+        composable(route = Screens.SIGNUP_SCREEN) {
             SignUpScreen(navController = navController)
         }
-        composable(Screens.SEARCH_SCREEN) {
+        composable(route = Screens.SEARCH_SCREEN) {
             SearchScreen(navController = navController)
         }
-        composable(Screens.POST_SCREEN + "/{postId}/{source}") {
+        composable(route = Screens.POST_SCREEN + "/{postId}/{source}") {
             PostScreen(navController = navController)
         }
-        composable(Screens.AUTHOR_PROFILE_NAVIGATION + "/{username}") {
+        composable(route = Screens.AUTHOR_PROFILE_NAVIGATION + "/{username}") {
             AuthorProfileNavigation()
         }
-        composable(Screens.AUTHOR_PROFILE_SCREEN + "/{username}") {
+        composable(route = Screens.AUTHOR_PROFILE_SCREEN + "/{username}") {
             AuthorProfileScreen(navController = navController)
         }
-        composable(Screens.AUTHOR_FOLLOWER_FOLLOWING_SCREEN + "/{username}" + "/{type}") {
+        composable(route = Screens.AUTHOR_FOLLOWER_FOLLOWING_SCREEN + "/{username}" + "/{type}") {
             AuthorFollowerFollowingScreen(navController = navController)
         }
-        composable(Screens.CATEGORY_SCREEN + "/{category}") {
+        composable(route = Screens.CATEGORY_SCREEN + "/{category}") {
             CategoryScreen(navController = navController)
         }
 
@@ -111,7 +128,7 @@ fun Navigation(
         composable(
             route = Screens.DASHBOARD_SCREEN
         ) {
-            BackHandler(true) {
+            BackHandler(enabled = true) {
                 // Or do nothing
                 activity?.finish()
 

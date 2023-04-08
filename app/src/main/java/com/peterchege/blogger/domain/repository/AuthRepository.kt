@@ -21,6 +21,8 @@ import com.peterchege.blogger.core.api.requests.SignUpUser
 import com.peterchege.blogger.core.api.responses.LoginResponse
 import com.peterchege.blogger.core.api.responses.LogoutResponse
 import com.peterchege.blogger.core.api.responses.SignUpResponse
+import com.peterchege.blogger.core.api.responses.User
+import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
     suspend fun signUpUser(signUpUser: SignUpUser): SignUpResponse
@@ -28,5 +30,13 @@ interface AuthRepository {
     suspend fun loginUser(loginUser: LoginUser): LoginResponse
 
     suspend fun logoutUser(logoutUser: LogoutUser): LogoutResponse
+
+    fun getLoggedInUser(): Flow<User?>
+
+
+    suspend fun setLoggedInUser(user: User)
+
+
+    suspend fun unsetLoggedInUser()
 
 }

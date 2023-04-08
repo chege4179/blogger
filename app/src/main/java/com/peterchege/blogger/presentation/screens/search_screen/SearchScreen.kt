@@ -48,7 +48,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SearchScreen(
     navController: NavHostController,
-    viewModel: SearchProductScreenViewModel = hiltViewModel()
+    viewModel: SearchScreenViewModel = hiltViewModel()
 ) {
     val scaffoldState = rememberScaffoldState()
 

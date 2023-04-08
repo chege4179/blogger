@@ -15,12 +15,17 @@
  */
 package com.peterchege.blogger.core.api.responses
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Follower(
     val followerUsername:String,
     val followerFullname:String,
     val followerId:String,
 
 )
+
+@Serializable
 data class Following(
     val followedUsername: String,
     val followedFullname:String,

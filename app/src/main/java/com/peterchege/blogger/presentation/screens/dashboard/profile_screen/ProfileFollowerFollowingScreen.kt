@@ -36,7 +36,7 @@ import java.util.*
 fun ProfileFollowerFollowingScreen(
     navController: NavController,
     viewModel: ProfileFollowerFollowingScreenViewModel = hiltViewModel(),
-    profileViewModel: ProfileViewModel = hiltViewModel(),
+    profileViewModel: ProfileScreenViewModel = hiltViewModel(),
 ) {
 
     Scaffold(

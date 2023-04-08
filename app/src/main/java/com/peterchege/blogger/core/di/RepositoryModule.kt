@@ -16,6 +16,7 @@
 package com.peterchege.blogger.core.di
 
 import com.peterchege.blogger.core.api.BloggerApi
+import com.peterchege.blogger.core.datastore.repository.UserDataStoreRepository
 import com.peterchege.blogger.core.room.database.BloggerDatabase
 import com.peterchege.blogger.data.*
 import com.peterchege.blogger.domain.repository.*
@@ -33,8 +34,16 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideAuthRepository(api: BloggerApi): AuthRepository {
-        return AuthRepositoryImpl(api = api)
+    fun provideAuthRepository(
+        api: BloggerApi,
+        userDataStoreRepository: UserDataStoreRepository,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher
+    ): AuthRepository {
+        return AuthRepositoryImpl(
+            api = api,
+            userDataStoreRepository = userDataStoreRepository,
+            ioDispatcher = ioDispatcher,
+        )
     }
     @Provides
     @Singleton
@@ -44,8 +53,14 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideProfileRepository(api: BloggerApi): ProfileRepository {
-        return ProfileRepositoryImpl(api = api)
+    fun provideProfileRepository(
+        api: BloggerApi,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+    ): ProfileRepository {
+        return ProfileRepositoryImpl(
+            api = api,
+            ioDispatcher = ioDispatcher,
+        )
     }
 
     @Provides
@@ -53,7 +68,8 @@ object RepositoryModule {
     fun providePostRepository(
         api: BloggerApi,
         db: BloggerDatabase,
-        @IoDispatcher ioDispatcher: CoroutineDispatcher): PostRepository {
+        @IoDispatcher ioDispatcher: CoroutineDispatcher
+    ): PostRepository {
         return PostRepositoryImpl(
             api = api,
             db = db,

@@ -28,22 +28,26 @@ import com.peterchege.blogger.core.api.responses.Post
 import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.Screens
+import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.PostRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import okio.IOException
 import retrofit2.HttpException
 import javax.inject.Inject
 
 @HiltViewModel
-class SearchProductScreenViewModel @Inject constructor(
+class SearchScreenViewModel @Inject constructor(
     private val postRepository: PostRepository,
-    private val sharedPreferences: SharedPreferences,
+    private val authRepository: AuthRepository,
     private val api: BloggerApi
 
 ) : ViewModel() {
+
+
     private var _searchTerm = mutableStateOf("")
     var searchTerm: State<String> = _searchTerm
 
@@ -71,6 +75,20 @@ class SearchProductScreenViewModel @Inject constructor(
 
     private var searchJob: Job? = null
 
+    private var _user = MutableStateFlow<User?>(null)
+    var user: StateFlow<User?> = _user
+
+
+
+    private fun loadUser(){
+        viewModelScope.launch {
+            authRepository.getLoggedInUser().collectLatest {
+                _user.value = it
+            }
+        }
+    }
+
+
 
     fun onChangeSearchType(searchType: String) {
         _searchType.value = searchType
@@ -81,18 +99,8 @@ class SearchProductScreenViewModel @Inject constructor(
         bottomNavController: NavController,
         navHostController: NavHostController
     ) {
-        val loginUsername = sharedPreferences.getString(Constants.LOGIN_USERNAME, null)
-        Log.e("Post author", username)
-        if (loginUsername != null) {
-            Log.e("Login Username", loginUsername)
-        }
+        val loginUsername = _user.value?.username ?:""
         navHostController.navigate(Screens.AUTHOR_PROFILE_SCREEN + "/$username")
-//        if (loginUsername == username){
-//            bottomNavController.navigate(Screens.PROFILE_NAVIGATION)
-//        }else{
-//
-//        }
-
     }
 
     fun onChangeSearchTerm(searchTerm: String) {
