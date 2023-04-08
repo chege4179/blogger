@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
@@ -52,6 +53,8 @@ fun ProfileScreen(
     navHostController: NavController,
     viewModel: ProfileScreenViewModel = hiltViewModel()
 ) {
+
+    val user = viewModel.user.collectAsStateWithLifecycle(initialValue = null)
     val sheetState = rememberBottomSheetState(
         initialValue = BottomSheetValue.Collapsed
     )
@@ -135,7 +138,7 @@ fun ProfileScreen(
 
                 }
             } else {
-                viewModel.user.value?.let { user ->
+                user.value?.let { user ->
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -241,7 +244,7 @@ fun ProfileScreen(
                                         Text(
                                             fontSize = 20.sp,
                                             fontWeight = FontWeight.Bold,
-                                            text = "${viewModel.user.value?.followers?.size}"
+                                            text = "${user.followers.size}"
                                         )
                                         Text(
                                             text = "Followers",
@@ -265,7 +268,7 @@ fun ProfileScreen(
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         Text(
-                                            text = "${viewModel.user.value?.following?.size}",
+                                            text = "${user.following?.size}",
                                             fontSize = 20.sp,
                                             fontWeight = FontWeight.Bold,
                                         )
@@ -310,7 +313,7 @@ fun ProfileScreen(
 
                                 }
                             }
-                            items(viewModel.posts.value) { post ->
+                            items(items = viewModel.posts.value) { post ->
                                 ArticleCard(
                                     post = post,
                                     onItemClick = {
