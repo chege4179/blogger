@@ -19,15 +19,21 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.peterchege.blogger.core.room.dao.DraftDao
 import com.peterchege.blogger.core.room.dao.PostDao
-import com.peterchege.blogger.core.room.entities.DraftRecord
-import com.peterchege.blogger.core.room.entities.PostRecord
+import com.peterchege.blogger.core.room.entities.*
 
 @Database(
-    entities = [PostRecord::class, DraftRecord::class],
+    entities = [
+        PostRecord::class,
+        DraftRecord::class,
+        LikeEntity::class,
+        ViewEntity::class,
+        CommentEntity::class,
+
+    ],
     version = 1,
     exportSchema = true
 )
-abstract class BloggerDatabase: RoomDatabase() {
+abstract class BloggerDatabase : RoomDatabase() {
 
     abstract val postDao: PostDao
     abstract val draftDao: DraftDao

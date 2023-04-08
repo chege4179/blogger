@@ -15,8 +15,7 @@
  */
 package com.peterchege.blogger.core.room.entities
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.*
 import com.peterchege.blogger.core.api.responses.Post
 
 
@@ -32,19 +31,91 @@ data class PostRecord(
     val postedOn: String,
 )
 
-fun PostRecord.toPost(): Post {
-    return Post(
-        _id,
-        postTitle,
-        postBody,
-        postAuthor,
-        imageUrl = ImageUrl,
-        postedAt,
-        postedOn,
-        emptyList(),
-        emptyList(),
-        emptyList(),
+data class PostRecordWithCommentsLikesViews(
+    @Embedded val post: PostRecord,
 
+
+    @Relation(
+        parentColumn = "_id",
+        entityColumn = "postId"
+    )
+    val comments: List<CommentEntity>,
+
+    @Relation(
+        parentColumn = "_id",
+        entityColumn = "postId"
+    )
+    val views: List<ViewEntity>,
+
+    @Relation(
+        parentColumn = "_id",
+        entityColumn = "postId"
+    )
+    val likes: List<LikeEntity>
+
+)
+
+
+@Entity(
+    foreignKeys = [
+        ForeignKey(
+            entity = PostRecord::class,
+            parentColumns = ["_id"],
+            childColumns = ["postId"],
+            onDelete = ForeignKey.CASCADE
         )
+    ]
+)
+data class CommentEntity(
+    @PrimaryKey
+    val id: String,
+    val postId: String,
 
-}
+    val comment: String,
+    val username: String,
+    val postedAt: String,
+    val postedOn: String,
+    val userId: String,
+    val imageUrl: String,
+
+
+    )
+
+@Entity(foreignKeys = [
+        ForeignKey(
+            entity = PostRecord::class,
+            parentColumns = ["_id"],
+            childColumns = ["postId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
+)
+data class ViewEntity(
+    @PrimaryKey
+    val viewerId:String,
+    val viewerUsername:String,
+    val viewerFullname:String,
+
+    val postId: String,
+)
+
+@Entity(
+    foreignKeys = [
+        ForeignKey(
+            entity = PostRecord::class,
+            parentColumns = ["_id"],
+            childColumns = ["postId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
+)
+data class LikeEntity(
+    @PrimaryKey
+    val fullname: String,
+    val username: String,
+    val userId: String,
+
+    val postId: String,
+)
+
+

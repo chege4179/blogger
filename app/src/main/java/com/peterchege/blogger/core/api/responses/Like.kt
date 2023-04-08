@@ -17,6 +17,6 @@ package com.peterchege.blogger.core.api.responses
 
 data class Like(
     val username:String,
+    val fullname:String,
     val userId:String,
-    val id:String,
 )

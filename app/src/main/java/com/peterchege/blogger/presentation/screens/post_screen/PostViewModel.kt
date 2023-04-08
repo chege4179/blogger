@@ -33,6 +33,7 @@ import com.peterchege.blogger.core.api.responses.Post
 import com.peterchege.blogger.core.api.responses.toPostRecord
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.Resource
+import com.peterchege.blogger.domain.mappers.toExternalModel
 import com.peterchege.blogger.domain.repository.PostRepository
 import com.peterchege.blogger.domain.use_case.GetPostUseCase
 import com.peterchege.blogger.domain.use_case.PostCommentUseCase
@@ -253,7 +254,7 @@ class PostViewModel @Inject constructor(
             try {
                 Log.e("insert", "inserted")
                 _state.value.post?.let {
-                    repository.insertPost(it.toPostRecord())
+                    repository.insertPost(it)
                     scaffoldState.snackbarHostState.showSnackbar(
                         message = "Your post has been saved "
                     )
@@ -377,19 +378,8 @@ class PostViewModel @Inject constructor(
                 val post = repository.getPostFromRoom(postId = postId)
                 if (post != null) {
                     _state.value = PostDetailState(
-                        false,
-                        Post(
-                            _id = post._id,
-                            postTitle = post.postTitle,
-                            postBody = post.postBody,
-                            postAuthor = post.postAuthor,
-                            imageUrl = post.ImageUrl,
-                            postedAt = post.postedAt,
-                            postedOn = post.postedOn,
-                            comments = emptyList(),
-                            views = emptyList(),
-                            likes = emptyList(),
-                        )
+                        isLoading = false,
+                        post = post.toExternalModel()
                     )
                     checkIsMyPost()
                 }

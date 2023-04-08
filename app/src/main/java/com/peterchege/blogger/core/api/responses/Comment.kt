@@ -22,5 +22,5 @@ data class Comment (
     val postedOn:String,
     val userId:String,
     val imageUrl:String,
-    val id:String,
+    val commentId:String,
 )

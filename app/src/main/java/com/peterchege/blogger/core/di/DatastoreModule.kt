@@ -13,32 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.core.api.responses
+package com.peterchege.blogger.core.di
 
-import com.peterchege.blogger.core.room.entities.PostRecord
+import android.app.Application
+import android.content.Context
+import android.content.SharedPreferences
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 
-data class Post(
-    val _id: String,
-    val postTitle: String,
-    val postBody:String,
-    val postAuthor:String,
-    val imageUrl: String,
-    val postedAt: String,
-    val postedOn: String,
-    val comments:List<Comment>,
-    val views:List<View>,
-    val likes:List<Like>
-    )
+@Module
+@InstallIn(SingletonComponent::class)
+class DatastoreModule {
 
-fun Post.toPostRecord(): PostRecord {
-    return PostRecord(
-        _id,
-        postTitle,
-        postBody,
-        imageUrl,
-        postedAt,
-        postAuthor,
-        postedOn,
-    )
+    @Provides
+    @Singleton
+    fun provideSharedPreference(app: Application): SharedPreferences {
+        return app.getSharedPreferences("user", Context.MODE_PRIVATE)
+    }
+
 }

@@ -21,6 +21,7 @@ import com.peterchege.blogger.core.api.requests.PostBody
 import com.peterchege.blogger.core.api.requests.Viewer
 import com.peterchege.blogger.core.api.responses.*
 import com.peterchege.blogger.core.room.entities.PostRecord
+import com.peterchege.blogger.core.room.entities.PostRecordWithCommentsLikesViews
 import kotlinx.coroutines.flow.Flow
 
 interface PostRepository {
@@ -44,14 +45,14 @@ interface PostRepository {
     suspend fun unfollowUser(followUser: FollowUser): FollowResponse
 
 
-    suspend fun insertPost(post: PostRecord)
+    suspend fun insertPost(post: Post)
 
     suspend fun deleteAllPosts()
 
     suspend fun deletePostById(id: String)
 
-    suspend fun getPostFromRoom(postId: String): PostRecord?
+    suspend fun getPostFromRoom(postId: String): PostRecordWithCommentsLikesViews?
 
 
-    fun getAllPostsFromRoom(): Flow<List<PostRecord>>
+    fun getAllPostsFromRoom(): Flow<List<PostRecordWithCommentsLikesViews>>
 }
