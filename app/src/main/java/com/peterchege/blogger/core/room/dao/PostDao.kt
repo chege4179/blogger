@@ -46,10 +46,10 @@ interface PostDao {
             postedAt = post.postedAt,
             postedOn = post.postedOn
         )
-
-        insertPostWithComments(postEntity, post.comments)
-        insertPostWithViews(postEntity, post.views)
-        insertPostWithLikes(postEntity, post.likes)
+        insertPostRecord(post = postEntity)
+        insertPostWithComments(postEntity = postEntity,comments =  post.comments)
+        insertPostWithViews(postEntity = postEntity,views =  post.views)
+        insertPostWithLikes(postEntity = postEntity,likes =  post.likes)
     }
 
 
@@ -58,6 +58,9 @@ interface PostDao {
 
     @Query("DELETE FROM post")
     suspend fun deleteAllPosts()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertPostRecord(post:PostRecord)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPostWithComments(postEntity: PostRecord, comments: List<Comment>) {
@@ -102,7 +105,7 @@ interface PostDao {
             LikeEntity(
                 username = it.username,
                 postId = postEntity._id,
-                id = it.id,
+                fullname = it.fullname,
                 userId = it.userId,
             )
         }

@@ -81,8 +81,7 @@ data class CommentEntity(
 
     )
 
-@Entity(
-    foreignKeys = [
+@Entity(foreignKeys = [
         ForeignKey(
             entity = PostRecord::class,
             parentColumns = ["_id"],
@@ -112,7 +111,7 @@ data class ViewEntity(
 )
 data class LikeEntity(
     @PrimaryKey
-    val id: String,
+    val fullname: String,
     val username: String,
     val userId: String,
 

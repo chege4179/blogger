@@ -22,16 +22,21 @@ import com.peterchege.blogger.core.api.requests.LikePost
 import com.peterchege.blogger.core.api.requests.PostBody
 import com.peterchege.blogger.core.api.requests.Viewer
 import com.peterchege.blogger.core.api.responses.*
+import com.peterchege.blogger.core.di.IoDispatcher
 import com.peterchege.blogger.core.room.database.BloggerDatabase
 import com.peterchege.blogger.core.room.entities.PostRecord
 import com.peterchege.blogger.core.room.entities.PostRecordWithCommentsLikesViews
 import com.peterchege.blogger.domain.repository.PostRepository
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class PostRepositoryImpl @Inject constructor(
     private val api: BloggerApi,
-    private val db: BloggerDatabase
+    private val db: BloggerDatabase,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ):PostRepository {
     override suspend fun getAllPosts(): AllPostsResponse {
         return api.getAllPosts()
@@ -52,9 +57,11 @@ class PostRepositoryImpl @Inject constructor(
         return api.addView(viewer = viewer)
     }
 
-    override suspend fun likePost(likePost: LikePost): LikeResponse {
-        return api.likePost(likePost = likePost)
+    override suspend fun likePost(likePost: LikePost): LikeResponse = withContext(context = ioDispatcher){
+        return@withContext api.likePost(likePost = likePost)
     }
+
+
 
     override suspend fun unlikePost(likePost: LikePost): LikeResponse {
         return api.unlikePost(likePost = likePost)
@@ -68,22 +75,23 @@ class PostRepositoryImpl @Inject constructor(
         return api.unfollowUser(followUser = followUser)
     }
 
-    override suspend fun insertPost(post: Post) {
-        return db.postDao.insertPost(post)
+    override suspend fun insertPost(post: Post) = withContext(context = ioDispatcher) {
+        return@withContext db.postDao.insertPost(post)
 
     }
 
-    override suspend fun deleteAllPosts() {
-        return db.postDao.deleteAllPosts()
+    override suspend fun deleteAllPosts() = withContext(context = ioDispatcher) {
+        return@withContext db.postDao.deleteAllPosts()
 
     }
 
-    override suspend fun deletePostById(id: String) {
-        return db.postDao.deletePostById(id)
+    override suspend fun deletePostById(id: String) = withContext(context = ioDispatcher) {
+        return@withContext db.postDao.deletePostById(id)
     }
 
-    override suspend fun getPostFromRoom(postId: String): PostRecordWithCommentsLikesViews? {
-        return db.postDao.getPostById(postId)
+    override suspend fun getPostFromRoom(postId: String): PostRecordWithCommentsLikesViews? =
+        withContext(context = ioDispatcher) {
+        return@withContext db.postDao.getPostById(postId)
     }
 
     override fun getAllPostsFromRoom(): Flow<List<PostRecordWithCommentsLikesViews>> {

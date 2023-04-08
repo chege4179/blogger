@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "848b820f7988b4d04e08adbcfa611eda",
+    "identityHash": "fd8f7d07c7e25f7f098834774cc9eb48",
     "entities": [
       {
         "tableName": "post",
@@ -94,11 +94,11 @@
       },
       {
         "tableName": "LikeEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `username` TEXT NOT NULL, `userId` TEXT NOT NULL, `postId` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`postId`) REFERENCES `post`(`_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`fullname` TEXT NOT NULL, `username` TEXT NOT NULL, `userId` TEXT NOT NULL, `postId` TEXT NOT NULL, PRIMARY KEY(`fullname`), FOREIGN KEY(`postId`) REFERENCES `post`(`_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
-            "fieldPath": "id",
-            "columnName": "id",
+            "fieldPath": "fullname",
+            "columnName": "fullname",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -124,7 +124,7 @@
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "id"
+            "fullname"
           ]
         },
         "indices": [],
@@ -270,7 +270,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '848b820f7988b4d04e08adbcfa611eda')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fd8f7d07c7e25f7f098834774cc9eb48')"
     ]
   }
 }

@@ -15,17 +15,11 @@
  */
 package com.peterchege.blogger.core.di
 
-import android.app.Application
 import android.content.Context
-import android.content.SharedPreferences
-import androidx.room.Room
 import com.chuckerteam.chucker.api.ChuckerCollector
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.peterchege.blogger.core.api.BloggerApi
-import com.peterchege.blogger.core.room.database.BloggerDatabase
 import com.peterchege.blogger.core.util.Constants
-import com.peterchege.blogger.data.*
-import com.peterchege.blogger.domain.repository.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,13 +30,14 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
+
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
+object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideHttpClient(@ApplicationContext context: Context, ): OkHttpClient {
+    fun provideHttpClient(@ApplicationContext context: Context): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(
                 ChuckerInterceptor.Builder(context = context)
@@ -55,6 +50,7 @@ object AppModule {
             .build()
     }
 
+
     @Provides
     @Singleton
     fun provideUserApi(client: OkHttpClient): BloggerApi {
@@ -64,51 +60,5 @@ object AppModule {
             .client(client)
             .build()
             .create(BloggerApi::class.java)
-    }
-
-    @Provides
-    @Singleton
-    fun provideSharedPreference(app: Application): SharedPreferences {
-        return app.getSharedPreferences("user", Context.MODE_PRIVATE)
-    }
-
-    @Provides
-    @Singleton
-    fun provideBloggerDatabase(app: Application): BloggerDatabase {
-        return Room.databaseBuilder(
-            app,
-            BloggerDatabase::class.java,
-            Constants.DATABASE_NAME
-        ).build()
-    }
-
-
-    @Provides
-    @Singleton
-    fun provideAuthRepository(api:BloggerApi):AuthRepository{
-        return AuthRepositoryImpl(api = api)
-    }
-    @Provides
-    @Singleton
-    fun provideCommentRepository(api:BloggerApi):CommentRepository{
-        return CommentRepositoryImpl(api = api)
-    }
-
-    @Provides
-    @Singleton
-    fun provideProfileRepository(api:BloggerApi):ProfileRepository{
-        return ProfileRepositoryImpl(api = api)
-    }
-
-    @Provides
-    @Singleton
-    fun providePostRepository(api:BloggerApi,db:BloggerDatabase):PostRepository{
-        return PostRepositoryImpl(api = api,db = db)
-    }
-
-    @Provides
-    @Singleton
-    fun provideDraftRepository(db:BloggerDatabase):DraftRepository{
-        return DraftRepositoryImpl(db = db)
     }
 }
