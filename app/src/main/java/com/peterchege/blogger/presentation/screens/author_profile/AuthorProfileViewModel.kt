@@ -27,13 +27,17 @@ import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.Resource
 import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.PostRepository
+import com.peterchege.blogger.domain.state.AuthorProfileScreenUi
+import com.peterchege.blogger.domain.state.AuthorProfileScreenUiState
 import com.peterchege.blogger.domain.use_case.GetProfileUseCase
+import com.skydoves.sealedx.core.Extensive
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
+
 
 
 @HiltViewModel
@@ -46,24 +50,13 @@ class AuthorProfileViewModel @Inject constructor(
     ) : ViewModel() {
 
 
-    private var _state = mutableStateOf<ProfileResponseState>(ProfileResponseState())
-    var state: State<ProfileResponseState> = _state
-
-    private var _isLoading = mutableStateOf(false)
-    var isLoading: State<Boolean> = _isLoading
-
-    private var _isFound = mutableStateOf(false)
-    var isFound: State<Boolean> = _isFound
+    private val _uiState = MutableStateFlow<AuthorProfileScreenUiState>(AuthorProfileScreenUiState.Loading)
+    val uiState = _uiState.asStateFlow()
 
     private var _isFollowing = mutableStateOf(false)
     var isFollowing: State<Boolean> = _isFollowing
 
-    data class ProfileResponseState(
-        val msg: String = "",
-        val success: Boolean = false,
-        val user: User? = null,
-        val posts: List<Post> = emptyList()
-    )
+
 
     init {
         loadUser()
@@ -85,10 +78,10 @@ class AuthorProfileViewModel @Inject constructor(
 
 
     private fun getFollowingStatus() {
-        val followers = _state.value.user?.followers
-        val username = _user.value?.username ?: ""
-        val followerUsernames = followers?.map { it.followerUsername }
-        _isFollowing.value = followerUsernames!!.contains(username)
+//        val followers = _state.value.user?.followers
+//        val username = _user.value?.username ?: ""
+//        val followerUsernames = followers?.map { it.followerUsername }
+//        _isFollowing.value = followerUsernames!!.contains(username)
 
     }
 
@@ -98,19 +91,19 @@ class AuthorProfileViewModel @Inject constructor(
             val username = _user.value?.username ?: ""
             val fullname = _user.value?.fullname ?: ""
             val userId = _user.value?._id ?: ""
-            viewModelScope.launch {
-                val followResponse = repository.followUser(
-                    FollowUser(
-                        followerUsername = username,
-                        followerFullname = fullname,
-                        followerId = userId,
-                        followedUsername = _state.value.user!!.username,
-                    )
-                )
-                if (followResponse.success) {
-                    _isFollowing.value = true
-                }
-            }
+//            viewModelScope.launch {
+//                val followResponse = repository.followUser(
+//                    FollowUser(
+//                        followerUsername = username,
+//                        followerFullname = fullname,
+//                        followerId = userId,
+//                        followedUsername = _state.value.user!!.username,
+//                    )
+//                )
+//                if (followResponse.success) {
+//                    _isFollowing.value = true
+//                }
+//            }
 
         } catch (e: HttpException) {
 
@@ -125,17 +118,17 @@ class AuthorProfileViewModel @Inject constructor(
             val fullname = _user.value?.fullname ?: ""
             val userId = _user.value?._id ?: ""
             viewModelScope.launch {
-                val followResponse = repository.unfollowUser(
-                    FollowUser(
-                        followerUsername = username,
-                        followerFullname = fullname,
-                        followerId = userId,
-                        followedUsername = _state.value.user!!.username,
-                    )
-                )
-                if (followResponse.success) {
-                    _isFollowing.value = false
-                }
+//                val followResponse = repository.unfollowUser(
+//                    FollowUser(
+//                        followerUsername = username,
+//                        followerFullname = fullname,
+//                        followerId = userId,
+//                        followedUsername = _state.value.user!!.username,
+//                    )
+//                )
+//                if (followResponse.success) {
+//                    _isFollowing.value = false
+//                }
             }
 
         } catch (e: HttpException) {
@@ -152,25 +145,21 @@ class AuthorProfileViewModel @Inject constructor(
             profileUseCase(username = username).onEach { result ->
                 when (result) {
                     is Resource.Success -> {
-                        _isLoading.value = false
-                        _isFound.value = true
-                        result.data?.user?.let { Log.e("user", it.username) }
-                        _state.value = ProfileResponseState(
-                            msg = result.data!!.msg,
-                            success = result.data.success,
-                            posts = result.data.posts,
-                            user = result.data.user,
+                        _uiState.value = AuthorProfileScreenUiState.Success(
+                            data = AuthorProfileScreenUi(
+                                posts = result.data?.posts ?: emptyList(),
+                                user = result.data?.user
+                            )
                         )
                         getFollowingStatus()
 
 
                     }
                     is Resource.Error -> {
-                        _isLoading.value = false
-                        _isFound.value = false
+                        _uiState.value = AuthorProfileScreenUiState.Error(
+                            message = result.message ?: "An unexpected error occurred")
                     }
                     is Resource.Loading -> {
-                        _isLoading.value = true
 
                     }
                 }

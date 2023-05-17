@@ -16,6 +16,7 @@
 package com.peterchege.blogger.domain.state
 
 import com.peterchege.blogger.core.api.responses.Post
+import com.peterchege.blogger.core.api.responses.User
 import com.skydoves.sealedx.core.Extensive
 import com.skydoves.sealedx.core.annotations.ExtensiveModel
 import com.skydoves.sealedx.core.annotations.ExtensiveSealed
@@ -23,6 +24,8 @@ import com.skydoves.sealedx.core.annotations.ExtensiveSealed
 @ExtensiveSealed(
     models = [
         ExtensiveModel(FeedScreenUi::class),
+        ExtensiveModel(AuthorProfileScreenUi::class),
+
 
     ]
 )
@@ -34,4 +37,9 @@ sealed interface State {
 
 data class FeedScreenUi(
     val posts:List<Post>,
+)
+
+data class AuthorProfileScreenUi(
+    val posts: List<Post>,
+    val user: User? = null
 )

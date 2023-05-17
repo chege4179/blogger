@@ -81,7 +81,7 @@ class FeedViewModel @Inject constructor(
     }
 
 
-    private fun getFeedPosts() {
+    fun getFeedPosts() {
         getFeedUseCase().onEach { result ->
             when (result) {
                 is Resource.Success -> {

@@ -46,6 +46,8 @@ import com.peterchege.blogger.domain.repository.NetworkStatus
 import com.peterchege.blogger.domain.state.FeedScreenUiState
 import com.peterchege.blogger.presentation.components.ArticleCard
 import com.peterchege.blogger.presentation.components.CategoryCard
+import com.peterchege.blogger.presentation.components.ErrorComponent
+import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.components.ProfileCard
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -68,7 +70,8 @@ fun FeedScreen(
         uiState = uiState.value,
         authUser = authUser.value,
         eventFlow = viewModel.eventFlow,
-        networkStatus =  networkStatus.value
+        networkStatus =  networkStatus.value,
+        retry = { viewModel.getFeedPosts() }
     )
 }
 
@@ -83,6 +86,7 @@ fun FeedScreenContent(
     authUser:User?,
     eventFlow:SharedFlow<UiEvent>,
     networkStatus: NetworkStatus,
+    retry:() -> Unit,
 
 ) {
     val scaffoldState = rememberScaffoldState()
@@ -173,17 +177,13 @@ fun FeedScreenContent(
             }
             when(uiState){
                 is FeedScreenUiState.Error -> {
-                    Box(modifier = Modifier.fillMaxSize()){
-                        Text(
-                            text = uiState.message,
-                            modifier = Modifier.align(Alignment.Center)
-                        )
-                    }
+                    ErrorComponent(
+                        errorMessage = uiState.message,
+                        retryCallback = { retry() },
+                    )
                 }
                 is FeedScreenUiState.Loading -> {
-                    Box(modifier = Modifier.fillMaxSize()){
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                    }
+                    LoadingComponent()
                 }
                 is FeedScreenUiState.Success -> {
                     if (uiState.data.posts.isEmpty()) {
