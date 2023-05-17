@@ -30,90 +30,86 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.peterchege.blogger.core.api.requests.LoginUser
 import com.peterchege.blogger.core.util.*
 import com.peterchege.blogger.domain.repository.AuthRepository
+import com.peterchege.blogger.domain.repository.NetworkInfoRepository
+import com.peterchege.blogger.domain.repository.NetworkStatus
 import com.peterchege.blogger.domain.use_case.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
+data class LoginFormState(
+    val username:String = "",
+    val password:String = "",
+    val isPasswordVisible:Boolean = false,
+    val isLoading: Boolean=false,
+)
 
 @HiltViewModel
 class LoginScreenViewModel @Inject constructor(
     private val repository: AuthRepository,
+    private val networkInfoRepository: NetworkInfoRepository
 ) : ViewModel() {
+
+    val networkStatus = networkInfoRepository.networkStatus
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = NetworkStatus.Unknown
+        )
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    private var _state = mutableStateOf(LoginScreenState())
-    var state: State<LoginScreenState> = _state
+    private var _uiState = MutableStateFlow(LoginFormState())
+    val uiState = _uiState.asStateFlow()
 
-    private var _isLoading = mutableStateOf(false)
-    var isLoading: State<Boolean> = _isLoading
 
-    private var _usernameState = mutableStateOf(TextFieldState())
-    var usernameState: State<TextFieldState> = _usernameState
-
-    private var _passwordState = mutableStateOf(TextFieldState())
-    var passwordState: State<TextFieldState> = _passwordState
-
-    private var _LoginResponseState = mutableStateOf(LoginResponse())
-    var LoginResponseState: State<LoginResponse> = _LoginResponseState
-
-    private val _passwordVisibility = mutableStateOf(false)
-    var passwordVisibility: State<Boolean> = _passwordVisibility
 
     fun onChangePasswordVisibility() {
-        _passwordVisibility.value = !_passwordVisibility.value
+        val initialState = _uiState.value.isPasswordVisible
+        _uiState.value = _uiState.value.copy(isPasswordVisible = !initialState)
     }
 
-    data class LoginScreenState(
-        val isLoading: Boolean = false,
-        val msg: String = "",
-        val success: Boolean = false,
-    )
-
-    data class LoginResponse(
-        val msg: String = "",
-        val success: Boolean = false
-    )
-
-    fun OnChangeUsername(text: String) {
-        _usernameState.value = TextFieldState(text = text)
-
-
+    fun onChangeUsername(text: String) {
+        _uiState.value = _uiState.value.copy(username = text)
     }
 
-    fun OnChangePassword(text: String) {
-        _passwordState.value = TextFieldState(text = text)
+    fun onChangePassword(text: String) {
+        _uiState.value = _uiState.value.copy(password = text)
 
     }
     fun initiateLogin() {
         viewModelScope.launch {
             try {
                 val token = FirebaseMessaging.getInstance().token.await()
-                _isLoading.value = true
-                if (_usernameState.value.text.length < 5 || _passwordState.value.text.length < 5) {
-                    _isLoading.value = false
+                _uiState.value = _uiState.value.copy(isLoading = true)
+                val username = _uiState.value.username
+                val password = _uiState.value.password
+                if (username.length < 5 || password.length < 5) {
+                    _uiState.value = _uiState.value.copy(isLoading = false)
                     _eventFlow.emit(UiEvent.ShowSnackbar(message = "Credentials should be at least 5 characters long"))
                 } else {
                     val loginUser = LoginUser(
-                        _usernameState.value.text.trim(),
-                        _passwordState.value.text.trim(),
+                        username = username.trim(),
+                        password = password.trim(),
                         token = token!!
                     )
                     try {
                         val response = repository.loginUser(loginUser)
-                        _isLoading.value = false
+                        _uiState.value = _uiState.value.copy(isLoading = false)
                         if (!response.success) {
                             _eventFlow.emit(UiEvent.ShowSnackbar(message =response.msg))
-
                         }
                         if (response.success) {
                             response.user?.let {
@@ -122,11 +118,11 @@ class LoginScreenViewModel @Inject constructor(
                             _eventFlow.emit(UiEvent.Navigate(route = Screens.DASHBOARD_SCREEN))
                         }
                     } catch (e: HttpException) {
-                        _isLoading.value = false
+                        _uiState.value = _uiState.value.copy(isLoading = false)
                         _eventFlow.emit(UiEvent.ShowSnackbar(message = "Server error...Please again later"))
 
                     } catch (e: IOException) {
-                        _isLoading.value = false
+                        _uiState.value = _uiState.value.copy(isLoading = false)
                         _eventFlow.emit(UiEvent.ShowSnackbar(message = "Could not connect to the server... Please try again"))
                     }
                 }

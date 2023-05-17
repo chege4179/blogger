@@ -16,7 +16,6 @@
 package com.peterchege.blogger.presentation.screens.login
 
 import android.annotation.SuppressLint
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -39,37 +38,91 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.peterchege.blogger.R
 import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.core.util.UiEvent
-import com.peterchege.blogger.core.util.hasInternetConnection
-import kotlinx.coroutines.InternalCoroutinesApi
+import com.peterchege.blogger.domain.repository.NetworkStatus
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-@ExperimentalComposeUiApi
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LoginScreen(
     navController: NavController,
     viewModel: LoginScreenViewModel = hiltViewModel()
 
-){
+) {
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+    val networkStatus = viewModel.networkStatus.collectAsStateWithLifecycle()
+
+
+    LoginScreenContent(
+        uiState = uiState.value,
+        networkStatus = networkStatus.value,
+        navController = navController,
+        eventFlow = viewModel.eventFlow,
+        onChangeUsername = { viewModel.onChangeUsername(it) },
+        onChangePassword = { viewModel.onChangePassword(it) },
+        onChangePasswordVisibility = { viewModel.onChangePasswordVisibility() },
+        onSubmit = { viewModel.initiateLogin() },
+
+        )
+
+
+}
+
+
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@ExperimentalComposeUiApi
+@Composable
+fun LoginScreenContent(
+    uiState: LoginFormState,
+    networkStatus: NetworkStatus,
+    navController: NavController,
+    eventFlow: SharedFlow<UiEvent>,
+    onChangeUsername: (String) -> Unit,
+    onChangePassword: (String) -> Unit,
+    onChangePasswordVisibility: () -> Unit,
+    onSubmit: () -> Unit,
+
+
+    ) {
     val context = LocalContext.current
-    val state = viewModel.state.value
-    val usernameState = viewModel.usernameState.value
-    val passwordState = viewModel.passwordState.value
+
     val scaffoldState = rememberScaffoldState()
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    LaunchedEffect(key1 = true){
-        viewModel.eventFlow.collectLatest { event ->
+    LaunchedEffect(key1 = networkStatus) {
+        when (networkStatus) {
+            is NetworkStatus.Unknown -> {
+
+            }
+
+            is NetworkStatus.Connected -> {
+                scaffoldState.snackbarHostState.showSnackbar(
+                    message = "Connected"
+                )
+            }
+
+            is NetworkStatus.Disconnected -> {
+                scaffoldState.snackbarHostState.showSnackbar(
+                    message = "You are offline"
+                )
+            }
+        }
+    }
+
+    LaunchedEffect(key1 = true) {
+        eventFlow.collectLatest { event ->
             when (event) {
                 is UiEvent.ShowSnackbar -> {
                     scaffoldState.snackbarHostState.showSnackbar(
                         message = event.message
                     )
                 }
+
                 is UiEvent.Navigate -> {
                     navController.navigate(route = event.route)
                 }
@@ -79,23 +132,27 @@ fun LoginScreen(
 
     Scaffold(
         scaffoldState = scaffoldState,
-        modifier= Modifier
+        modifier = Modifier
             .fillMaxSize()
     ) {
         Box(
-            modifier= Modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(20.dp),
         ) {
 
-            Column(modifier = Modifier.fillMaxSize(),
+            Column(
+                modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
                     painter = painterResource(id = R.mipmap.blogger_app_icon_foreground),
-                    modifier = Modifier.width(80.dp).height(80.dp),
-                    contentDescription = "App Icon")
+                    modifier = Modifier
+                        .width(80.dp)
+                        .height(80.dp),
+                    contentDescription = "App Icon"
+                )
                 Text(
                     text = "Blogger App",
                     fontSize = 30.sp,
@@ -111,9 +168,9 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(15.dp))
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = usernameState.text,
-                    onValueChange ={
-                        viewModel.OnChangeUsername(it)
+                    value = uiState.username,
+                    onValueChange = {
+                        onChangeUsername(it)
                         //state.username = it
                     },
                     label = { Text("Username") }
@@ -121,35 +178,30 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = passwordState.text ,
-                    onValueChange ={
-                        viewModel.OnChangePassword(it)
-                        //state.password = it
+                    value = uiState.password,
+                    onValueChange = {
+                        onChangePassword(it)
                     },
                     trailingIcon = {
-                        if(viewModel.passwordVisibility.value){
-                            Icon(
-                                Icons.Filled.Visibility,
-                                contentDescription = "Visibility on",
-                                Modifier
-                                    .size(26.dp)
-                                    .clickable {
-                                        viewModel.onChangePasswordVisibility()
-                                    }
-                            )
-                        }else{
-                            Icon(
+
+                        Icon(
+                            imageVector = if (!uiState.isPasswordVisible)
+                                Icons.Filled.Visibility
+                            else
                                 Icons.Filled.VisibilityOff,
-                                contentDescription = "Visibility Off",
-                                Modifier
-                                    .size(26.dp)
-                                    .clickable {
-                                        viewModel.onChangePasswordVisibility()
-                                    }
-                            )
-                        }
+                            contentDescription = "Visibility on",
+                            modifier = Modifier
+                                .size(26.dp)
+                                .clickable {
+                                    onChangePasswordVisibility()
+                                }
+                        )
+
                     },
-                    visualTransformation = if (viewModel.passwordVisibility.value) VisualTransformation.None else PasswordVisualTransformation(),
+                    visualTransformation = if (!uiState.isPasswordVisible)
+                        VisualTransformation.None
+                    else
+                        PasswordVisualTransformation(),
                     label = { Text("Password") }
                 )
                 Spacer(modifier = Modifier.height(10.dp))
@@ -159,11 +211,7 @@ fun LoginScreen(
                         .height(50.dp),
                     onClick = {
                         keyboardController?.hide()
-                        if(hasInternetConnection(context)){
-                            viewModel.initiateLogin()
-                        }else{
-                            Toast.makeText(context,"No Internet found",Toast.LENGTH_SHORT).show()
-                        }
+                        onSubmit()
 
                     }
                 )
@@ -176,20 +224,19 @@ fun LoginScreen(
                         .fillMaxWidth()
                         .height(50.dp),
                     onClick = {
-                    navController.navigate(Screens.SIGNUP_SCREEN)
+                        navController.navigate(Screens.SIGNUP_SCREEN)
 
-                }) {
+                    }) {
                     Text(text = "Sign Up")
                 }
             }
-            if (viewModel.isLoading.value){
+            if (uiState.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
 
         }
 
     }
-
 
 
 }

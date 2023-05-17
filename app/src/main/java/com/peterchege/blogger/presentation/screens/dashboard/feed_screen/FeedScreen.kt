@@ -33,33 +33,89 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.annotation.ExperimentalCoilApi
+import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.Screens
+import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.core.util.categories
+import com.peterchege.blogger.domain.repository.NetworkStatus
+import com.peterchege.blogger.domain.state.FeedScreenUiState
 import com.peterchege.blogger.presentation.components.ArticleCard
 import com.peterchege.blogger.presentation.components.CategoryCard
 import com.peterchege.blogger.presentation.components.ProfileCard
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.collectLatest
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+
 @Composable
 @ExperimentalCoilApi
 fun FeedScreen(
     bottomNavController: NavController,
     navHostController: NavHostController,
     viewModel: FeedViewModel = hiltViewModel()
+){
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+    val authUser = viewModel.authUser.collectAsStateWithLifecycle()
+    val networkStatus = viewModel.networkStatus.collectAsStateWithLifecycle()
+
+    FeedScreenContent(
+        bottomNavController = bottomNavController,
+        navHostController = navHostController,
+        uiState = uiState.value,
+        authUser = authUser.value,
+        eventFlow = viewModel.eventFlow,
+        networkStatus =  networkStatus.value
+    )
+}
+
+
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@Composable
+@ExperimentalCoilApi
+fun FeedScreenContent(
+    bottomNavController: NavController,
+    navHostController: NavHostController,
+    uiState: FeedScreenUiState,
+    authUser:User?,
+    eventFlow:SharedFlow<UiEvent>,
+    networkStatus: NetworkStatus,
+
 ) {
     val scaffoldState = rememberScaffoldState()
-    LaunchedEffect(key1 = viewModel.isError.value) {
-        if (viewModel.isError.value) {
-            scaffoldState.snackbarHostState.showSnackbar(
-                message = viewModel.errorMsg.value
-            )
+    LaunchedEffect(key1 = networkStatus) {
+        when (networkStatus) {
+            is NetworkStatus.Unknown -> {}
+
+            is NetworkStatus.Connected -> {}
+
+            is NetworkStatus.Disconnected -> {
+                scaffoldState.snackbarHostState.showSnackbar(
+                    message = "You are offline"
+                )
+            }
         }
     }
-    val state = viewModel.state.value
+
+    LaunchedEffect(key1 = true) {
+        eventFlow.collectLatest { event ->
+            when (event) {
+                is UiEvent.ShowSnackbar -> {
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        message = event.message
+                    )
+                }
+
+                is UiEvent.Navigate -> {
+                    navHostController.navigate(route = event.route)
+                }
+            }
+        }
+    }
+
     Scaffold(
         Modifier
             .fillMaxSize()
@@ -79,7 +135,7 @@ fun FeedScreen(
                             navHostController.navigate(Screens.SEARCH_SCREEN)
                         }) {
                         Icon(
-                            Icons.Filled.Search,
+                            imageVector = Icons.Filled.Search,
                             contentDescription = "Chats",
                             Modifier.size(26.dp)
 
@@ -99,84 +155,102 @@ fun FeedScreen(
             }
         }
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            if (state.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            }
-            Column(
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(5.dp),
+        ) {
+            LazyRow(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(5.dp),
+                    .fillMaxWidth()
+                    .padding(5.dp)
             ) {
-                LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(5.dp)
-                ) {
-                    items(categories) { category ->
-                        CategoryCard(navController = navHostController, categoryItem = category)
-                        Spacer(modifier = Modifier.width(10.dp))
+                items(items = categories) { category ->
+                    CategoryCard(navController = navHostController, categoryItem = category)
+                    Spacer(modifier = Modifier.width(10.dp))
 
-                    }
                 }
-                if (!viewModel.isFound.value) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-
-                        ) {
+            }
+            when(uiState){
+                is FeedScreenUiState.Error -> {
+                    Box(modifier = Modifier.fillMaxSize()){
                         Text(
-                            modifier = Modifier.align(Alignment.Center),
-                            text = "No posts or users were found ... Please try a different search",
-                            textAlign = TextAlign.Center,
+                            text = uiState.message,
+                            modifier = Modifier.align(Alignment.Center)
                         )
                     }
+                }
+                is FeedScreenUiState.Loading -> {
+                    Box(modifier = Modifier.fillMaxSize()){
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    }
+                }
+                is FeedScreenUiState.Success -> {
+                    if (uiState.data.posts.isEmpty()) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
 
-                } else {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(top = 5.dp)
-                    ) {
-
-                        items(state.posts) { post ->
-                            ArticleCard(
-                                post = post,
-                                onItemClick = {
-                                    navHostController.navigate(Screens.POST_SCREEN + "/${post._id}/${Constants.API_SOURCE}")
-                                },
-                                onProfileNavigate = {
-                                    viewModel.onProfileNavigate(
-                                        it,
-                                        bottomNavController,
-                                        navHostController
-                                    )
-                                },
-                                onDeletePost = {
-
-                                },
-                                isLiked = false,
-                                isSaved = false,
-                                isProfile = false,
-                                profileImageUrl = "https://res.cloudinary.com/dhuqr5iyw/image/upload/v1640971757/mystory/profilepictures/default_y4mjwp.jpg"
+                            ) {
+                            Text(
+                                modifier = Modifier.align(Alignment.Center),
+                                text = "No posts were found ",
+                                textAlign = TextAlign.Center,
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
                         }
-                        items(state.users) { user ->
-                            ProfileCard(
-                                navController = navHostController,
-                                user = user,
-                                onProfileNavigate = {
-                                    viewModel.onProfileNavigate(
-                                        it,
-                                        bottomNavController,
-                                        navHostController
-                                    )
-                                }
-                            )
+
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(5.dp)
+                        ) {
+
+                            items(items = uiState.data.posts) { post ->
+                                ArticleCard(
+                                    post = post,
+                                    onItemClick = {
+                                        navHostController.navigate(Screens.POST_SCREEN + "/${post._id}/${Constants.API_SOURCE}")
+                                    },
+                                    onProfileNavigate = {
+                                        onProfileNavigate(
+                                            username = it,
+                                            bottomNavController = bottomNavController,
+                                            navHostController = navHostController,
+                                            authUser = authUser,
+                                        )
+                                    },
+                                    onDeletePost = {},
+                                    isLiked = false,
+                                    isSaved = false,
+                                    isProfile = false,
+                                    profileImageUrl = "https://res.cloudinary.com/dhuqr5iyw/image/upload/v1640971757/mystory/profilepictures/default_y4mjwp.jpg"
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+
                         }
                     }
                 }
             }
+
+
+
         }
     }
+}
+
+
+fun onProfileNavigate(
+    username: String,
+    bottomNavController: NavController,
+    authUser: User?,
+    navHostController: NavHostController
+) {
+    val loginUsername = authUser?.username ?: ""
+    if (loginUsername == username) {
+        bottomNavController.navigate(Screens.PROFILE_NAVIGATION)
+    } else {
+        navHostController.navigate(Screens.AUTHOR_PROFILE_SCREEN + "/$username")
+    }
+
 }

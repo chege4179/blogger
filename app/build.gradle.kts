@@ -6,6 +6,7 @@ plugins {
     id ("com.google.gms.google-services")
     id ("com.google.firebase.crashlytics")
     id("org.jetbrains.kotlin.plugin.serialization")
+    id("com.google.devtools.ksp") version "1.8.20-1.0.11"
 }
 
 android {
@@ -31,10 +32,8 @@ android {
             proguardFiles (getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
-    kapt {
-        arguments {
-            arg("room.schemaLocation", "$projectDir/schemas")
-        }
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
     }
     compileOptions {
         sourceCompatibility= JavaVersion.VERSION_1_8
@@ -48,7 +47,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.3"
+        kotlinCompilerExtensionVersion = "1.4.6"
         kotlinCompilerVersion = "1.5.21"
     }
     packagingOptions {
@@ -57,22 +56,26 @@ android {
         }
     }
 }
-
+kotlin {
+    sourceSets.configureEach {
+        kotlin.srcDir("$buildDir/generated/ksp/$name/kotlin/")
+    }
+}
 dependencies {
 
-    implementation ("androidx.core:core-ktx:1.10.0")
+    implementation ("androidx.core:core-ktx:1.10.1")
     implementation ("androidx.appcompat:appcompat:1.6.1")
-    implementation ("com.google.android.material:material:1.8.0")
-    implementation ("androidx.compose.ui:ui:1.5.0-alpha02")
-    implementation ("androidx.compose.material:material:1.5.0-alpha02")
-    implementation ("androidx.compose.ui:ui-tooling-preview:1.5.0-alpha02")
+    implementation ("com.google.android.material:material:1.9.0")
+    implementation ("androidx.compose.ui:ui:1.5.0-alpha04")
+    implementation ("androidx.compose.material:material:1.5.0-alpha04")
+    implementation ("androidx.compose.ui:ui-tooling-preview:1.5.0-alpha04")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
-    implementation ("androidx.activity:activity-compose:1.7.0")
+    implementation ("androidx.activity:activity-compose:1.7.1")
     testImplementation ("junit:junit:4.13.2")
     androidTestImplementation ("androidx.test.ext:junit:1.1.5")
     androidTestImplementation ("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:1.5.0-alpha02")
-    debugImplementation ("androidx.compose.ui:ui-tooling:1.5.0-alpha02")
+    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:1.5.0-alpha04")
+    debugImplementation ("androidx.compose.ui:ui-tooling:1.5.0-alpha04")
 
 
 
@@ -99,20 +102,20 @@ dependencies {
     implementation ("androidx.hilt:hilt-navigation-compose:1.0.0")
     implementation ("androidx.navigation:navigation-compose:2.5.3")
     // coil
-    implementation ("io.coil-kt:coil-compose:2.2.2")
+    implementation ("io.coil-kt:coil-compose:2.3.0")
 
     //fcm
     implementation ("com.google.firebase:firebase-messaging:23.1.2")
 
     // room 
     implementation ("androidx.room:room-runtime:2.5.1")
-    kapt ("androidx.room:room-compiler:2.5.1")
+    ksp ("androidx.room:room-compiler:2.5.1")
 
     // Kotlin Extensions and Coroutines support for Room
     implementation ("androidx.room:room-ktx:2.5.1")
 
 //    implementation "androidx.compose.runtime:runtime-livedata:1.3.0-alpha03"
-    implementation ("androidx.compose.material:material-icons-extended:1.5.0-alpha02")
+    implementation ("androidx.compose.material:material-icons-extended:1.5.0-alpha04")
 
     //glide
     implementation ("dev.chrisbanes.accompanist:accompanist-glide:0.5.1")
@@ -133,13 +136,16 @@ dependencies {
 
 
     implementation ("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5")
-    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
 
 
     implementation("androidx.work:work-runtime-ktx:2.8.1")
 
-    implementation ("com.google.firebase:firebase-crashlytics-ktx:18.3.6")
-    implementation ("com.google.firebase:firebase-analytics-ktx:21.2.1")
+    implementation ("com.google.firebase:firebase-crashlytics-ktx:18.3.7")
+    implementation ("com.google.firebase:firebase-analytics-ktx:21.2.2")
+
+    implementation("com.github.skydoves:sealedx-core:1.0.1")
+    ksp("com.github.skydoves:sealedx-processor:1.0.1")
     //timber
     implementation("com.jakewharton.timber:timber:5.0.1")
 
@@ -151,4 +157,5 @@ dependencies {
 
 
 }
+
 
