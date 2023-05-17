@@ -15,6 +15,7 @@
  */
 package com.peterchege.blogger.core.di
 
+import android.content.Context
 import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.datastore.repository.UserDataStoreRepository
 import com.peterchege.blogger.core.room.database.BloggerDatabase
@@ -23,6 +24,7 @@ import com.peterchege.blogger.domain.repository.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Singleton
@@ -82,4 +84,14 @@ object RepositoryModule {
     fun provideDraftRepository(db: BloggerDatabase): DraftRepository {
         return DraftRepositoryImpl(db = db)
     }
+
+    @Provides
+    @Singleton
+    fun provideNetworkInfoRepository(
+        @ApplicationContext context: Context,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher
+        ):NetworkInfoRepository{
+        return NetworkInfoRepositoryImpl(context = context,ioDispatcher = ioDispatcher)
+    }
+
 }

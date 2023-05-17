@@ -26,122 +26,105 @@ import androidx.navigation.NavController
 import com.peterchege.blogger.core.api.requests.SignUpUser
 import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.core.util.TextFieldState
+import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.core.util.hasInternetConnection
 import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.use_case.SignUpUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
+data class SignUpFormState(
+    val username: String = "",
+    val fullName: String = "",
+    val email: String = "",
+    val password: String = "",
+    val confirmPassword: String = "",
+    val isPasswordVisible: Boolean = false,
+    val isLoading: Boolean = false,
+
+    )
 
 @HiltViewModel
 class SignUpScreenViewModel @Inject constructor(
-    private val signUpUseCase: SignUpUseCase,
     private val signUpRepository: AuthRepository,
+) : ViewModel() {
 
-    ) : ViewModel() {
+    private val _uiState = MutableStateFlow(SignUpFormState())
+    val uiState = _uiState.asStateFlow()
 
-    private var _isLoading = mutableStateOf(false)
-    var isLoading: State<Boolean> = _isLoading
-
-    private var _usernameState = mutableStateOf(TextFieldState())
-    var usernameState: State<TextFieldState> = _usernameState
-
-    private var _fullnameState = mutableStateOf(TextFieldState())
-    var fullnameState: State<TextFieldState> = _fullnameState
-
-    private var _emailState = mutableStateOf(TextFieldState())
-    var emailState: State<TextFieldState> = _emailState
-
-    private var _passwordState = mutableStateOf(TextFieldState())
-    var passwordState: State<TextFieldState> = _passwordState
-
-
-    private var _confirmPasswordState = mutableStateOf(TextFieldState())
-    var confirmPasswordState: State<TextFieldState> = _confirmPasswordState
-
-    private val _passwordVisibility = mutableStateOf(false)
-    var passwordVisibility: State<Boolean> = _passwordVisibility
+    private val _eventFlow = MutableSharedFlow<UiEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
 
     fun onChangePasswordVisibility() {
-        _passwordVisibility.value = !_passwordVisibility.value
+        val initialState = _uiState.value.isPasswordVisible
+        _uiState.value = _uiState.value.copy(isPasswordVisible = !initialState)
     }
 
-
-    fun OnChangeUsername(text: String) {
-        _usernameState.value = TextFieldState(text = text)
+    fun onChangeUsername(text: String) {
+        _uiState.value = _uiState.value.copy(username = text)
     }
 
-    fun OnChangePassword(text: String) {
-        _passwordState.value = TextFieldState(text = text)
-
-    }
-
-    fun OnChangeConfirmPassword(text: String) {
-        _confirmPasswordState.value = TextFieldState(text = text)
+    fun onChangePassword(text: String) {
+        _uiState.value = _uiState.value.copy(password = text)
 
     }
 
-    fun OnChangeEmail(text: String) {
-        _emailState.value = TextFieldState(text = text)
+    fun onChangePasswordConfirm(text: String) {
+        _uiState.value = _uiState.value.copy(confirmPassword = text)
 
     }
 
-    fun OnChangeFullName(text: String) {
-        _fullnameState.value = TextFieldState(text = text)
+    fun onChangeEmail(text: String) {
+        _uiState.value = _uiState.value.copy(email = text)
 
     }
 
-    fun signUpUser(navController: NavController, scaffoldState: ScaffoldState, context: Context) {
+    fun onChangeFullName(text: String) {
+        _uiState.value = _uiState.value.copy(fullName = text)
+
+    }
+
+    fun signUpUser() {
         viewModelScope.launch {
-            _isLoading.value = true
+            _uiState.value = _uiState.value.copy(isLoading = true)
+            val confirmPassword = _uiState.value.confirmPassword
+            val password = _uiState.value.password
 
-            if (_confirmPasswordState.value.text.trim() != _passwordState.value.text.trim()) {
-                _isLoading.value = false
-                scaffoldState.snackbarHostState.showSnackbar(
-                    message = "Passwords do not match",
-                )
+            if (confirmPassword.trim() != password.trim()) {
+                _uiState.value = _uiState.value.copy(isLoading = false)
+                _eventFlow.emit(UiEvent.ShowSnackbar(message = "Passwords do not match"))
+
             } else {
-                if (hasInternetConnection(context)) {
-                    val signUpUser = SignUpUser(
-                        _usernameState.value.text.trim(),
-                        _fullnameState.value.text.trim(),
-                        _passwordState.value.text.trim(),
-                        _emailState.value.text.trim()
-                    )
-                    try {
-                        val signUpResponse = signUpRepository.signUpUser(signUpUser = signUpUser)
-                        _isLoading.value = false
-                        scaffoldState.snackbarHostState.showSnackbar(
-                            message = signUpResponse.msg
-                        )
-                        if (signUpResponse.success) {
-                            navController.navigate(Screens.LOGIN_SCREEN)
-                        }
-                    } catch (e: HttpException) {
-                        _isLoading.value = false
-                        Log.e(
-                            "http error",
-                            e.localizedMessage ?: "Server error...Please try again later"
-                        )
-                        scaffoldState.snackbarHostState.showSnackbar(
-                            message = "Server error...Please try again later"
-                        )
-                    } catch (e: IOException) {
-                        _isLoading.value = false
-                        scaffoldState.snackbarHostState.showSnackbar(
-                            message = "Could not connect to the server...Please try again later"
-                        )
-                    }
-                } else {
-                    _isLoading.value = false
-                    scaffoldState.snackbarHostState.showSnackbar(
-                        message = "No internet connection was found"
-                    )
-                }
+                val signUpUser = SignUpUser(
+                    username = _uiState.value.username.trim(),
+                    fullname = _uiState.value.fullName.trim(),
+                    password = _uiState.value.password.trim(),
+                    email = _uiState.value.email.trim()
+                )
+                try {
+                    val signUpResponse = signUpRepository.signUpUser(signUpUser = signUpUser)
+                    _uiState.value = _uiState.value.copy(isLoading = false)
+                    _eventFlow.emit(UiEvent.ShowSnackbar(message = signUpResponse.msg))
+                    if (signUpResponse.success) {
+                        _eventFlow.emit(UiEvent.Navigate(route = Screens.LOGIN_SCREEN))
 
+                    }
+                } catch (e: HttpException) {
+                    _uiState.value = _uiState.value.copy(isLoading = false)
+                    _eventFlow.emit(UiEvent.ShowSnackbar(message = "Server error...Please try again later"))
+
+                } catch (e: IOException) {
+                    _uiState.value = _uiState.value.copy(isLoading = false)
+                    _eventFlow.emit(UiEvent.ShowSnackbar(message = "Could not connect to the server...Please try again later"))
+
+                }
             }
         }
     }
