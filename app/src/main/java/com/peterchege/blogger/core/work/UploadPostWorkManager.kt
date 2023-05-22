@@ -72,8 +72,7 @@ class UploadPostWorkManagerImpl @Inject constructor(
             )
             .build()
         val workManager = WorkManager.getInstance(context)
-        workManager
-            .beginUniqueWork(
+        workManager.beginUniqueWork(
                 uploadPostWorkerName,
                 ExistingWorkPolicy.KEEP,
                 postArticleRequest
