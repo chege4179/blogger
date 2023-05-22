@@ -19,33 +19,42 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
+import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import androidx.work.WorkManager
+import androidx.work.WorkerFactory
 import com.peterchege.blogger.BuildConfig
 import com.peterchege.blogger.core.crashlytics.CrashlyticsTree
 import com.peterchege.blogger.core.util.Constants
+import com.peterchege.blogger.core.work.WorkConstants
 import dagger.hilt.android.HiltAndroidApp
 import org.jetbrains.annotations.NotNull
 import timber.log.Timber
+import javax.inject.Inject
 
 
 @HiltAndroidApp
-class BloggerApp :Application(),Configuration.Provider{
+class BloggerApp :Application(),Configuration.Provider {
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
     override fun onCreate() {
         super.onCreate()
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             val channel = NotificationChannel(
                 Constants.NOTIFICATION_CHANNEL,
-                "Post Upload",
+                WorkConstants.uploadPostWorkerName,
                 NotificationManager.IMPORTANCE_HIGH
             )
             val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(channel)
         }
+        WorkManager.initialize(this, Configuration.Builder().setWorkerFactory(workerFactory).build())
     }
     override fun getWorkManagerConfiguration(): Configuration =
 
         Configuration.Builder()
             .setMinimumLoggingLevel(android.util.Log.DEBUG)
+            .setWorkerFactory(workerFactory)
             .build()
     private fun initTimber() = when {
         BuildConfig.DEBUG -> {

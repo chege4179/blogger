@@ -15,18 +15,10 @@
  */
 package com.peterchege.blogger.presentation.screens.dashboard.feed_screen
 
-import android.util.Log
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import com.peterchege.blogger.core.api.BloggerApi
-import com.peterchege.blogger.core.api.responses.Post
 import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.Resource
-import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.NetworkInfoRepository
@@ -35,20 +27,14 @@ import com.peterchege.blogger.domain.state.FeedScreenUi
 import com.peterchege.blogger.domain.state.FeedScreenUiState
 import com.peterchege.blogger.domain.use_case.GetFeedUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
-class FeedViewModel @Inject constructor(
+class FeedScreenViewModel @Inject constructor(
     private val getFeedUseCase: GetFeedUseCase,
-    private val authRepository: AuthRepository,
-    private val networkInfoRepository: NetworkInfoRepository,
-    private val api: BloggerApi
+    authRepository: AuthRepository,
+    networkInfoRepository: NetworkInfoRepository
 ) : ViewModel() {
 
     val networkStatus = networkInfoRepository.networkStatus

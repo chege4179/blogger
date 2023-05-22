@@ -26,4 +26,6 @@ sealed class NetworkStatus {
 interface NetworkInfoRepository {
 
     val networkStatus: Flow<NetworkStatus>
+
+    val isOnline:Flow<Boolean>
 }

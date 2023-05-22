@@ -33,59 +33,92 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.peterchege.blogger.domain.state.NotificationScreenUiState
+import com.peterchege.blogger.presentation.components.ErrorComponent
+import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.components.NotificationCard
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+
 @Composable
 fun NotificationScreen(
     navController: NavController,
     navHostController: NavController,
-    viewModel: NotificationViewModel = hiltViewModel()
+    viewModel: NotificationScreenViewModel = hiltViewModel()
 ){
-    val notifications = viewModel.notifications.value
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+    NotificationScreenContent(
+        navController = navController,
+        navHostController = navHostController,
+        uiState = uiState.value)
+
+}
+
+
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@Composable
+fun NotificationScreenContent(
+    navController: NavController,
+    navHostController: NavController,
+    uiState:NotificationScreenUiState,
+
+){
     Scaffold(
         modifier = Modifier
-
             .fillMaxSize()
             .background(Color.LightGray)
-
         ,
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text= "My Notifications",
+                        text= "Notifications",
                     )
                 }
                 ,
                 backgroundColor = MaterialTheme.colors.primary)
         }
     ) {
-        LazyColumn(modifier = Modifier
-            .fillMaxSize()
-            .padding(15.dp)){
-            if (notifications.isEmpty()){
-                item{
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
+        when(uiState){
+            is NotificationScreenUiState.Loading -> {
+                LoadingComponent()
+            }
+            is NotificationScreenUiState.Error -> {
+                ErrorComponent(
+                    retryCallback = { /*TODO*/ },
+                    errorMessage = uiState.message
+                )
+            }
+            is NotificationScreenUiState.Success -> {
+                val notifications = uiState.data.notifications
+                LazyColumn(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(15.dp)){
+                    if (notifications.isEmpty()){
+                        item{
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally,
 
-                        ){
-                        Text(text = "You have no notifications yet")
+                                ){
+                                Text(text = "You have no notifications yet")
+                            }
+                        }
+                    }else{
+                        items(items = notifications.reversed()){ notification ->
+                            NotificationCard(
+                                navController = navHostController,
+                                notification = notification
+                            )
+                            Spacer(modifier = Modifier.padding(10.dp))
+                        }
                     }
-                }
-            }else{
-                items(notifications.reversed()){ notification ->
-                    NotificationCard(
-                        navController = navHostController,
-                        notification =notification
-                    )
-                    Spacer(modifier = Modifier.padding(10.dp))
+
                 }
             }
-
         }
+
     }
 }

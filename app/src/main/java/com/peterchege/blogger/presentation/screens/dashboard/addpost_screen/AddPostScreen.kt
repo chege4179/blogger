@@ -26,22 +26,25 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.work.*
 import coil.annotation.ExperimentalCoilApi
 import com.peterchege.blogger.core.util.Screens
-import com.peterchege.blogger.core.util.UploadPostWorker
+import com.peterchege.blogger.core.util.UiEvent
+import com.peterchege.blogger.core.work.UploadPostWorker
 
 import com.skydoves.landscapist.glide.GlideImage
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.collectLatest
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @ExperimentalCoilApi
 @Composable
 fun AddPostScreen(
@@ -49,51 +52,79 @@ fun AddPostScreen(
     bottomNavController: NavController,
     viewModel: AddPostScreenViewModel = hiltViewModel(),
 
+    ){
+    val isUploading = viewModel.isUploading.collectAsStateWithLifecycle()
+    val formState = viewModel.formState.collectAsStateWithLifecycle()
+
+    AddPostScreenContent(
+        navController = navController,
+        bottomNavController = bottomNavController,
+        formState = formState.value,
+        isUploading = isUploading.value,
+        eventFlow = viewModel.eventFlow,
+        onChangePostTitle = { viewModel.onChangePostTitle(it) },
+        onChangePostBody = { viewModel.onChangePostBody(it) },
+        onChangeImageUri = { viewModel.onChangePhotoUri(it) },
+        onSubmit = { viewModel.postArticle() }
+    )
+
+
+
+}
+
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@ExperimentalCoilApi
+@Composable
+fun AddPostScreenContent(
+    navController: NavController,
+    bottomNavController: NavController,
+    formState: AddPostFormState,
+    isUploading:Boolean,
+    eventFlow:SharedFlow<UiEvent>,
+    onChangePostTitle:(String) -> Unit,
+    onChangePostBody:(String) -> Unit,
+    onChangeImageUri: (Uri?) -> Unit,
+    onSubmit:() -> Unit,
+
+
     ) {
-    val context = LocalContext.current
-    val state = viewModel.state.value
-    val imageUrlState = viewModel.imageUrlState.value
-    val postTitle = viewModel.postTitle.value
-    val postBody = viewModel.postBody.value
-    var bitmapState = viewModel.bitmapState.value
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
+    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         if (uri != null) {
-            viewModel.onChangePhotoUri(uri, context = context)
+            onChangeImageUri(uri)
         }
 
     }
     val scaffoldState = rememberScaffoldState()
-    val postArticleRequest = OneTimeWorkRequestBuilder<UploadPostWorker>()
-        .setConstraints(
-            Constraints.Builder()
-                .setRequiredNetworkType(
-                    NetworkType.CONNECTED
-                )
-                .build()
-        )
-        .build()
+    LaunchedEffect(key1 = true) {
+        eventFlow.collectLatest { event ->
+            when (event) {
+                is UiEvent.ShowSnackbar -> {
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        message = event.message
+                    )
+                }
 
-    val workManager = WorkManager.getInstance(context)
-//    val workInfos = workManager
-//        .getWorkInfosForUniqueWorkLiveData("post_article")
-//        .observeAsState()
-//        .value
+                is UiEvent.Navigate -> {
+                    navController.navigate(route = event.route)
+                }
+            }
+        }
+    }
     Scaffold(
         scaffoldState = scaffoldState
 
     ) {
 
-        BackHandler() {
-            viewModel.onBackPress(scaffoldState, navController = navController)
-        }
-        if (viewModel.openSaveDraftModal.value) {
-            DraftConfirmBox(
-                scaffoldState = scaffoldState,
-                navController = navController,
-            )
-        }
+//        BackHandler() {
+//            viewModel.onBackPress(scaffoldState, navController = navController)
+//        }
+//        if (viewModel.openSaveDraftModal.value) {
+//            DraftConfirmBox(
+//                scaffoldState = scaffoldState,
+//                navController = navController,
+//            )
+//        }
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -108,7 +139,7 @@ fun AddPostScreen(
                         horizontalArrangement = Arrangement.SpaceEvenly
 
                     ) {
-                        imageUrlState?.let {
+                        formState.uri?.let {
                             GlideImage(
                                 imageModel = { it },
                                 modifier = Modifier
@@ -136,7 +167,7 @@ fun AddPostScreen(
                             Button(
                                 modifier = Modifier.fillMaxWidth(0.95f),
                                 onClick = {
-                                    viewModel.onChangePhotoUri(null, context)
+                                    onChangeImageUri(null)
                                 }) {
                                 Text("Remove Image")
                             }
@@ -152,26 +183,26 @@ fun AddPostScreen(
                         OutlinedTextField(
                             modifier = Modifier
                                 .fillMaxWidth(),
-                            value = postTitle.text,
+                            value = formState.postTitle,
                             maxLines = 3,
                             label = {
                                 Text("Post Title")
                             },
                             onValueChange = {
-                                viewModel.onChangePostTitle(it)
+                                onChangePostTitle(it)
                             })
                         Spacer(modifier = Modifier.height(10.dp))
                         OutlinedTextField(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(400.dp),
-                            value = postBody.text,
+                            value = formState.postBody,
                             maxLines = 70,
                             label = {
                                 Text("Write your own story")
                             },
                             onValueChange = {
-                                viewModel.onChangePostBody(it)
+                                onChangePostBody(it)
                             })
                         Spacer(modifier = Modifier.height(10.dp))
                         Row(
@@ -182,24 +213,23 @@ fun AddPostScreen(
                                 onClick = {
                                     navController.navigate(Screens.DRAFT_SCREEN)
                                 }) {
-                                Text("Go To Drafts")
+                                Text(
+                                    text = "Go To Drafts"
+                                )
                             }
                             Button(
                                 onClick = {
-                                    viewModel.postArticle(
-                                        bottomNavController,
-                                        scaffoldState,
-                                        context
-                                    )
+                                    onSubmit()
                                 }) {
-                                Text("Post")
+                                Text(
+                                    text = "Post")
                             }
                         }
 
                     }
                 }
             }
-            if (state.isLoading) {
+            if (isUploading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
         }

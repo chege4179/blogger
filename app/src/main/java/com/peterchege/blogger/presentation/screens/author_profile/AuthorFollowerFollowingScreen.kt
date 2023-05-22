@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -31,17 +32,45 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.peterchege.blogger.core.api.responses.Follower
+import com.peterchege.blogger.core.api.responses.Following
 import com.peterchege.blogger.presentation.components.FollowerCard
 import com.peterchege.blogger.presentation.components.FollowingCard
 import com.peterchege.blogger.core.util.Constants
+import com.peterchege.blogger.core.util.Screens
+import com.peterchege.blogger.domain.state.AuthorProfileFollowerFollowingUi
+import com.peterchege.blogger.domain.state.AuthorProfileFollowerFollowingUiState
+import com.peterchege.blogger.domain.state.AuthorProfileScreenUiState
+import com.peterchege.blogger.presentation.components.ErrorComponent
+import com.peterchege.blogger.presentation.components.FollowersList
+import com.peterchege.blogger.presentation.components.FollowingList
+import com.peterchege.blogger.presentation.components.LoadingComponent
 import java.util.*
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun AuthorFollowerFollowingScreen(
     navController: NavController,
     viewModel: AuthorFollowerFollowingScreenViewModel = hiltViewModel()
+){
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+
+    AuthorFollowerFollowingScreenContent(
+        navController = navController,
+        uiState = uiState.value,
+        type = viewModel.type.value
+    )
+
+}
+
+
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@Composable
+fun AuthorFollowerFollowingScreenContent(
+    navController: NavController,
+    uiState:AuthorProfileFollowerFollowingUiState,
+    type:String,
 ){
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -49,7 +78,7 @@ fun AuthorFollowerFollowingScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text= "User's " + viewModel.type.value.toLowerCase(Locale.ROOT).capitalize(
+                        text= "User's " + type.toLowerCase(Locale.ROOT).capitalize(
                             Locale.ROOT) + "s",
                     )
                 }
@@ -57,70 +86,32 @@ fun AuthorFollowerFollowingScreen(
                 backgroundColor = MaterialTheme.colors.primary)
         }
     ){
-
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(10.dp)
-        ){
-            if (viewModel.type.value == Constants.FOLLOWER){
-                viewModel.user.value?.let { user ->
-                    if (user.followers.isEmpty()){
-                        item {
-                            Column(
-                                modifier = Modifier.fillMaxSize(),
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(text = "This user not have any followers yet")
-
-                            }
-                        }
-                    }else{
-                        items(user.followers){ follower ->
-                            FollowerCard(
-                                navController =navController ,
-                                follower =follower,
-                                isFollowing = viewModel.getIsFollowingStatus(follower.followerUsername),
-                                removeFollower = {
-
-                                },
-                                followFollower = {
-
-
-                                },
-                                isYourProfile = false
-                            )
-                        }
+        when(uiState){
+            is AuthorProfileFollowerFollowingUiState.Loading ->{
+                LoadingComponent()
+            }
+            is AuthorProfileFollowerFollowingUiState.Error -> {
+                ErrorComponent(
+                    retryCallback = { /*TODO*/ },
+                    errorMessage = uiState.message)
+            }
+            is AuthorProfileFollowerFollowingUiState.Success -> {
+                when(type){
+                    Constants.FOLLOWER -> {
+                        FollowersList(
+                            followers = uiState.data.followers,
+                            navController = navController
+                        )
                     }
-
-                }
-            }else if (viewModel.type.value == Constants.FOLLOWING){
-                viewModel.user.value?.let { user ->
-                    if (user.following.isEmpty()){
-                        item {
-                            Column(
-                                modifier = Modifier.fillMaxSize(),
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(text = "This user isn't following anybody yet")
-
-                            }
-                        }
-                    }else{
-                        items(user.following){ following ->
-                            FollowingCard(
-                                navController =navController ,
-                                following =following,
-                                unFollowUser ={
-                                },
-                                isYourProfile = false
-                            )
-                        }
+                    Constants.FOLLOWING -> {
+                        FollowingList(
+                            following = uiState.data.following,
+                            navController =navController
+                        )
                     }
                 }
             }
         }
+
     }
 }

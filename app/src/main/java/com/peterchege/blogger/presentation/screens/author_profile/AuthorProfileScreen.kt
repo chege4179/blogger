@@ -76,6 +76,14 @@ fun AuthorProfileScreen(
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
 
+    AuthorProfileScreenContent(
+        navController = navController,
+        followUser = { /*TODO*/ },
+        unfollowUser = { /*TODO*/ },
+        uiState = uiState.value
+    )
+
+
 
 
 }

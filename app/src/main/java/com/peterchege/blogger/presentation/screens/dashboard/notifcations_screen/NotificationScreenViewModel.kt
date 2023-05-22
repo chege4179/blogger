@@ -23,6 +23,8 @@ import com.peterchege.blogger.core.api.requests.Notification
 import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.Resource
 import com.peterchege.blogger.domain.repository.AuthRepository
+import com.peterchege.blogger.domain.state.NotificationScreenUi
+import com.peterchege.blogger.domain.state.NotificationScreenUiState
 import com.peterchege.blogger.domain.use_case.GetProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -31,17 +33,15 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class NotificationViewModel @Inject constructor(
+class NotificationScreenViewModel @Inject constructor(
     private val getProfileUseCase: GetProfileUseCase,
     private val authRepository: AuthRepository,
 ) : ViewModel() {
 
+    private val _uiState =
+        MutableStateFlow<NotificationScreenUiState>(NotificationScreenUiState.Loading)
+    val uiState = _uiState.asStateFlow()
 
-    private var _notifications = mutableStateOf<List<Notification>>(emptyList())
-    var notifications: State<List<Notification>> = _notifications
-
-    private var _isLoading = mutableStateOf(false)
-    var isLoading: State<Boolean> = _isLoading
 
     private var _user = MutableStateFlow<User?>(null)
     var user: StateFlow<User?> = _user
@@ -51,7 +51,7 @@ class NotificationViewModel @Inject constructor(
         getNotifications()
     }
 
-    private fun loadUser(){
+    private fun loadUser() {
         viewModelScope.launch {
             authRepository.getLoggedInUser().collectLatest {
                 _user.value = it
@@ -64,14 +64,23 @@ class NotificationViewModel @Inject constructor(
         getProfileUseCase(username = _user.value?.username ?: "").onEach { result ->
             when (result) {
                 is Resource.Success -> {
-                    _isLoading.value = false
-                    _notifications.value = result.data!!.user.notifications
+                    _uiState.value = NotificationScreenUiState.Success(
+                        data = NotificationScreenUi(
+                            notifications = result.data?.user?.notifications ?: emptyList()
+
+                        )
+                    )
+
                 }
+
                 is Resource.Loading -> {
-                    _isLoading.value = true
+                    _uiState.value = NotificationScreenUiState.Loading
                 }
+
                 is Resource.Error -> {
-                    _isLoading.value = false
+                    _uiState.value = NotificationScreenUiState.Error(
+                        message = result.message ?: "An unexpected error occurred"
+                    )
                 }
             }
 
