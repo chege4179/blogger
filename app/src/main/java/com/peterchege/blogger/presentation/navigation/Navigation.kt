@@ -53,8 +53,7 @@ fun Navigation(
     viewModel: NavigationViewModel = hiltViewModel(),
 ) {
     val activity = (LocalContext.current as? Activity)
-    val user = viewModel.user.
-    collectAsStateWithLifecycle(initialValue = null)
+    val user = viewModel.user.collectAsStateWithLifecycle()
 
 
     fun getInitialRoute(user: State<User?>):String {

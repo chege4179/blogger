@@ -160,6 +160,8 @@ dependencies {
     releaseImplementation("com.github.chuckerteam.chucker:library-no-op:3.5.2")
 
 
+    implementation ("androidx.core:core-splashscreen:1.0.1")
+
 }
 
 

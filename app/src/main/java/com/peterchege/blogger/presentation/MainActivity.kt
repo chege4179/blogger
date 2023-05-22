@@ -18,26 +18,37 @@ package com.peterchege.blogger.presentation
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import coil.annotation.ExperimentalCoilApi
 import com.peterchege.blogger.presentation.navigation.Navigation
+import com.peterchege.blogger.presentation.navigation.NavigationViewModel
 import com.peterchege.blogger.presentation.theme.BloggerTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
 @ExperimentalCoilApi
 
 class MainActivity : ComponentActivity() {
+
+    private val viewModel : NavigationViewModel by viewModels()
     // My blogger app
 
     @OptIn(ExperimentalMaterialApi::class)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installSplashScreen().apply {
+            setKeepOnScreenCondition {
+                viewModel.user.value != null
+            }
+        }
         setContent {
             BloggerTheme {
                 val navController = rememberNavController()
