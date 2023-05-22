@@ -20,6 +20,8 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import android.os.Build
+import androidx.core.content.getSystemService
 import com.peterchege.blogger.core.di.IoDispatcher
 import com.peterchege.blogger.domain.repository.NetworkInfoRepository
 import com.peterchege.blogger.domain.repository.NetworkStatus
@@ -28,6 +30,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
@@ -38,9 +41,14 @@ class NetworkInfoRepositoryImpl @Inject constructor(
 
 ):NetworkInfoRepository{
 
-    private val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    private val connectivityManager = context.getSystemService<ConnectivityManager>()
 
     override val networkStatus: Flow<NetworkStatus> = callbackFlow {
+        if (connectivityManager == null) {
+            channel.trySend(NetworkStatus.Unknown)
+            channel.close()
+            return@callbackFlow
+        }
         val connectivityCallback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 trySend(element = NetworkStatus.Connected)
@@ -62,6 +70,7 @@ class NetworkInfoRepositoryImpl @Inject constructor(
             .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
             .build()
 
+
         connectivityManager.registerNetworkCallback(request, connectivityCallback)
 
         awaitClose {
@@ -70,4 +79,60 @@ class NetworkInfoRepositoryImpl @Inject constructor(
     }
         .distinctUntilChanged()
         .flowOn(context = ioDispatcher)
+
+
+    override val isOnline: Flow<Boolean> = callbackFlow {
+
+        if (connectivityManager == null) {
+            channel.trySend(false)
+            channel.close()
+            return@callbackFlow
+        }
+
+        /**
+         * Sends the latest connectivity status to the underlying channel.
+         */
+        fun update() {
+            channel.trySend(connectivityManager.isCurrentlyConnected())
+        }
+
+        /**
+         * The callback's methods are invoked on changes to *any* network, not just the active
+         * network. So to check for network connectivity, one must query the active network of the
+         * ConnectivityManager.
+         */
+        val callback = object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) = update()
+
+            override fun onLost(network: Network) = update()
+
+            override fun onCapabilitiesChanged(
+                network: Network,
+                networkCapabilities: NetworkCapabilities,
+            ) = update()
+        }
+
+        connectivityManager.registerNetworkCallback(
+            NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .build(),
+            callback,
+        )
+
+        update()
+
+        awaitClose {
+            connectivityManager.unregisterNetworkCallback(callback)
+        }
+    }
+        .conflate()
+
+    @Suppress("DEPRECATION")
+    private fun ConnectivityManager.isCurrentlyConnected() = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ->
+            activeNetwork
+                ?.let(::getNetworkCapabilities)
+                ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        else -> activeNetworkInfo?.isConnected
+    } ?: false
 }

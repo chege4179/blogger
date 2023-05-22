@@ -58,7 +58,7 @@ import kotlinx.coroutines.flow.collectLatest
 fun FeedScreen(
     bottomNavController: NavController,
     navHostController: NavHostController,
-    viewModel: FeedViewModel = hiltViewModel()
+    viewModel: FeedScreenViewModel = hiltViewModel()
 ){
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     val authUser = viewModel.authUser.collectAsStateWithLifecycle()

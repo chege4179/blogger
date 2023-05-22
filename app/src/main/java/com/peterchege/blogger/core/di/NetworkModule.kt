@@ -18,6 +18,7 @@ package com.peterchege.blogger.core.di
 import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerCollector
 import com.chuckerteam.chucker.api.ChuckerInterceptor
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.util.Constants
 import dagger.Module
@@ -25,15 +26,22 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
+
+    @Provides
+    @Singleton
+    fun providesNetworkJson(): Json = Json {
+        ignoreUnknownKeys = true
+    }
 
     @Provides
     @Singleton
@@ -53,11 +61,16 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideUserApi(client: OkHttpClient): BloggerApi {
+    fun provideUserApi(
+        client: OkHttpClient,
+        networkJson:Json,
+    ): BloggerApi {
         return Retrofit.Builder()
-            .addConverterFactory(GsonConverterFactory.create())
             .baseUrl(Constants.BASE_URL)
             .client(client)
+            .addConverterFactory(
+                networkJson.asConverterFactory("application/json".toMediaType()),
+            )
             .build()
             .create(BloggerApi::class.java)
     }

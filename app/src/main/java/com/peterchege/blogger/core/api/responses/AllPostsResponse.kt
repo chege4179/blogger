@@ -15,6 +15,10 @@
  */
 package com.peterchege.blogger.core.api.responses
 
+import kotlinx.serialization.Serializable
+
+
+@Serializable
 data class AllPostsResponse(
     val msg: String,
     val posts: List<Post>,

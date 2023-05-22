@@ -71,6 +71,7 @@ dependencies {
     implementation ("androidx.compose.ui:ui-tooling-preview:1.5.0-alpha04")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
     implementation ("androidx.activity:activity-compose:1.7.1")
+    implementation("androidx.hilt:hilt-common:1.0.0")
     testImplementation ("junit:junit:4.13.2")
     androidTestImplementation ("androidx.test.ext:junit:1.1.5")
     androidTestImplementation ("androidx.test.espresso:espresso-core:3.5.1")
@@ -81,7 +82,7 @@ dependencies {
 
     // retrofit
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-moshi:2.4.0")
     implementation ("com.squareup.okhttp3:okhttp:5.0.0-alpha.2")
     implementation ("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2")
 
@@ -89,6 +90,7 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
     implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.6.1")
+    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
 
     //coroutines
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
@@ -97,10 +99,11 @@ dependencies {
     // dagger hilt
     implementation ("com.google.dagger:hilt-android:2.45")
     kapt ("com.google.dagger:hilt-android-compiler:2.45")
-//    implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03"
     kapt ("androidx.hilt:hilt-compiler:1.0.0")
     implementation ("androidx.hilt:hilt-navigation-compose:1.0.0")
     implementation ("androidx.navigation:navigation-compose:2.5.3")
+
+
     // coil
     implementation ("io.coil-kt:coil-compose:2.3.0")
 
@@ -114,7 +117,7 @@ dependencies {
     // Kotlin Extensions and Coroutines support for Room
     implementation ("androidx.room:room-ktx:2.5.1")
 
-//    implementation "androidx.compose.runtime:runtime-livedata:1.3.0-alpha03"
+    // material icons extended
     implementation ("androidx.compose.material:material-icons-extended:1.5.0-alpha04")
 
     //glide
@@ -130,16 +133,17 @@ dependencies {
 
     implementation ("com.google.accompanist:accompanist-flowlayout:0.28.0")
 
-// datastore (core and preferences)
+    // datastore (core and preferences)
     implementation ("androidx.datastore:datastore:1.0.0")
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
 
     implementation ("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5")
     implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
-
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
 
     implementation("androidx.work:work-runtime-ktx:2.8.1")
+    implementation("androidx.hilt:hilt-work:1.0.0")
 
     implementation ("com.google.firebase:firebase-crashlytics-ktx:18.3.7")
     implementation ("com.google.firebase:firebase-analytics-ktx:21.2.2")

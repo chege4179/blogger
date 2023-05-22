@@ -28,6 +28,8 @@ import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.Resource
 import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.PostRepository
+import com.peterchege.blogger.domain.state.AuthorProfileFollowerFollowingUi
+import com.peterchege.blogger.domain.state.AuthorProfileFollowerFollowingUiState
 import com.peterchege.blogger.domain.use_case.GetProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -55,7 +57,9 @@ class ProfileFollowerFollowingScreenViewModel @Inject constructor(
     private var _user = MutableStateFlow<User?>(null)
     var user: StateFlow<User?> = _user
 
-
+    private val _uiState = MutableStateFlow<AuthorProfileFollowerFollowingUiState>(
+        AuthorProfileFollowerFollowingUiState.Loading)
+    val uiState = _uiState.asStateFlow()
 
     private fun loadUser(){
         viewModelScope.launch {
@@ -76,18 +80,6 @@ class ProfileFollowerFollowingScreenViewModel @Inject constructor(
             _type.value = it
 
         }
-    }
-
-
-    private val _userFollowers = mutableStateOf<List<Follower>>(emptyList())
-    val userFollowers: State<List<Follower>> = _userFollowers
-
-    private val _userFollowing = mutableStateOf<List<Following>>(emptyList())
-    val userFollowing: State<List<Following>> = _userFollowing
-
-    fun getIsFollowingStatus(username: String): Boolean {
-        val followingUsernames = _userFollowing.value.map { it.followedUsername }
-        return followingUsernames.contains(username)
     }
 
     fun followUser(followedUsername: String) {
@@ -147,15 +139,20 @@ class ProfileFollowerFollowingScreenViewModel @Inject constructor(
         profileUseCase(username = username).onEach { result ->
             when (result) {
                 is Resource.Success -> {
-                    _isLoading.value = false
-                    _userFollowers.value = result.data?.user?.followers ?: emptyList()
-                    _userFollowing.value = result.data?.user?.following ?: emptyList()
+                    _user.value = result.data?.user
+                    _uiState.value = AuthorProfileFollowerFollowingUiState.Success(
+                        AuthorProfileFollowerFollowingUi(
+                            followers = result.data?.user?.followers ?: emptyList(),
+                            following = result.data?.user?.following ?: emptyList()
+                        )
+                    )
                 }
                 is Resource.Error -> {
-                    _isLoading.value = false
+                    _uiState.value = AuthorProfileFollowerFollowingUiState.Error(
+                        message = result.message ?: "An unexpected error occurred")
                 }
                 is Resource.Loading -> {
-                    _isLoading.value = false
+                    _uiState.value = AuthorProfileFollowerFollowingUiState.Loading
                 }
             }
 

@@ -29,7 +29,10 @@ import com.google.firebase.messaging.RemoteMessage
 import com.peterchege.blogger.R
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.presentation.MainActivity
+import dagger.hilt.android.AndroidEntryPoint
 
+
+@AndroidEntryPoint
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
 

@@ -26,8 +26,12 @@ import com.peterchege.blogger.core.api.responses.Following
 import com.peterchege.blogger.core.api.responses.Post
 import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.Resource
+import com.peterchege.blogger.domain.state.AuthorProfileFollowerFollowingUi
+import com.peterchege.blogger.domain.state.AuthorProfileFollowerFollowingUiState
 import com.peterchege.blogger.domain.use_case.GetProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -39,37 +43,23 @@ class AuthorFollowerFollowingScreenViewModel @Inject constructor(
     private val profileUseCase: GetProfileUseCase,
 
     ) : ViewModel() {
-    private var _type = mutableStateOf<String>("")
-    var type: State<String> = _type
+    private val _type = mutableStateOf<String>("")
+    val type: State<String> = _type
 
-    private var _user = mutableStateOf<User?>(null)
-    var user: State<User?> = _user
+    private val _user = mutableStateOf<User?>(null)
+    val user: State<User?> = _user
 
-    private var _isLoading = mutableStateOf(false)
-    var isLoading: State<Boolean> = _isLoading
 
-    private var _isFound = mutableStateOf(false)
-    var isFound: State<Boolean> = _isFound
+    private val _uiState = MutableStateFlow<AuthorProfileFollowerFollowingUiState>(
+        AuthorProfileFollowerFollowingUiState.Loading)
+    val uiState = _uiState.asStateFlow()
 
-    private var _success = mutableStateOf(false)
-    var success: State<Boolean> = _success
 
-    private var _msg = mutableStateOf("")
-    var msg: State<String> = _msg
 
-    private var _posts = mutableStateOf<List<Post>>(emptyList())
-    var posts: State<List<Post>> = _posts
-
-    private val _authorFollowers = mutableStateOf<List<Follower>>(emptyList())
-    val authorFollowers: State<List<Follower>> = _authorFollowers
-
-    private val _authorFollowing = mutableStateOf<List<Following>>(emptyList())
-    val authorFollowing: State<List<Following>> = _authorFollowing
 
 
     init {
         savedStateHandle.get<String>("username")?.let { username ->
-            Log.e("Author Username", username)
             getProfile(username = username)
         }
         getType()
@@ -84,11 +74,7 @@ class AuthorFollowerFollowingScreenViewModel @Inject constructor(
 
     fun getIsFollowingStatus(username: String): Boolean {
         val followingUsernames = _user.value?.following?.map { it.followedUsername }
-        if (followingUsernames != null) {
-            return followingUsernames.contains(username)
-        } else {
-            return false
-        }
+        return followingUsernames?.contains(username) ?: false
     }
 
     private fun getProfile(username: String) {
@@ -96,14 +82,19 @@ class AuthorFollowerFollowingScreenViewModel @Inject constructor(
             when (result) {
                 is Resource.Success -> {
                     _user.value = result.data?.user
-                    _authorFollowers.value = result.data?.user?.followers ?: emptyList()
-                    _authorFollowing.value = result.data?.user?.following ?: emptyList()
+                    _uiState.value = AuthorProfileFollowerFollowingUiState.Success(
+                        AuthorProfileFollowerFollowingUi(
+                            followers = result.data?.user?.followers ?: emptyList(),
+                            following = result.data?.user?.following ?: emptyList()
+                        )
+                    )
                 }
                 is Resource.Error -> {
-
+                    _uiState.value = AuthorProfileFollowerFollowingUiState.Error(
+                        message = result.message ?: "An unexpected error occurred")
                 }
                 is Resource.Loading -> {
-
+                    _uiState.value = AuthorProfileFollowerFollowingUiState.Loading
                 }
             }
 

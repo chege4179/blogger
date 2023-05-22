@@ -39,7 +39,7 @@ import com.peterchege.blogger.core.util.generateAvatarURL
 
 @Composable
 fun FollowerCard(
-    navController: NavController,
+    navigateToFollowerPage:(String) ->Unit,
     follower: Follower,
     isFollowing: Boolean,
     removeFollower: (follower: Follower) -> Unit,
@@ -52,7 +52,8 @@ fun FollowerCard(
             .padding(10.dp)
             .height(70.dp)
             .clickable {
-                navController.navigate(Screens.AUTHOR_PROFILE_SCREEN + "/${follower.followerUsername}")
+                navigateToFollowerPage(follower.followerUsername)
+
             },
         shape = RoundedCornerShape(15),
         elevation = 3.dp

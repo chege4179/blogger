@@ -15,7 +15,10 @@
  */
 package com.peterchege.blogger.core.api.responses
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class DeleteResponse (
     val msg:String,
-    val success:String,
-        )
+    val success:Boolean,
+    )

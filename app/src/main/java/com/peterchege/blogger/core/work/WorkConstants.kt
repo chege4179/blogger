@@ -13,13 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.core.api.responses
+package com.peterchege.blogger.core.work
 
-import kotlinx.serialization.Serializable
+object WorkConstants {
 
-@Serializable
-data class Like(
-    val username:String,
-    val fullname:String,
-    val userId:String,
-)
+    const val uploadPostWorkerName = "post_article"
+}

@@ -15,6 +15,9 @@
  */
 package com.peterchege.blogger.domain.state
 
+import com.peterchege.blogger.core.api.requests.Notification
+import com.peterchege.blogger.core.api.responses.Follower
+import com.peterchege.blogger.core.api.responses.Following
 import com.peterchege.blogger.core.api.responses.Post
 import com.peterchege.blogger.core.api.responses.User
 import com.skydoves.sealedx.core.Extensive
@@ -25,6 +28,8 @@ import com.skydoves.sealedx.core.annotations.ExtensiveSealed
     models = [
         ExtensiveModel(FeedScreenUi::class),
         ExtensiveModel(AuthorProfileScreenUi::class),
+        ExtensiveModel(AuthorProfileFollowerFollowingUi::class),
+        ExtensiveModel(NotificationScreenUi::class),
 
 
     ]
@@ -42,4 +47,13 @@ data class FeedScreenUi(
 data class AuthorProfileScreenUi(
     val posts: List<Post>,
     val user: User? = null
+)
+
+data class AuthorProfileFollowerFollowingUi(
+    val followers:List<Follower>,
+    val following:List<Following>,
+)
+
+data class NotificationScreenUi(
+    val notifications:List<Notification>
 )

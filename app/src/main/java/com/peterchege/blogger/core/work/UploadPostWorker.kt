@@ -13,17 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.core.util
+package com.peterchege.blogger.core.work
 
 import android.content.Context
 import android.net.Uri
 import androidx.core.app.NotificationCompat
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
+import androidx.work.Worker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.peterchege.blogger.R
 import com.peterchege.blogger.core.api.BloggerApi
+import com.peterchege.blogger.core.util.Constants
+import com.peterchege.blogger.core.util.UriToFile
+import com.peterchege.blogger.core.util.WorkerKeys
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -33,10 +40,12 @@ import java.io.IOException
 import javax.inject.Inject
 import kotlin.random.Random
 
-@Suppress("BlockingMethodInNonBlockingContext")
-class UploadPostWorker @Inject constructor(
-    private val context: Context,
-    private val workerParams: WorkerParameters,
+
+@HiltWorker
+class UploadPostWorker @AssistedInject constructor(
+    @Assisted private val context: Context,
+    @Assisted workerParams: WorkerParameters,
+    private val api:BloggerApi,
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
@@ -46,7 +55,10 @@ class UploadPostWorker @Inject constructor(
         val postedBy = inputData.getString("postedBy")
         val postedAt = inputData.getString("postedAt")
         val postedOn = inputData.getString("postedOn")
-        startForegroundService()
+        startForegroundService(
+            notificationTitle = "Uploading Post",
+            notificationInfo = "Your post is being uploaded"
+        )
 
 
         val file = UriToFile(context = context).getImageBody(Uri.parse(uri))
@@ -63,21 +75,26 @@ class UploadPostWorker @Inject constructor(
         val requestBody: RequestBody = builder.build()
 
         try {
-            val response = BloggerApi.instance.postImage(body = requestBody)
+            val response = api.postImage(body = requestBody)
             if (response.success) {
+                startForegroundService(
+                    notificationTitle = "Post uploaded successfully",
+                    notificationInfo = "Your post has been uploaded successfully"
+                )
                 Result.success(
                     workDataOf(
                         WorkerKeys.MSG to response.msg,
                         WorkerKeys.IS_LOADING to false,
                         WorkerKeys.SUCCESS to response.success
-
                     )
                 )
-
             }
 
         } catch (e: HttpException) {
-
+            startForegroundService(
+                notificationTitle = "Upload Failed !!",
+                notificationInfo = "Could not reach server at the moment"
+            )
             Result.failure(
                 workDataOf(
                     WorkerKeys.MSG to "Could not reach server at the moment",
@@ -88,17 +105,23 @@ class UploadPostWorker @Inject constructor(
             )
 
         } catch (e: IOException) {
-
+            startForegroundService(
+                notificationTitle = "Upload Failed !!",
+                notificationInfo = "The server is down ....Please try again later"
+            )
             Result.failure(
                 workDataOf(
                     WorkerKeys.MSG to "The server is down ....Please try again later",
                     WorkerKeys.IS_LOADING to false,
                     WorkerKeys.SUCCESS to false
-
                 )
             )
 
         }
+        startForegroundService(
+            notificationTitle = "Upload Failed !!",
+            notificationInfo = "Unknown error"
+        )
         return Result.failure(
             workDataOf(WorkerKeys.MSG to "Unknown error")
         )
@@ -106,14 +129,14 @@ class UploadPostWorker @Inject constructor(
 
     }
 
-    private suspend fun startForegroundService() {
+    private suspend fun startForegroundService(notificationTitle:String, notificationInfo:String) {
         setForeground(
             ForegroundInfo(
                 Random.nextInt(),
                 NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL)
                     .setSmallIcon(R.drawable.ic_launcher_background)
-                    .setContentText("Uploading...")
-                    .setContentTitle("Your post is being uploaded")
+                    .setContentText(notificationTitle)
+                    .setContentTitle(notificationInfo)
                     .build()
 
             )
@@ -121,4 +144,23 @@ class UploadPostWorker @Inject constructor(
 
     }
 
+
+    class Factory @Inject constructor(
+        val api: BloggerApi,
+
+    ): ChildWorkerFactory {
+
+        override fun create(appContext: Context, params: WorkerParameters): CoroutineWorker {
+            return UploadPostWorker(
+                context = appContext,
+                workerParams = params,
+                api = api
+            )
+        }
+    }
+
+}
+
+interface ChildWorkerFactory {
+    fun create(appContext: Context, params: WorkerParameters): CoroutineWorker
 }

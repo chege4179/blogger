@@ -15,11 +15,14 @@
  */
 package com.peterchege.blogger.core.api.requests
 
-data
-class SignUpUser (
-        val username:String,
-        val fullname:String,
-        val password:String,
-        val email:String,
+import kotlinx.serialization.Serializable
 
-)
+
+@Serializable
+data class SignUpUser(
+    val username: String,
+    val fullname: String,
+    val password: String,
+    val email: String,
+
+    )

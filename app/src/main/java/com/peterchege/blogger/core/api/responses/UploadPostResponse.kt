@@ -15,6 +15,9 @@
  */
 package com.peterchege.blogger.core.api.responses
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class UploadPostResponse (
     val msg:String,
     val success:Boolean,
