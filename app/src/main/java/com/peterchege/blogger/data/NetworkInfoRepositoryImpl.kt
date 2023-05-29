@@ -36,7 +36,7 @@ import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 class NetworkInfoRepositoryImpl @Inject constructor(
-    private val context: Context,
+    context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 
 ):NetworkInfoRepository{
@@ -89,18 +89,12 @@ class NetworkInfoRepositoryImpl @Inject constructor(
             return@callbackFlow
         }
 
-        /**
-         * Sends the latest connectivity status to the underlying channel.
-         */
+
         fun update() {
             channel.trySend(connectivityManager.isCurrentlyConnected())
         }
 
-        /**
-         * The callback's methods are invoked on changes to *any* network, not just the active
-         * network. So to check for network connectivity, one must query the active network of the
-         * ConnectivityManager.
-         */
+
         val callback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) = update()
 

@@ -26,6 +26,9 @@ import com.peterchege.blogger.core.di.IoDispatcher
 import com.peterchege.blogger.core.room.database.BloggerDatabase
 import com.peterchege.blogger.core.room.entities.PostRecord
 import com.peterchege.blogger.core.room.entities.PostRecordWithCommentsLikesViews
+import com.peterchege.blogger.data.local.posts.cached_posts.CachedPostsDataSource
+import com.peterchege.blogger.data.local.posts.saved_posts.SavedPostsDataSource
+import com.peterchege.blogger.data.remote.posts.RemotePostsDataSource
 import com.peterchege.blogger.domain.repository.PostRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -34,67 +37,72 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class PostRepositoryImpl @Inject constructor(
-    private val api: BloggerApi,
-    private val db: BloggerDatabase,
+    private val cachedPostsDataSource: CachedPostsDataSource,
+    private val remotePostsDataSource: RemotePostsDataSource,
+    private val savedPostsDataSource: SavedPostsDataSource,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ):PostRepository {
-    override suspend fun getAllPosts(): AllPostsResponse {
-        return api.getAllPosts()
+    override fun getAllPosts():Flow<List<Post>> {
+        return cachedPostsDataSource.getCachedPosts()
     }
 
     override suspend fun uploadPost(postBody: PostBody): UploadPostResponse {
-        return api.uploadPost(postBody = postBody)
+        return remotePostsDataSource.uploadPost(postBody = postBody)
     }
+
     override suspend fun getPostById(postId: String): Post? {
-        return api.getPostById(postId).post
+        return remotePostsDataSource.getPostById(postId = postId)
     }
 
     override suspend fun deletePostFromApi(postId: String): DeleteResponse {
-        return api.getDeletePostById(postId)
+        return remotePostsDataSource.deletePostFromApi(postId = postId)
     }
 
     override suspend fun addView(viewer: Viewer): ViewResponse {
-        return api.addView(viewer = viewer)
+        return remotePostsDataSource.addView(viewer = viewer)
     }
 
-    override suspend fun likePost(likePost: LikePost): LikeResponse = withContext(context = ioDispatcher){
-        return@withContext api.likePost(likePost = likePost)
+    override suspend fun likePost(likePost: LikePost): LikeResponse {
+        return remotePostsDataSource.likePost(likePost = likePost)
     }
-
-
 
     override suspend fun unlikePost(likePost: LikePost): LikeResponse {
-        return api.unlikePost(likePost = likePost)
+        return remotePostsDataSource.unlikePost(likePost = likePost)
     }
 
     override suspend fun followUser(followUser: FollowUser): FollowResponse {
-        return api.followUser(followUser = followUser)
+        return remotePostsDataSource.followUser(followUser = followUser)
     }
 
     override suspend fun unfollowUser(followUser: FollowUser): FollowResponse {
-        return api.unfollowUser(followUser = followUser)
+        return remotePostsDataSource.unfollowUser(followUser = followUser)
     }
 
-    override suspend fun insertPost(post: Post) = withContext(context = ioDispatcher) {
-        return@withContext db.postDao.insertPost(post)
-
+    override suspend fun insertSavedPost(post: Post) = withContext(ioDispatcher) {
+        savedPostsDataSource.insertPost(post = post)
     }
 
-    override suspend fun deleteAllPosts() = withContext(context = ioDispatcher) {
-        return@withContext db.postDao.deleteAllPosts()
-
+    override suspend fun deleteAllSavedPosts() {
+        withContext(ioDispatcher){
+            savedPostsDataSource.deleteAllPosts()
+        }
     }
 
-    override suspend fun deletePostById(id: String) = withContext(context = ioDispatcher) {
-        return@withContext db.postDao.deletePostById(id)
+    override suspend fun deleteSavedPostById(id: String) {
+        withContext(ioDispatcher){
+            savedPostsDataSource.deletePostById(id = id)
+        }
     }
 
-    override suspend fun getPostFromRoom(postId: String): PostRecordWithCommentsLikesViews? =
-        withContext(context = ioDispatcher) {
-        return@withContext db.postDao.getPostById(postId)
+    override suspend fun getSavedPost(postId: String): PostRecordWithCommentsLikesViews? {
+        return withContext(ioDispatcher){
+            savedPostsDataSource.getPostFromRoom(postId = postId)
+        }
     }
 
-    override fun getAllPostsFromRoom(): Flow<List<PostRecordWithCommentsLikesViews>> {
-        return db.postDao.getAllLocalPosts()
+    override fun getAllSavedPosts(): Flow<List<PostRecordWithCommentsLikesViews>> {
+        return savedPostsDataSource.getAllPostsFromRoom()
     }
+
+
 }

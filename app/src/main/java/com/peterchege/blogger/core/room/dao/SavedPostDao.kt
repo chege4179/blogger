@@ -25,7 +25,7 @@ import com.peterchege.blogger.core.room.entities.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface PostDao {
+interface SavedPostDao {
 
     @Transaction
     @Query("SELECT * FROM post")

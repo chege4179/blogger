@@ -13,17 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.core.work
+package com.peterchege.blogger.data.local.posts.saved_posts
 
-import androidx.work.WorkInfo
+import com.peterchege.blogger.core.api.responses.Post
+import com.peterchege.blogger.core.room.entities.PostRecordWithCommentsLikesViews
+import kotlinx.coroutines.flow.Flow
 
-object WorkConstants {
+interface SavedPostsDataSource {
+    suspend fun insertPost(post: Post)
+    suspend fun deleteAllPosts()
 
-    const val uploadPostWorkerName = "post_article"
+    suspend fun deletePostById(id: String)
 
-    const val syncFeedWorkName = "sync_feed"
+    suspend fun getPostFromRoom(postId: String): PostRecordWithCommentsLikesViews?
 
-
+    fun getAllPostsFromRoom(): Flow<List<PostRecordWithCommentsLikesViews>>
 }
-
-val List<WorkInfo>.anyRunning get() = any { it.state == WorkInfo.State.RUNNING }

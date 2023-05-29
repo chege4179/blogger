@@ -17,25 +17,39 @@ package com.peterchege.blogger.presentation.screens.dashboard.feed_screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.peterchege.blogger.core.api.responses.User
-import com.peterchege.blogger.core.util.Resource
 import com.peterchege.blogger.core.util.UiEvent
+import com.peterchege.blogger.core.work.sync_feed.SyncFeedWorkManager
 import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.NetworkInfoRepository
 import com.peterchege.blogger.domain.repository.NetworkStatus
-import com.peterchege.blogger.domain.state.FeedScreenUi
-import com.peterchege.blogger.domain.state.FeedScreenUiState
-import com.peterchege.blogger.domain.use_case.GetFeedUseCase
+import com.peterchege.blogger.domain.repository.PostRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class FeedScreenViewModel @Inject constructor(
-    private val getFeedUseCase: GetFeedUseCase,
+    postRepository: PostRepository,
     authRepository: AuthRepository,
-    networkInfoRepository: NetworkInfoRepository
+    networkInfoRepository: NetworkInfoRepository,
+    private val syncFeedWorkManager: SyncFeedWorkManager,
+
 ) : ViewModel() {
+
+    val isSyncing = syncFeedWorkManager.isSyncing
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = false
+        )
+
+    val cachedPosts = postRepository.getAllPosts()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = emptyList()
+        )
 
     val networkStatus = networkInfoRepository.networkStatus
         .stateIn(
@@ -51,39 +65,14 @@ class FeedScreenViewModel @Inject constructor(
             initialValue = null
         )
 
-    private var _user = MutableStateFlow<User?>(null)
-    var user: StateFlow<User?> = _user
-
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
 
-
-    private val _uiState = MutableStateFlow<FeedScreenUiState>(FeedScreenUiState.Loading)
-    val uiState = _uiState.asStateFlow()
-
-    init {
-        getFeedPosts()
+    fun refreshFeed(){
+        viewModelScope.launch {
+            syncFeedWorkManager.startSync()
+        }
     }
 
-
-    fun getFeedPosts() {
-        getFeedUseCase().onEach { result ->
-            when (result) {
-                is Resource.Success -> {
-                    if (result.data == null){
-                        _uiState.value = FeedScreenUiState.Error(message = "An unexpected error has occurred")
-                    }else{
-                        _uiState.value = FeedScreenUiState.Success(data = FeedScreenUi(posts = result.data))
-                    }
-                }
-                is Resource.Error -> {
-                    _uiState.value = FeedScreenUiState.Error(message = result.message ?: "An unexpected error occurred")
-
-                }
-                is Resource.Loading -> {
-                }
-            }
-        }.launchIn(viewModelScope)
-    }
 }

@@ -39,16 +39,9 @@ class BloggerApp :Application(),Configuration.Provider {
     lateinit var workerFactory: HiltWorkerFactory
     override fun onCreate() {
         super.onCreate()
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            val channel = NotificationChannel(
-                Constants.NOTIFICATION_CHANNEL,
-                WorkConstants.uploadPostWorkerName,
-                NotificationManager.IMPORTANCE_HIGH
-            )
-            val notificationManager = getSystemService(NotificationManager::class.java)
-            notificationManager.createNotificationChannel(channel)
-        }
-        WorkManager.initialize(this, Configuration.Builder().setWorkerFactory(workerFactory).build())
+        initTimber()
+        setUpWorkerManagerNotificationChannel()
+
     }
     override fun getWorkManagerConfiguration(): Configuration =
 
@@ -59,7 +52,7 @@ class BloggerApp :Application(),Configuration.Provider {
     private fun initTimber() = when {
         BuildConfig.DEBUG -> {
             Timber.plant(object : Timber.DebugTree() {
-                override fun createStackElementTag(@NotNull element: StackTraceElement): String {
+                override fun createStackElementTag(element: StackTraceElement): String {
                     return super.createStackElementTag(element) + ":" + element.lineNumber
                 }
             })
@@ -67,6 +60,19 @@ class BloggerApp :Application(),Configuration.Provider {
         else -> {
             Timber.plant(CrashlyticsTree())
         }
+    }
+
+    private fun setUpWorkerManagerNotificationChannel(){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            val channel = NotificationChannel(
+                Constants.NOTIFICATION_CHANNEL,
+                WorkConstants.uploadPostWorkerName,
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(channel)
+        }
+        WorkManager.initialize(this, Configuration.Builder().setWorkerFactory(workerFactory).build())
     }
 
 }

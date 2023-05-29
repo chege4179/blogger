@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.core.work
+package com.peterchege.blogger.data.local.posts.cached_posts
 
-import androidx.work.WorkInfo
+import com.peterchege.blogger.core.api.responses.Post
+import kotlinx.coroutines.flow.Flow
 
-object WorkConstants {
+interface CachedPostsDataSource {
 
-    const val uploadPostWorkerName = "post_article"
+    suspend fun insertCachedPosts(posts:List<Post>)
 
-    const val syncFeedWorkName = "sync_feed"
+    fun getCachedPosts(): Flow<List<Post>>
+
+    suspend fun deleteAllPostsFromCache()
 
 
 }
-
-val List<WorkInfo>.anyRunning get() = any { it.state == WorkInfo.State.RUNNING }

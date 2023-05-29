@@ -37,7 +37,7 @@ class SavedPostScreenViewModel @Inject constructor(
     private val authRepository: AuthRepository,
 
     ) : ViewModel() {
-    val posts = repository.getAllPostsFromRoom()
+    val posts = repository.getAllSavedPosts()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000L),
