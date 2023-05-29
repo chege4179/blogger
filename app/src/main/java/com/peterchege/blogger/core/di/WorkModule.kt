@@ -17,8 +17,10 @@ package com.peterchege.blogger.core.di
 
 import android.content.Context
 import androidx.work.ListenableWorker
-import com.peterchege.blogger.core.work.UploadPostWorkManager
-import com.peterchege.blogger.core.work.UploadPostWorkManagerImpl
+import com.peterchege.blogger.core.work.sync_feed.SyncFeedWorkManager
+import com.peterchege.blogger.core.work.sync_feed.SyncFeedWorkManagerImpl
+import com.peterchege.blogger.core.work.upload_post.UploadPostWorkManager
+import com.peterchege.blogger.core.work.upload_post.UploadPostWorkManagerImpl
 import dagger.MapKey
 import dagger.Module
 import dagger.Provides
@@ -29,14 +31,10 @@ import javax.inject.Singleton
 import kotlin.reflect.KClass
 
 
-@MapKey
-@Target(AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class WorkerKey(val value: KClass<out ListenableWorker>)
 
 @Module
 @InstallIn(SingletonComponent::class)
-object WorkManagerModule {
+object WorkModule {
 
 
     @Provides
@@ -45,6 +43,16 @@ object WorkManagerModule {
         @ApplicationContext context: Context,
     ): UploadPostWorkManager {
         return UploadPostWorkManagerImpl(context = context)
+
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideSyncFeedWorkManager(
+        @ApplicationContext context: Context,
+    ): SyncFeedWorkManager {
+        return SyncFeedWorkManagerImpl(context = context)
 
     }
 }

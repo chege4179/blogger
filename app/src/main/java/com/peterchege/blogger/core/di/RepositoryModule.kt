@@ -20,6 +20,12 @@ import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.datastore.repository.UserDataStoreRepository
 import com.peterchege.blogger.core.room.database.BloggerDatabase
 import com.peterchege.blogger.data.*
+import com.peterchege.blogger.data.local.posts.cached_posts.CachedPostsDataSource
+import com.peterchege.blogger.data.local.posts.cached_posts.CachedPostsDataSourceImpl
+import com.peterchege.blogger.data.local.posts.saved_posts.SavedPostsDataSource
+import com.peterchege.blogger.data.local.posts.saved_posts.SavedPostsDataSourceImpl
+import com.peterchege.blogger.data.remote.posts.RemotePostsDataSource
+import com.peterchege.blogger.data.remote.posts.RemotePostsDataSourceImpl
 import com.peterchege.blogger.domain.repository.*
 import dagger.Module
 import dagger.Provides
@@ -47,6 +53,7 @@ object RepositoryModule {
             ioDispatcher = ioDispatcher,
         )
     }
+
     @Provides
     @Singleton
     fun provideCommentRepository(api: BloggerApi): CommentRepository {
@@ -67,15 +74,57 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun providePostRepository(
+    fun provideRemotePostsDataSource(
         api: BloggerApi,
         db: BloggerDatabase,
         @IoDispatcher ioDispatcher: CoroutineDispatcher
-    ): PostRepository {
-        return PostRepositoryImpl(
+    ): RemotePostsDataSource {
+        return RemotePostsDataSourceImpl(
             api = api,
+            ioDispatcher = ioDispatcher
+        )
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideSavedPostsDataSource(
+        db: BloggerDatabase,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher
+    ): SavedPostsDataSource {
+        return SavedPostsDataSourceImpl(
             db = db,
             ioDispatcher = ioDispatcher
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideCachedPostsDataSource(
+        db: BloggerDatabase,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher
+    ): CachedPostsDataSource {
+        return CachedPostsDataSourceImpl(
+            db = db,
+            ioDispatcher = ioDispatcher
+        )
+    }
+
+
+    @Provides
+    @Singleton
+    fun providePostRepository(
+        savedPostsDataSource: SavedPostsDataSource,
+        cachedPostsDataSource: CachedPostsDataSource,
+        remotePostsDataSource: RemotePostsDataSource,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher
+
+    ): PostRepository {
+        return PostRepositoryImpl(
+            savedPostsDataSource = savedPostsDataSource,
+            cachedPostsDataSource = cachedPostsDataSource,
+            remotePostsDataSource = remotePostsDataSource,
+            ioDispatcher = ioDispatcher,
         )
     }
 
@@ -90,8 +139,8 @@ object RepositoryModule {
     fun provideNetworkInfoRepository(
         @ApplicationContext context: Context,
         @IoDispatcher ioDispatcher: CoroutineDispatcher
-        ):NetworkInfoRepository{
-        return NetworkInfoRepositoryImpl(context = context,ioDispatcher = ioDispatcher)
+    ): NetworkInfoRepository {
+        return NetworkInfoRepositoryImpl(context = context, ioDispatcher = ioDispatcher)
     }
 
 }

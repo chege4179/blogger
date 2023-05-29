@@ -18,7 +18,6 @@ package com.peterchege.blogger.presentation.screens.dashboard.addpost_screen
 //import androidx.compose.runtime.livedata.observeAsState
 import android.annotation.SuppressLint
 import android.net.Uri
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -39,7 +38,6 @@ import androidx.work.*
 import coil.annotation.ExperimentalCoilApi
 import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.core.util.UiEvent
-import com.peterchege.blogger.core.work.UploadPostWorker
 
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.flow.SharedFlow

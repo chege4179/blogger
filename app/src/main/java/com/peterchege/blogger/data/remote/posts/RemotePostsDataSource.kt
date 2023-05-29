@@ -13,20 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.domain.repository
+package com.peterchege.blogger.data.remote.posts
 
 import com.peterchege.blogger.core.api.requests.FollowUser
 import com.peterchege.blogger.core.api.requests.LikePost
 import com.peterchege.blogger.core.api.requests.PostBody
 import com.peterchege.blogger.core.api.requests.Viewer
-import com.peterchege.blogger.core.api.responses.*
-import com.peterchege.blogger.core.room.entities.PostRecord
-import com.peterchege.blogger.core.room.entities.PostRecordWithCommentsLikesViews
-import kotlinx.coroutines.flow.Flow
+import com.peterchege.blogger.core.api.responses.AllPostsResponse
+import com.peterchege.blogger.core.api.responses.DeleteResponse
+import com.peterchege.blogger.core.api.responses.FollowResponse
+import com.peterchege.blogger.core.api.responses.LikeResponse
+import com.peterchege.blogger.core.api.responses.Post
+import com.peterchege.blogger.core.api.responses.UploadPostResponse
+import com.peterchege.blogger.core.api.responses.ViewResponse
 
-interface PostRepository {
+interface RemotePostsDataSource {
 
-    fun getAllPosts():Flow<List<Post>>
+    suspend fun getAllPosts(): AllPostsResponse
 
     suspend fun uploadPost(postBody: PostBody): UploadPostResponse
 
@@ -38,21 +41,10 @@ interface PostRepository {
 
     suspend fun likePost(likePost: LikePost): LikeResponse
 
+
     suspend fun unlikePost(likePost: LikePost): LikeResponse
 
     suspend fun followUser(followUser: FollowUser): FollowResponse
 
     suspend fun unfollowUser(followUser: FollowUser): FollowResponse
-
-
-    suspend fun insertSavedPost(post: Post)
-
-    suspend fun deleteAllSavedPosts()
-
-    suspend fun deleteSavedPostById(id: String)
-
-    suspend fun getSavedPost(postId: String): PostRecordWithCommentsLikesViews?
-
-
-    fun getAllSavedPosts(): Flow<List<PostRecordWithCommentsLikesViews>>
 }

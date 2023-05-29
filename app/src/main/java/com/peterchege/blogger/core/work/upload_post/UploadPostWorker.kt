@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.core.work
+package com.peterchege.blogger.core.work.upload_post
 
 import android.content.Context
 import android.net.Uri
@@ -21,7 +21,6 @@ import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
-import androidx.work.Worker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.peterchege.blogger.R
@@ -55,12 +54,13 @@ class UploadPostWorker @AssistedInject constructor(
         val postedBy = inputData.getString("postedBy")
         val postedAt = inputData.getString("postedAt")
         val postedOn = inputData.getString("postedOn")
+
+
+
         startForegroundService(
             notificationTitle = "Uploading Post",
             notificationInfo = "Your post is being uploaded"
         )
-
-
         val file = UriToFile(context = context).getImageBody(Uri.parse(uri))
         val requestFile: RequestBody = file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
         val builder: MultipartBody.Builder = MultipartBody.Builder().setType(MultipartBody.FORM)
@@ -145,22 +145,7 @@ class UploadPostWorker @AssistedInject constructor(
     }
 
 
-    class Factory @Inject constructor(
-        val api: BloggerApi,
 
-    ): ChildWorkerFactory {
-
-        override fun create(appContext: Context, params: WorkerParameters): CoroutineWorker {
-            return UploadPostWorker(
-                context = appContext,
-                workerParams = params,
-                api = api
-            )
-        }
-    }
 
 }
 
-interface ChildWorkerFactory {
-    fun create(appContext: Context, params: WorkerParameters): CoroutineWorker
-}

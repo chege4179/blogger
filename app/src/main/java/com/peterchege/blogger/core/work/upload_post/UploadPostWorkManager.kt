@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.core.work
+package com.peterchege.blogger.core.work.upload_post
 
 import android.content.Context
 import android.net.Uri
@@ -30,6 +30,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.workDataOf
 import com.peterchege.blogger.core.api.requests.PostBody
 import com.peterchege.blogger.core.work.WorkConstants.uploadPostWorkerName
+import com.peterchege.blogger.core.work.anyRunning
 import kotlinx.coroutines.flow.conflate
 import javax.inject.Inject
 
@@ -41,7 +42,7 @@ interface UploadPostWorkManager {
 
 class UploadPostWorkManagerImpl @Inject constructor(
     @ApplicationContext private val context: Context,
-):UploadPostWorkManager{
+): UploadPostWorkManager {
 
 
 
@@ -81,4 +82,4 @@ class UploadPostWorkManagerImpl @Inject constructor(
     }
 }
 
-private val List<WorkInfo>.anyRunning get() = any { it.state == WorkInfo.State.RUNNING }
+

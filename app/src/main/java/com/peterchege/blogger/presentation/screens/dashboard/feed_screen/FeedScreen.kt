@@ -25,6 +25,10 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.PullRefreshState
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -37,6 +41,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.annotation.ExperimentalCoilApi
+import com.peterchege.blogger.core.api.responses.Post
 import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.Screens
@@ -53,6 +58,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 @ExperimentalCoilApi
 fun FeedScreen(
@@ -60,35 +66,49 @@ fun FeedScreen(
     navHostController: NavHostController,
     viewModel: FeedScreenViewModel = hiltViewModel()
 ){
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+
     val authUser = viewModel.authUser.collectAsStateWithLifecycle()
     val networkStatus = viewModel.networkStatus.collectAsStateWithLifecycle()
+    val isSyncing = viewModel.isSyncing.collectAsStateWithLifecycle()
+    val posts = viewModel.cachedPosts.collectAsStateWithLifecycle()
+
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = isSyncing.value,
+        onRefresh =  { viewModel.refreshFeed() }
+    )
+
+    LaunchedEffect(key1 = true){
+        viewModel.refreshFeed()
+    }
 
     FeedScreenContent(
         bottomNavController = bottomNavController,
         navHostController = navHostController,
-        uiState = uiState.value,
         authUser = authUser.value,
         eventFlow = viewModel.eventFlow,
         networkStatus =  networkStatus.value,
-        retry = { viewModel.getFeedPosts() }
+        pullRefreshState = pullRefreshState,
+        posts = posts.value,
+        isRefreshing = isSyncing.value
     )
 }
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 @ExperimentalCoilApi
 fun FeedScreenContent(
     bottomNavController: NavController,
     navHostController: NavHostController,
-    uiState: FeedScreenUiState,
+    isRefreshing :Boolean,
     authUser:User?,
+    posts:List<Post>,
     eventFlow:SharedFlow<UiEvent>,
     networkStatus: NetworkStatus,
-    retry:() -> Unit,
+    pullRefreshState: PullRefreshState,
 
-) {
+    ) {
     val scaffoldState = rememberScaffoldState()
     LaunchedEffect(key1 = networkStatus) {
         when (networkStatus) {
@@ -137,11 +157,12 @@ fun FeedScreenContent(
                     IconButton(
                         onClick = {
                             navHostController.navigate(Screens.SEARCH_SCREEN)
-                        }) {
+                        }
+                    ) {
                         Icon(
                             imageVector = Icons.Filled.Search,
                             contentDescription = "Chats",
-                            Modifier.size(26.dp)
+                            modifier = Modifier.size(26.dp)
 
                         )
                     }
@@ -155,87 +176,94 @@ fun FeedScreenContent(
                     navHostController.navigate(Screens.ADD_NEW_POST_SCREEN)
                 }
             ) {
-                Icon(Icons.Filled.Add, "")
+                Icon(
+                    imageVector =  Icons.Filled.Add,
+                    contentDescription = "Create Post"
+                )
+
             }
         }
     ) {
-        Column(
+        Box(
             modifier = Modifier
+                .pullRefresh(pullRefreshState)
                 .fillMaxSize()
-                .padding(5.dp),
-        ) {
-            LazyRow(
+        ){
+            PullRefreshIndicator(
+                refreshing = true,
+                state = pullRefreshState,
+                modifier =  Modifier.align(Alignment.TopCenter)
+            )
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp)
+                    .pullRefresh(pullRefreshState)
+                    .fillMaxSize()
+                    .padding(5.dp),
             ) {
-                items(items = categories) { category ->
-                    CategoryCard(navController = navHostController, categoryItem = category)
-                    Spacer(modifier = Modifier.width(10.dp))
 
-                }
-            }
-            when(uiState){
-                is FeedScreenUiState.Error -> {
-                    ErrorComponent(
-                        errorMessage = uiState.message,
-                        retryCallback = { retry() },
-                    )
-                }
-                is FeedScreenUiState.Loading -> {
-                    LoadingComponent()
-                }
-                is FeedScreenUiState.Success -> {
-                    if (uiState.data.posts.isEmpty()) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp)
+                ) {
+                    items(items = categories) { category ->
+                        CategoryCard(navController = navHostController, categoryItem = category)
+                        Spacer(modifier = Modifier.width(10.dp))
 
-                            ) {
-                            Text(
-                                modifier = Modifier.align(Alignment.Center),
-                                text = "No posts were found ",
-                                textAlign = TextAlign.Center,
-                            )
-                        }
+                    }
+                }
+                if (posts.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .pullRefresh(pullRefreshState)
+                        ,
 
-                    } else {
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(5.dp)
                         ) {
 
-                            items(items = uiState.data.posts) { post ->
-                                ArticleCard(
-                                    post = post,
-                                    onItemClick = {
-                                        navHostController.navigate(Screens.POST_SCREEN + "/${post._id}/${Constants.API_SOURCE}")
-                                    },
-                                    onProfileNavigate = {
-                                        onProfileNavigate(
-                                            username = it,
-                                            bottomNavController = bottomNavController,
-                                            navHostController = navHostController,
-                                            authUser = authUser,
-                                        )
-                                    },
-                                    onDeletePost = {},
-                                    isLiked = false,
-                                    isSaved = false,
-                                    isProfile = false,
-                                    profileImageUrl = "https://res.cloudinary.com/dhuqr5iyw/image/upload/v1640971757/mystory/profilepictures/default_y4mjwp.jpg"
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                            }
+                        Text(
+                            modifier = Modifier.align(Alignment.Center),
+                            text = "No posts were found ",
+                            textAlign = TextAlign.Center,
+                        )
+                    }
 
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .pullRefresh(pullRefreshState)
+                            .fillMaxSize()
+                            .padding(5.dp)
+                    ) {
+
+                        items(items = posts) { post ->
+                            ArticleCard(
+                                post = post,
+                                onItemClick = {
+                                    navHostController.navigate(Screens.POST_SCREEN + "/${post._id}/${Constants.API_SOURCE}")
+                                },
+                                onProfileNavigate = {
+                                    onProfileNavigate(
+                                        username = it,
+                                        bottomNavController = bottomNavController,
+                                        navHostController = navHostController,
+                                        authUser = authUser,
+                                    )
+                                },
+                                onDeletePost = {},
+                                isLiked = false,
+                                isSaved = false,
+                                isProfile = false,
+                                profileImageUrl = "https://res.cloudinary.com/dhuqr5iyw/image/upload/v1640971757/mystory/profilepictures/default_y4mjwp.jpg"
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
                         }
+
                     }
                 }
             }
-
-
-
         }
+
     }
 }
 

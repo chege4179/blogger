@@ -19,9 +19,13 @@ import com.peterchege.blogger.core.api.responses.Comment
 import com.peterchege.blogger.core.api.responses.Like
 import com.peterchege.blogger.core.api.responses.Post
 import com.peterchege.blogger.core.api.responses.View
+import com.peterchege.blogger.core.room.entities.CommentCacheEntity
 import com.peterchege.blogger.core.room.entities.CommentEntity
+import com.peterchege.blogger.core.room.entities.LikeCacheEntity
 import com.peterchege.blogger.core.room.entities.LikeEntity
+import com.peterchege.blogger.core.room.entities.PostCacheRecordWithCommentsLikesViews
 import com.peterchege.blogger.core.room.entities.PostRecordWithCommentsLikesViews
+import com.peterchege.blogger.core.room.entities.ViewCacheEntity
 import com.peterchege.blogger.core.room.entities.ViewEntity
 
 
@@ -56,7 +60,56 @@ fun CommentEntity.toExternalModel():Comment{
     )
 }
 
+
+fun ViewCacheEntity.toExternalModel(): View {
+    return View(
+        viewerUsername = viewerUsername,
+        viewerFullname = viewerFullname,
+        viewerId = viewerId,
+
+        )
+}
+
+fun LikeCacheEntity.toExternalModel(): Like {
+    return Like(
+        username = username,
+        fullname = fullname,
+        userId = userId,
+    )
+}
+
+fun CommentCacheEntity.toExternalModel():Comment{
+    return Comment(
+        username = username,
+        userId = userId,
+        imageUrl = imageUrl,
+        commentId = id,
+        postedAt = postedAt,
+        postedOn = postedOn,
+        comment = comment
+
+    )
+}
+
+
 fun PostRecordWithCommentsLikesViews.toExternalModel():Post{
+    return Post(
+        _id = post._id,
+        postTitle = post.postTitle,
+        postBody = post.postBody,
+        imageUrl = post.ImageUrl,
+        postedAt = post.postedAt,
+        postAuthor = post.postAuthor,
+        postedOn = post.postedOn,
+        views = views.map { it.toExternalModel() },
+        likes = likes.map { it.toExternalModel() },
+        comments = comments.map { it.toExternalModel() },
+    )
+}
+
+
+
+fun PostCacheRecordWithCommentsLikesViews.toExternalModel():Post{
     return Post(
         _id = post._id,
         postTitle = post.postTitle,

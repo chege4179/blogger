@@ -15,7 +15,6 @@
  */
 package com.peterchege.blogger.presentation.screens.dashboard.addpost_screen
 
-import android.content.Context
 import android.net.Uri
 import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.State
@@ -24,16 +23,14 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import androidx.work.*
 import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.api.requests.PostBody
 import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.*
-import com.peterchege.blogger.core.work.UploadPostWorkManager
+import com.peterchege.blogger.core.work.upload_post.UploadPostWorkManager
 import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.DraftRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.IOException

@@ -15,21 +15,12 @@
  */
 package com.peterchege.blogger.presentation.screens.signup
 
-import android.content.Context
-import android.util.Log
-import androidx.compose.material.ScaffoldState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
 import com.peterchege.blogger.core.api.requests.SignUpUser
 import com.peterchege.blogger.core.util.Screens
-import com.peterchege.blogger.core.util.TextFieldState
 import com.peterchege.blogger.core.util.UiEvent
-import com.peterchege.blogger.core.util.hasInternetConnection
 import com.peterchege.blogger.domain.repository.AuthRepository
-import com.peterchege.blogger.domain.use_case.SignUpUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

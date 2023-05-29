@@ -259,7 +259,7 @@ class PostScreenViewModel @Inject constructor(
             try {
 
                 _state.value.post?.let {
-                    repository.insertPost(it)
+                    repository.insertSavedPost(it)
                     scaffoldState.snackbarHostState.showSnackbar(
                         message = "Your post has been saved "
                     )
@@ -277,7 +277,7 @@ class PostScreenViewModel @Inject constructor(
             try {
 
                 _state.value.post?.let {
-                    repository.deletePostById(_state.value.post!!._id)
+                    repository.deleteSavedPostById(_state.value.post!!._id)
                     scaffoldState.snackbarHostState.showSnackbar(
                         message = "Your post has been deleted from the saved posts "
                     )
@@ -292,15 +292,13 @@ class PostScreenViewModel @Inject constructor(
     private fun getSavedPostState(postId: String) {
         viewModelScope.launch {
             try {
-                val post = repository.getPostFromRoom(postId = postId)
+                val post = repository.getSavedPost(postId = postId)
                 _isSaved.value = post != null
             } catch (e: IOException) {
 
             }
 
         }
-
-
     }
 
     fun getIsLikedState(likes: List<Like>): Boolean {
@@ -380,7 +378,7 @@ class PostScreenViewModel @Inject constructor(
                 _state.value = PostDetailState(
                     true,
                 )
-                val post = repository.getPostFromRoom(postId = postId)
+                val post = repository.getSavedPost(postId = postId)
                 if (post != null) {
                     _state.value = PostDetailState(
                         isLoading = false,

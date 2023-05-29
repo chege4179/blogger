@@ -20,5 +20,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UpdateTokenResponse (
     val msg:String,
-    val success:String,
+    val success:Boolean,
 )
