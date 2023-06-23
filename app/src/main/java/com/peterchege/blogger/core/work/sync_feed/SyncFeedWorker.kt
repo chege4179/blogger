@@ -25,6 +25,7 @@ import com.peterchege.blogger.R
 import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.di.IoDispatcher
 import com.peterchege.blogger.core.util.Constants
+import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.data.local.posts.cached_posts.CachedPostsDataSource
 import com.peterchege.blogger.data.remote.posts.RemotePostsDataSource
 import dagger.assisted.Assisted
@@ -47,25 +48,25 @@ class SyncFeedWorker @AssistedInject constructor(
 
 
     override suspend fun doWork(): Result {
-        return try {
-            startForegroundService(notificationInfo = "Syncing Feed .......")
-            val remotePosts = remotePostsDataSource.getAllPosts().posts
-            cachedPostsDataSource.deleteAllPostsFromCache()
-            cachedPostsDataSource.insertCachedPosts(posts = remotePosts)
-            Result.success()
-
-        }catch (e:HttpException){
-            startForegroundService(notificationInfo = "Failed to sync feed")
-            Result.retry()
-            Result.failure()
-        }catch (e:IOException){
-            startForegroundService(notificationInfo = "Failed to sync feed")
-            Result.failure()
+        startForegroundService(notificationInfo = "Syncing Feed .......")
+        val remotePosts = remotePostsDataSource.getAllPosts()
+        when(remotePosts){
+            is NetworkResult.Success -> {
+                cachedPostsDataSource.deleteAllPostsFromCache()
+                cachedPostsDataSource.insertCachedPosts(posts = remotePosts.data.posts)
+                return Result.success()
+            }
+            is NetworkResult.Error -> {
+                startForegroundService(notificationInfo = "Failed to sync feed")
+                Result.retry()
+                return Result.failure()
+            }
+            is NetworkResult.Exception -> {
+                startForegroundService(notificationInfo = "Failed to sync feed")
+                return Result.failure()
+            }
         }
     }
-
-
-
 
     private suspend fun startForegroundService(notificationInfo:String) {
         setForeground(

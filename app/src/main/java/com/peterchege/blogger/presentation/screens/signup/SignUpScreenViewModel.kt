@@ -18,6 +18,7 @@ package com.peterchege.blogger.presentation.screens.signup
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.peterchege.blogger.core.api.requests.SignUpUser
+import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.domain.repository.AuthRepository
@@ -99,22 +100,24 @@ class SignUpScreenViewModel @Inject constructor(
                     password = _uiState.value.password.trim(),
                     email = _uiState.value.email.trim()
                 )
-                try {
-                    val signUpResponse = signUpRepository.signUpUser(signUpUser = signUpUser)
-                    _uiState.value = _uiState.value.copy(isLoading = false)
-                    _eventFlow.emit(UiEvent.ShowSnackbar(message = signUpResponse.msg))
-                    if (signUpResponse.success) {
-                        _eventFlow.emit(UiEvent.Navigate(route = Screens.LOGIN_SCREEN))
+                val signUpResponse = signUpRepository.signUpUser(signUpUser = signUpUser)
+                when(signUpResponse){
+                    is NetworkResult.Success -> {
+                        _uiState.value = _uiState.value.copy(isLoading = false)
+                        _eventFlow.emit(UiEvent.ShowSnackbar(message = signUpResponse.data.msg))
+                        if (signUpResponse.data.success) {
+                            _eventFlow.emit(UiEvent.Navigate(route = Screens.LOGIN_SCREEN))
 
+                        }
                     }
-                } catch (e: HttpException) {
-                    _uiState.value = _uiState.value.copy(isLoading = false)
-                    _eventFlow.emit(UiEvent.ShowSnackbar(message = "Server error...Please try again later"))
-
-                } catch (e: IOException) {
-                    _uiState.value = _uiState.value.copy(isLoading = false)
-                    _eventFlow.emit(UiEvent.ShowSnackbar(message = "Could not connect to the server...Please try again later"))
-
+                    is NetworkResult.Error -> {
+                        _uiState.value = _uiState.value.copy(isLoading = false)
+                        _eventFlow.emit(UiEvent.ShowSnackbar(message = "Server error...Please try again later"))
+                    }
+                    is NetworkResult.Exception -> {
+                        _uiState.value = _uiState.value.copy(isLoading = false)
+                        _eventFlow.emit(UiEvent.ShowSnackbar(message = "Could not connect to the server...Please try again later"))
+                    }
                 }
             }
         }

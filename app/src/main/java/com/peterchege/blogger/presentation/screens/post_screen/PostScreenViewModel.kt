@@ -32,6 +32,7 @@ import com.peterchege.blogger.core.api.responses.Like
 import com.peterchege.blogger.core.api.responses.Post
 import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.Constants
+import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.core.util.Resource
 import com.peterchege.blogger.domain.mappers.toExternalModel
 import com.peterchege.blogger.domain.repository.AuthRepository
@@ -198,21 +199,22 @@ class PostScreenViewModel @Inject constructor(
     fun onDialogDeleteConfirm(scaffoldState: ScaffoldState) {
         _openDeleteDialogState.value = false
         viewModelScope.launch {
-            try {
-                val response = repository.deletePostFromApi(_state.value.post!!._id)
-                scaffoldState.snackbarHostState.showSnackbar(
-                    message = response.msg
-                )
+            val response = repository.deletePostFromApi(_state.value.post!!._id)
+            when(response){
+                is NetworkResult.Success -> {
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        message = response.data.msg
+                    )
+                }
+                is NetworkResult.Exception -> {
 
-            } catch (e: HttpException) {
-                scaffoldState.snackbarHostState.showSnackbar(
-                    message = "Server error...Please try again later"
-                )
-            } catch (e: IOException) {
-                scaffoldState.snackbarHostState.showSnackbar(
-                    message = "Could not reach the internet....Please check your internet connection"
-                )
+                }
+                is NetworkResult.Error -> {
+
+                }
+
             }
+
         }
     }
 
@@ -331,9 +333,9 @@ class PostScreenViewModel @Inject constructor(
                         followedUsername = _state.value.post!!.postAuthor,
                     )
                 )
-                if (followResponse.success) {
-                    _isFollowing.value = true
-                }
+//                if (followResponse.success) {
+//                    _isFollowing.value = true
+//                }
             }
 
         } catch (e: HttpException) {
@@ -346,30 +348,33 @@ class PostScreenViewModel @Inject constructor(
     }
 
     fun unfollowUser() {
-        try {
-            val username = _user.value?.username ?: ""
-            val fullname = _user.value?.fullname ?: ""
-            val userId = _user.value?._id ?: ""
-            viewModelScope.launch {
-                val followResponse = repository.unfollowUser(
-                    FollowUser(
-                        followerUsername = username,
-                        followerFullname = fullname,
-                        followerId = userId,
-                        followedUsername = _state.value.post!!.postAuthor,
-                    )
+        val username = _user.value?.username ?: ""
+        val fullname = _user.value?.fullname ?: ""
+        val userId = _user.value?._id ?: ""
+        viewModelScope.launch {
+            val followResponse = repository.unfollowUser(
+                FollowUser(
+                    followerUsername = username,
+                    followerFullname = fullname,
+                    followerId = userId,
+                    followedUsername = _state.value.post!!.postAuthor,
                 )
-                if (followResponse.success) {
-                    _isFollowing.value = false
+            )
+            when(followResponse){
+                is NetworkResult.Success -> {
+                    if (followResponse.data.success) {
+                        _isFollowing.value = false
+                    }
+                }
+                is NetworkResult.Error -> {
+
+                }
+                is NetworkResult.Exception -> {
+
                 }
             }
 
-        } catch (e: HttpException) {
-
-        } catch (e: IOException) {
-
         }
-
     }
 
     private fun getPostFromRoom(postId: String) {
@@ -398,28 +403,31 @@ class PostScreenViewModel @Inject constructor(
         val username = _user.value?.username ?: ""
         val fullname = _user.value?.fullname ?: ""
         viewModelScope.launch {
-            try {
-                val likeResponse = repository.likePost(
-                    LikePost(
-                        userId = userId,
-                        username = username,
-                        fullname = fullname,
-                        postAuthor = _state.value.post!!.postAuthor,
-                        postId = _state.value.post!!._id
+            val likeResponse = repository.likePost(
+                LikePost(
+                    userId = userId,
+                    username = username,
+                    fullname = fullname,
+                    postAuthor = _state.value.post!!.postAuthor,
+                    postId = _state.value.post!!._id
 
-                    )
                 )
-                if (likeResponse.success) {
-                    scaffoldState.snackbarHostState.showSnackbar(
-                        message = likeResponse.msg
-                    )
+            )
+            when(likeResponse){
+                is NetworkResult.Success -> {
+                    if (likeResponse.data.success) {
+                        scaffoldState.snackbarHostState.showSnackbar(
+                            message = likeResponse.data.msg
+                        )
+
+                    }
+                }
+                is NetworkResult.Error -> {
 
                 }
+                is NetworkResult.Exception -> {
 
-            } catch (e: HttpException) {
-
-            } catch (e: IOException) {
-
+                }
             }
 
         }
@@ -431,28 +439,31 @@ class PostScreenViewModel @Inject constructor(
         val username =_user.value?.username ?: ""
         val fullname = _user.value?.fullname ?: ""
         viewModelScope.launch {
-            try {
-                val likeResponse = repository.unlikePost(
-                    LikePost(
-                        userId = userId,
-                        username = username,
-                        fullname = fullname,
-                        postAuthor = _state.value.post!!.postAuthor,
-                        postId = _state.value.post!!._id
+            val likeResponse = repository.unlikePost(
+                LikePost(
+                    userId = userId,
+                    username = username,
+                    fullname = fullname,
+                    postAuthor = _state.value.post!!.postAuthor,
+                    postId = _state.value.post!!._id
 
-                    )
                 )
-                if (likeResponse.success) {
-                    scaffoldState.snackbarHostState.showSnackbar(
-                        message = likeResponse.msg
-                    )
+            )
+            when(likeResponse){
+                is NetworkResult.Success -> {
+                    if (likeResponse.data.success) {
+                        scaffoldState.snackbarHostState.showSnackbar(
+                            message = likeResponse.data.msg
+                        )
+
+                    }
+                }
+                is NetworkResult.Error -> {
 
                 }
+                is NetworkResult.Exception -> {
 
-            } catch (e: HttpException) {
-
-            } catch (e: IOException) {
-
+                }
             }
 
         }

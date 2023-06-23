@@ -22,14 +22,15 @@ import com.peterchege.blogger.core.api.responses.LoginResponse
 import com.peterchege.blogger.core.api.responses.LogoutResponse
 import com.peterchege.blogger.core.api.responses.SignUpResponse
 import com.peterchege.blogger.core.api.responses.User
+import com.peterchege.blogger.core.util.NetworkResult
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
-    suspend fun signUpUser(signUpUser: SignUpUser): SignUpResponse
+    suspend fun signUpUser(signUpUser: SignUpUser):NetworkResult <SignUpResponse>
 
-    suspend fun loginUser(loginUser: LoginUser): LoginResponse
+    suspend fun loginUser(loginUser: LoginUser):NetworkResult<LoginResponse>
 
-    suspend fun logoutUser(logoutUser: LogoutUser): LogoutResponse
+    suspend fun logoutUser(logoutUser: LogoutUser):NetworkResult<LogoutResponse>
 
     fun getLoggedInUser(): Flow<User?>
 

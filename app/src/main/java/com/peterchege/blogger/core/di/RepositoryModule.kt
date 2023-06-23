@@ -68,7 +68,6 @@ object RepositoryModule {
     ): ProfileRepository {
         return ProfileRepositoryImpl(
             api = api,
-            ioDispatcher = ioDispatcher,
         )
     }
 

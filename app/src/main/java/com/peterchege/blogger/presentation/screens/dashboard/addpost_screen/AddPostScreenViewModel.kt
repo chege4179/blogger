@@ -49,9 +49,7 @@ data class AddPostFormState(
 class AddPostScreenViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val uploadPostWorkManager: UploadPostWorkManager,
-    private val draftRepository: DraftRepository,
     savedStateHandle: SavedStateHandle,
-    private val api: BloggerApi,
 ) : ViewModel() {
 
     val isUploading = uploadPostWorkManager.isUploading

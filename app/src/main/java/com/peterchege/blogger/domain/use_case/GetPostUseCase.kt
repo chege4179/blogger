@@ -16,6 +16,7 @@
 package com.peterchege.blogger.domain.use_case
 
 import com.peterchege.blogger.core.api.responses.Post
+import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.core.util.Resource
 import com.peterchege.blogger.domain.repository.PostRepository
 import kotlinx.coroutines.flow.Flow
@@ -29,24 +30,22 @@ class GetPostUseCase @Inject constructor(
     private val repository: PostRepository
 ) {
     operator fun invoke(postId: String): Flow<Resource<Post?>> = flow {
-        try {
-            emit(Resource.Loading<Post?>())
-            val post = repository.getPostById(postId)
-            if (post == null) {
-                emit(Resource.Error<Post?>("This post has been deleted right now"))
-            } else {
-                emit(Resource.Success<Post?>(post))
+        emit(Resource.Loading<Post?>())
+        val postResponse = repository.getPostById(postId)
+        when(postResponse){
+            is NetworkResult.Success -> {
+                if (postResponse.data.post == null) {
+                    emit(Resource.Error<Post?>("This post has been deleted right now"))
+                } else {
+                    emit(Resource.Success<Post?>(postResponse.data.post))
+                }
             }
-        } catch (e: HttpException) {
-            emit(Resource.Error<Post?>(e.localizedMessage ?: "An unexpected error occurred"))
-
-        } catch (e: IOException) {
-            emit(Resource.Error<Post?>("Could not reach server... Please check your internet connection"))
-
+            is NetworkResult.Error -> {
+                emit(Resource.Error<Post?>(postResponse.message ?: "An unexpected error occurred"))
+            }
+            is NetworkResult.Exception -> {
+                emit(Resource.Error<Post?>("Could not reach server... Please check your internet connection"))
+            }
         }
-
-
     }
-
-
 }

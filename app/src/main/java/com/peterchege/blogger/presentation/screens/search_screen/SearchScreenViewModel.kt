@@ -27,6 +27,7 @@ import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.api.responses.Post
 import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.Constants
+import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.PostRepository
@@ -110,24 +111,20 @@ class SearchScreenViewModel @Inject constructor(
 
             searchJob?.cancel()
             searchJob = viewModelScope.launch {
-                try {
-                    val response = api.searchPost(searchTerm = searchTerm)
-
-                    _isLoading.value = false
-                    _searchUsers.value = response.users
-                    _searchPosts.value = response.posts
-
-
-                } catch (e: HttpException) {
-                    _isLoading.value = false
-                    Log.e("http error", e.localizedMessage ?: "a http error occurred")
-
-                } catch (e: IOException) {
-                    _isLoading.value = false
-                    Log.e("io error", e.localizedMessage ?: "a http error occurred")
-
+                val response = postRepository.searchPosts(searchTerm = searchTerm)
+                when(response) {
+                    is NetworkResult.Success -> {
+                        _isLoading.value = false
+                        _searchUsers.value = response.data.users
+                        _searchPosts.value = response.data.posts
+                    }
+                    is NetworkResult.Error -> {
+                        _isLoading.value = false
+                    }
+                    is NetworkResult.Exception -> {
+                        _isLoading.value = false
+                    }
                 }
-
             }
         } else if (searchTerm.length < 2) {
             viewModelScope.launch {

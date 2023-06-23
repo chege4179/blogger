@@ -25,11 +25,16 @@ import com.peterchege.blogger.core.api.responses.DeleteResponse
 import com.peterchege.blogger.core.api.responses.FollowResponse
 import com.peterchege.blogger.core.api.responses.LikeResponse
 import com.peterchege.blogger.core.api.responses.Post
+import com.peterchege.blogger.core.api.responses.PostResponse
+import com.peterchege.blogger.core.api.responses.SearchPostResponse
 import com.peterchege.blogger.core.api.responses.UploadPostResponse
 import com.peterchege.blogger.core.api.responses.ViewResponse
+import com.peterchege.blogger.core.api.safeApiCall
 import com.peterchege.blogger.core.di.IoDispatcher
+import com.peterchege.blogger.core.util.NetworkResult
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import okhttp3.RequestBody
 import javax.inject.Inject
 
 class RemotePostsDataSourceImpl @Inject constructor(
@@ -37,41 +42,46 @@ class RemotePostsDataSourceImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 
 ):RemotePostsDataSource {
-    override suspend fun getAllPosts(): AllPostsResponse {
-        return api.getAllPosts()
+    override suspend fun getAllPosts(): NetworkResult<AllPostsResponse> {
+        return safeApiCall { api.getAllPosts() }
     }
 
-    override suspend fun uploadPost(postBody: PostBody): UploadPostResponse {
-        return api.uploadPost(postBody = postBody)
+    override suspend fun uploadPost(body: RequestBody): NetworkResult<UploadPostResponse> {
+        return safeApiCall{ api.postImage(body = body) }
     }
-    override suspend fun getPostById(postId: String): Post? {
-        return api.getPostById(postId).post
-    }
-
-    override suspend fun deletePostFromApi(postId: String): DeleteResponse {
-        return api.getDeletePostById(postId)
+    override suspend fun getPostById(postId: String): NetworkResult<PostResponse> {
+        return safeApiCall { api.getPostById(postId) }
     }
 
-    override suspend fun addView(viewer: Viewer): ViewResponse {
-        return api.addView(viewer = viewer)
+    override suspend fun deletePostFromApi(postId: String): NetworkResult<DeleteResponse> {
+        return safeApiCall { api.getDeletePostById(postId) }
     }
 
-    override suspend fun likePost(likePost: LikePost): LikeResponse = withContext(context = ioDispatcher){
-        return@withContext api.likePost(likePost = likePost)
+    override suspend fun searchPosts(searchTerm: String): NetworkResult<SearchPostResponse> {
+        return safeApiCall { api.searchPost(searchTerm = searchTerm) }
+    }
+
+    override suspend fun addView(viewer: Viewer): NetworkResult<ViewResponse> {
+        return safeApiCall { api.addView(viewer = viewer) }
+    }
+
+    override suspend fun likePost(likePost: LikePost): NetworkResult<LikeResponse> =
+        withContext(context = ioDispatcher){
+        return@withContext safeApiCall { api.likePost(likePost = likePost) }
     }
 
 
 
-    override suspend fun unlikePost(likePost: LikePost): LikeResponse {
-        return api.unlikePost(likePost = likePost)
+    override suspend fun unlikePost(likePost: LikePost): NetworkResult<LikeResponse> {
+        return safeApiCall { api.unlikePost(likePost = likePost) }
     }
 
-    override suspend fun followUser(followUser: FollowUser): FollowResponse {
-        return api.followUser(followUser = followUser)
+    override suspend fun followUser(followUser: FollowUser): NetworkResult<FollowResponse> {
+        return safeApiCall { api.followUser(followUser = followUser) }
     }
 
-    override suspend fun unfollowUser(followUser: FollowUser): FollowResponse {
-        return api.unfollowUser(followUser = followUser)
+    override suspend fun unfollowUser(followUser: FollowUser): NetworkResult<FollowResponse> {
+        return safeApiCall { api.unfollowUser(followUser = followUser) }
     }
 
 }

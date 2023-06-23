@@ -17,6 +17,7 @@ package com.peterchege.blogger.domain.use_case
 
 import com.peterchege.blogger.core.api.requests.CommentBody
 import com.peterchege.blogger.core.api.responses.CommentResponse
+import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.core.util.Resource
 import com.peterchege.blogger.data.CommentRepositoryImpl
 import kotlinx.coroutines.flow.Flow
@@ -29,22 +30,22 @@ class PostCommentUseCase @Inject constructor(
     private val repository: CommentRepositoryImpl,
 ) {
     operator fun invoke(commentBody: CommentBody): Flow<Resource<CommentResponse>> = flow {
-        try {
-            emit(Resource.Loading<CommentResponse>())
-            val response = repository.postComment(commentBody)
-            emit(Resource.Success(response))
-        } catch (e: HttpException) {
-            emit(
-                Resource.Error<CommentResponse>(
-                    e.localizedMessage ?: "An unexpected error occurred"
+        emit(Resource.Loading<CommentResponse>())
+        val response = repository.postComment(commentBody)
+        when(response){
+            is NetworkResult.Success -> {
+                emit(Resource.Success(response.data))
+            }
+            is NetworkResult.Error -> {
+                emit(
+                    Resource.Error<CommentResponse>(
+                        response.message ?: "An unexpected error occurred"
+                    )
                 )
-            )
-
-        } catch (e: IOException) {
-            emit(Resource.Error<CommentResponse>("Could not reach server... Please check your internet connection"))
-
+            }
+            is NetworkResult.Exception -> {
+                emit(Resource.Error<CommentResponse>("Could not reach server... Please check your internet connection"))
+            }
         }
-
-
     }
 }

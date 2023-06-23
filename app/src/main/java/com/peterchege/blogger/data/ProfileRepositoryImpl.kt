@@ -17,17 +17,18 @@ package com.peterchege.blogger.data
 
 import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.api.responses.ProfileResponse
+import com.peterchege.blogger.core.api.safeApiCall
 import com.peterchege.blogger.core.di.IoDispatcher
+import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.domain.repository.ProfileRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
 class ProfileRepositoryImpl @Inject constructor(
     private val api: BloggerApi,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     ):ProfileRepository {
-    override suspend fun getProfile(username: String): ProfileResponse {
-        return api.getUserProfile(username = username)
+    override suspend fun getProfile(username: String): NetworkResult<ProfileResponse> {
+        return safeApiCall{ api.getUserProfile(username = username) }
     }
 
 }

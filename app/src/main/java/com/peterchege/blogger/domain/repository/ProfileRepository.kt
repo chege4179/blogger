@@ -16,8 +16,9 @@
 package com.peterchege.blogger.domain.repository
 
 import com.peterchege.blogger.core.api.responses.ProfileResponse
+import com.peterchege.blogger.core.util.NetworkResult
 
 interface ProfileRepository {
 
-    suspend fun getProfile(username: String): ProfileResponse
+    suspend fun getProfile(username: String):NetworkResult<ProfileResponse>
 }

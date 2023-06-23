@@ -26,8 +26,10 @@ import androidx.work.workDataOf
 import com.peterchege.blogger.R
 import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.util.Constants
+import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.core.util.UriToFile
 import com.peterchege.blogger.core.util.WorkerKeys
+import com.peterchege.blogger.domain.repository.PostRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -44,7 +46,7 @@ import kotlin.random.Random
 class UploadPostWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val api:BloggerApi,
+    private val postRepository: PostRepository,
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
@@ -54,8 +56,6 @@ class UploadPostWorker @AssistedInject constructor(
         val postedBy = inputData.getString("postedBy")
         val postedAt = inputData.getString("postedAt")
         val postedOn = inputData.getString("postedOn")
-
-
 
         startForegroundService(
             notificationTitle = "Uploading Post",
@@ -74,57 +74,64 @@ class UploadPostWorker @AssistedInject constructor(
 
         val requestBody: RequestBody = builder.build()
 
-        try {
-            val response = api.postImage(body = requestBody)
-            if (response.success) {
+        val response = postRepository.uploadPost(body = requestBody)
+        when(response){
+            is NetworkResult.Success -> {
+                if (response.data.success){
+                    startForegroundService(
+                        notificationTitle = "Post uploaded successfully",
+                        notificationInfo = "Your post has been uploaded successfully"
+                    )
+                    return Result.success(
+                        workDataOf(
+                            WorkerKeys.MSG to response.data.msg,
+                            WorkerKeys.IS_LOADING to false,
+                            WorkerKeys.SUCCESS to response.data.success
+                        )
+                    )
+                }
+
+            }
+            is NetworkResult.Error -> {
                 startForegroundService(
-                    notificationTitle = "Post uploaded successfully",
-                    notificationInfo = "Your post has been uploaded successfully"
+                    notificationTitle = "Upload Failed !!",
+                    notificationInfo = "Could not reach server at the moment"
                 )
-                Result.success(
+                return Result.failure(
                     workDataOf(
-                        WorkerKeys.MSG to response.msg,
+                        WorkerKeys.MSG to "Could not reach server at the moment",
                         WorkerKeys.IS_LOADING to false,
-                        WorkerKeys.SUCCESS to response.success
+                        WorkerKeys.SUCCESS to false
+
                     )
                 )
             }
-
-        } catch (e: HttpException) {
-            startForegroundService(
-                notificationTitle = "Upload Failed !!",
-                notificationInfo = "Could not reach server at the moment"
-            )
-            Result.failure(
-                workDataOf(
-                    WorkerKeys.MSG to "Could not reach server at the moment",
-                    WorkerKeys.IS_LOADING to false,
-                    WorkerKeys.SUCCESS to false
-
+            is NetworkResult.Exception -> {
+                startForegroundService(
+                    notificationTitle = "Upload Failed !!",
+                    notificationInfo = "The server is down ....Please try again later"
                 )
-            )
-
-        } catch (e: IOException) {
-            startForegroundService(
-                notificationTitle = "Upload Failed !!",
-                notificationInfo = "The server is down ....Please try again later"
-            )
-            Result.failure(
-                workDataOf(
-                    WorkerKeys.MSG to "The server is down ....Please try again later",
-                    WorkerKeys.IS_LOADING to false,
-                    WorkerKeys.SUCCESS to false
+                return Result.failure(
+                    workDataOf(
+                        WorkerKeys.MSG to "The server is down ....Please try again later",
+                        WorkerKeys.IS_LOADING to false,
+                        WorkerKeys.SUCCESS to false
+                    )
                 )
-            )
-
+            }
         }
         startForegroundService(
             notificationTitle = "Upload Failed !!",
             notificationInfo = "Unknown error"
         )
         return Result.failure(
-            workDataOf(WorkerKeys.MSG to "Unknown error")
+            workDataOf(
+                WorkerKeys.MSG to "The server is down ....Please try again later",
+                WorkerKeys.IS_LOADING to false,
+                WorkerKeys.SUCCESS to false
+            )
         )
+
 
 
     }

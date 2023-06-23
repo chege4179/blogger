@@ -59,7 +59,7 @@ fun SearchScreen(
             .padding(10.dp),
         topBar = {
             Row(
-                Modifier
+                modifier = Modifier
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = CenterVertically

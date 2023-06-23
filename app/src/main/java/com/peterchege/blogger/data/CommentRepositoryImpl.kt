@@ -18,14 +18,16 @@ package com.peterchege.blogger.data
 import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.api.requests.CommentBody
 import com.peterchege.blogger.core.api.responses.CommentResponse
+import com.peterchege.blogger.core.api.safeApiCall
+import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.domain.repository.CommentRepository
 import javax.inject.Inject
 
 class CommentRepositoryImpl @Inject constructor (
     private val api: BloggerApi
 ):CommentRepository {
-    override suspend fun postComment(commentBody: CommentBody): CommentResponse {
-        return api.postComment(commentbody = commentBody)
+    override suspend fun postComment(commentBody: CommentBody): NetworkResult<CommentResponse> {
+        return safeApiCall { api.postComment(commentbody = commentBody) }
     }
 
 }

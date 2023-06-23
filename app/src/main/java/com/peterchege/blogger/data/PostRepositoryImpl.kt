@@ -26,6 +26,7 @@ import com.peterchege.blogger.core.di.IoDispatcher
 import com.peterchege.blogger.core.room.database.BloggerDatabase
 import com.peterchege.blogger.core.room.entities.PostRecord
 import com.peterchege.blogger.core.room.entities.PostRecordWithCommentsLikesViews
+import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.data.local.posts.cached_posts.CachedPostsDataSource
 import com.peterchege.blogger.data.local.posts.saved_posts.SavedPostsDataSource
 import com.peterchege.blogger.data.remote.posts.RemotePostsDataSource
@@ -34,6 +35,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import okhttp3.RequestBody
 import javax.inject.Inject
 
 class PostRepositoryImpl @Inject constructor(
@@ -46,36 +48,40 @@ class PostRepositoryImpl @Inject constructor(
         return cachedPostsDataSource.getCachedPosts()
     }
 
-    override suspend fun uploadPost(postBody: PostBody): UploadPostResponse {
-        return remotePostsDataSource.uploadPost(postBody = postBody)
+    override suspend fun uploadPost(body: RequestBody): NetworkResult<UploadPostResponse> {
+        return remotePostsDataSource.uploadPost(body= body)
     }
 
-    override suspend fun getPostById(postId: String): Post? {
+    override suspend fun getPostById(postId: String): NetworkResult<PostResponse> {
         return remotePostsDataSource.getPostById(postId = postId)
     }
 
-    override suspend fun deletePostFromApi(postId: String): DeleteResponse {
+    override suspend fun deletePostFromApi(postId: String): NetworkResult<DeleteResponse> {
         return remotePostsDataSource.deletePostFromApi(postId = postId)
     }
 
-    override suspend fun addView(viewer: Viewer): ViewResponse {
+    override suspend fun addView(viewer: Viewer): NetworkResult<ViewResponse> {
         return remotePostsDataSource.addView(viewer = viewer)
     }
 
-    override suspend fun likePost(likePost: LikePost): LikeResponse {
+    override suspend fun likePost(likePost: LikePost): NetworkResult<LikeResponse> {
         return remotePostsDataSource.likePost(likePost = likePost)
     }
 
-    override suspend fun unlikePost(likePost: LikePost): LikeResponse {
+    override suspend fun unlikePost(likePost: LikePost): NetworkResult<LikeResponse> {
         return remotePostsDataSource.unlikePost(likePost = likePost)
     }
 
-    override suspend fun followUser(followUser: FollowUser): FollowResponse {
+    override suspend fun followUser(followUser: FollowUser): NetworkResult<FollowResponse> {
         return remotePostsDataSource.followUser(followUser = followUser)
     }
 
-    override suspend fun unfollowUser(followUser: FollowUser): FollowResponse {
+    override suspend fun unfollowUser(followUser: FollowUser): NetworkResult<FollowResponse> {
         return remotePostsDataSource.unfollowUser(followUser = followUser)
+    }
+
+    override suspend fun searchPosts(searchTerm: String): NetworkResult<SearchPostResponse> {
+        return remotePostsDataSource.searchPosts(searchTerm = searchTerm)
     }
 
     override suspend fun insertSavedPost(post: Post) = withContext(ioDispatcher) {

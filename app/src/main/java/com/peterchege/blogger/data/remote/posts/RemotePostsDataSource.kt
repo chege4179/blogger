@@ -24,27 +24,33 @@ import com.peterchege.blogger.core.api.responses.DeleteResponse
 import com.peterchege.blogger.core.api.responses.FollowResponse
 import com.peterchege.blogger.core.api.responses.LikeResponse
 import com.peterchege.blogger.core.api.responses.Post
+import com.peterchege.blogger.core.api.responses.PostResponse
+import com.peterchege.blogger.core.api.responses.SearchPostResponse
 import com.peterchege.blogger.core.api.responses.UploadPostResponse
 import com.peterchege.blogger.core.api.responses.ViewResponse
+import com.peterchege.blogger.core.util.NetworkResult
+import okhttp3.RequestBody
 
 interface RemotePostsDataSource {
 
-    suspend fun getAllPosts(): AllPostsResponse
+    suspend fun getAllPosts(): NetworkResult<AllPostsResponse>
 
-    suspend fun uploadPost(postBody: PostBody): UploadPostResponse
+    suspend fun uploadPost(body: RequestBody):NetworkResult<UploadPostResponse>
 
-    suspend fun getPostById(postId: String): Post?
+    suspend fun getPostById(postId: String): NetworkResult<PostResponse>
 
-    suspend fun deletePostFromApi(postId: String): DeleteResponse
+    suspend fun deletePostFromApi(postId: String): NetworkResult<DeleteResponse>
 
-    suspend fun addView(viewer: Viewer): ViewResponse
+    suspend fun searchPosts(searchTerm:String):NetworkResult<SearchPostResponse>
 
-    suspend fun likePost(likePost: LikePost): LikeResponse
+    suspend fun addView(viewer: Viewer): NetworkResult<ViewResponse>
+
+    suspend fun likePost(likePost: LikePost):NetworkResult<LikeResponse>
 
 
-    suspend fun unlikePost(likePost: LikePost): LikeResponse
+    suspend fun unlikePost(likePost: LikePost):NetworkResult<LikeResponse>
 
-    suspend fun followUser(followUser: FollowUser): FollowResponse
+    suspend fun followUser(followUser: FollowUser):NetworkResult<FollowResponse>
 
-    suspend fun unfollowUser(followUser: FollowUser): FollowResponse
+    suspend fun unfollowUser(followUser: FollowUser):NetworkResult<FollowResponse>
 }

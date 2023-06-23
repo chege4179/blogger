@@ -22,27 +22,31 @@ import com.peterchege.blogger.core.api.requests.Viewer
 import com.peterchege.blogger.core.api.responses.*
 import com.peterchege.blogger.core.room.entities.PostRecord
 import com.peterchege.blogger.core.room.entities.PostRecordWithCommentsLikesViews
+import com.peterchege.blogger.core.util.NetworkResult
 import kotlinx.coroutines.flow.Flow
+import okhttp3.RequestBody
 
 interface PostRepository {
 
     fun getAllPosts():Flow<List<Post>>
 
-    suspend fun uploadPost(postBody: PostBody): UploadPostResponse
+    suspend fun uploadPost(body: RequestBody):NetworkResult<UploadPostResponse>
 
-    suspend fun getPostById(postId: String): Post?
+    suspend fun getPostById(postId: String):NetworkResult<PostResponse>
 
-    suspend fun deletePostFromApi(postId: String): DeleteResponse
+    suspend fun deletePostFromApi(postId: String):NetworkResult<DeleteResponse>
 
-    suspend fun addView(viewer: Viewer): ViewResponse
+    suspend fun addView(viewer: Viewer):NetworkResult<ViewResponse>
 
-    suspend fun likePost(likePost: LikePost): LikeResponse
+    suspend fun likePost(likePost: LikePost):NetworkResult<LikeResponse>
 
-    suspend fun unlikePost(likePost: LikePost): LikeResponse
+    suspend fun unlikePost(likePost: LikePost):NetworkResult<LikeResponse>
 
-    suspend fun followUser(followUser: FollowUser): FollowResponse
+    suspend fun followUser(followUser: FollowUser):NetworkResult<FollowResponse>
 
-    suspend fun unfollowUser(followUser: FollowUser): FollowResponse
+    suspend fun unfollowUser(followUser: FollowUser):NetworkResult<FollowResponse>
+
+    suspend fun searchPosts(searchTerm:String):NetworkResult<SearchPostResponse>
 
 
     suspend fun insertSavedPost(post: Post)

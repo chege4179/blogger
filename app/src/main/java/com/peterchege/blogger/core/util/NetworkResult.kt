@@ -13,13 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.domain.repository
+package com.peterchege.blogger.core.util
 
-import com.peterchege.blogger.core.api.requests.CommentBody
-import com.peterchege.blogger.core.api.responses.CommentResponse
-import com.peterchege.blogger.core.util.NetworkResult
-
-interface CommentRepository {
-
-    suspend fun postComment(commentBody: CommentBody):NetworkResult<CommentResponse>
+sealed class NetworkResult<T : Any> {
+    class Success<T: Any>(val data: T) : NetworkResult<T>()
+    class Error<T: Any>(val code: Int, val message: String?) : NetworkResult<T>()
+    class Exception<T: Any>(val e: Throwable) : NetworkResult<T>()
 }

@@ -15,44 +15,30 @@
  */
 package com.peterchege.blogger.presentation.screens.login
 
-import android.content.Context
-import android.content.SharedPreferences
-import android.util.Log
-import androidx.compose.material.ScaffoldState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.peterchege.blogger.core.api.requests.LoginUser
 import com.peterchege.blogger.core.util.*
 import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.NetworkInfoRepository
 import com.peterchege.blogger.domain.repository.NetworkStatus
-import com.peterchege.blogger.domain.use_case.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import retrofit2.HttpException
-import java.io.IOException
 import javax.inject.Inject
 
 data class LoginFormState(
-    val username:String = "",
-    val password:String = "",
-    val isPasswordVisible:Boolean = false,
-    val isLoading: Boolean=false,
+    val username: String = "",
+    val password: String = "",
+    val isPasswordVisible: Boolean = false,
+    val isLoading: Boolean = false,
 )
 
 @HiltViewModel
@@ -75,7 +61,6 @@ class LoginScreenViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
 
-
     fun onChangePasswordVisibility() {
         val initialState = _uiState.value.isPasswordVisible
         _uiState.value = _uiState.value.copy(isPasswordVisible = !initialState)
@@ -89,6 +74,7 @@ class LoginScreenViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(password = text)
 
     }
+
     fun initiateLogin() {
         viewModelScope.launch {
             try {
@@ -105,28 +91,42 @@ class LoginScreenViewModel @Inject constructor(
                         password = password.trim(),
                         token = token!!
                     )
-                    try {
-                        val response = repository.loginUser(loginUser)
-                        _uiState.value = _uiState.value.copy(isLoading = false)
-                        if (!response.success) {
-                            _eventFlow.emit(UiEvent.ShowSnackbar(message =response.msg))
-                        }
-                        if (response.success) {
-                            response.user?.let {
-                                repository.setLoggedInUser(user = it)
+                    val response = repository.loginUser(loginUser)
+                    when (response) {
+                        is NetworkResult.Success -> {
+                            _uiState.value = _uiState.value.copy(isLoading = false)
+                            if (!response.data.success) {
+                                _eventFlow.emit(UiEvent.ShowSnackbar(message = response.data.msg))
                             }
-                            _eventFlow.emit(UiEvent.Navigate(route = Screens.DASHBOARD_SCREEN))
+                            if (response.data.success) {
+                                response.data.user?.let {
+                                    repository.setLoggedInUser(user = it)
+                                }
+                                _eventFlow.emit(UiEvent.Navigate(route = Screens.DASHBOARD_SCREEN))
+                            }
                         }
-                    } catch (e: HttpException) {
-                        _uiState.value = _uiState.value.copy(isLoading = false)
-                        _eventFlow.emit(UiEvent.ShowSnackbar(message = "Server error...Please again later"))
 
-                    } catch (e: IOException) {
-                        _uiState.value = _uiState.value.copy(isLoading = false)
-                        _eventFlow.emit(UiEvent.ShowSnackbar(message = "Could not connect to the server... Please try again"))
+                        is NetworkResult.Error -> {
+                            _eventFlow.emit(
+                                UiEvent.ShowSnackbar(
+                                    message = response.message ?: "An unexpected error occurred"
+                                )
+                            )
+                        }
+
+                        is NetworkResult.Exception -> {
+                            _eventFlow.emit(
+                                UiEvent.ShowSnackbar(
+                                    message = response.e.message ?: "An unexpected exception occurred"
+                                )
+                            )
+                        }
+
                     }
+
+
                 }
-            }catch (e:Exception){
+            } catch (e: Exception) {
                 _eventFlow.emit(UiEvent.ShowSnackbar(message = "Unexpected error "))
             }
         }

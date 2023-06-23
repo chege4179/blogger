@@ -16,6 +16,7 @@
 package com.peterchege.blogger.domain.use_case
 
 import com.peterchege.blogger.core.api.responses.ProfileResponse
+import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.core.util.Resource
 import com.peterchege.blogger.domain.repository.ProfileRepository
 import kotlinx.coroutines.flow.Flow
@@ -30,24 +31,22 @@ class GetProfileUseCase @Inject constructor(
     ) {
 
     operator fun invoke(username: String): Flow<Resource<ProfileResponse>> = flow {
-        try {
-            emit(Resource.Loading<ProfileResponse>())
-
-            val profileResponse = repository.getProfile(username)
-            if (profileResponse.success) {
-                emit(Resource.Success(profileResponse))
-            } else {
-                emit(Resource.Error<ProfileResponse>("User could not be found"))
+        emit(Resource.Loading<ProfileResponse>())
+        val profileResponse = repository.getProfile(username)
+        when(profileResponse){
+            is NetworkResult.Success -> {
+                if (profileResponse.data.success) {
+                    emit(Resource.Success(profileResponse.data))
+                } else {
+                    emit(Resource.Error<ProfileResponse>("User could not be found"))
+                }
             }
-
-        } catch (e: HttpException) {
-            emit(Resource.Error<ProfileResponse>(e.localizedMessage ?: "Server error"))
-
-        } catch (e: IOException) {
-            emit(Resource.Error<ProfileResponse>("Could not reach server"))
-
+            is NetworkResult.Error -> {
+                emit(Resource.Error<ProfileResponse>(profileResponse.message ?: "Server error"))
+            }
+            is NetworkResult.Exception -> {
+                emit(Resource.Error<ProfileResponse>("Could not reach server"))
+            }
         }
-
-
     }
 }
