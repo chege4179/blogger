@@ -47,12 +47,12 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.6"
-        kotlinCompilerVersion = "1.5.21"
+        kotlinCompilerExtensionVersion = "1.4.7"
+
     }
     packagingOptions {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes.add("/META-INF/**")
         }
     }
     namespace = "com.peterchege.blogger"
@@ -83,9 +83,11 @@ dependencies {
 
     // retrofit
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation ("com.squareup.retrofit2:converter-moshi:2.4.0")
+    implementation ("com.squareup.retrofit2:converter-moshi:2.9.0")
     implementation ("com.squareup.okhttp3:okhttp:5.0.0-alpha.2")
     implementation ("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2")
+    implementation ("com.squareup.retrofit2:retrofit-mock:2.9.0")
+    implementation ("com.squareup.okhttp3:mockwebserver:4.11.0")
 
     // view model
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
@@ -98,25 +100,19 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
 
     // dagger hilt
-    implementation ("com.google.dagger:hilt-android:2.45")
-    kapt ("com.google.dagger:hilt-android-compiler:2.45")
+    implementation ("com.google.dagger:hilt-android:2.46.1")
+    kapt ("com.google.dagger:hilt-android-compiler:2.46.1")
     kapt ("androidx.hilt:hilt-compiler:1.0.0")
     implementation ("androidx.hilt:hilt-navigation-compose:1.0.0")
-    implementation ("androidx.navigation:navigation-compose:2.5.3")
-
+    implementation ("androidx.navigation:navigation-compose:2.6.0")
 
     // coil
     implementation ("io.coil-kt:coil-compose:2.3.0")
 
-    //fcm
-    implementation ("com.google.firebase:firebase-messaging:23.1.2")
-
     // room 
-    implementation ("androidx.room:room-runtime:2.5.1")
-    ksp ("androidx.room:room-compiler:2.5.1")
-
-    // Kotlin Extensions and Coroutines support for Room
-    implementation ("androidx.room:room-ktx:2.5.1")
+    implementation ("androidx.room:room-runtime:2.5.2")
+    ksp ("androidx.room:room-compiler:2.5.2")
+    implementation ("androidx.room:room-ktx:2.5.2")
 
     // material icons extended
     implementation ("androidx.compose.material:material-icons-extended:1.5.0-beta01")
@@ -139,14 +135,15 @@ dependencies {
 
 
     implementation ("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5")
-    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
 
     implementation("androidx.work:work-runtime-ktx:2.8.1")
     implementation("androidx.hilt:hilt-work:1.0.0")
 
     implementation ("com.google.firebase:firebase-crashlytics-ktx:18.3.7")
-    implementation ("com.google.firebase:firebase-analytics-ktx:21.2.2")
+    implementation ("com.google.firebase:firebase-analytics-ktx:21.3.0")
+    implementation ("com.google.firebase:firebase-messaging:23.1.2")
 
     implementation("com.github.skydoves:sealedx-core:1.0.1")
     ksp("com.github.skydoves:sealedx-processor:1.0.1")
@@ -161,6 +158,9 @@ dependencies {
 
 
     implementation ("androidx.core:core-splashscreen:1.0.1")
+
+    testImplementation ("io.mockk:mockk:1.13.5")
+    androidTestImplementation ("io.mockk:mockk-android:1.13.4")
 
 }
 
