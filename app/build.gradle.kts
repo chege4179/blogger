@@ -10,13 +10,13 @@ plugins {
 }
 
 android {
-    compileSdk = 33
+    compileSdk = 34
 
 
     defaultConfig {
         applicationId = "com.peterchege.blogger"
         minSdk = 21
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName= "1.0"
 
@@ -67,17 +67,17 @@ dependencies {
     implementation ("androidx.core:core-ktx:1.10.1")
     implementation ("androidx.appcompat:appcompat:1.6.1")
     implementation ("com.google.android.material:material:1.9.0")
-    implementation ("androidx.compose.ui:ui:1.5.0-beta01")
-    implementation ("androidx.compose.material:material:1.5.0-beta01")
-    implementation ("androidx.compose.ui:ui-tooling-preview:1.5.0-beta01")
+    implementation ("androidx.compose.ui:ui:1.6.0-alpha02")
+    implementation ("androidx.compose.material:material:1.6.0-alpha01")
+    implementation ("androidx.compose.ui:ui-tooling-preview:1.6.0-alpha02")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
     implementation ("androidx.activity:activity-compose:1.7.2")
     implementation("androidx.hilt:hilt-common:1.0.0")
     testImplementation ("junit:junit:4.13.2")
     androidTestImplementation ("androidx.test.ext:junit:1.1.5")
     androidTestImplementation ("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:1.5.0-beta01")
-    debugImplementation ("androidx.compose.ui:ui-tooling:1.5.0-beta01")
+    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:1.6.0-alpha02")
+    debugImplementation ("androidx.compose.ui:ui-tooling:1.6.0-alpha02")
 
 
 
@@ -96,8 +96,8 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
 
     //coroutines
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.2")
 
     // dagger hilt
     implementation ("com.google.dagger:hilt-android:2.46.1")
@@ -107,7 +107,7 @@ dependencies {
     implementation ("androidx.navigation:navigation-compose:2.6.0")
 
     // coil
-    implementation ("io.coil-kt:coil-compose:2.3.0")
+    implementation ("io.coil-kt:coil-compose:2.4.0")
 
     // room 
     implementation ("androidx.room:room-runtime:2.5.2")
@@ -115,7 +115,7 @@ dependencies {
     implementation ("androidx.room:room-ktx:2.5.2")
 
     // material icons extended
-    implementation ("androidx.compose.material:material-icons-extended:1.5.0-beta01")
+    implementation ("androidx.compose.material:material-icons-extended:1.6.0-alpha01")
 
     //glide
     implementation ("dev.chrisbanes.accompanist:accompanist-glide:0.5.1")
@@ -127,7 +127,7 @@ dependencies {
     // landscapist
     implementation ("com.github.skydoves:landscapist-glide:2.1.8")
 
-    implementation ("com.google.accompanist:accompanist-flowlayout:0.28.0")
+    implementation ("com.google.accompanist:accompanist-flowlayout:0.30.1")
 
     // datastore (core and preferences)
     implementation ("androidx.datastore:datastore:1.0.0")
@@ -141,9 +141,9 @@ dependencies {
     implementation("androidx.work:work-runtime-ktx:2.8.1")
     implementation("androidx.hilt:hilt-work:1.0.0")
 
-    implementation ("com.google.firebase:firebase-crashlytics-ktx:18.3.7")
+    implementation ("com.google.firebase:firebase-crashlytics-ktx:18.4.0")
     implementation ("com.google.firebase:firebase-analytics-ktx:21.3.0")
-    implementation ("com.google.firebase:firebase-messaging:23.1.2")
+    implementation ("com.google.firebase:firebase-messaging:23.2.0")
 
     implementation("com.github.skydoves:sealedx-core:1.0.1")
     ksp("com.github.skydoves:sealedx-processor:1.0.1")
@@ -160,7 +160,7 @@ dependencies {
     implementation ("androidx.core:core-splashscreen:1.0.1")
 
     testImplementation ("io.mockk:mockk:1.13.5")
-    androidTestImplementation ("io.mockk:mockk-android:1.13.4")
+    androidTestImplementation ("io.mockk:mockk-android:1.13.5")
 
 }
 

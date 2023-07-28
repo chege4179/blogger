@@ -23,6 +23,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.peterchege.blogger.core.analytics.analytics.AnalyticsHelper
+import com.peterchege.blogger.core.analytics.analytics.logLogOutEvent
 import com.peterchege.blogger.core.api.requests.LogoutUser
 import com.peterchege.blogger.core.api.responses.Post
 import com.peterchege.blogger.core.api.responses.User
@@ -39,10 +41,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileScreenViewModel @Inject constructor(
-
     private val logoutUseCase: LogoutUseCase,
     private val profileUseCase: GetProfileUseCase,
     private val authRepository: AuthRepository,
+    private val analyticsHelper: AnalyticsHelper,
 ) : ViewModel() {
 
 
@@ -111,6 +113,7 @@ class ProfileScreenViewModel @Inject constructor(
         logoutUseCase(logoutUser).onEach { result ->
             when (result) {
                 is Resource.Success -> {
+                    analyticsHelper.logLogOutEvent(username = username)
                     authRepository.unsetLoggedInUser()
                     navController.navigate(Screens.LOGIN_SCREEN)
                 }

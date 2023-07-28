@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.core.api.responses
+package com.peterchege.blogger.core.analytics.analytics
 
-import kotlinx.serialization.Serializable
+import com.peterchege.blogger.core.analytics.analytics.AnalyticsEvent
 
-@Serializable
-data class LogoutResponse (
-    val msg:String,
-    val success:Boolean,
-    )
+/**
+ * Interface for logging analytics events. See `FirebaseAnalyticsHelper` and
+ * `StubAnalyticsHelper` for implementations.
+ */
+interface AnalyticsHelper {
+    fun logEvent(event: AnalyticsEvent)
+}

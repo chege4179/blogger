@@ -22,13 +22,11 @@ import android.os.Build
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import androidx.work.WorkManager
-import androidx.work.WorkerFactory
 import com.peterchege.blogger.BuildConfig
-import com.peterchege.blogger.core.crashlytics.CrashlyticsTree
+import com.peterchege.blogger.core.analytics.crashlytics.CrashlyticsTree
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.work.WorkConstants
 import dagger.hilt.android.HiltAndroidApp
-import org.jetbrains.annotations.NotNull
 import timber.log.Timber
 import javax.inject.Inject
 

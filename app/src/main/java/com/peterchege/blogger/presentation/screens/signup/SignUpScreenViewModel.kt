@@ -17,6 +17,8 @@ package com.peterchege.blogger.presentation.screens.signup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.peterchege.blogger.core.analytics.analytics.AnalyticsHelper
+import com.peterchege.blogger.core.analytics.analytics.logSignUpEvent
 import com.peterchege.blogger.core.api.requests.SignUpUser
 import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.core.util.Screens
@@ -46,6 +48,7 @@ data class SignUpFormState(
 @HiltViewModel
 class SignUpScreenViewModel @Inject constructor(
     private val signUpRepository: AuthRepository,
+    private val analyticsHelper: AnalyticsHelper,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SignUpFormState())
@@ -106,6 +109,7 @@ class SignUpScreenViewModel @Inject constructor(
                         _uiState.value = _uiState.value.copy(isLoading = false)
                         _eventFlow.emit(UiEvent.ShowSnackbar(message = signUpResponse.data.msg))
                         if (signUpResponse.data.success) {
+                            analyticsHelper.logSignUpEvent(email = _uiState.value.email)
                             _eventFlow.emit(UiEvent.Navigate(route = Screens.LOGIN_SCREEN))
 
                         }

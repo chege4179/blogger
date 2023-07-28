@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.core.crashlytics
+package com.peterchege.blogger.core.analytics.crashlytics
 
 import android.util.Log
 import com.google.firebase.crashlytics.FirebaseCrashlytics

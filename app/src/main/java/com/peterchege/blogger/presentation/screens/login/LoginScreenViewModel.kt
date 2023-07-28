@@ -18,6 +18,8 @@ package com.peterchege.blogger.presentation.screens.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.messaging.FirebaseMessaging
+import com.peterchege.blogger.core.analytics.analytics.AnalyticsHelper
+import com.peterchege.blogger.core.analytics.analytics.logLoginEvent
 import com.peterchege.blogger.core.api.requests.LoginUser
 import com.peterchege.blogger.core.util.*
 import com.peterchege.blogger.domain.repository.AuthRepository
@@ -44,7 +46,8 @@ data class LoginFormState(
 @HiltViewModel
 class LoginScreenViewModel @Inject constructor(
     private val repository: AuthRepository,
-    private val networkInfoRepository: NetworkInfoRepository
+    private val networkInfoRepository: NetworkInfoRepository,
+    private val analyticsHelper: AnalyticsHelper,
 ) : ViewModel() {
 
     val networkStatus = networkInfoRepository.networkStatus
@@ -96,6 +99,7 @@ class LoginScreenViewModel @Inject constructor(
                         is NetworkResult.Success -> {
                             _uiState.value = _uiState.value.copy(isLoading = false)
                             if (!response.data.success) {
+                                analyticsHelper.logLoginEvent(username = _uiState.value.username)
                                 _eventFlow.emit(UiEvent.ShowSnackbar(message = response.data.msg))
                             }
                             if (response.data.success) {
