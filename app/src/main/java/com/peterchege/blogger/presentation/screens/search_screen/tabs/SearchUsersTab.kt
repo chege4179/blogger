@@ -29,7 +29,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.annotation.ExperimentalCoilApi
+import com.peterchege.blogger.presentation.components.ErrorComponent
+import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.components.ProfileCard
+import com.peterchege.blogger.presentation.screens.search_screen.SearchScreenUiState
 import com.peterchege.blogger.presentation.screens.search_screen.SearchScreenViewModel
 
 @OptIn(ExperimentalCoilApi::class)
@@ -37,8 +40,7 @@ import com.peterchege.blogger.presentation.screens.search_screen.SearchScreenVie
 @Composable
 fun SearchUsersTab(
     navHostController: NavHostController,
-
-    viewModel: SearchScreenViewModel = hiltViewModel()
+    uiState: SearchScreenUiState,
 ) {
 
     Scaffold(
@@ -47,45 +49,38 @@ fun SearchUsersTab(
             .padding(6.dp)
 
     ) {
-        if (viewModel.isLoading.value) {
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        when (uiState) {
+            is SearchScreenUiState.Idle -> {
+
             }
 
-        } else {
-            if (viewModel.searchUser.value.isEmpty()) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = "No users found")
-                }
-            } else {
+            is SearchScreenUiState.Searching -> {
+                LoadingComponent()
+            }
+
+            is SearchScreenUiState.Error -> {
+                ErrorComponent(
+                    retryCallback = { /*TODO*/ },
+                    errorMessage = uiState.message
+                )
+            }
+
+            is SearchScreenUiState.ResultsFound -> {
+                val searchUsers = uiState.users
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(top = 10.dp)
                 ) {
-                    items(viewModel.searchUser.value) { user ->
+                    items(items = searchUsers) { user ->
                         ProfileCard(
                             navController = navHostController,
                             user = user,
-                            onProfileNavigate = {
-                                viewModel.onProfileNavigate(
-                                    it,
-                                    navHostController,
-                                    navHostController
-                                )
-                            }
+                            onProfileNavigate = {}
                         )
                     }
                 }
             }
         }
-
-
     }
 }

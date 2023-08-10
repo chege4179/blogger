@@ -25,6 +25,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.google.accompanist.pager.*
 import com.peterchege.blogger.core.util.Constants
@@ -43,13 +45,35 @@ import com.peterchege.blogger.presentation.theme.MainWhiteColor
 import com.peterchege.blogger.presentation.theme.testColor
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalPagerApi::class)
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun SearchScreen(
     navController: NavHostController,
     viewModel: SearchScreenViewModel = hiltViewModel()
+){
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+
+
+    SearchScreenContent(
+        uiState = uiState,
+        searchQuery = searchQuery,
+        onChangeSearchQuery = viewModel::onChangeSearchTerm,
+        navController = navController
+    )
+
+}
+
+
+@OptIn(ExperimentalPagerApi::class)
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@Composable
+fun SearchScreenContent(
+    uiState: SearchScreenUiState,
+    searchQuery:String,
+    onChangeSearchQuery:(String) -> Unit,
+    navController: NavHostController,
 ) {
+
     val scaffoldState = rememberScaffoldState()
 
     Scaffold(
@@ -65,9 +89,9 @@ fun SearchScreen(
                 verticalAlignment = CenterVertically
             ) {
                 TextField(
-                    value = viewModel.searchTerm.value,
+                    value = searchQuery,
                     onValueChange = {
-                        viewModel.onChangeSearchTerm(it)
+                        onChangeSearchQuery(it)
                     },
                     placeholder = {
                         Text(
@@ -140,8 +164,8 @@ fun SearchScreen(
             Tabs(pagerState = pagerState)
             TabsContent(
                 pagerState = pagerState,
-                navController = navController
-
+                navController = navController,
+                uiState = uiState,
             )
         }
     }
@@ -194,11 +218,11 @@ fun Tabs(pagerState: PagerState) {
 
 @ExperimentalPagerApi
 @Composable
-fun TabsContent(pagerState: PagerState, navController: NavHostController) {
+fun TabsContent(pagerState: PagerState, navController: NavHostController,uiState: SearchScreenUiState) {
     HorizontalPager(state = pagerState, count = 2) { page ->
         when (page) {
-            0 -> SearchPostsTab(navHostController = navController)
-            1 -> SearchUsersTab(navHostController = navController)
+            0 -> SearchPostsTab(navHostController = navController,uiState = uiState)
+            1 -> SearchUsersTab(navHostController = navController,uiState = uiState)
 
         }
     }

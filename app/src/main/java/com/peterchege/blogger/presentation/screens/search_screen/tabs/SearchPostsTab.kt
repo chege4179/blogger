@@ -31,14 +31,17 @@ import androidx.navigation.NavHostController
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.presentation.components.ArticleCard
+import com.peterchege.blogger.presentation.components.ErrorComponent
+import com.peterchege.blogger.presentation.components.LoadingComponent
+import com.peterchege.blogger.presentation.screens.dashboard.feed_screen.onProfileNavigate
+import com.peterchege.blogger.presentation.screens.search_screen.SearchScreenUiState
 import com.peterchege.blogger.presentation.screens.search_screen.SearchScreenViewModel
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun SearchPostsTab(
     navHostController: NavHostController,
-
-    viewModel: SearchScreenViewModel = hiltViewModel()
+    uiState: SearchScreenUiState,
 ) {
     Scaffold(
         modifier = Modifier
@@ -46,55 +49,52 @@ fun SearchPostsTab(
             .padding(6.dp)
 
     ) {
-        if (viewModel.isLoading.value) {
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        when(uiState){
+            is SearchScreenUiState.Idle -> {
+                
             }
-
-        } else {
-            if (viewModel.searchPosts.value.isEmpty()) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = "No posts found")
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 10.dp)
-                ) {
-                    items(viewModel.searchPosts.value) { post ->
-                        ArticleCard(
-                            post = post,
-                            onItemClick = {
-                                navHostController.navigate(Screens.POST_SCREEN + "/${post._id}/${Constants.API_SOURCE}")
-                            },
-                            onProfileNavigate = {
-                                viewModel.onProfileNavigate(
-                                    it,
-                                    navHostController,
-                                    navHostController
-                                )
-                            },
-                            onDeletePost = {
-
-                            },
-                            isLiked = false,
-                            isSaved = false,
-                            isProfile = false,
-                            profileImageUrl = "https://res.cloudinary.com/dhuqr5iyw/image/upload/v1640971757/mystory/profilepictures/default_y4mjwp.jpg"
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
+            is SearchScreenUiState.Searching -> {
+                LoadingComponent()
+            }
+            is SearchScreenUiState.Error -> {
+                ErrorComponent(
+                    retryCallback = { /*TODO*/ },
+                    errorMessage = uiState.message)
+            }
+            is SearchScreenUiState.ResultsFound -> {
+                val searchPosts = uiState.posts
+                if (searchPosts.isEmpty()) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(text = "No posts found")
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 10.dp)
+                    ) {
+                        items(items = searchPosts) { post ->
+                            ArticleCard(
+                                post = post,
+                                onItemClick = {
+                                    navHostController.navigate(Screens.POST_SCREEN + "/${post._id}/${Constants.API_SOURCE}")
+                                },
+                                onProfileNavigate = {},
+                                onDeletePost = {},
+                                isLiked = false,
+                                isSaved = false,
+                                isProfile = false,
+                                profileImageUrl = "https://res.cloudinary.com/dhuqr5iyw/image/upload/v1640971757/mystory/profilepictures/default_y4mjwp.jpg"
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
                     }
                 }
             }
         }
-
-
     }
 }
