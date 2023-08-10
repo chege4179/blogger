@@ -26,7 +26,7 @@ import com.skydoves.sealedx.core.annotations.ExtensiveSealed
 
 @ExtensiveSealed(
     models = [
-        ExtensiveModel(FeedScreenUi::class),
+
         ExtensiveModel(AuthorProfileScreenUi::class),
         ExtensiveModel(AuthorProfileFollowerFollowingUi::class),
         ExtensiveModel(NotificationScreenUi::class),

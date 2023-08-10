@@ -27,7 +27,7 @@ import com.peterchege.blogger.core.room.entities.PostCacheRecordWithCommentsLike
 import com.peterchege.blogger.core.room.entities.PostRecordWithCommentsLikesViews
 import com.peterchege.blogger.core.room.entities.ViewCacheEntity
 import com.peterchege.blogger.core.room.entities.ViewEntity
-
+import com.peterchege.blogger.domain.models.PostUI
 
 
 fun ViewEntity.toExternalModel(): View {
@@ -107,7 +107,41 @@ fun PostRecordWithCommentsLikesViews.toExternalModel():Post{
     )
 }
 
-
+fun Post.toDomain(
+    isLiked:Boolean,
+    isProfile:Boolean,
+    isSaved:Boolean,
+): PostUI {
+    return PostUI(
+        _id = _id,
+        postTitle = postTitle,
+        postBody = postBody,
+        imageUrl = imageUrl,
+        postedAt = postedAt,
+        postAuthor = postAuthor,
+        postedOn = postedOn,
+        views = views,
+        likes = likes,
+        comments = comments,
+        isLiked = isLiked,
+        isProfile = isProfile,
+        isSaved = isSaved
+    )
+}
+fun PostUI.toPost():Post{
+    return Post(
+        _id = _id,
+        postTitle = postTitle,
+        postBody = postBody,
+        imageUrl = imageUrl,
+        postedAt = postedAt,
+        postAuthor = postAuthor,
+        postedOn = postedOn,
+        views = views,
+        likes = likes,
+        comments = comments,
+    )
+}
 
 fun PostCacheRecordWithCommentsLikesViews.toExternalModel():Post{
     return Post(

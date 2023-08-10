@@ -16,24 +16,26 @@
 package com.peterchege.blogger.data
 
 
-import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.api.requests.FollowUser
 import com.peterchege.blogger.core.api.requests.LikePost
-import com.peterchege.blogger.core.api.requests.PostBody
 import com.peterchege.blogger.core.api.requests.Viewer
 import com.peterchege.blogger.core.api.responses.*
 import com.peterchege.blogger.core.di.IoDispatcher
-import com.peterchege.blogger.core.room.database.BloggerDatabase
-import com.peterchege.blogger.core.room.entities.PostRecord
 import com.peterchege.blogger.core.room.entities.PostRecordWithCommentsLikesViews
 import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.data.local.posts.cached_posts.CachedPostsDataSource
 import com.peterchege.blogger.data.local.posts.saved_posts.SavedPostsDataSource
 import com.peterchege.blogger.data.remote.posts.RemotePostsDataSource
+import com.peterchege.blogger.domain.models.PostUI
+import com.peterchege.blogger.domain.mappers.toDomain
+import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.PostRepository
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import okhttp3.RequestBody
 import javax.inject.Inject
@@ -42,18 +44,61 @@ class PostRepositoryImpl @Inject constructor(
     private val cachedPostsDataSource: CachedPostsDataSource,
     private val remotePostsDataSource: RemotePostsDataSource,
     private val savedPostsDataSource: SavedPostsDataSource,
+    private val authRepository:AuthRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ):PostRepository {
-    override fun getAllPosts():Flow<List<Post>> {
-        return cachedPostsDataSource.getCachedPosts()
+    override fun getAllPosts():Flow<List<PostUI>> {
+        val cachedPosts = cachedPostsDataSource.getCachedPosts()
+        val savedPostIds = savedPostsDataSource.getSavedPostIds()
+        val authUser = authRepository.getLoggedInUser()
+        return combine(cachedPosts,savedPostIds,authUser){ posts, ids,user ->
+            posts.map { post ->
+                post.toDomain(
+                    isLiked = post.likes.map { it.userId }.contains(user?._id),
+                    isSaved = ids.contains(post._id),
+                    isProfile = false
+                )
+            }
+
+        }
     }
 
     override suspend fun uploadPost(body: RequestBody): NetworkResult<UploadPostResponse> {
         return remotePostsDataSource.uploadPost(body= body)
     }
 
-    override suspend fun getPostById(postId: String): NetworkResult<PostResponse> {
-        return remotePostsDataSource.getPostById(postId = postId)
+    override fun getPostById(postId: String): Flow<Post?> = flow {
+        val cachedPost = cachedPostsDataSource.getCachedPostById(postId).first()
+        val savedPost = savedPostsDataSource.getPostFromRoom(postId).first()
+        if (cachedPost == null && savedPost == null){
+            val response = remotePostsDataSource.getPostById(postId = postId)
+            when(response){
+                is NetworkResult.Success -> {
+                    val remotePost = response.data.post
+                    emit(remotePost)
+                    if (remotePost != null){
+                        cachedPostsDataSource.insertCachedPosts(listOf(remotePost))
+                    }
+                }
+                is NetworkResult.Error -> {
+                    emit(null)
+                }
+                is NetworkResult.Exception -> {
+                    emit(null)
+                }
+            }
+
+        }else if(cachedPost == null){
+            emit(savedPost)
+
+        }else{
+            emit(cachedPost)
+        }
+    }
+
+    override fun getSavedPostIds(): Flow<List<String>> {
+        return savedPostsDataSource.getSavedPostIds()
+
     }
 
     override suspend fun deletePostFromApi(postId: String): NetworkResult<DeleteResponse> {
@@ -100,10 +145,9 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getSavedPost(postId: String): PostRecordWithCommentsLikesViews? {
-        return withContext(ioDispatcher){
-            savedPostsDataSource.getPostFromRoom(postId = postId)
-        }
+    override suspend fun getSavedPost(postId: String): Flow<Post?> {
+        return savedPostsDataSource.getPostFromRoom(postId = postId)
+
     }
 
     override fun getAllSavedPosts(): Flow<List<PostRecordWithCommentsLikesViews>> {

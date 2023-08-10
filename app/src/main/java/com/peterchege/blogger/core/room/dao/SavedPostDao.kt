@@ -32,7 +32,10 @@ interface SavedPostDao {
     fun getAllLocalPosts(): Flow<List<PostRecordWithCommentsLikesViews>>
 
     @Query("SELECT * FROM post WHERE _id = :id")
-    suspend fun getPostById(id: String): PostRecordWithCommentsLikesViews?
+    fun getPostById(id: String): Flow<PostRecordWithCommentsLikesViews?>
+
+    @Query("SELECT _id FROM post")
+    fun getSavedPostIds():Flow<List<String>>
 
 
     @Transaction

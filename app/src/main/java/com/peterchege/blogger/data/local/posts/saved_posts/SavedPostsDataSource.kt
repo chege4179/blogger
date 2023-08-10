@@ -25,7 +25,9 @@ interface SavedPostsDataSource {
 
     suspend fun deletePostById(id: String)
 
-    suspend fun getPostFromRoom(postId: String): PostRecordWithCommentsLikesViews?
+    fun getPostFromRoom(postId: String): Flow<Post?>
 
     fun getAllPostsFromRoom(): Flow<List<PostRecordWithCommentsLikesViews>>
+
+    fun getSavedPostIds():Flow<List<String>>
 }

@@ -46,6 +46,17 @@ class SyncFeedWorker @AssistedInject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) :CoroutineWorker(context,workerParams){
 
+    override suspend fun getForegroundInfo(): ForegroundInfo {
+        return ForegroundInfo(
+            Random.nextInt(),
+            NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL)
+                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setContentTitle("Syncing")
+                .build()
+
+        )
+    }
+
 
     override suspend fun doWork(): Result {
         startForegroundService(notificationInfo = "Syncing Feed .......")

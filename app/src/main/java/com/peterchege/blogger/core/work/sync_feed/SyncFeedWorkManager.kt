@@ -32,6 +32,7 @@ import com.peterchege.blogger.core.work.upload_post.UploadPostWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.conflate
+import timber.log.Timber
 import javax.inject.Inject
 
 interface SyncFeedWorkManager {
@@ -53,6 +54,7 @@ class SyncFeedWorkManagerImpl @Inject constructor(
         .conflate()
 
     override suspend fun startSync() {
+        Timber.d("Starting normal sync")
         val syncFeedRequest = OneTimeWorkRequestBuilder<SyncFeedWorker>()
             .setConstraints(
                 Constraints.Builder()
@@ -70,6 +72,23 @@ class SyncFeedWorkManagerImpl @Inject constructor(
         )
             .enqueue()
     }
+
+//    override  fun startExpeditedSyncWork(appContext: Context) {
+//        Timber.d("Started expedited work")
+//        val request = OneTimeWorkRequestBuilder<SyncFeedWorker>()
+//            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+//            .setConstraints(Constraints.Builder()
+//                .setRequiredNetworkType(
+//                    NetworkType.CONNECTED
+//                )
+//                .build())
+//            .build()
+//        WorkManager.getInstance(appContext).apply {
+//            enqueueUniqueWork(WorkConstants.syncFeedWorkName,
+//                ExistingWorkPolicy.KEEP,request)
+//        }
+//
+//    }
 
 
 }

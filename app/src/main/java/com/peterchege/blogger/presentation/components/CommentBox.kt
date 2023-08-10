@@ -40,7 +40,7 @@ import com.peterchege.blogger.core.util.Screens
 @Composable
 fun CommentBox(
     comment: Comment,
-    navController: NavController,
+
 ) {
     Box(
         modifier = Modifier
@@ -76,7 +76,7 @@ fun CommentBox(
                     modifier = Modifier
                         .padding(bottom = 5.dp)
                         .clickable {
-                            navController.navigate(Screens.AUTHOR_PROFILE_SCREEN + "/${comment.username}")
+//                            navController.navigate(Screens.AUTHOR_PROFILE_SCREEN + "/${comment.username}")
                         }
                 )
                 Box(

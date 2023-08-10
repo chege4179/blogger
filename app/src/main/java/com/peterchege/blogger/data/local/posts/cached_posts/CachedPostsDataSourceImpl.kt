@@ -21,6 +21,7 @@ import com.peterchege.blogger.core.room.database.BloggerDatabase
 import com.peterchege.blogger.domain.mappers.toExternalModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -37,8 +38,17 @@ class CachedPostsDataSourceImpl @Inject constructor(
         }
 
     }
+
+    override fun getCachedPostById(postId: String): Flow<Post?> {
+        return db.cachedPostDao.getCachedPostById(postId = postId)
+            .map { it?.toExternalModel() }
+            .flowOn(ioDispatcher)
+
+
+    }
     override fun getCachedPosts(): Flow<List<Post>> {
         return db.cachedPostDao.getAllLocalPosts().map { it.map { it.toExternalModel() } }
+            .flowOn(ioDispatcher)
     }
 
     override suspend fun deleteAllPostsFromCache() {

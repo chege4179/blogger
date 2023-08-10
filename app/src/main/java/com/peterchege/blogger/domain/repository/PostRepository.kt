@@ -17,22 +17,21 @@ package com.peterchege.blogger.domain.repository
 
 import com.peterchege.blogger.core.api.requests.FollowUser
 import com.peterchege.blogger.core.api.requests.LikePost
-import com.peterchege.blogger.core.api.requests.PostBody
 import com.peterchege.blogger.core.api.requests.Viewer
 import com.peterchege.blogger.core.api.responses.*
-import com.peterchege.blogger.core.room.entities.PostRecord
 import com.peterchege.blogger.core.room.entities.PostRecordWithCommentsLikesViews
 import com.peterchege.blogger.core.util.NetworkResult
+import com.peterchege.blogger.domain.models.PostUI
 import kotlinx.coroutines.flow.Flow
 import okhttp3.RequestBody
 
 interface PostRepository {
 
-    fun getAllPosts():Flow<List<Post>>
+    fun getAllPosts():Flow<List<PostUI>>
 
     suspend fun uploadPost(body: RequestBody):NetworkResult<UploadPostResponse>
 
-    suspend fun getPostById(postId: String):NetworkResult<PostResponse>
+    fun getPostById(postId: String):Flow<Post?>
 
     suspend fun deletePostFromApi(postId: String):NetworkResult<DeleteResponse>
 
@@ -55,7 +54,9 @@ interface PostRepository {
 
     suspend fun deleteSavedPostById(id: String)
 
-    suspend fun getSavedPost(postId: String): PostRecordWithCommentsLikesViews?
+    suspend fun getSavedPost(postId: String): Flow<Post?>
+
+    fun getSavedPostIds():Flow<List<String>>
 
 
     fun getAllSavedPosts(): Flow<List<PostRecordWithCommentsLikesViews>>

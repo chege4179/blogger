@@ -39,64 +39,156 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.SubcomposeAsyncImage
+import com.peterchege.blogger.core.api.responses.Post
+import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.Screens
+import com.peterchege.blogger.core.util.UiEvent
+import com.peterchege.blogger.domain.mappers.toPost
 import com.peterchege.blogger.presentation.components.CommentBox
+import com.peterchege.blogger.presentation.components.ErrorComponent
+import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.screens.dashboard.profile_screen.DeleteBox
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.collectLatest
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-@ExperimentalCoilApi
 @Composable
 fun PostScreen(
     navController: NavController,
     viewModel: PostScreenViewModel = hiltViewModel()
 
+){
+    val authUser by viewModel.authUserFlow.collectAsStateWithLifecycle(initialValue = null)
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val commentUiState by viewModel.commentUiState.collectAsStateWithLifecycle()
+    val deletePostUiState by viewModel.deletePostUiState.collectAsStateWithLifecycle()
+
+    PostScreenContent(
+        uiState = uiState,
+        commentUiState = commentUiState,
+        deletePostUiState = deletePostUiState,
+        onLikePost = viewModel::likePost,
+        onUnlikePost = viewModel::unlikePost,
+        onFollowUser = viewModel::followUser,
+        onUnFollowUser = viewModel::unfollowUser,
+        onChangeNewComment = viewModel::onChangeComment,
+        savePost = viewModel::savePostToRoom,
+        unSavePost = viewModel::deletePostFromRoom,
+        openCommentDialog = viewModel::onDialogOpen,
+        closeCommentDialog = viewModel::onDialogDismiss,
+        openDeleteDialog = viewModel::onDialogDeleteOpen,
+        closeDeleteDialog = viewModel::onDialogDeleteDismiss,
+        eventFlow = viewModel.eventFlow,
+        user = authUser,
+        postComment = {
+            viewModel.onDialogConfirm(authUser!!)
+        }
+    )
+}
+
+
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@ExperimentalCoilApi
+@Composable
+fun PostScreenContent(
+    uiState:PostScreenUiState,
+    commentUiState: CommentUiState,
+    deletePostUiState: DeletePostUiState,
+    onLikePost:(User,String) -> Unit,
+    onUnlikePost:(User, String) -> Unit,
+    onFollowUser:(User,String) -> Unit,
+    onUnFollowUser:(User,String) -> Unit,
+    onChangeNewComment:(String) -> Unit,
+    savePost:(Post) -> Unit,
+    unSavePost:(String) -> Unit,
+    openCommentDialog:() -> Unit,
+    closeCommentDialog:() -> Unit,
+    openDeleteDialog:() -> Unit,
+    closeDeleteDialog:() -> Unit,
+    eventFlow:SharedFlow<UiEvent>,
+    user: User?,
+    postComment:() -> Unit,
 ) {
-    val state = viewModel.state.value
-    val openDialogState = viewModel.openDialogState.value
+
     val scaffoldState = rememberScaffoldState()
 
+    LaunchedEffect(key1 = true) {
+        eventFlow.collectLatest { event ->
+            when (event) {
+                is UiEvent.ShowSnackbar -> {
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        message = event.message
+                    )
+                }
+
+                is UiEvent.Navigate -> {
+
+                }
+            }
+        }
+    }
     Scaffold(
         scaffoldState = scaffoldState,
         modifier = Modifier.fillMaxSize(),
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    viewModel.onDialogOpen()
+                    openCommentDialog()
                 }
             ) {
-                Icon(Icons.Outlined.Message, "")
+                Icon(
+                    imageVector = Icons.Outlined.Message,
+                    contentDescription = "Add a comment"
+                )
             }
         }
     ) {
-        if (viewModel.openDeleteDialogState.value) {
-            DeleteBox(scaffoldState = scaffoldState)
-        }
-        if (openDialogState) {
-            CommentDialog(scaffoldState = scaffoldState)
-        }
-        if (state.error != "") {
-            Box(modifier = Modifier.fillMaxSize()) {
-                Text(text = state.error)
+        when(uiState){
+            is PostScreenUiState.Loading -> {
+                LoadingComponent()
             }
-        } else {
-            LazyColumn(
-
-            ) {
-                item {
-                    Box(
-                        Modifier.fillMaxSize()
+            is PostScreenUiState.Error -> {
+                ErrorComponent(
+                    retryCallback = { /*TODO*/ },
+                    errorMessage = "An unexpected error occurred")
+            }
+            is PostScreenUiState.PostNotFound -> {
+                ErrorComponent(
+                    retryCallback = { /*TODO*/ },
+                    errorMessage = "Post not found")
+            }
+            is PostScreenUiState.Success -> {
+                val post = uiState.post
+                if (deletePostUiState.isDeleteDialogOpen) {
+                    DeleteBox(
+                        post = post.toPost(),
+                        closeDeleteDialog = { closeDeleteDialog() },
+                        deletePost = {  },
+                        )
+                }
+                if (commentUiState.isCommentDialogOpen) {
+                    CommentDialog(
+                        closeCommentDialog = { closeCommentDialog() },
+                        commentUiState = commentUiState,
+                        postComment = { postComment() },
+                        onChangeNewComment = { onChangeNewComment(it) },
                     )
-                    {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        ) {
-                            state.post?.let {
+                }
+                LazyColumn() {
+                    item {
+                        Box(
+                            Modifier.fillMaxSize()
+                        )
+                        {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                            ) {
                                 SubcomposeAsyncImage(
-                                    model = state.post.imageUrl,
+                                    model = post.imageUrl,
                                     loading = {
                                         Box(modifier = Modifier.fillMaxSize()) {
                                             CircularProgressIndicator(
@@ -112,20 +204,7 @@ fun PostScreen(
                                         .height(300.dp),
                                     contentDescription = "Post Image"
                                 )
-//                                Image(
-//                                    painter = rememberImagePainter(
-//                                        data = state.post.imageUrl,
-//                                        builder = {
-//                                            crossfade(true)
-//
-//                                        }
-//                                    ),
-//                                    contentDescription = "Post Image",
-//                                    contentScale = ContentScale.Crop,
-//                                    modifier = Modifier
-//                                        .fillMaxWidth()
-//                                        .height(300.dp)
-//                                )
+
                                 Spacer(
                                     modifier = Modifier
                                         .height(8.dp)
@@ -141,7 +220,7 @@ fun PostScreen(
 
                                 ) {
                                     Text(
-                                        text = state.post.postTitle,
+                                        text = post.postTitle,
                                         textAlign = TextAlign.Center,
                                         fontWeight = FontWeight.ExtraBold,
                                         fontSize = 30.sp
@@ -154,75 +233,50 @@ fun PostScreen(
                                     ) {
                                         Text(text = "By: ")
                                         Text(
-                                            text = state.post.postAuthor,
+                                            text = post.postAuthor,
                                             fontWeight = FontWeight.Bold,
                                             modifier = Modifier.clickable {
-                                                navController.navigate(Screens.AUTHOR_PROFILE_SCREEN + "/${state.post.postAuthor}")
+//                                                navController.navigate(Screens.AUTHOR_PROFILE_SCREEN + "/${state.post.postAuthor}")
                                             }
                                         )
-                                        if (viewModel.isMyPost.value) {
+                                        if (post.isLiked) {
                                             Icon(
-                                                Icons.Default.Delete,
-                                                contentDescription = "Delete",
-                                                modifier = Modifier.clickable {
-                                                    viewModel.onDialogDeleteOpen()
-
-                                                },
-
-                                                )
-                                        }
-                                        if (viewModel.isLiked.value) {
-                                            Icon(
-                                                Icons.Default.Favorite,
+                                                imageVector = Icons.Default.Favorite,
                                                 contentDescription = "Un Like",
                                                 modifier = Modifier.clickable {
-                                                    viewModel.unlikePost(scaffoldState)
-
+                                                    if (user != null) {
+                                                        onUnlikePost(user,post.postAuthor)
+                                                    }
                                                 },
                                                 tint = Color.Red
                                             )
                                         } else {
                                             Icon(
-                                                Icons.Default.FavoriteBorder,
+                                                imageVector = Icons.Default.FavoriteBorder,
                                                 contentDescription = "Like",
                                                 modifier = Modifier.clickable {
-                                                    viewModel.likePost(scaffoldState)
+                                                    if (user != null) {
+                                                        onLikePost(user,post.postAuthor)
+                                                    }
                                                 }
                                             )
                                         }
-                                        if (viewModel.source.value == "api") {
-                                            if (viewModel.isSaved.value) {
-                                                Icon(
-                                                    Icons.Default.Bookmark,
-                                                    contentDescription = "Un Save",
-                                                    modifier = Modifier.clickable {
-                                                        viewModel.deletePostFromRoom(scaffoldState)
-
-                                                    }
-                                                )
-                                            } else {
-                                                Icon(
-                                                    Icons.Default.BookmarkBorder,
-                                                    contentDescription = "UnSave",
-                                                    modifier = Modifier.clickable {
-
-                                                        viewModel.savePostToRoom(scaffoldState)
-                                                    }
-                                                )
-                                            }
-                                        } else {
-                                            Icon(
-                                                Icons.Default.Bookmark,
-                                                contentDescription = "Un Save",
-                                                modifier = Modifier.clickable {
-                                                    viewModel.deletePostFromRoom(scaffoldState)
-
-                                                }
-                                            )
-                                        }
-
                                         Icon(
-                                            Icons.Default.Share,
+                                            imageVector = if (post.isSaved)
+                                                Icons.Default.Bookmark
+                                            else
+                                                Icons.Default.Bookmark,
+                                            contentDescription = if(post.isSaved) "Un Save" else "Save",
+                                            modifier = Modifier.clickable {
+                                                if(post.isSaved){
+                                                    unSavePost(post._id)
+                                                }else{
+                                                    savePost(post.toPost())
+                                                }
+                                            }
+                                        )
+                                        Icon(
+                                            imageVector = Icons.Default.Share,
                                             contentDescription = "Share",
                                             modifier = Modifier.clickable {
 
@@ -242,10 +296,10 @@ fun PostScreen(
                                         Alignment.CenterVertically
 
                                     ) {
-                                        Text(text = state.post.postedOn)
-                                        Text(text = state.post.postedAt)
-                                        Text(text = "${state.post.likes.size} like(s)")
-                                        Text(text = "${state.post.views.size} view(s)")
+                                        Text(text = post.postedOn)
+                                        Text(text = post.postedAt)
+                                        Text(text = "${post.likes.size} like(s)")
+                                        Text(text = "${post.views.size} view(s)")
 
                                     }
                                     Spacer(
@@ -253,14 +307,6 @@ fun PostScreen(
                                             .height(8.dp)
                                             .padding(15.dp)
                                     )
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.Center,
-                                    ) {
-                                        if (viewModel.source.value == "room") {
-                                            Text(text = "Offline Mode")
-                                        }
-                                    }
                                 }
                                 Divider(
                                     color = Color.Blue,
@@ -268,7 +314,7 @@ fun PostScreen(
                                     modifier = Modifier.padding(10.dp)
                                 )
                                 Text(
-                                    text = state.post.postBody,
+                                    text = post.postBody,
                                     textAlign = TextAlign.Left,
                                     modifier = Modifier
                                         .padding(10.dp)
@@ -283,7 +329,7 @@ fun PostScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(horizontal = 15.dp),
-                                    text = "Comments (${state.post.comments.size})",
+                                    text = "Comments (${post.comments.size})",
                                     textAlign = TextAlign.Start,
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 27.sp
@@ -295,26 +341,21 @@ fun PostScreen(
                                 )
 
                             }
-
                         }
                     }
-                }
-
-                state.post?.let { it1 ->
-                    items(viewModel.comments.value) { comment ->
+                    items(items = commentUiState.comments) { comment ->
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 15.dp)
                         ) {
-                            CommentBox(comment = comment, navController = navController)
+                            CommentBox(comment = comment)
                             Spacer(modifier = Modifier.height(10.dp))
                         }
                     }
                 }
             }
         }
-
     }
 }
 
@@ -322,18 +363,20 @@ fun PostScreen(
 @Composable
 fun CommentDialog(
     modifier: Modifier = Modifier,
-    viewModel: PostScreenViewModel = hiltViewModel(),
-    scaffoldState: ScaffoldState,
+    commentUiState:CommentUiState,
+    onChangeNewComment: (String) -> Unit,
+    postComment:() -> Unit,
+    closeCommentDialog: () -> Unit,
 ) {
-    val commentInputState = viewModel.commentInputState.value
-    val commentResponseState = viewModel.commentResponseState.value
+
+
     val context = LocalContext.current
 
 
     AlertDialog(
         modifier = modifier,
         onDismissRequest = {
-            viewModel.onDialogDismiss()
+            closeCommentDialog()
         },
         text = {
             Column {
@@ -348,9 +391,9 @@ fun CommentDialog(
                 TextField(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    value = commentInputState,
+                    value = commentUiState.newComment,
                     onValueChange = {
-                        viewModel.OnChangeComment(it)
+                        onChangeNewComment(it)
                     },
                     singleLine = false,
                     textStyle = MaterialTheme.typography.h6.copy(textAlign = TextAlign.Start),
@@ -376,7 +419,7 @@ fun CommentDialog(
                 TextButton(
                     modifier = buttonModifier,
                     onClick = {
-                        viewModel.onDialogDismiss()
+                        closeCommentDialog()
                     },
                     colors = ButtonDefaults.textButtonColors(
                         contentColor = MaterialTheme.colors.onSurface
@@ -387,17 +430,7 @@ fun CommentDialog(
                 TextButton(
                     modifier = buttonModifier,
                     onClick = {
-                        viewModel.onDialogConfirm(scaffoldState = scaffoldState)
-                        if (commentResponseState.isLoading) {
-                            Toast.makeText(context, commentResponseState.msg, Toast.LENGTH_LONG)
-                                .show()
-                        }
-                        if (commentResponseState.success) {
-                            Toast.makeText(context, commentResponseState.msg, Toast.LENGTH_LONG)
-                                .show()
-                        }
-
-
+                        closeCommentDialog()
                     }
                 ) {
                     Text(text = "Comment".uppercase())

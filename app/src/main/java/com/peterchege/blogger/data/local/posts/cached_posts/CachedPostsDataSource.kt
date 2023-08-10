@@ -26,5 +26,7 @@ interface CachedPostsDataSource {
 
     suspend fun deleteAllPostsFromCache()
 
+    fun getCachedPostById(postId:String):Flow<Post?>
+
 
 }

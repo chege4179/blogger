@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.core.work.sync_feed.SyncFeedWorkManager
+import com.peterchege.blogger.domain.models.PostUI
 import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.NetworkInfoRepository
 import com.peterchege.blogger.domain.repository.NetworkStatus
@@ -27,6 +28,18 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+sealed interface FeedScreenUiState {
+
+    object Loading : FeedScreenUiState
+
+    data class Success(val posts:List<PostUI>) : FeedScreenUiState
+
+    data class Error(val message: String) : FeedScreenUiState
+
+    object Empty : FeedScreenUiState
+}
+
 
 @HiltViewModel
 class FeedScreenViewModel @Inject constructor(
@@ -44,11 +57,18 @@ class FeedScreenViewModel @Inject constructor(
             initialValue = false
         )
 
-    val cachedPosts = postRepository.getAllPosts()
+    val feedScreenUiState = postRepository.getAllPosts()
+        .map<List<PostUI>,FeedScreenUiState> {
+            FeedScreenUiState.Success(posts = it)
+        }
+        .onStart {
+            emit(FeedScreenUiState.Loading)
+        }
+        .catch { emit(FeedScreenUiState.Error(message = it.message ?: it.localizedMessage)) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000L),
-            initialValue = emptyList()
+            initialValue = FeedScreenUiState.Empty
         )
 
     val networkStatus = networkInfoRepository.networkStatus

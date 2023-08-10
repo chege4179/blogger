@@ -26,11 +26,13 @@ import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.NetworkInfoRepository
 import com.peterchege.blogger.domain.repository.NetworkStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -99,10 +101,11 @@ class LoginScreenViewModel @Inject constructor(
                         is NetworkResult.Success -> {
                             _uiState.value = _uiState.value.copy(isLoading = false)
                             if (!response.data.success) {
-                                analyticsHelper.logLoginEvent(username = _uiState.value.username)
+
                                 _eventFlow.emit(UiEvent.ShowSnackbar(message = response.data.msg))
                             }
                             if (response.data.success) {
+                                analyticsHelper.logLoginEvent(username = _uiState.value.username)
                                 response.data.user?.let {
                                     repository.setLoggedInUser(user = it)
                                 }

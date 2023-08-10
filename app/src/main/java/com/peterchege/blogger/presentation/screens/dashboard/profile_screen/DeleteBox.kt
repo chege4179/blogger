@@ -25,30 +25,29 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.peterchege.blogger.core.api.responses.Post
 import com.peterchege.blogger.presentation.screens.post_screen.PostScreenViewModel
 
 @Composable
 fun DeleteBox(
     modifier: Modifier = Modifier,
-    viewModel: PostScreenViewModel = hiltViewModel(),
-    scaffoldState: ScaffoldState,
+    post:Post,
+    closeDeleteDialog:() -> Unit,
+    deletePost:() -> Unit,
 
     ) {
-
-    val context = LocalContext.current
-
 
     AlertDialog(
         modifier = modifier,
         onDismissRequest = {
-            viewModel.onDialogDeleteDismiss()
+            closeDeleteDialog()
         },
         text = {
             Column {
                 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
                     Text(
                         modifier = Modifier.fillMaxWidth(),
-                        text = "Delete" + "${viewModel.state.value.post?.postTitle}",
+                        text = "Delete" + "${post?.postTitle}",
                         style = MaterialTheme.typography.h6,
                         textAlign = TextAlign.Center
                     )
@@ -72,7 +71,7 @@ fun DeleteBox(
                 TextButton(
                     modifier = buttonModifier,
                     onClick = {
-                        viewModel.onDialogDismiss()
+                        closeDeleteDialog()
                     },
                     colors = ButtonDefaults.textButtonColors(
                         contentColor = MaterialTheme.colors.onSurface
@@ -83,7 +82,7 @@ fun DeleteBox(
                 TextButton(
                     modifier = buttonModifier,
                     onClick = {
-                        viewModel.onDialogDeleteConfirm(scaffoldState = scaffoldState)
+                        deletePost()
 
                     }
                 ) {

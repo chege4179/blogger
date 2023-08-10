@@ -116,6 +116,7 @@ object RepositoryModule {
         savedPostsDataSource: SavedPostsDataSource,
         cachedPostsDataSource: CachedPostsDataSource,
         remotePostsDataSource: RemotePostsDataSource,
+        authRepository: AuthRepository,
         @IoDispatcher ioDispatcher: CoroutineDispatcher
 
     ): PostRepository {
@@ -124,6 +125,7 @@ object RepositoryModule {
             cachedPostsDataSource = cachedPostsDataSource,
             remotePostsDataSource = remotePostsDataSource,
             ioDispatcher = ioDispatcher,
+            authRepository = authRepository
         )
     }
 

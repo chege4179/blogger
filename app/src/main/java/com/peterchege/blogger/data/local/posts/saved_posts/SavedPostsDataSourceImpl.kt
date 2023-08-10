@@ -19,8 +19,11 @@ import com.peterchege.blogger.core.api.responses.Post
 import com.peterchege.blogger.core.di.IoDispatcher
 import com.peterchege.blogger.core.room.database.BloggerDatabase
 import com.peterchege.blogger.core.room.entities.PostRecordWithCommentsLikesViews
+import com.peterchege.blogger.domain.mappers.toExternalModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -45,13 +48,19 @@ class SavedPostsDataSourceImpl @Inject constructor(
         return@withContext db.savedPostDao.deletePostById(id)
     }
 
-    override suspend fun getPostFromRoom(postId: String): PostRecordWithCommentsLikesViews? =
-        withContext(context = ioDispatcher) {
-            return@withContext db.savedPostDao.getPostById(postId)
-        }
+    override fun getPostFromRoom(postId: String): Flow<Post?> {
+        return db.savedPostDao.getPostById(postId)
+            .map { it?.toExternalModel() }
+            .flowOn(ioDispatcher)
+    }
+
 
     override fun getAllPostsFromRoom(): Flow<List<PostRecordWithCommentsLikesViews>> {
-        return db.savedPostDao.getAllLocalPosts()
+        return db.savedPostDao.getAllLocalPosts().flowOn(ioDispatcher)
+    }
+
+    override fun getSavedPostIds(): Flow<List<String>> {
+        return db.savedPostDao.getSavedPostIds().flowOn(ioDispatcher)
     }
 
 }

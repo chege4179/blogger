@@ -16,7 +16,6 @@
 package com.peterchege.blogger
 
 import android.content.Context
-import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.platform.app.InstrumentationRegistry
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.peterchege.blogger.core.api.BloggerApi
@@ -29,20 +28,21 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import org.hamcrest.CoreMatchers
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 import retrofit2.Retrofit
 import java.io.InputStream
 import java.net.HttpURLConnection
 
+@RunWith(RobolectricTestRunner::class)
 class BloggerApiTest {
 
     private var context: Context? = null
     private var mockWebServer = MockWebServer()
     private lateinit var bloggerApi: BloggerApi
-
 
 
     @Before
@@ -59,7 +59,7 @@ class BloggerApiTest {
             .build()
 
         val contentType = "application/json".toMediaType()
-        val converterFactory = Json{ignoreUnknownKeys = true }.asConverterFactory(contentType)
+        val converterFactory = Json { ignoreUnknownKeys = true }.asConverterFactory(contentType)
 
         bloggerApi = Retrofit.Builder()
             .baseUrl(mockWebServer.url("/"))
@@ -67,7 +67,6 @@ class BloggerApiTest {
             .client(client)
             .build()
             .create(BloggerApi::class.java)
-
 
 
     }
@@ -78,7 +77,7 @@ class BloggerApiTest {
     }
 
     @Test
-    fun when_given_a_proper_response_network_success_result_is_returned (): Unit = runBlocking {
+    fun when_given_a_proper_response_network_success_result_is_returned(): Unit = runBlocking {
         val jsonStream: InputStream = context!!.resources.assets.open("all_posts_success.json")
         val jsonBytes: ByteArray = jsonStream.readBytes()
         val response = MockResponse()
@@ -93,7 +92,7 @@ class BloggerApiTest {
     }
 
     @Test
-    fun when_given_an_error_response_network_error_result_is_returned (): Unit = runBlocking {
+    fun when_given_an_error_response_network_error_result_is_returned(): Unit = runBlocking {
         val jsonStream: InputStream = context!!.resources.assets.open("all_posts_error.json")
         val jsonBytes: ByteArray = jsonStream.readBytes()
         val response = MockResponse()
@@ -106,10 +105,6 @@ class BloggerApiTest {
 
 
     }
-
-
-
-
 
 
 }

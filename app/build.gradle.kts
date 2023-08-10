@@ -100,7 +100,7 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.2")
 
     // dagger hilt
-    implementation ("com.google.dagger:hilt-android:2.46.1")
+    implementation ("com.google.dagger:hilt-android:2.47")
     kapt ("com.google.dagger:hilt-android-compiler:2.46.1")
     kapt ("androidx.hilt:hilt-compiler:1.0.0")
     implementation ("androidx.hilt:hilt-navigation-compose:1.0.0")
@@ -143,7 +143,7 @@ dependencies {
 
     implementation ("com.google.firebase:firebase-crashlytics-ktx:18.4.0")
     implementation ("com.google.firebase:firebase-analytics-ktx:21.3.0")
-    implementation ("com.google.firebase:firebase-messaging:23.2.0")
+    implementation ("com.google.firebase:firebase-messaging:23.2.1")
 
     implementation("com.github.skydoves:sealedx-core:1.0.1")
     ksp("com.github.skydoves:sealedx-processor:1.0.1")
@@ -160,6 +160,7 @@ dependencies {
     implementation ("androidx.core:core-splashscreen:1.0.1")
 
     testImplementation ("io.mockk:mockk:1.13.5")
+    testImplementation ("org.robolectric:robolectric:4.10.3")
     androidTestImplementation ("io.mockk:mockk-android:1.13.5")
 
 }
