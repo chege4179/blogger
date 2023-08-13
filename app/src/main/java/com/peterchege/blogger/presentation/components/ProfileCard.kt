@@ -35,8 +35,7 @@ import com.peterchege.blogger.core.api.responses.User
 @ExperimentalCoilApi
 @Composable
 fun ProfileCard(
-    navController: NavController,
-    onProfileNavigate: (String) -> Unit,
+   navigateToAuthorProfileScreen:(String) -> Unit,
     user: User,
 ) {
     Card(
@@ -45,7 +44,7 @@ fun ProfileCard(
             .padding(10.dp)
             .height(70.dp)
             .clickable {
-                onProfileNavigate(user.username)
+               navigateToAuthorProfileScreen(user.username)
 
             },
         shape = RoundedCornerShape(15),

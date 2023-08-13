@@ -40,7 +40,7 @@ import com.peterchege.blogger.presentation.screens.search_screen.SearchScreenVie
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun SearchPostsTab(
-    navHostController: NavHostController,
+    navigateToPostScreen:(String) -> Unit,
     uiState: SearchScreenUiState,
 ) {
     Scaffold(
@@ -81,7 +81,8 @@ fun SearchPostsTab(
                             ArticleCard(
                                 post = post,
                                 onItemClick = {
-                                    navHostController.navigate(Screens.POST_SCREEN + "/${post._id}/${Constants.API_SOURCE}")
+                                    navigateToPostScreen(post._id)
+
                                 },
                                 onProfileNavigate = {},
                                 onDeletePost = {},

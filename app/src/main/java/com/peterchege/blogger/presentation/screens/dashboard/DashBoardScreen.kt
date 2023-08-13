@@ -32,30 +32,44 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navigation
 import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.presentation.components.BottomNavItem
+import com.peterchege.blogger.presentation.navigation.navigateToAddPostScreen
+import com.peterchege.blogger.presentation.navigation.navigateToAuthUserProfileScreen
+import com.peterchege.blogger.presentation.navigation.navigateToAuthorProfileScreen
+import com.peterchege.blogger.presentation.navigation.navigateToCategoryScreen
+import com.peterchege.blogger.presentation.navigation.navigateToLoginScreen
+import com.peterchege.blogger.presentation.navigation.navigateToPostScreen
+import com.peterchege.blogger.presentation.navigation.navigateToProfileFollowerFollowingScreen
+import com.peterchege.blogger.presentation.navigation.navigateToSearchScreen
+import com.peterchege.blogger.presentation.screens.dashboard.feed_screen.FeedScreen
+import com.peterchege.blogger.presentation.screens.dashboard.notifcations_screen.NotificationScreen
+import com.peterchege.blogger.presentation.screens.dashboard.profile_screen.ProfileScreen
+import com.peterchege.blogger.presentation.screens.dashboard.savedposts_screen.SavedPostScreen
 
 
 @ExperimentalMaterialApi
 @Composable
 fun BottomNavBar(
-    items:List<BottomNavItem>,
+    items: List<BottomNavItem>,
     navController: NavController,
     modifier: Modifier = Modifier,
-    onItemClick:(BottomNavItem) -> Unit
-){
+    onItemClick: (BottomNavItem) -> Unit
+) {
     val backStackEntry = navController.currentBackStackEntryAsState()
     BottomNavigation(
         modifier = modifier,
         backgroundColor = Color.DarkGray,
         elevation = 5.dp
     ) {
-        items.forEach{ item ->
+        items.forEach { item ->
             val selected = item.route == backStackEntry.value?.destination?.route
             BottomNavigationItem(
-                selected =selected ,
+                selected = selected,
                 selectedContentColor = Color.Blue,
                 unselectedContentColor = Color.Gray,
                 onClick = { onItemClick(item) },
@@ -63,9 +77,9 @@ fun BottomNavBar(
                     Column(horizontalAlignment = CenterHorizontally) {
                         Icon(
                             imageVector = item.icon,
-                            contentDescription =item.name
+                            contentDescription = item.name
                         )
-                        if (selected){
+                        if (selected) {
                             Text(
                                 text = item.name,
                                 textAlign = TextAlign.Center,
@@ -73,7 +87,7 @@ fun BottomNavBar(
 
                             )
                         }
-                        
+
                     }
 
                 }
@@ -87,8 +101,6 @@ fun BottomNavBar(
 }
 
 
-
-
 @ExperimentalMaterialApi
 @Composable
 fun DashBoardScreen(
@@ -96,49 +108,51 @@ fun DashBoardScreen(
     viewModel: DashBoardViewModel = hiltViewModel()
 
 ) {
-    val navController = rememberNavController()
-
+    val bottomNavController = rememberNavController()
     Scaffold(
         bottomBar = {
             BottomNavBar(
                 items = listOf(
                     BottomNavItem(
-                        name="Home",
-                        route = Screens.FEED_SCREEN  ,
+                        name = "Home",
+                        route = Screens.FEED_SCREEN,
                         icon = Icons.Default.Home
                     ),
                     BottomNavItem(
-                        name="Saved Posts",
-                        route = Screens.SAVED_POST_SCREEN   ,
+                        name = "Saved Posts",
+                        route = Screens.SAVED_POST_SCREEN,
                         icon = Icons.Default.Favorite
                     ),
 
                     BottomNavItem(
-                        name="Notifications",
-                        route = Screens.NOTIFICATION_SCREEN ,
+                        name = "Notifications",
+                        route = Screens.NOTIFICATION_SCREEN,
                         icon = Icons.Default.Notifications
                     ),
                     BottomNavItem(
-                        name="Profile",
-                        route = Screens.PROFILE_NAVIGATION ,
+                        name = "Profile",
+                        route = Screens.PROFILE_SCREEN,
                         icon = Icons.Default.Person
                     )
 
                 ),
-                navController = navController,
-                onItemClick ={
-                    navController.navigate(it.route)
+                navController = bottomNavController,
+                onItemClick = {
+                    bottomNavController.navigate(it.route)
                 }
             )
         }
     ) { innerPadding ->
-            // Apply the padding globally to the whole BottomNavScreensController
-            Box(modifier = Modifier
+        Box(
+            modifier = Modifier
                 .background(Color.LightGray)
                 .padding(innerPadding)
-            ) {
-                DashboardNavigation(navController = navController, navHostController = navHostController)
-            }
+        ) {
+            DashboardNavigation(
+                navHostController = navHostController,
+                bottomNavController = bottomNavController
+            )
+        }
 
     }
 }

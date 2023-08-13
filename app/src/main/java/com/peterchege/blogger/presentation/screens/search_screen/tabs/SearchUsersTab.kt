@@ -39,7 +39,7 @@ import com.peterchege.blogger.presentation.screens.search_screen.SearchScreenVie
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun SearchUsersTab(
-    navHostController: NavHostController,
+    navigateToAuthorProfileScreen:(String) -> Unit,
     uiState: SearchScreenUiState,
 ) {
 
@@ -74,9 +74,9 @@ fun SearchUsersTab(
                 ) {
                     items(items = searchUsers) { user ->
                         ProfileCard(
-                            navController = navHostController,
+                            navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
                             user = user,
-                            onProfileNavigate = {}
+
                         )
                     }
                 }

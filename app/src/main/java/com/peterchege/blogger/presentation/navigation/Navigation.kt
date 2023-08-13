@@ -30,15 +30,18 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import coil.annotation.ExperimentalCoilApi
 import com.peterchege.blogger.core.api.responses.User
-import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.presentation.screens.author_profile.AuthorFollowerFollowingScreen
-import com.peterchege.blogger.presentation.screens.author_profile.AuthorProfileNavigation
 import com.peterchege.blogger.presentation.screens.author_profile.AuthorProfileScreen
 import com.peterchege.blogger.presentation.screens.category_screen.CategoryScreen
 import com.peterchege.blogger.presentation.screens.dashboard.DashBoardScreen
 import com.peterchege.blogger.presentation.screens.dashboard.addpost_screen.AddPostScreen
 import com.peterchege.blogger.presentation.screens.dashboard.draft_screen.DraftScreen
+import com.peterchege.blogger.presentation.screens.dashboard.feed_screen.FeedScreen
+import com.peterchege.blogger.presentation.screens.dashboard.notifcations_screen.NotificationScreen
+import com.peterchege.blogger.presentation.screens.dashboard.profile_screen.ProfileFollowerFollowingScreen
+import com.peterchege.blogger.presentation.screens.dashboard.profile_screen.ProfileScreen
+import com.peterchege.blogger.presentation.screens.dashboard.savedposts_screen.SavedPostScreen
 import com.peterchege.blogger.presentation.screens.login.LoginScreen
 import com.peterchege.blogger.presentation.screens.post_screen.PostScreen
 import com.peterchege.blogger.presentation.screens.search_screen.SearchScreen
@@ -71,70 +74,122 @@ fun Navigation(
         startDestination = getInitialRoute(user = user)
     ) {
         composable(route = Screens.LOGIN_SCREEN) {
-            LoginScreen(navController = navController)
+            LoginScreen(
+                navigateToDashBoard = navController::navigateToDashBoard,
+                navigateToSignUpScreen = navController::navigateToSignUpScreen,
+            )
             BackHandler(enabled = true) {
                 activity?.finish()
 
             }
         }
         composable(route = Screens.SIGNUP_SCREEN) {
-            SignUpScreen(navController = navController)
+            SignUpScreen(
+                navigateToLoginScreen = navController::navigateToLoginScreen,
+            )
         }
         composable(route = Screens.SEARCH_SCREEN) {
-            SearchScreen(navController = navController)
+            SearchScreen(
+                navigateToPostScreen = navController::navigateToPostScreen,
+                navigateToAuthorProfileScreen = navController::navigateToAuthorProfileScreen,
+            )
         }
-        composable(route = Screens.POST_SCREEN + "/{postId}/{source}") {
-            PostScreen(navController = navController)
-        }
-        composable(route = Screens.AUTHOR_PROFILE_NAVIGATION + "/{username}") {
-            AuthorProfileNavigation()
+        composable(route = Screens.POST_SCREEN + "/{postId}") {
+            PostScreen()
         }
         composable(route = Screens.AUTHOR_PROFILE_SCREEN + "/{username}") {
-            AuthorProfileScreen(navController = navController)
+            AuthorProfileScreen(
+                navigateToPostScreen = navController::navigateToPostScreen,
+                navigateToAuthorFollowerFollowingScreen = navController::navigateToAuthorProfileFollowingScreen
+            )
         }
         composable(route = Screens.AUTHOR_FOLLOWER_FOLLOWING_SCREEN + "/{username}" + "/{type}") {
-            AuthorFollowerFollowingScreen(navController = navController)
+            AuthorFollowerFollowingScreen(
+                navigateToAuthorProfileScreen = navController::navigateToAuthorProfileScreen
+            )
         }
         composable(route = Screens.CATEGORY_SCREEN + "/{category}") {
-            CategoryScreen(navController = navController)
+            CategoryScreen()
+        }
+        composable(route = Screens.PROFILE_FOLLOWER_FOLLOWING_SCREEN + "/{type}"){
+            ProfileFollowerFollowingScreen(
+                navigateToAuthorProfileScreen = navController::navigateToAuthorProfileScreen,
+
+            )
         }
 
-
         composable(
-            route = Screens.ADD_NEW_POST_SCREEN + "?postTitle={postTitle}&postBody={postBody}",
+            route = Screens.ADD_NEW_POST_SCREEN + "?draftId={draftId}",
             arguments = listOf(
-                navArgument("postTitle") {
+                navArgument(name = "draftId") {
                     defaultValue = ""
                 },
-                navArgument("postBody") {
-                    defaultValue = ""
-                }
+
             )
         ) { backStackEntry ->
             AddPostScreen(
-                navController = navController,
-                bottomNavController = navController,
-//                postBodyDraft = backStackEntry.arguments?.getString("postBody"),
-//                postTitleDraft = backStackEntry.arguments?.getString("postTitle"),
+                navigateToDraftScreen = navController::navigateToDraftScreen,
+                navigateToDashboardScreen = navController::navigateToDashBoard,
             )
 
         }
         composable(
             route = Screens.DRAFT_SCREEN
         ) {
-            DraftScreen(navController = navController)
+            DraftScreen(
+                navigateToAddPostScreen = navController::navigateToAddPostScreen,
+            )
         }
+
         composable(
             route = Screens.DASHBOARD_SCREEN
         ) {
             BackHandler(enabled = true) {
-                // Or do nothing
                 activity?.finish()
-
             }
             DashBoardScreen(navHostController = navController)
 
         }
+
+
+//        composable(
+//            route = Screens.FEED_SCREEN
+//        ) {
+//            FeedScreen(
+//                navigateToAddPostScreen = navController::navigateToAddPostScreen,
+//                navigateToAuthorProfileScreen = navController::navigateToAuthorProfileScreen,
+//                navigateToCategoryScreen = navController::navigateToCategoryScreen,
+//                navigateToPostScreen = navController::navigateToPostScreen,
+//                navigateToSearchScreen = navController::navigateToSearchScreen,
+//                navigateToAuthUserProfileScreen = navController::navigateToAuthUserProfileScreen,
+//            )
+//        }
+//        composable(
+//            route = Screens.SAVED_POST_SCREEN
+//        ) {
+//            SavedPostScreen(
+//                navigateToPostScreen = navController::navigateToPostScreen,
+//            )
+//        }
+//
+//        composable(
+//            route = Screens.NOTIFICATION_SCREEN
+//        ) {
+//            NotificationScreen(
+//                navigateToPostScreen = navController::navigateToPostScreen,
+//                navigateToAuthorProfileScreen = navController::navigateToAuthorProfileScreen,
+//            )
+//
+//        }
+//        composable(
+//            route = Screens.PROFILE_SCREEN
+//        ) {
+//            ProfileScreen(
+//                navigateToLoginScreen = navController::navigateToLoginScreen,
+//                navigateToProfileFollowerFollowingScreen = navController::navigateToProfileFollowerFollowingScreen,
+//                navigateToPostScreen = navController::navigateToPostScreen,
+//            )
+//        }
 
     }
 

@@ -40,15 +40,17 @@ import java.util.*
 
 @Composable
 fun ProfileFollowerFollowingScreen(
-    navController: NavController,
+
     viewModel: ProfileFollowerFollowingScreenViewModel = hiltViewModel(),
     profileViewModel: ProfileScreenViewModel = hiltViewModel(),
+    navigateToAuthorProfileScreen:(String) -> Unit,
 ){
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     ProfileFollowerFollowingScreenContent(
-        navController = navController,
+
         uiState = uiState.value,
-        type = viewModel.type.value
+        type = viewModel.type.value,
+        navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
     )
 
 }
@@ -56,9 +58,10 @@ fun ProfileFollowerFollowingScreen(
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ProfileFollowerFollowingScreenContent(
-    navController: NavController,
+
     uiState:AuthorProfileFollowerFollowingUiState,
     type:String,
+    navigateToAuthorProfileScreen:(String) -> Unit,
 
 ) {
 
@@ -89,13 +92,13 @@ fun ProfileFollowerFollowingScreenContent(
                     Constants.FOLLOWER -> {
                         FollowersList(
                             followers = uiState.data.followers,
-                            navController = navController
+                            navigateToAuthorProfileScreen = navigateToAuthorProfileScreen
                         )
                     }
                     Constants.FOLLOWING -> {
                         FollowingList(
                             following = uiState.data.following,
-                            navController =navController
+                            navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
                         )
                     }
                 }

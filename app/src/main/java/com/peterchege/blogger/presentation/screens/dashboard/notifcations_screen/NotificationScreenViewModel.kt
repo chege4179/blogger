@@ -42,26 +42,14 @@ class NotificationScreenViewModel @Inject constructor(
         MutableStateFlow<NotificationScreenUiState>(NotificationScreenUiState.Loading)
     val uiState = _uiState.asStateFlow()
 
-
-    private var _user = MutableStateFlow<User?>(null)
-    var user: StateFlow<User?> = _user
-
-    init {
-        loadUser()
-        getNotifications()
-    }
-
-    private fun loadUser() {
-        viewModelScope.launch {
-            authRepository.getLoggedInUser().collectLatest {
-                _user.value = it
-            }
-        }
-    }
-
-
-    private fun getNotifications() {
-        getProfileUseCase(username = _user.value?.username ?: "").onEach { result ->
+    val authUser = authRepository.getLoggedInUser()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = null
+        )
+    private fun getNotifications(username:String) {
+        getProfileUseCase(username = username).onEach { result ->
             when (result) {
                 is Resource.Success -> {
                     _uiState.value = NotificationScreenUiState.Success(

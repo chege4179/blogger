@@ -16,20 +16,18 @@
 package com.peterchege.blogger.core.di
 
 import android.content.Context
-import androidx.work.ListenableWorker
 import com.peterchege.blogger.core.work.sync_feed.SyncFeedWorkManager
 import com.peterchege.blogger.core.work.sync_feed.SyncFeedWorkManagerImpl
+import com.peterchege.blogger.core.work.sync_user_data.SyncUserDataWorkManager
+import com.peterchege.blogger.core.work.sync_user_data.SyncUserDataWorkManagerImpl
 import com.peterchege.blogger.core.work.upload_post.UploadPostWorkManager
 import com.peterchege.blogger.core.work.upload_post.UploadPostWorkManagerImpl
-import dagger.MapKey
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
-import kotlin.reflect.KClass
-
 
 
 @Module
@@ -53,6 +51,15 @@ object WorkModule {
         @ApplicationContext context: Context,
     ): SyncFeedWorkManager {
         return SyncFeedWorkManagerImpl(context = context)
+
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideSyncUserDataWorkManager(
+    ): SyncUserDataWorkManager {
+        return SyncUserDataWorkManagerImpl()
 
     }
 }

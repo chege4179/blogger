@@ -52,68 +52,55 @@ import java.util.*
 
 
 @Composable
-fun AuthorProfileNavigation(
-
-){
-    val navController  = rememberNavController()
-    NavHost(navController =navController, startDestination = Screens.AUTHOR_PROFILE_SCREEN +"/{username}" ){
-        composable(Screens.AUTHOR_PROFILE_SCREEN + "/{username}"){
-            AuthorProfileScreen(navController = navController)
-        }
-        composable(Screens.AUTHOR_FOLLOWER_FOLLOWING_SCREEN + "/{username}" + "/{type}"){
-            AuthorFollowerFollowingScreen(navController = navController)
-        }
-
-
-    }
-}
-
-@Composable
 fun AuthorProfileScreen(
-    navController: NavController,
+    navigateToAuthorFollowerFollowingScreen: (String, String) -> Unit,
+    navigateToPostScreen:(String) -> Unit,
     viewModel: AuthorProfileViewModel = hiltViewModel()
-){
+) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
 
     AuthorProfileScreenContent(
-        navController = navController,
+
         followUser = { /*TODO*/ },
         unfollowUser = { /*TODO*/ },
-        uiState = uiState.value
+        uiState = uiState.value,
+        navigateToAuthorFollowerFollowingScreen = navigateToAuthorFollowerFollowingScreen,
+        navigateToPostScreen = navigateToPostScreen
     )
 
 
-
-
 }
+
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @OptIn(ExperimentalCoilApi::class)
 @Composable
 fun AuthorProfileScreenContent(
-    navController: NavController,
-    followUser:() -> Unit,
-    unfollowUser:() -> Unit,
-    uiState:AuthorProfileScreenUiState,
+    followUser: () -> Unit,
+    unfollowUser: () -> Unit,
+    uiState: AuthorProfileScreenUiState,
+    navigateToAuthorFollowerFollowingScreen: (String, String) -> Unit,
+    navigateToPostScreen:(String) -> Unit,
 
-){
+    ) {
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.LightGray)
-        ,
+            .background(Color.LightGray),
     ) {
-        when(uiState){
+        when (uiState) {
             is AuthorProfileScreenUiState.Loading -> {
                 LoadingComponent()
             }
+
             is AuthorProfileScreenUiState.Error -> {
                 ErrorComponent(
                     errorMessage = uiState.message,
-                    retryCallback = {  },
+                    retryCallback = { },
                 )
 
             }
+
             is AuthorProfileScreenUiState.Success -> {
                 val user = uiState.data.user
                 val posts = uiState.data.posts
@@ -122,9 +109,9 @@ fun AuthorProfileScreenContent(
                         .fillMaxSize()
                         .background(Color.White)
                         .padding(10.dp),
-                ){
+                ) {
 
-                    item{
+                    item {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -136,13 +123,12 @@ fun AuthorProfileScreenContent(
                                 modifier = Modifier
                                     .fillMaxWidth(0.3f)
 
-                            ){
+                            ) {
                                 Image(
                                     modifier = Modifier
                                         .width(80.dp)
                                         .height(80.dp)
-                                        .align(Alignment.Center)
-                                    ,
+                                        .align(Alignment.Center),
                                     painter = rememberImagePainter(
                                         data = user?.imageUrl,
                                         builder = {
@@ -150,7 +136,8 @@ fun AuthorProfileScreenContent(
 
                                         },
                                     ),
-                                    contentDescription = "Profile Image")
+                                    contentDescription = "Profile Image"
+                                )
 
                             }
                             Spacer(modifier = Modifier.height(5.dp))
@@ -166,7 +153,7 @@ fun AuthorProfileScreenContent(
                                 )
                                 Spacer(modifier = Modifier.padding(3.dp))
                                 Text(
-                                    text = "@"+ (user?.username?.toLowerCase(Locale.ROOT)
+                                    text = "@" + (user?.username?.toLowerCase(Locale.ROOT)
                                         ?: ""),
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 18.sp
@@ -174,11 +161,10 @@ fun AuthorProfileScreenContent(
                                 Spacer(modifier = Modifier.height(3.dp))
 
 
-
                             }
                         }
                     }
-                    item{
+                    item {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -201,13 +187,20 @@ fun AuthorProfileScreenContent(
                                     fontSize = 17.sp,
                                 )
                             }
-                            Divider(color = Color.LightGray, thickness = 2.dp, modifier = Modifier
-                                .fillMaxHeight(0.7f)
-                                .width(1.dp))
+                            Divider(
+                                color = Color.LightGray, thickness = 2.dp, modifier = Modifier
+                                    .fillMaxHeight(0.7f)
+                                    .width(1.dp)
+                            )
 
                             Column(
                                 modifier = Modifier.clickable {
-                                    navController.navigate(route = Screens.AUTHOR_FOLLOWER_FOLLOWING_SCREEN + "/${user?.username}"+ "/${Constants.FOLLOWER}")
+                                    user?.username?.let { it1 ->
+                                        navigateToAuthorFollowerFollowingScreen(
+                                            it1,
+                                            Constants.FOLLOWER
+                                        )
+                                    }
                                 },
                                 verticalArrangement = Arrangement.Center,
                                 horizontalAlignment = Alignment.CenterHorizontally
@@ -223,13 +216,19 @@ fun AuthorProfileScreenContent(
 
                                     )
                             }
-                            Divider(color = Color.LightGray, thickness = 2.dp, modifier = Modifier
-                                .fillMaxHeight(0.7f)
-                                .width(1.dp))
+                            Divider(
+                                color = Color.LightGray, thickness = 2.dp, modifier = Modifier
+                                    .fillMaxHeight(0.7f)
+                                    .width(1.dp)
+                            )
 
                             Column(
                                 modifier = Modifier.clickable {
-                                    navController.navigate(Screens.AUTHOR_FOLLOWER_FOLLOWING_SCREEN + "/${user?.username}"+ "/${Constants.FOLLOWING}")
+                                    user?.username?.let { it1 ->
+                                        navigateToAuthorFollowerFollowingScreen(
+                                            it1,Constants.FOLLOWING)
+                                    }
+
                                 },
                                 verticalArrangement = Arrangement.Center,
                                 horizontalAlignment = Alignment.CenterHorizontally
@@ -248,14 +247,14 @@ fun AuthorProfileScreenContent(
 
                         }
                     }
-                    item{
+                    item {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(60.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceEvenly,
-                        ){
+                        ) {
                             Button(
                                 modifier = Modifier.fillMaxWidth(0.5f),
                                 onClick = {
@@ -275,29 +274,28 @@ fun AuthorProfileScreenContent(
                         }
                     }
                     if (posts.isEmpty()) {
-                        item{
-                            Box(modifier = Modifier.fillMaxSize()){
+                        item {
+                            Box(modifier = Modifier.fillMaxSize()) {
                                 Text(
-                                    modifier =Modifier.align(Alignment.Center),
+                                    modifier = Modifier.align(Alignment.Center),
                                     text = "This user does not have any posts yet"
                                 )
                             }
                         }
-                    }else{
-                        items(items = posts){ post ->
+                    } else {
+                        items(items = posts) { post ->
                             ArticleCard(
                                 post = post,
                                 onItemClick = {
-                                    navController.navigate(Screens.POST_SCREEN +"/${post._id}/${Constants.API_SOURCE}")
+                                    navigateToPostScreen(post._id)
+                                },
+                                onProfileNavigate = { username ->
 
                                 },
-                                onProfileNavigate ={ username ->
-
-                                } ,
-                                onDeletePost ={
+                                onDeletePost = {
 
                                 },
-                                profileImageUrl = user?.imageUrl ?: "" ,
+                                profileImageUrl = user?.imageUrl ?: "",
                                 isLiked = false,
                                 isSaved = false,
                                 isProfile = true

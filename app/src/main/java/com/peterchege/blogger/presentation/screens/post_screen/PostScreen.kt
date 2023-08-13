@@ -57,7 +57,7 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun PostScreen(
-    navController: NavController,
+
     viewModel: PostScreenViewModel = hiltViewModel()
 
 ){

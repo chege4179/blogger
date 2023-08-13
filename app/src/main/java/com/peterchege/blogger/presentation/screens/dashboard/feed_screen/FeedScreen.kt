@@ -61,10 +61,14 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 @ExperimentalCoilApi
 fun FeedScreen(
-    bottomNavController: NavController,
-    navHostController: NavHostController,
+    navigateToPostScreen: (String) -> Unit,
+    navigateToAuthUserProfileScreen: () -> Unit,
+    navigateToAuthorProfileScreen: (String) -> Unit,
+    navigateToSearchScreen: () -> Unit,
+    navigateToAddPostScreen: () -> Unit,
+    navigateToCategoryScreen:(String) -> Unit,
     viewModel: FeedScreenViewModel = hiltViewModel()
-){
+) {
 
     val authUser by viewModel.authUser.collectAsStateWithLifecycle()
     val networkStatus by viewModel.networkStatus.collectAsStateWithLifecycle()
@@ -73,19 +77,23 @@ fun FeedScreen(
 
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isSyncing,
-        onRefresh =  { viewModel.refreshFeed() }
+        onRefresh = { viewModel.refreshFeed() }
     )
 
-    LaunchedEffect(key1 = true){
+    LaunchedEffect(key1 = true) {
         viewModel.refreshFeed()
     }
 
     FeedScreenContent(
-        bottomNavController = bottomNavController,
-        navHostController = navHostController,
+        navigateToPostScreen = navigateToPostScreen,
+        navigateToAuthUserProfileScreen = navigateToAuthUserProfileScreen,
+        navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
+        navigateToSearchScreen = navigateToSearchScreen,
+        navigateToAddPostScreen = navigateToAddPostScreen,
+        navigateToCategoryScreen = navigateToCategoryScreen,
         authUser = authUser,
         eventFlow = viewModel.eventFlow,
-        networkStatus =  networkStatus,
+        networkStatus = networkStatus,
         pullRefreshState = pullRefreshState,
         uiState = feedScreenUiState,
         isRefreshing = isSyncing,
@@ -99,15 +107,19 @@ fun FeedScreen(
 @Composable
 @ExperimentalCoilApi
 fun FeedScreenContent(
-    bottomNavController: NavController,
-    navHostController: NavHostController,
-    isRefreshing :Boolean,
-    authUser:User?,
+    navigateToPostScreen: (String) -> Unit,
+    navigateToAuthUserProfileScreen: () -> Unit,
+    navigateToAuthorProfileScreen: (String) -> Unit,
+    navigateToAddPostScreen: () -> Unit,
+    navigateToSearchScreen: () -> Unit,
+    navigateToCategoryScreen: (String) -> Unit,
+    isRefreshing: Boolean,
+    authUser: User?,
     uiState: FeedScreenUiState,
-    eventFlow:SharedFlow<UiEvent>,
+    eventFlow: SharedFlow<UiEvent>,
     networkStatus: NetworkStatus,
     pullRefreshState: PullRefreshState,
-    retryCallback:() -> Unit,
+    retryCallback: () -> Unit,
 
     ) {
     val scaffoldState = rememberScaffoldState()
@@ -135,7 +147,7 @@ fun FeedScreenContent(
                 }
 
                 is UiEvent.Navigate -> {
-                    navHostController.navigate(route = event.route)
+
                 }
             }
         }
@@ -157,7 +169,7 @@ fun FeedScreenContent(
                 actions = {
                     IconButton(
                         onClick = {
-                            navHostController.navigate(Screens.SEARCH_SCREEN)
+                            navigateToSearchScreen()
                         }
                     ) {
                         Icon(
@@ -174,11 +186,12 @@ fun FeedScreenContent(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    navHostController.navigate(Screens.ADD_NEW_POST_SCREEN)
+                    navigateToAddPostScreen()
+
                 }
             ) {
                 Icon(
-                    imageVector =  Icons.Filled.Add,
+                    imageVector = Icons.Filled.Add,
                     contentDescription = "Create Post"
                 )
 
@@ -190,11 +203,11 @@ fun FeedScreenContent(
             modifier = Modifier
                 .pullRefresh(pullRefreshState)
                 .fillMaxSize()
-        ){
+        ) {
             PullRefreshIndicator(
                 refreshing = true,
                 state = pullRefreshState,
-                modifier =  Modifier.align(Alignment.TopCenter)
+                modifier = Modifier.align(Alignment.TopCenter)
             )
             Column(
                 modifier = Modifier
@@ -208,27 +221,33 @@ fun FeedScreenContent(
                         .padding(5.dp)
                 ) {
                     items(items = categories) { category ->
-                        CategoryCard(navController = navHostController, categoryItem = category)
+                        CategoryCard(
+                            navigateToCategoryScreen = navigateToCategoryScreen,
+                            categoryItem = category
+                        )
                         Spacer(modifier = Modifier.width(10.dp))
 
                     }
                 }
-                when(uiState){
+                when (uiState) {
                     is FeedScreenUiState.Empty -> {
                         ErrorComponent(
                             retryCallback = { retryCallback() },
                             errorMessage = "No posts were found"
                         )
                     }
+
                     is FeedScreenUiState.Loading -> {
                         LoadingComponent()
                     }
+
                     is FeedScreenUiState.Error -> {
                         ErrorComponent(
                             retryCallback = { retryCallback() },
                             errorMessage = uiState.message
                         )
                     }
+
                     is FeedScreenUiState.Success -> {
                         LazyColumn(
                             modifier = Modifier
@@ -241,15 +260,19 @@ fun FeedScreenContent(
                                 ArticleCard(
                                     post = post.toPost(),
                                     onItemClick = {
-                                        navHostController.navigate(Screens.POST_SCREEN + "/${post._id}/${Constants.API_SOURCE}")
+                                        navigateToPostScreen(it._id)
                                     },
                                     onProfileNavigate = {
-                                        onProfileNavigate(
-                                            username = it,
-                                            bottomNavController = bottomNavController,
-                                            navHostController = navHostController,
-                                            authUser = authUser,
-                                        )
+                                        if (authUser != null) {
+                                            if (authUser.username == it) {
+                                                navigateToAuthUserProfileScreen()
+                                            }else{
+                                                navigateToAuthorProfileScreen(it)
+                                            }
+                                        }else{
+                                            navigateToAuthorProfileScreen(it)
+                                        }
+
                                     },
                                     onDeletePost = {},
                                     isLiked = post.isLiked,

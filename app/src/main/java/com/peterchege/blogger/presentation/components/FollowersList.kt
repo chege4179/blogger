@@ -33,7 +33,7 @@ import com.peterchege.blogger.core.util.Screens
 @Composable
 fun FollowersList(
     followers:List<Follower>,
-    navController: NavController
+    navigateToAuthorProfileScreen:(String) -> Unit,
 ){
     LazyColumn(
         modifier = Modifier
@@ -56,7 +56,8 @@ fun FollowersList(
             items(items = followers){ follower ->
                 FollowerCard(
                     navigateToFollowerPage = {
-                        navController.navigate(Screens.AUTHOR_PROFILE_SCREEN + "/${follower.followerUsername}")
+                        navigateToAuthorProfileScreen(follower.followerUsername)
+
                     },
                     follower =follower,
                     isFollowing = false,

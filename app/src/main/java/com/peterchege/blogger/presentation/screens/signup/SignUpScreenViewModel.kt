@@ -86,7 +86,7 @@ class SignUpScreenViewModel @Inject constructor(
 
     }
 
-    fun signUpUser() {
+    fun signUpUser(navigateToLoginScreen:() -> Unit,) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
             val confirmPassword = _uiState.value.confirmPassword
@@ -110,7 +110,7 @@ class SignUpScreenViewModel @Inject constructor(
                         _eventFlow.emit(UiEvent.ShowSnackbar(message = signUpResponse.data.msg))
                         if (signUpResponse.data.success) {
                             analyticsHelper.logSignUpEvent(email = _uiState.value.email)
-                            _eventFlow.emit(UiEvent.Navigate(route = Screens.LOGIN_SCREEN))
+                            navigateToLoginScreen()
 
                         }
                     }

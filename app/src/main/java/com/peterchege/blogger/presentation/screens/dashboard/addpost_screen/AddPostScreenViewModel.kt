@@ -175,7 +175,7 @@ class AddPostScreenViewModel @Inject constructor(
     }
 
 
-    fun postArticle() {
+    fun postArticle(navigateToDashboardScreen :() -> Unit,) {
         viewModelScope.launch {
             val postedOn = SimpleDateFormat("dd/MM/yyyy").format(Date())
             val postedAt = SimpleDateFormat("hh:mm:ss").format(Date())
@@ -191,7 +191,7 @@ class AddPostScreenViewModel @Inject constructor(
 
             _formState.value.uri?.let {
                 uploadPostWorkManager.startUpload(postBody = postBody,uri = it)
-                _eventFlow.emit(UiEvent.Navigate(route = Screens.DASHBOARD_SCREEN))
+                navigateToDashboardScreen()
             }
 
 

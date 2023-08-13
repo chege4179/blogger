@@ -34,7 +34,8 @@ import com.peterchege.blogger.core.util.Screens
 
 @Composable
 fun NotificationCard(
-    navController: NavController,
+    navigateToPostScreen:(String) -> Unit,
+    navigateToAuthorProfileScreen:(String) -> Unit,
     notification: Notification
 ) {
     Card(
@@ -43,11 +44,9 @@ fun NotificationCard(
             .height(60.dp)
             .clickable {
                 if (notification.notificationType == "Like" || notification.notificationType == "Comment") {
-                    navController.navigate(Screens.POST_SCREEN + "/${notification.postId}/${Constants.API_SOURCE}")
-
+                    notification.postId?.let { navigateToPostScreen(it) }
                 } else {
-                    navController.navigate(Screens.AUTHOR_PROFILE_SCREEN + "/${notification.notificationSender}")
-
+                    navigateToAuthorProfileScreen(notification.notificationSender)
                 }
 
             },

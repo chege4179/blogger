@@ -39,7 +39,7 @@ import com.peterchege.blogger.core.util.categoryItem
 @Composable
 fun CategoryCard(
     modifier: Modifier = Modifier,
-    navController: NavController,
+    navigateToCategoryScreen:(String) -> Unit,
     categoryItem: categoryItem,
     icon: ImageVector? = null
 ) {
@@ -54,7 +54,7 @@ fun CategoryCard(
             )
             .padding(6.dp)
             .clickable{
-                navController.navigate(Screens.CATEGORY_SCREEN + "/${categoryItem.name}")
+                navigateToCategoryScreen(categoryItem.name)
 
             }
     ) {

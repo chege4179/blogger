@@ -28,6 +28,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -51,15 +52,17 @@ import java.util.*
 
 @Composable
 fun AuthorFollowerFollowingScreen(
-    navController: NavController,
+
+    navigateToAuthorProfileScreen:(String) -> Unit,
     viewModel: AuthorFollowerFollowingScreenViewModel = hiltViewModel()
 ){
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     AuthorFollowerFollowingScreenContent(
-        navController = navController,
-        uiState = uiState.value,
-        type = viewModel.type.value
+        uiState = uiState,
+        type = viewModel.type.value,
+        navigateToAuthorProfileScreen = navigateToAuthorProfileScreen
     )
 
 }
@@ -68,8 +71,8 @@ fun AuthorFollowerFollowingScreen(
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun AuthorFollowerFollowingScreenContent(
-    navController: NavController,
     uiState:AuthorProfileFollowerFollowingUiState,
+    navigateToAuthorProfileScreen: (String) -> Unit,
     type:String,
 ){
     Scaffold(
@@ -100,13 +103,14 @@ fun AuthorFollowerFollowingScreenContent(
                     Constants.FOLLOWER -> {
                         FollowersList(
                             followers = uiState.data.followers,
-                            navController = navController
+                            navigateToAuthorProfileScreen = navigateToAuthorProfileScreen
                         )
                     }
                     Constants.FOLLOWING -> {
                         FollowingList(
                             following = uiState.data.following,
-                            navController =navController
+                            navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
+
                         )
                     }
                 }

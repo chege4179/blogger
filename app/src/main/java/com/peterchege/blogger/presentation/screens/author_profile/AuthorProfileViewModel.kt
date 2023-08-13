@@ -57,40 +57,26 @@ class AuthorProfileViewModel @Inject constructor(
     var isFollowing: State<Boolean> = _isFollowing
 
 
+    val authUser = authRepository.getLoggedInUser()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = null,
+        )
+
+
 
     init {
-        loadUser()
         getProfile()
-
     }
 
-    private var _user = MutableStateFlow<User?>(null)
-    var user: StateFlow<User?> = _user
-
-
-    private fun loadUser() {
-        viewModelScope.launch {
-            authRepository.getLoggedInUser().collectLatest {
-                _user.value = it
-            }
-        }
-    }
-
-
-    private fun getFollowingStatus() {
-//        val followers = _state.value.user?.followers
-//        val username = _user.value?.username ?: ""
-//        val followerUsernames = followers?.map { it.followerUsername }
-//        _isFollowing.value = followerUsernames!!.contains(username)
-
-    }
 
 
     fun followUser() {
         try {
-            val username = _user.value?.username ?: ""
-            val fullname = _user.value?.fullname ?: ""
-            val userId = _user.value?._id ?: ""
+//            val username = _user.value?.username ?: ""
+//            val fullname = _user.value?.fullname ?: ""
+//            val userId = _user.value?._id ?: ""
 //            viewModelScope.launch {
 //                val followResponse = repository.followUser(
 //                    FollowUser(
@@ -114,9 +100,9 @@ class AuthorProfileViewModel @Inject constructor(
 
     fun unfollowUser() {
         try {
-            val username = _user.value?.username ?: ""
-            val fullname = _user.value?.fullname ?: ""
-            val userId = _user.value?._id ?: ""
+//            val username = _user.value?.username ?: ""
+//            val fullname = _user.value?.fullname ?: ""
+//            val userId = _user.value?._id ?: ""
             viewModelScope.launch {
 //                val followResponse = repository.unfollowUser(
 //                    FollowUser(
@@ -151,7 +137,6 @@ class AuthorProfileViewModel @Inject constructor(
                                 user = result.data?.user
                             )
                         )
-                        getFollowingStatus()
 
 
                     }

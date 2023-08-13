@@ -30,7 +30,7 @@ import com.peterchege.blogger.core.util.Constants
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun CategoryScreen(
-    navController: NavController,
+
     viewModel: CategoryScreenViewModel = hiltViewModel()
 ) {
     Scaffold(

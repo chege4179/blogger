@@ -49,9 +49,10 @@ import kotlinx.coroutines.launch
 @ExperimentalCoilApi
 @Composable
 fun ProfileScreen(
-    navController: NavController,
-    navHostController: NavController,
-    viewModel: ProfileScreenViewModel = hiltViewModel()
+    viewModel: ProfileScreenViewModel = hiltViewModel(),
+    navigateToProfileFollowerFollowingScreen:(String) -> Unit,
+    navigateToPostScreen:(String) -> Unit,
+    navigateToLoginScreen:() -> Unit
 ) {
 
     val user = viewModel.user.collectAsStateWithLifecycle(initialValue = null)
@@ -109,7 +110,7 @@ fun ProfileScreen(
                     BottomSheetItem(
                         name = "Log Out",
                         onClick = {
-                            viewModel.logoutUser(navHostController)
+                            viewModel.logoutUser(navigateToLoginScreen = navigateToLoginScreen)
                         },
                         icon = Icons.Filled.Logout
                     )
@@ -235,7 +236,7 @@ fun ProfileScreen(
 
                                     Column(
                                         modifier = Modifier.clickable {
-                                            navController.navigate(Screens.PROFILE_FOLLOWER_FOLLOWING_SCREEN + "/${Constants.FOLLOWER}")
+                                            navigateToProfileFollowerFollowingScreen(Constants.FOLLOWER)
 
                                         },
                                         verticalArrangement = Arrangement.Center,
@@ -262,7 +263,8 @@ fun ProfileScreen(
 
                                     Column(
                                         modifier = Modifier.clickable {
-                                            navController.navigate(Screens.PROFILE_FOLLOWER_FOLLOWING_SCREEN + "/${Constants.FOLLOWING}")
+                                            navigateToProfileFollowerFollowingScreen(Constants.FOLLOWING)
+
                                         },
                                         verticalArrangement = Arrangement.Center,
                                         horizontalAlignment = Alignment.CenterHorizontally
@@ -317,7 +319,7 @@ fun ProfileScreen(
                                 ArticleCard(
                                     post = post,
                                     onItemClick = {
-                                        navHostController.navigate(Screens.POST_SCREEN + "/${post._id}/${Constants.API_SOURCE}")
+                                        navigateToPostScreen(post._id)
 
                                     },
                                     onProfileNavigate = { username ->

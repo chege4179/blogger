@@ -80,7 +80,7 @@ class LoginScreenViewModel @Inject constructor(
 
     }
 
-    fun initiateLogin() {
+    fun initiateLogin(navigateToDashBoard:() ->Unit) {
         viewModelScope.launch {
             try {
                 val token = FirebaseMessaging.getInstance().token.await()
@@ -109,7 +109,7 @@ class LoginScreenViewModel @Inject constructor(
                                 response.data.user?.let {
                                     repository.setLoggedInUser(user = it)
                                 }
-                                _eventFlow.emit(UiEvent.Navigate(route = Screens.DASHBOARD_SCREEN))
+                                navigateToDashBoard()
                             }
                         }
 

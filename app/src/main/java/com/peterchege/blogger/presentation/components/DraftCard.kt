@@ -36,7 +36,7 @@ import com.peterchege.blogger.core.util.Screens
 
 @Composable
 fun DraftCard(
-    navController: NavController,
+    navigateToAddPostScreen:(String) -> Unit,
     draftRecord: DraftRecord,
     onDeleteDraft:(Int) -> Unit
 ){
@@ -47,9 +47,8 @@ fun DraftCard(
             .height(60.dp)
             .border(BorderStroke(1.dp, Color.DarkGray))
             .clickable {
-                navController.navigate(
-                    Screens.ADD_NEW_POST_SCREEN+
-                        "?postTitle=${draftRecord.postTitle}&postBody=${draftRecord.postBody}")
+                navigateToAddPostScreen(draftRecord.id.toString())
+
             }
         ,
 

@@ -25,6 +25,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,26 +44,26 @@ import com.peterchege.blogger.presentation.components.NotificationCard
 
 @Composable
 fun NotificationScreen(
-    navController: NavController,
-    navHostController: NavController,
+
+    navigateToAuthorProfileScreen: (String) -> Unit,
+    navigateToPostScreen: (String) -> Unit,
     viewModel: NotificationScreenViewModel = hiltViewModel()
 ){
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     NotificationScreenContent(
-        navController = navController,
-        navHostController = navHostController,
-        uiState = uiState.value)
-
+        uiState = uiState,
+        navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
+        navigateToPostScreen = navigateToPostScreen,
+    )
 }
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun NotificationScreenContent(
-    navController: NavController,
-    navHostController: NavController,
     uiState:NotificationScreenUiState,
-
+    navigateToPostScreen:(String) -> Unit,
+    navigateToAuthorProfileScreen:(String) -> Unit,
 ){
     Scaffold(
         modifier = Modifier
@@ -109,8 +110,9 @@ fun NotificationScreenContent(
                     }else{
                         items(items = notifications.reversed()){ notification ->
                             NotificationCard(
-                                navController = navHostController,
-                                notification = notification
+                                notification = notification,
+                                navigateToPostScreen = navigateToPostScreen,
+                                navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
                             )
                             Spacer(modifier = Modifier.padding(10.dp))
                         }

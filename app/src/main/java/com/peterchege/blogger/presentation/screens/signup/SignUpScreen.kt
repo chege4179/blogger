@@ -49,13 +49,13 @@ import kotlinx.coroutines.flow.collectLatest
 @ExperimentalComposeUiApi
 @Composable
 fun SignUpScreen(
-    navController: NavController,
+    navigateToLoginScreen:() ->Unit,
     viewModel: SignUpScreenViewModel = hiltViewModel()
 ){
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
     SignUpScreenContent(
-        navController = navController,
+        navigateToLoginScreen = navigateToLoginScreen,
         uiState = uiState.value,
         eventFlow = viewModel.eventFlow,
         onChangeUsername = { viewModel.onChangeUsername(it) },
@@ -64,7 +64,7 @@ fun SignUpScreen(
         onChangePassword = { viewModel.onChangePassword(it) },
         onChangeConfirmPassword = { viewModel.onChangePasswordConfirm(it) },
         onChangePasswordVisibility = { viewModel.onChangePasswordVisibility() },
-        onSubmit = { viewModel.signUpUser() }
+        onSubmit = { viewModel.signUpUser(navigateToLoginScreen = navigateToLoginScreen) }
     )
 
 }
@@ -74,7 +74,7 @@ fun SignUpScreen(
 @ExperimentalComposeUiApi
 @Composable
 fun SignUpScreenContent(
-    navController:NavController,
+    navigateToLoginScreen: () -> Unit,
     uiState: SignUpFormState,
     eventFlow: SharedFlow<UiEvent>,
     onChangeUsername:(String) -> Unit,
@@ -100,7 +100,7 @@ fun SignUpScreenContent(
                     )
                 }
                 is UiEvent.Navigate -> {
-                    navController.navigate(route = event.route)
+
                 }
             }
         }
@@ -243,7 +243,7 @@ fun SignUpScreenContent(
                         .fillMaxWidth()
                         .height(50.dp),
                     onClick = {
-                    navController.navigate(Screens.LOGIN_SCREEN)
+                    navigateToLoginScreen()
 
                 }) {
                     Text(text = "Login")

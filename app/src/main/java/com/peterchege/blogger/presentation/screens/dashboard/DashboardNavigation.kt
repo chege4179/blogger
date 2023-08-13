@@ -16,53 +16,78 @@
 package com.peterchege.blogger.presentation.screens.dashboard
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navigation
+import coil.annotation.ExperimentalCoilApi
 import com.peterchege.blogger.core.util.Screens
+import com.peterchege.blogger.presentation.navigation.navigateToAddPostScreen
+import com.peterchege.blogger.presentation.navigation.navigateToAuthUserProfileScreen
+import com.peterchege.blogger.presentation.navigation.navigateToAuthorProfileScreen
+import com.peterchege.blogger.presentation.navigation.navigateToCategoryScreen
+import com.peterchege.blogger.presentation.navigation.navigateToLoginScreen
+import com.peterchege.blogger.presentation.navigation.navigateToPostScreen
+import com.peterchege.blogger.presentation.navigation.navigateToProfileFollowerFollowingScreen
+import com.peterchege.blogger.presentation.navigation.navigateToSearchScreen
 import com.peterchege.blogger.presentation.screens.dashboard.feed_screen.FeedScreen
 import com.peterchege.blogger.presentation.screens.dashboard.notifcations_screen.NotificationScreen
-import com.peterchege.blogger.presentation.screens.dashboard.profile_screen.ProfileNavigation
+import com.peterchege.blogger.presentation.screens.dashboard.profile_screen.ProfileScreen
 import com.peterchege.blogger.presentation.screens.dashboard.savedposts_screen.SavedPostScreen
 
 
 @Composable
 fun DashboardNavigation(
-    navController: NavHostController,
-    navHostController: NavHostController
+    navHostController: NavHostController,
+    bottomNavController:NavHostController
 ) {
 
+
     NavHost(
-
-        navController = navController,
+        navController = bottomNavController,
         startDestination = Screens.FEED_SCREEN
-    ) {
-
+    ){
         composable(
             route = Screens.FEED_SCREEN
         ) {
-            FeedScreen(bottomNavController = navController, navHostController = navHostController)
+            FeedScreen(
+                navigateToAddPostScreen = navHostController::navigateToAddPostScreen,
+                navigateToAuthorProfileScreen = navHostController::navigateToAuthorProfileScreen,
+                navigateToCategoryScreen = navHostController::navigateToCategoryScreen,
+                navigateToPostScreen = navHostController::navigateToPostScreen,
+                navigateToSearchScreen = navHostController::navigateToSearchScreen,
+                navigateToAuthUserProfileScreen = navHostController::navigateToAuthUserProfileScreen,
+            )
         }
         composable(
             route = Screens.SAVED_POST_SCREEN
         ) {
             SavedPostScreen(
-                bottomNavController = navController,
-                navHostController = navHostController
+                navigateToPostScreen = navHostController::navigateToPostScreen,
             )
         }
 
         composable(
             route = Screens.NOTIFICATION_SCREEN
         ) {
-            NotificationScreen(navController, navHostController = navHostController)
+            NotificationScreen(
+                navigateToPostScreen = navHostController::navigateToPostScreen,
+                navigateToAuthorProfileScreen = navHostController::navigateToAuthorProfileScreen,
+            )
+
         }
         composable(
-            route = Screens.PROFILE_NAVIGATION
+            route = Screens.PROFILE_SCREEN
         ) {
-            ProfileNavigation(navController, navHostController = navHostController)
+            ProfileScreen(
+                navigateToLoginScreen = navHostController::navigateToLoginScreen,
+                navigateToProfileFollowerFollowingScreen = navHostController::navigateToProfileFollowerFollowingScreen,
+                navigateToPostScreen = navHostController::navigateToPostScreen,
+            )
         }
-
     }
 
 }

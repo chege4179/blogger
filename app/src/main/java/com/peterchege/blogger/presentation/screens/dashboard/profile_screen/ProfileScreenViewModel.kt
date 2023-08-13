@@ -30,13 +30,30 @@ import com.peterchege.blogger.core.api.responses.Post
 import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.Resource
 import com.peterchege.blogger.core.util.Screens
+import com.peterchege.blogger.domain.models.PostUI
 import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.use_case.GetProfileUseCase
 import com.peterchege.blogger.domain.use_case.LogoutUseCase
+import com.peterchege.blogger.presentation.screens.dashboard.feed_screen.FeedScreenUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+
+
+sealed interface ProfileScreenUiState {
+    object Loading : ProfileScreenUiState
+
+    data class Success(val posts:List<PostUI>) : ProfileScreenUiState
+
+    data class Error(val message: String) : ProfileScreenUiState
+
+    object Empty : ProfileScreenUiState
+}
+
+
+
 
 
 @HiltViewModel
@@ -97,7 +114,7 @@ class ProfileScreenViewModel @Inject constructor(
         _openDialogState.value = false
     }
 
-    fun logoutUser(navController: NavController) {
+    fun logoutUser(navigateToLoginScreen:() -> Unit) {
         val sharedPref: SharedPreferences? = null
 
         val username = _user.value?.username ?: ""
@@ -115,7 +132,7 @@ class ProfileScreenViewModel @Inject constructor(
                 is Resource.Success -> {
                     analyticsHelper.logLogOutEvent(username = username)
                     authRepository.unsetLoggedInUser()
-                    navController.navigate(Screens.LOGIN_SCREEN)
+                    navigateToLoginScreen()
                 }
                 is Resource.Loading -> {
 

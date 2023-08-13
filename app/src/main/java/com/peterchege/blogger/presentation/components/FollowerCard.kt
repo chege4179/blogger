@@ -128,7 +128,7 @@ fun FollowerCard(
 
 @Composable
 fun FollowingCard(
-    navController: NavController,
+    navigateToFollowingPage:(String) ->Unit,
     following: Following,
     unFollowUser: (following: Following) -> Unit,
     isYourProfile: Boolean,
@@ -139,7 +139,8 @@ fun FollowingCard(
             .padding(10.dp)
             .height(70.dp)
             .clickable {
-                navController.navigate(Screens.AUTHOR_PROFILE_SCREEN + "/${following.followedUsername}")
+                navigateToFollowingPage(following.followedUsername)
+
             },
         shape = RoundedCornerShape(15),
         elevation = 3.dp

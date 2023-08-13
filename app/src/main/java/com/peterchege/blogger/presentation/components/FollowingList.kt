@@ -32,7 +32,7 @@ import com.peterchege.blogger.core.api.responses.Following
 @Composable
 fun FollowingList(
     following:List<Following>,
-    navController: NavController
+    navigateToAuthorProfileScreen:(String) -> Unit,
 ){
     LazyColumn(
         modifier = Modifier
@@ -53,7 +53,7 @@ fun FollowingList(
         }else{
             items(items = following){ following ->
                 FollowingCard(
-                    navController =navController ,
+                    navigateToFollowingPage = navigateToAuthorProfileScreen,
                     following =following,
                     unFollowUser ={
                     },

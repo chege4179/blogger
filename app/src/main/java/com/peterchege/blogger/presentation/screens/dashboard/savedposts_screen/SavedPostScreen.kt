@@ -36,13 +36,13 @@ import com.peterchege.blogger.presentation.components.ArticleCard
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.domain.mappers.toExternalModel
+import com.peterchege.blogger.presentation.navigation.navigateToPostScreen
 
 @OptIn(ExperimentalCoilApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun SavedPostScreen(
-    navHostController: NavHostController,
-    bottomNavController: NavController,
+    navigateToPostScreen:(String) -> Unit,
     viewModel: SavedPostScreenViewModel = hiltViewModel()
 ){
     val posts = viewModel.posts
@@ -88,10 +88,10 @@ fun SavedPostScreen(
                 ArticleCard(
                     post = post,
                     onItemClick = {
-                        navHostController.navigate(Screens.POST_SCREEN + "/${post._id}/${Constants.ROOM_SOURCE}")
+                        navigateToPostScreen(it._id)
                     },
                     onProfileNavigate = {
-                        viewModel.onProfileNavigate(it,bottomNavController,navHostController)
+
                     },
                     onDeletePost = {
 

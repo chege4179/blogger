@@ -80,22 +80,6 @@ fun ArticleCard(
                         .height(150.dp),
                     contentDescription = "Post Image"
                 )
-
-//                Image(
-//                    painter = rememberImagePainter(
-//                        data = post.imageUrl,
-//                        builder = {
-//                            crossfade(true)
-//
-//                        },
-//                        imageLoader =
-//                    ),
-//                    contentDescription = "Post Image",
-//                    contentScale = ContentScale.Crop,
-//                    modifier = Modifier
-//                        .fillMaxSize()
-//                        .height(150.dp)
-//                )
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(
                     modifier = Modifier

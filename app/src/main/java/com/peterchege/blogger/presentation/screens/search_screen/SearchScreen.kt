@@ -47,7 +47,9 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SearchScreen(
-    navController: NavHostController,
+    navigateToPostScreen:(String) -> Unit,
+    navigateToAuthorProfileScreen:(String) -> Unit,
+
     viewModel: SearchScreenViewModel = hiltViewModel()
 ){
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -58,7 +60,9 @@ fun SearchScreen(
         uiState = uiState,
         searchQuery = searchQuery,
         onChangeSearchQuery = viewModel::onChangeSearchTerm,
-        navController = navController
+        navigateToPostScreen = navigateToPostScreen,
+        navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
+
     )
 
 }
@@ -71,8 +75,10 @@ fun SearchScreenContent(
     uiState: SearchScreenUiState,
     searchQuery:String,
     onChangeSearchQuery:(String) -> Unit,
-    navController: NavHostController,
-) {
+    navigateToPostScreen: (String) -> Unit,
+    navigateToAuthorProfileScreen: (String) -> Unit,
+
+    ) {
 
     val scaffoldState = rememberScaffoldState()
 
@@ -164,8 +170,9 @@ fun SearchScreenContent(
             Tabs(pagerState = pagerState)
             TabsContent(
                 pagerState = pagerState,
-                navController = navController,
                 uiState = uiState,
+                navigateToPostScreen = navigateToPostScreen,
+                navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
             )
         }
     }
@@ -218,11 +225,21 @@ fun Tabs(pagerState: PagerState) {
 
 @ExperimentalPagerApi
 @Composable
-fun TabsContent(pagerState: PagerState, navController: NavHostController,uiState: SearchScreenUiState) {
+fun TabsContent(
+    pagerState: PagerState,
+    uiState: SearchScreenUiState,
+    navigateToAuthorProfileScreen: (String) -> Unit,
+    navigateToPostScreen: (String) -> Unit
+) {
     HorizontalPager(state = pagerState, count = 2) { page ->
         when (page) {
-            0 -> SearchPostsTab(navHostController = navController,uiState = uiState)
-            1 -> SearchUsersTab(navHostController = navController,uiState = uiState)
+            0 -> SearchPostsTab(
+                uiState = uiState,
+                navigateToPostScreen = navigateToPostScreen)
+            1 -> SearchUsersTab(
+                uiState = uiState,
+                navigateToAuthorProfileScreen = navigateToAuthorProfileScreen
+            )
 
         }
     }

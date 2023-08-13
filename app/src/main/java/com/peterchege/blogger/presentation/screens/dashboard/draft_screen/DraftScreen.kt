@@ -36,7 +36,8 @@ import com.peterchege.blogger.presentation.components.DraftCard
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun DraftScreen(
-    navController: NavController,
+    navigateToAddPostScreen:(String) -> Unit,
+
     viewModel: DraftScreenViewModel = hiltViewModel()
 ){
     val drafts = viewModel.drafts.collectAsStateWithLifecycle().value
@@ -67,7 +68,7 @@ fun DraftScreen(
                 items(items = drafts){ draft ->
                     DraftCard(
                         draftRecord = draft,
-                        navController = navController,
+                        navigateToAddPostScreen = navigateToAddPostScreen,
                         onDeleteDraft = {
                             viewModel.deleteDraft(it)
                         }

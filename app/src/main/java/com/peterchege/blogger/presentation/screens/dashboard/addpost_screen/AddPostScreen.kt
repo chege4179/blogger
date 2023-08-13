@@ -26,6 +26,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -46,24 +47,24 @@ import kotlinx.coroutines.flow.collectLatest
 @ExperimentalCoilApi
 @Composable
 fun AddPostScreen(
-    navController: NavController,
-    bottomNavController: NavController,
+    navigateToDraftScreen: () -> Unit,
+    navigateToDashboardScreen:() -> Unit,
     viewModel: AddPostScreenViewModel = hiltViewModel(),
 
     ){
-    val isUploading = viewModel.isUploading.collectAsStateWithLifecycle()
-    val formState = viewModel.formState.collectAsStateWithLifecycle()
+    val isUploading by viewModel.isUploading.collectAsStateWithLifecycle()
+    val formState by viewModel.formState.collectAsStateWithLifecycle()
 
     AddPostScreenContent(
-        navController = navController,
-        bottomNavController = bottomNavController,
-        formState = formState.value,
-        isUploading = isUploading.value,
+
+        formState = formState,
+        isUploading = isUploading,
         eventFlow = viewModel.eventFlow,
         onChangePostTitle = { viewModel.onChangePostTitle(it) },
         onChangePostBody = { viewModel.onChangePostBody(it) },
         onChangeImageUri = { viewModel.onChangePhotoUri(it) },
-        onSubmit = { viewModel.postArticle() }
+        onSubmit = { viewModel.postArticle(navigateToDashboardScreen = navigateToDashboardScreen) },
+        navigateToDraftScreen = navigateToDraftScreen,
     )
 
 
@@ -74,8 +75,7 @@ fun AddPostScreen(
 @ExperimentalCoilApi
 @Composable
 fun AddPostScreenContent(
-    navController: NavController,
-    bottomNavController: NavController,
+    navigateToDraftScreen:() -> Unit,
     formState: AddPostFormState,
     isUploading:Boolean,
     eventFlow:SharedFlow<UiEvent>,
@@ -104,7 +104,7 @@ fun AddPostScreenContent(
                 }
 
                 is UiEvent.Navigate -> {
-                    navController.navigate(route = event.route)
+
                 }
             }
         }
@@ -209,7 +209,8 @@ fun AddPostScreenContent(
                         ) {
                             Button(
                                 onClick = {
-                                    navController.navigate(Screens.DRAFT_SCREEN)
+                                    navigateToDraftScreen()
+
                                 }) {
                                 Text(
                                     text = "Go To Drafts"
