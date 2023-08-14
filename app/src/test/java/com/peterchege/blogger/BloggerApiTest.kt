@@ -37,6 +37,10 @@ import retrofit2.Retrofit
 import java.io.InputStream
 import java.net.HttpURLConnection
 
+private val json: Json by lazy {
+    Json { ignoreUnknownKeys = true }
+}
+
 @RunWith(RobolectricTestRunner::class)
 class BloggerApiTest {
 
@@ -59,7 +63,7 @@ class BloggerApiTest {
             .build()
 
         val contentType = "application/json".toMediaType()
-        val converterFactory = Json { ignoreUnknownKeys = true }.asConverterFactory(contentType)
+        val converterFactory = json.asConverterFactory(contentType)
 
         bloggerApi = Retrofit.Builder()
             .baseUrl(mockWebServer.url("/"))
@@ -78,11 +82,10 @@ class BloggerApiTest {
 
     @Test
     fun when_given_a_proper_response_network_success_result_is_returned(): Unit = runBlocking {
-        val jsonStream: InputStream = context!!.resources.assets.open("all_posts_success.json")
-        val jsonBytes: ByteArray = jsonStream.readBytes()
+
         val response = MockResponse()
             .setResponseCode(HttpURLConnection.HTTP_OK)
-            .setBody(String(jsonBytes))
+            .setBody(all_posts_success)
         mockWebServer.enqueue(response)
 
         val data = safeApiCall { bloggerApi.getAllPosts() }
@@ -93,11 +96,9 @@ class BloggerApiTest {
 
     @Test
     fun when_given_an_error_response_network_error_result_is_returned(): Unit = runBlocking {
-        val jsonStream: InputStream = context!!.resources.assets.open("all_posts_error.json")
-        val jsonBytes: ByteArray = jsonStream.readBytes()
         val response = MockResponse()
             .setResponseCode(400)
-            .setBody(String(jsonBytes))
+            .setBody(all_posts_error)
         mockWebServer.enqueue(response)
 
         val data = safeApiCall { bloggerApi.getAllPosts() }
