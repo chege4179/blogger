@@ -24,6 +24,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -36,20 +37,30 @@ import com.peterchege.blogger.presentation.components.ArticleCard
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.domain.mappers.toExternalModel
+import com.peterchege.blogger.presentation.components.ErrorComponent
+import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.navigation.navigateToPostScreen
-
-@OptIn(ExperimentalCoilApi::class)
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun SavedPostScreen(
     navigateToPostScreen:(String) -> Unit,
     viewModel: SavedPostScreenViewModel = hiltViewModel()
 ){
-    val posts = viewModel.posts
-        .collectAsStateWithLifecycle()
-        .value
-        .map { it.toExternalModel() }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    SavedPostScreenContent(
+        navigateToPostScreen = navigateToPostScreen,
+        uiState = uiState
+    )
+}
 
+
+
+@OptIn(ExperimentalCoilApi::class)
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@Composable
+fun SavedPostScreenContent(
+    navigateToPostScreen:(String) -> Unit,
+    uiState: SavedPostScreenUiState,
+){
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
@@ -64,45 +75,62 @@ fun SavedPostScreen(
                 backgroundColor = MaterialTheme.colors.primary)
         }
     ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(15.dp)
-        ){
-            item{
-                Column(
+        when(uiState){
+            is SavedPostScreenUiState.Loading -> {
+                LoadingComponent()
+            }
+            is SavedPostScreenUiState.Empty -> {
+
+            }
+            is SavedPostScreenUiState.Error -> {
+                ErrorComponent(
+                    retryCallback = { /*TODO*/ },
+                    errorMessage = uiState.message)
+            }
+            is SavedPostScreenUiState.Success -> {
+                val posts = uiState.posts
+                LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                ) {
-                    if (posts.isEmpty()){
-                        Text(
-                            text = "You have no saved posts",
-                            fontWeight = FontWeight.Bold,
-                        )
+                        .padding(15.dp)
+                ){
+                    item{
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            if (posts.isEmpty()){
+                                Text(
+                                    text = "You have no saved posts",
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            }
+
+                        }
                     }
 
+                    items(items = posts){ post ->
+                        ArticleCard(
+                            post = post,
+                            onItemClick = {
+                                navigateToPostScreen(it._id)
+                            },
+                            onProfileNavigate = {
+
+                            },
+                            onDeletePost = {
+
+                            },
+                            profileImageUrl ="https://res.cloudinary.com/dhuqr5iyw/image/upload/v1640971757/mystory/profilepictures/default_y4mjwp.jpg",
+                            isLiked = false,
+                            isSaved =true,
+                            isProfile = false
+                        )
+                    }
                 }
             }
-
-            items(items = posts){ post ->
-                ArticleCard(
-                    post = post,
-                    onItemClick = {
-                        navigateToPostScreen(it._id)
-                    },
-                    onProfileNavigate = {
-
-                    },
-                    onDeletePost = {
-
-                    },
-                    profileImageUrl ="https://res.cloudinary.com/dhuqr5iyw/image/upload/v1640971757/mystory/profilepictures/default_y4mjwp.jpg",
-                    isLiked = false,
-                    isSaved =true,
-                    isProfile = false
-                )
-            }
         }
+
     }
 
 

@@ -46,7 +46,8 @@ data class FeedScreenUi(
 
 data class AuthorProfileScreenUi(
     val posts: List<Post>,
-    val user: User? = null
+    val user: User? = null,
+    val isFollowing:Boolean = false,
 )
 
 data class AuthorProfileFollowerFollowingUi(

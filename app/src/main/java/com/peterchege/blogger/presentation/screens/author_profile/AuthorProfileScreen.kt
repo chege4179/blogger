@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -41,6 +42,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
+import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.presentation.components.ArticleCard
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.Screens
@@ -57,16 +59,18 @@ fun AuthorProfileScreen(
     navigateToPostScreen:(String) -> Unit,
     viewModel: AuthorProfileViewModel = hiltViewModel()
 ) {
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val authUser by viewModel.authUser.collectAsStateWithLifecycle()
 
 
     AuthorProfileScreenContent(
 
         followUser = { /*TODO*/ },
         unfollowUser = { /*TODO*/ },
-        uiState = uiState.value,
+        uiState = uiState,
         navigateToAuthorFollowerFollowingScreen = navigateToAuthorFollowerFollowingScreen,
-        navigateToPostScreen = navigateToPostScreen
+        navigateToPostScreen = navigateToPostScreen,
+        authUser = authUser
     )
 
 
@@ -76,6 +80,7 @@ fun AuthorProfileScreen(
 @OptIn(ExperimentalCoilApi::class)
 @Composable
 fun AuthorProfileScreenContent(
+    authUser: User?,
     followUser: () -> Unit,
     unfollowUser: () -> Unit,
     uiState: AuthorProfileScreenUiState,
@@ -255,13 +260,25 @@ fun AuthorProfileScreenContent(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceEvenly,
                         ) {
-                            Button(
-                                modifier = Modifier.fillMaxWidth(0.5f),
-                                onClick = {
-                                    followUser()
-                                }) {
-                                Text(text = "Follow")
+                            val authUserFollowing = authUser?.following?.map { it.followedId } ?: emptyList()
+                            if(authUserFollowing.contains(user?._id)){
+                                Button(
+                                    modifier = Modifier.fillMaxWidth(0.5f),
+                                    onClick = {
+                                        unfollowUser()
+                                    }) {
+                                    Text(text = "Un Follow")
+                                }
+                            }else{
+                                Button(
+                                    modifier = Modifier.fillMaxWidth(0.5f),
+                                    onClick = {
+                                        followUser()
+                                    }) {
+                                    Text(text = "Follow")
+                                }
                             }
+
                             Spacer(modifier = Modifier.width(5.dp))
                             Button(
                                 modifier = Modifier.fillMaxWidth(),

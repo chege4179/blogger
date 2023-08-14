@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.peterchege.blogger.core.api.requests.FollowUser
 import com.peterchege.blogger.core.api.responses.Post
+import com.peterchege.blogger.core.api.responses.ProfileResponse
 import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.Resource
 import com.peterchege.blogger.domain.repository.AuthRepository
@@ -49,14 +50,6 @@ class AuthorProfileViewModel @Inject constructor(
 
     ) : ViewModel() {
 
-
-    private val _uiState = MutableStateFlow<AuthorProfileScreenUiState>(AuthorProfileScreenUiState.Loading)
-    val uiState = _uiState.asStateFlow()
-
-    private var _isFollowing = mutableStateOf(false)
-    var isFollowing: State<Boolean> = _isFollowing
-
-
     val authUser = authRepository.getLoggedInUser()
         .stateIn(
             scope = viewModelScope,
@@ -65,6 +58,8 @@ class AuthorProfileViewModel @Inject constructor(
         )
 
 
+    private val _uiState = MutableStateFlow<AuthorProfileScreenUiState>(AuthorProfileScreenUiState.Loading)
+    val uiState = _uiState.asStateFlow()
 
     init {
         getProfile()

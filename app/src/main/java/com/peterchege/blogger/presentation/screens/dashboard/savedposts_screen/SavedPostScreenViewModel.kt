@@ -20,9 +20,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import com.peterchege.blogger.core.api.responses.Post
 import com.peterchege.blogger.core.api.responses.User
+import com.peterchege.blogger.core.room.entities.PostRecordWithCommentsLikesViews
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.Screens
+import com.peterchege.blogger.domain.mappers.toExternalModel
+import com.peterchege.blogger.domain.models.PostUI
 import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.PostRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,6 +34,16 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+sealed interface SavedPostScreenUiState {
+
+    object Loading : SavedPostScreenUiState
+
+    data class Success(val posts:List<Post>) : SavedPostScreenUiState
+
+    data class Error(val message: String) : SavedPostScreenUiState
+
+    object Empty : SavedPostScreenUiState
+}
 
 @HiltViewModel
 class SavedPostScreenViewModel @Inject constructor(
@@ -37,46 +51,22 @@ class SavedPostScreenViewModel @Inject constructor(
     private val authRepository: AuthRepository,
 
     ) : ViewModel() {
-    val posts = repository.getAllSavedPosts()
+
+
+    val uiState = repository.getAllSavedPosts()
+        .map <List<PostRecordWithCommentsLikesViews>,SavedPostScreenUiState>{
+            val posts = it.map { it.toExternalModel() }
+            SavedPostScreenUiState.Success(posts = posts)
+        }
+        .onStart {
+            SavedPostScreenUiState.Empty
+        }
+        .catch {
+            SavedPostScreenUiState.Error(message = "An unexpected error occurred")
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000L),
-            initialValue = emptyList()
-
+            initialValue = SavedPostScreenUiState.Loading
         )
-    private var _user = MutableStateFlow<User?>(null)
-    var user: StateFlow<User?> = _user
-
-    init {
-        loadUser()
-    }
-
-    private fun loadUser(){
-        viewModelScope.launch {
-            authRepository.getLoggedInUser().collectLatest {
-                _user.value = it
-            }
-        }
-    }
-
-
-    fun onProfileNavigate(
-        username: String,
-        bottomNavController: NavController,
-        navHostController: NavHostController
-    ) {
-        val loginUsername = _user.value?.username ?: ""
-        Log.e("Post author", username)
-        if (loginUsername != null) {
-            Log.e("Login Username", loginUsername)
-        }
-        if (loginUsername == username) {
-            bottomNavController.navigate(Screens.PROFILE_SCREEN)
-        } else {
-            navHostController.navigate(Screens.AUTHOR_PROFILE_NAVIGATION)
-        }
-
-    }
-
-
 }
