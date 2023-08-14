@@ -131,8 +131,11 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideDraftRepository(db: BloggerDatabase): DraftRepository {
-        return DraftRepositoryImpl(db = db)
+    fun provideDraftRepository(
+        db: BloggerDatabase,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher
+    ): DraftRepository {
+        return DraftRepositoryImpl(db = db,ioDispatcher = ioDispatcher)
     }
 
     @Provides

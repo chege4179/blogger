@@ -21,24 +21,42 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.peterchege.blogger.core.room.entities.DraftRecord
 import com.peterchege.blogger.data.DraftRepositoryImpl
+import com.peterchege.blogger.domain.models.PostUI
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.IOException
 import javax.inject.Inject
+
+sealed interface DraftsScreenUiState {
+
+    object Loading : DraftsScreenUiState
+
+    data class Success(val drafts:List<DraftRecord>) : DraftsScreenUiState
+
+    data class Error(val message: String) : DraftsScreenUiState
+
+
+}
+
 
 
 @HiltViewModel
 class DraftScreenViewModel @Inject constructor(
     private val draftRepository: DraftRepositoryImpl
 ):ViewModel() {
-
-    val drafts  = draftRepository.getAllDrafts()
+    val uiState = draftRepository.getAllDrafts()
+        .map { DraftsScreenUiState.Success(it) }
+        .onStart { DraftsScreenUiState.Loading }
+        .catch { DraftsScreenUiState.Error(message = "An unexpected error occurred while fetching your drafts") }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000L),
-            initialValue = emptyList(),
+            initialValue = DraftsScreenUiState.Loading,
         )
 
     fun deleteDraft(id:Int){

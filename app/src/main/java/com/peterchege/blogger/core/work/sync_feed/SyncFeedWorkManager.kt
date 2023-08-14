@@ -23,6 +23,7 @@ import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.peterchege.blogger.core.api.requests.PostBody
@@ -39,6 +40,8 @@ interface SyncFeedWorkManager {
     val isSyncing: Flow<Boolean>
 
     suspend fun startSync()
+
+
 }
 
 class SyncFeedWorkManagerImpl @Inject constructor(
@@ -73,22 +76,6 @@ class SyncFeedWorkManagerImpl @Inject constructor(
             .enqueue()
     }
 
-//    override  fun startExpeditedSyncWork(appContext: Context) {
-//        Timber.d("Started expedited work")
-//        val request = OneTimeWorkRequestBuilder<SyncFeedWorker>()
-//            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-//            .setConstraints(Constraints.Builder()
-//                .setRequiredNetworkType(
-//                    NetworkType.CONNECTED
-//                )
-//                .build())
-//            .build()
-//        WorkManager.getInstance(appContext).apply {
-//            enqueueUniqueWork(WorkConstants.syncFeedWorkName,
-//                ExistingWorkPolicy.KEEP,request)
-//        }
-//
-//    }
 
 
 }

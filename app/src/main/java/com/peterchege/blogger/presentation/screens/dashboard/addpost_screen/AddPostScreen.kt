@@ -18,6 +18,7 @@ package com.peterchege.blogger.presentation.screens.dashboard.addpost_screen
 //import androidx.compose.runtime.livedata.observeAsState
 import android.annotation.SuppressLint
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -47,6 +48,7 @@ import kotlinx.coroutines.flow.collectLatest
 @ExperimentalCoilApi
 @Composable
 fun AddPostScreen(
+    navigateBack:() -> Unit,
     navigateToDraftScreen: () -> Unit,
     navigateToDashboardScreen:() -> Unit,
     viewModel: AddPostScreenViewModel = hiltViewModel(),
@@ -54,17 +56,21 @@ fun AddPostScreen(
     ){
     val isUploading by viewModel.isUploading.collectAsStateWithLifecycle()
     val formState by viewModel.formState.collectAsStateWithLifecycle()
+    val authUser by viewModel.authUser.collectAsStateWithLifecycle()
 
     AddPostScreenContent(
-
         formState = formState,
         isUploading = isUploading,
         eventFlow = viewModel.eventFlow,
         onChangePostTitle = { viewModel.onChangePostTitle(it) },
         onChangePostBody = { viewModel.onChangePostBody(it) },
         onChangeImageUri = { viewModel.onChangePhotoUri(it) },
-        onSubmit = { viewModel.postArticle(navigateToDashboardScreen = navigateToDashboardScreen) },
+        onSubmit = { viewModel.postArticle(navigateToDashboardScreen = navigateToDashboardScreen,user = authUser) },
         navigateToDraftScreen = navigateToDraftScreen,
+        onBackPress = { viewModel.onBackPress(navigateToDashboardScreen) },
+        onSaveDraftConfirm = { viewModel.onSaveDraftConfirm(navigateBack) },
+        onSaveDraftDismiss = { viewModel.onSaveDraftDismiss(navigateBack) },
+        onCloseDialog = { viewModel.onCloseDialog() }
     )
 
 
@@ -83,6 +89,10 @@ fun AddPostScreenContent(
     onChangePostBody:(String) -> Unit,
     onChangeImageUri: (Uri?) -> Unit,
     onSubmit:() -> Unit,
+    onBackPress:() -> Unit,
+    onSaveDraftConfirm: () -> Unit,
+    onSaveDraftDismiss: () -> Unit,
+    onCloseDialog: () -> Unit
 
 
     ) {
@@ -111,18 +121,18 @@ fun AddPostScreenContent(
     }
     Scaffold(
         scaffoldState = scaffoldState
-
     ) {
 
-//        BackHandler() {
-//            viewModel.onBackPress(scaffoldState, navController = navController)
-//        }
-//        if (viewModel.openSaveDraftModal.value) {
-//            DraftConfirmBox(
-//                scaffoldState = scaffoldState,
-//                navController = navController,
-//            )
-//        }
+        BackHandler() {
+            onBackPress()
+        }
+        if (formState.isSaveDraftModalOpen) {
+            DraftConfirmBox(
+                onSaveDraftDismiss = onSaveDraftDismiss,
+                onSaveDraftConfirm = onSaveDraftConfirm,
+                onCloseDialog = onCloseDialog,
+            )
+        }
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -239,9 +249,9 @@ fun AddPostScreenContent(
 @Composable
 fun DraftConfirmBox(
     modifier: Modifier = Modifier,
-    viewModel: AddPostScreenViewModel = hiltViewModel(),
-    scaffoldState: ScaffoldState,
-    navController: NavController
+    onSaveDraftConfirm:() -> Unit,
+    onSaveDraftDismiss:() -> Unit,
+    onCloseDialog:() -> Unit,
 
 ) {
 
@@ -250,7 +260,7 @@ fun DraftConfirmBox(
     AlertDialog(
         modifier = modifier,
         onDismissRequest = {
-            viewModel.onSaveDraftDismiss(navController = navController)
+            onCloseDialog()
         },
         title = {
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
@@ -284,22 +294,29 @@ fun DraftConfirmBox(
                 TextButton(
                     modifier = buttonModifier,
                     onClick = {
-                        viewModel.onSaveDraftDismiss(navController = navController)
+                        onCloseDialog()
                     },
                     colors = ButtonDefaults.textButtonColors(
                         contentColor = MaterialTheme.colors.onSurface
                     )
                 ) {
-                    Text(text = "Cancel".uppercase())
+                    Text(text = "Close".uppercase())
                 }
                 TextButton(
                     modifier = buttonModifier,
                     onClick = {
-                        viewModel.onSaveDraftConfirm(
-                            scaffoldState = scaffoldState,
-                            navController = navController
-                        )
-
+                        onSaveDraftDismiss()
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colors.onSurface
+                    )
+                ) {
+                    Text(text = "Don't Save".uppercase())
+                }
+                TextButton(
+                    modifier = buttonModifier,
+                    onClick = {
+                        onSaveDraftConfirm()
                     }
                 ) {
                     Text(text = "Save ".uppercase())

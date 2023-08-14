@@ -24,4 +24,5 @@ data class DraftRecord (
     val id: Int? = null,
     val postTitle:String = "",
     val postBody:String = "",
+    val imageUri:String = "",
 )

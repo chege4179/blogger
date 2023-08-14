@@ -24,9 +24,11 @@ interface DraftRepository {
 
     fun getAllDrafts(): Flow<List<DraftRecord>>
 
-    suspend fun getDraftById(id:Int): DraftRecord
+    suspend fun getDraftById(id:Int): DraftRecord?
 
     suspend fun deleteAllDrafts()
 
     suspend fun deleteDraftById(id: Int)
+
+    suspend fun updateDraft(postTitle:String,postBody:String,imageUri:String,draftId:Int)
 }

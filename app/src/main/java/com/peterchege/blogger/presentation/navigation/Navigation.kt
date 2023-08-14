@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
@@ -122,12 +123,14 @@ fun Navigation(
             route = Screens.ADD_NEW_POST_SCREEN + "?draftId={draftId}",
             arguments = listOf(
                 navArgument(name = "draftId") {
-                    defaultValue = ""
+                    type = NavType.IntType
+                    defaultValue = 10000
                 },
 
             )
         ) { backStackEntry ->
             AddPostScreen(
+                navigateBack = navController::navigateToDashBoard,
                 navigateToDraftScreen = navController::navigateToDraftScreen,
                 navigateToDashboardScreen = navController::navigateToDashBoard,
             )
@@ -150,47 +153,6 @@ fun Navigation(
             DashBoardScreen(navHostController = navController)
 
         }
-
-
-//        composable(
-//            route = Screens.FEED_SCREEN
-//        ) {
-//            FeedScreen(
-//                navigateToAddPostScreen = navController::navigateToAddPostScreen,
-//                navigateToAuthorProfileScreen = navController::navigateToAuthorProfileScreen,
-//                navigateToCategoryScreen = navController::navigateToCategoryScreen,
-//                navigateToPostScreen = navController::navigateToPostScreen,
-//                navigateToSearchScreen = navController::navigateToSearchScreen,
-//                navigateToAuthUserProfileScreen = navController::navigateToAuthUserProfileScreen,
-//            )
-//        }
-//        composable(
-//            route = Screens.SAVED_POST_SCREEN
-//        ) {
-//            SavedPostScreen(
-//                navigateToPostScreen = navController::navigateToPostScreen,
-//            )
-//        }
-//
-//        composable(
-//            route = Screens.NOTIFICATION_SCREEN
-//        ) {
-//            NotificationScreen(
-//                navigateToPostScreen = navController::navigateToPostScreen,
-//                navigateToAuthorProfileScreen = navController::navigateToAuthorProfileScreen,
-//            )
-//
-//        }
-//        composable(
-//            route = Screens.PROFILE_SCREEN
-//        ) {
-//            ProfileScreen(
-//                navigateToLoginScreen = navController::navigateToLoginScreen,
-//                navigateToProfileFollowerFollowingScreen = navController::navigateToProfileFollowerFollowingScreen,
-//                navigateToPostScreen = navController::navigateToPostScreen,
-//            )
-//        }
-
     }
 
 }

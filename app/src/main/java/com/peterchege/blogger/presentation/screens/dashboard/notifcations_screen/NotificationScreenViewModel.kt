@@ -17,6 +17,7 @@ package com.peterchege.blogger.presentation.screens.dashboard.notifcations_scree
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.peterchege.blogger.core.api.requests.Notification
@@ -48,7 +49,8 @@ class NotificationScreenViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000L),
             initialValue = null
         )
-    private fun getNotifications(username:String) {
+
+    fun getNotifications(username:String) {
         getProfileUseCase(username = username).onEach { result ->
             when (result) {
                 is Resource.Success -> {

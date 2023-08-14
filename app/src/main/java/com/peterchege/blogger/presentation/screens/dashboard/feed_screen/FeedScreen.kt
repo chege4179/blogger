@@ -80,9 +80,9 @@ fun FeedScreen(
         onRefresh = { viewModel.refreshFeed() }
     )
 
-    LaunchedEffect(key1 = true) {
-        viewModel.refreshFeed()
-    }
+//    LaunchedEffect(key1 = true) {
+//        viewModel.refreshFeed()
+//    }
 
     FeedScreenContent(
         navigateToPostScreen = navigateToPostScreen,
@@ -263,16 +263,7 @@ fun FeedScreenContent(
                                         navigateToPostScreen(it._id)
                                     },
                                     onProfileNavigate = {
-                                        if (authUser != null) {
-                                            if (authUser.username == it) {
-                                                navigateToAuthUserProfileScreen()
-                                            }else{
-                                                navigateToAuthorProfileScreen(it)
-                                            }
-                                        }else{
-                                            navigateToAuthorProfileScreen(it)
-                                        }
-
+                                        navigateToAuthorProfileScreen(it)
                                     },
                                     onDeletePost = {},
                                     isLiked = post.isLiked,

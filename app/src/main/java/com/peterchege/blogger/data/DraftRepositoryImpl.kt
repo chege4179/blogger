@@ -15,34 +15,59 @@
  */
 package com.peterchege.blogger.data
 
+import com.peterchege.blogger.core.di.IoDispatcher
 import com.peterchege.blogger.core.room.database.BloggerDatabase
 import com.peterchege.blogger.core.room.entities.DraftRecord
 import com.peterchege.blogger.domain.repository.DraftRepository
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
 class DraftRepositoryImpl @Inject constructor(
-    private val db: BloggerDatabase
+    private val db: BloggerDatabase,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ):DraftRepository {
 
     override suspend fun insertDraft(draft: DraftRecord){
-        return db.draftDao.insertDraft(draft)
+        withContext(ioDispatcher){
+            db.draftDao.insertDraft(draft)
+        }
+
     }
     override fun getAllDrafts(): Flow<List<DraftRecord>> {
-        return db.draftDao.getAllDrafts()
+        return db.draftDao.getAllDrafts().flowOn(ioDispatcher)
     }
 
-    override suspend fun getDraftById(id:Int): DraftRecord {
-        return db.draftDao.getDraftById(id)
+    override suspend fun getDraftById(id:Int): DraftRecord? {
+        return withContext(ioDispatcher){
+            db.draftDao.getDraftById(id)
+        }
     }
 
     override suspend fun deleteAllDrafts(){
-        return db.draftDao.deleteAllDrafts()
+        withContext(ioDispatcher){
+            db.draftDao.deleteAllDrafts()
+        }
     }
 
     override suspend fun deleteDraftById(id: Int){
-        return db.draftDao.deleteDraftById(id)
+        withContext(ioDispatcher){
+            db.draftDao.deleteDraftById(id)
+        }
+    }
+
+    override suspend fun updateDraft(
+        postTitle: String,
+        postBody: String,
+        imageUri: String,
+        draftId: Int
+    ) {
+        withContext(ioDispatcher){
+            db.draftDao.updateDraft(postTitle, postBody, imageUri, draftId)
+        }
     }
 
 }

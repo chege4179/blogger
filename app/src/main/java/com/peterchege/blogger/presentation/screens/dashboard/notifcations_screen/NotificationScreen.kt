@@ -25,6 +25,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,6 +51,14 @@ fun NotificationScreen(
     viewModel: NotificationScreenViewModel = hiltViewModel()
 ){
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val authUser by viewModel.authUser.collectAsStateWithLifecycle()
+
+    LaunchedEffect(key1 = authUser){
+        authUser?.let {
+            viewModel.getNotifications(username = it.username)
+        }
+
+    }
     NotificationScreenContent(
         uiState = uiState,
         navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,

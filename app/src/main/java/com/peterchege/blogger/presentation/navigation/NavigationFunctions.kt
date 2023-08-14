@@ -52,7 +52,7 @@ fun NavController.navigateToAuthorProfileFollowingScreen(username:String,type:St
     this.navigate(route = Screens.AUTHOR_FOLLOWER_FOLLOWING_SCREEN +"/$username" +"/$type")
 }
 
-fun NavController.navigateToAddPostScreen(draftId:String? = null){
+fun NavController.navigateToAddPostScreen(draftId:Int? = null){
     if (draftId == null){
         this.navigate(route = Screens.ADD_NEW_POST_SCREEN)
     }else{

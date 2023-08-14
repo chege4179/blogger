@@ -26,6 +26,7 @@ import com.peterchege.blogger.BuildConfig
 import com.peterchege.blogger.core.analytics.crashlytics.CrashlyticsTree
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.work.WorkConstants
+import com.peterchege.blogger.core.work.WorkInitializer
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 import javax.inject.Inject
@@ -39,6 +40,7 @@ class BloggerApp :Application(),Configuration.Provider {
         super.onCreate()
         initTimber()
         setUpWorkerManagerNotificationChannel()
+        WorkInitializer.initialize(context = this)
 
     }
     override fun getWorkManagerConfiguration(): Configuration =

@@ -26,21 +26,38 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.peterchege.blogger.presentation.components.DraftCard
+import com.peterchege.blogger.presentation.components.ErrorComponent
+import com.peterchege.blogger.presentation.components.LoadingComponent
+
+
+@Composable
+fun DraftScreen(
+    navigateToAddPostScreen:(Int) -> Unit,
+    viewModel: DraftScreenViewModel = hiltViewModel()
+){
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    DraftScreenContent(
+        navigateToAddPostScreen = navigateToAddPostScreen,
+        deleteDraft = { viewModel.deleteDraft(it) },
+        uiState = uiState
+    )
+
+}
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun DraftScreen(
-    navigateToAddPostScreen:(String) -> Unit,
-
-    viewModel: DraftScreenViewModel = hiltViewModel()
+fun DraftScreenContent(
+    navigateToAddPostScreen:(Int) -> Unit,
+    deleteDraft:(Int) -> Unit,
+    uiState: DraftsScreenUiState,
 ){
-    val drafts = viewModel.drafts.collectAsStateWithLifecycle().value
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -54,30 +71,41 @@ fun DraftScreen(
                 backgroundColor = MaterialTheme.colors.primary)
         }
     ) {
-        if (drafts.isEmpty()){
-            Box(modifier = Modifier.fillMaxSize()){
-                Text(
-                    text = "You have no drafts",
-                    modifier = Modifier.align(Alignment.Center)
+        when(uiState){
+            is DraftsScreenUiState.Loading -> {
+                LoadingComponent()
+            }
+            is DraftsScreenUiState.Error -> {
+                ErrorComponent(
+                    retryCallback = { /*TODO*/ },
+                    errorMessage = uiState.message
                 )
             }
-        }else{
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ){
-                items(items = drafts){ draft ->
-                    DraftCard(
-                        draftRecord = draft,
-                        navigateToAddPostScreen = navigateToAddPostScreen,
-                        onDeleteDraft = {
-                            viewModel.deleteDraft(it)
+            is DraftsScreenUiState.Success -> {
+                val drafts = uiState.drafts
+                if (drafts.isEmpty()){
+                    Box(modifier = Modifier.fillMaxSize()){
+                        Text(
+                            text = "You have no drafts",
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
+                }else{
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
+                    ){
+                        items(items = drafts){ draft ->
+                            DraftCard(
+                                draftRecord = draft,
+                                navigateToAddPostScreen = navigateToAddPostScreen,
+                                onDeleteDraft = {
+                                    deleteDraft(it)
+                                }
+                            )
                         }
-                    )
+                    }
                 }
             }
         }
-
-
     }
-
 }

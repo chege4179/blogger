@@ -29,13 +29,16 @@ interface DraftDao {
     suspend fun insertDraft(draft: DraftRecord)
 
     @Query("SELECT * FROM draft where id = :id")
-    suspend fun getDraftById(id:Int): DraftRecord
+    suspend fun getDraftById(id:Int): DraftRecord?
 
     @Query("DELETE FROM draft where id = :id")
     suspend fun deleteDraftById(id:Int)
 
     @Query("DELETE FROM draft")
     suspend fun deleteAllDrafts()
+
+    @Query("UPDATE draft SET postTitle =:postTitle, postBody=:postBody , imageUri = :imageUri WHERE id =:draftId")
+    suspend fun updateDraft(postTitle:String,postBody:String,imageUri:String,draftId:Int)
 
 
 

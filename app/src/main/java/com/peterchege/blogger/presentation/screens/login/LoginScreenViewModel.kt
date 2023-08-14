@@ -101,7 +101,6 @@ class LoginScreenViewModel @Inject constructor(
                         is NetworkResult.Success -> {
                             _uiState.value = _uiState.value.copy(isLoading = false)
                             if (!response.data.success) {
-
                                 _eventFlow.emit(UiEvent.ShowSnackbar(message = response.data.msg))
                             }
                             if (response.data.success) {
@@ -114,17 +113,19 @@ class LoginScreenViewModel @Inject constructor(
                         }
 
                         is NetworkResult.Error -> {
+                            _uiState.value = _uiState.value.copy(isLoading = false)
                             _eventFlow.emit(
                                 UiEvent.ShowSnackbar(
-                                    message = response.message ?: "An unexpected error occurred"
+                                    message =  "An unexpected error occurred"
                                 )
                             )
                         }
 
                         is NetworkResult.Exception -> {
+                            _uiState.value = _uiState.value.copy(isLoading = false)
                             _eventFlow.emit(
                                 UiEvent.ShowSnackbar(
-                                    message = response.e.message ?: "An unexpected exception occurred"
+                                    message =  "An unexpected exception occurred"
                                 )
                             )
                         }

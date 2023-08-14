@@ -30,6 +30,7 @@ import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.domain.repository.AuthRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -52,14 +53,14 @@ class AuthRepositoryImpl  @Inject constructor(
     }
 
     override fun getLoggedInUser(): Flow<User?> {
-        return userDataStoreRepository.getLoggedInUser()
+        return userDataStoreRepository.getLoggedInUser().flowOn(ioDispatcher)
     }
 
     override suspend fun setLoggedInUser(user: User) = withContext(context = ioDispatcher) {
         return@withContext userDataStoreRepository.setLoggedInUser(user = user)
     }
 
-    override suspend fun unsetLoggedInUser()= withContext(context = ioDispatcher) {
+    override suspend fun unsetLoggedInUser() = withContext(context = ioDispatcher) {
         return@withContext userDataStoreRepository.unsetLoggedInUser()
     }
 

@@ -189,9 +189,9 @@ fun LoginScreenContent(
 
                         Icon(
                             imageVector = if (!uiState.isPasswordVisible)
-                                Icons.Filled.Visibility
+                                Icons.Filled.VisibilityOff
                             else
-                                Icons.Filled.VisibilityOff,
+                                Icons.Filled.Visibility,
                             contentDescription = "Visibility on",
                             modifier = Modifier
                                 .size(26.dp)
@@ -201,7 +201,7 @@ fun LoginScreenContent(
                         )
 
                     },
-                    visualTransformation = if (!uiState.isPasswordVisible)
+                    visualTransformation = if (uiState.isPasswordVisible)
                         VisualTransformation.None
                     else
                         PasswordVisualTransformation(),

@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "f6ef5987cd69b9e216f1f45b0a5786c3",
+    "identityHash": "4a3ac38b5084b0caf78b7b5211499f61",
     "entities": [
       {
         "tableName": "draft",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `postTitle` TEXT NOT NULL, `postBody` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `postTitle` TEXT NOT NULL, `postBody` TEXT NOT NULL, `imageUri` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -23,6 +23,12 @@
           {
             "fieldPath": "postBody",
             "columnName": "postBody",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "imageUri",
+            "columnName": "imageUri",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -500,7 +506,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f6ef5987cd69b9e216f1f45b0a5786c3')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4a3ac38b5084b0caf78b7b5211499f61')"
     ]
   }
 }
