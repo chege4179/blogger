@@ -16,14 +16,19 @@
 package com.peterchege.blogger.presentation.screens.search_screen
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -36,22 +41,21 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
-import com.google.accompanist.pager.*
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.presentation.screens.search_screen.tabs.SearchPostsTab
 import com.peterchege.blogger.presentation.screens.search_screen.tabs.SearchUsersTab
 import com.peterchege.blogger.presentation.theme.MainWhiteColor
+import com.peterchege.blogger.presentation.theme.defaultPadding
 import com.peterchege.blogger.presentation.theme.testColor
 import kotlinx.coroutines.launch
 
 @Composable
 fun SearchScreen(
-    navigateToPostScreen:(String) -> Unit,
-    navigateToAuthorProfileScreen:(String) -> Unit,
+    navigateToPostScreen: (String) -> Unit,
+    navigateToAuthorProfileScreen: (String) -> Unit,
 
     viewModel: SearchScreenViewModel = hiltViewModel()
-){
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
 
@@ -63,27 +67,32 @@ fun SearchScreen(
         navigateToPostScreen = navigateToPostScreen,
         navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
 
-    )
+        )
 
 }
 
 
-@OptIn(ExperimentalPagerApi::class)
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class
+)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SearchScreenContent(
     uiState: SearchScreenUiState,
-    searchQuery:String,
-    onChangeSearchQuery:(String) -> Unit,
+    searchQuery: String,
+    onChangeSearchQuery: (String) -> Unit,
     navigateToPostScreen: (String) -> Unit,
     navigateToAuthorProfileScreen: (String) -> Unit,
 
     ) {
 
-    val scaffoldState = rememberScaffoldState()
+    val snackbarHostState = SnackbarHostState()
 
     Scaffold(
-        scaffoldState = scaffoldState,
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
         modifier = Modifier
             .fillMaxSize()
             .padding(10.dp),
@@ -117,9 +126,7 @@ fun SearchScreenContent(
                         keyboardType = KeyboardType.Text,
                     ),
                     colors = TextFieldDefaults.textFieldColors(
-                        textColor = Color.White,
                         disabledTextColor = MainWhiteColor,
-                        backgroundColor = MainWhiteColor,
                         focusedIndicatorColor = MainWhiteColor,
                         unfocusedIndicatorColor = MainWhiteColor,
                         disabledIndicatorColor = MainWhiteColor
@@ -139,33 +146,19 @@ fun SearchScreenContent(
                         )
                     }
                 )
-
-//                IconButton(
-//                    onClick = {
-//
-//                    }) {
-//
-//                    Icon(
-//                        modifier = Modifier
-//                            .size(55.dp)
-//                            .clip(
-//                                shape = RoundedCornerShape(
-//                                    size = 8.dp
-//                                )
-//                            )
-//                            .background(MainWhiteColor)
-//                            .padding(start = 4.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
-//                        imageVector = Icons.Default.FilterList,
-//                        contentDescription = null,
-//                        tint = DarkBlue
-//                    )
-//                }
             }
         },
     ) {
-        val pagerState = rememberPagerState()
+        val pagerState = rememberPagerState(
+            initialPage = 0,
+            initialPageOffsetFraction = 0f,
+            pageCount = { 2 }
+        )
         Column(
-            modifier = Modifier.background(Color.White)
+            modifier = Modifier
+                .background(Color.White)
+                .padding(defaultPadding)
+            ,
         ) {
             Tabs(pagerState = pagerState)
             TabsContent(
@@ -180,7 +173,7 @@ fun SearchScreenContent(
 }
 
 
-@ExperimentalPagerApi
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Tabs(pagerState: PagerState) {
     val list = listOf(Constants.SEARCH_TYPE_POSTS, Constants.SEARCH_TYPE_USERS)
@@ -188,17 +181,16 @@ fun Tabs(pagerState: PagerState) {
 
     TabRow(
         selectedTabIndex = pagerState.currentPage,
-        backgroundColor = Color.White,
+        containerColor = Color.White,
         contentColor = Color.White,
         divider = {
-            TabRowDefaults.Divider(
-                thickness = 2.dp,
+            TabRowDefaults.PrimaryIndicator(
+//                thickness = 2.dp,
                 color = Color.White
             )
         },
         indicator = { tabPositions ->
-            TabRowDefaults.Indicator(
-                Modifier.pagerTabIndicatorOffset(pagerState, tabPositions),
+            SecondaryIndicator(
                 height = 2.dp,
                 color = testColor
             )
@@ -223,7 +215,7 @@ fun Tabs(pagerState: PagerState) {
     }
 }
 
-@ExperimentalPagerApi
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TabsContent(
     pagerState: PagerState,
@@ -231,11 +223,13 @@ fun TabsContent(
     navigateToAuthorProfileScreen: (String) -> Unit,
     navigateToPostScreen: (String) -> Unit
 ) {
-    HorizontalPager(state = pagerState, count = 2) { page ->
+    HorizontalPager(state = pagerState) { page ->
         when (page) {
             0 -> SearchPostsTab(
                 uiState = uiState,
-                navigateToPostScreen = navigateToPostScreen)
+                navigateToPostScreen = navigateToPostScreen
+            )
+
             1 -> SearchUsersTab(
                 uiState = uiState,
                 navigateToAuthorProfileScreen = navigateToAuthorProfileScreen

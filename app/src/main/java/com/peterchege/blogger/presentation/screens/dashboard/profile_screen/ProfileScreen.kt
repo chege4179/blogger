@@ -20,10 +20,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -35,31 +36,34 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.Constants
-import com.peterchege.blogger.core.util.Screens
+import com.peterchege.blogger.domain.repository.NetworkStatus
 import com.peterchege.blogger.presentation.components.ArticleCard
 import com.peterchege.blogger.presentation.components.BottomSheetItem
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
+import com.peterchege.blogger.presentation.theme.defaultPadding
 import com.peterchege.blogger.presentation.theme.lightGrayColor
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun ProfileScreen(
     viewModel: ProfileScreenViewModel = hiltViewModel(),
-    navigateToProfileFollowerFollowingScreen:(String) -> Unit,
-    navigateToPostScreen:(String) -> Unit,
-    navigateToLoginScreen:() -> Unit
-){
+    navigateToProfileFollowerFollowingScreen: (String) -> Unit,
+    navigateToPostScreen: (String) -> Unit,
+    navigateToLoginScreen: () -> Unit
+) {
 
     val authUser by viewModel.authUser.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val networkStatus by viewModel.networkStatus.collectAsStateWithLifecycle()
 
     ProfileScreenContent(
+        networkStatus = networkStatus,
         user = authUser,
         uiState = uiState,
         navigateToProfileFollowerFollowingScreen = navigateToProfileFollowerFollowingScreen,
@@ -69,100 +73,61 @@ fun ProfileScreen(
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @ExperimentalCoilApi
 @Composable
 fun ProfileScreenContent(
+    networkStatus: NetworkStatus,
     user: User?,
     uiState: ProfileScreenUiState,
-    navigateToProfileFollowerFollowingScreen:(String) -> Unit,
-    navigateToPostScreen:(String) -> Unit,
-    navigateToLoginScreen:() -> Unit,
-    logoutUser:() -> Unit,
+    navigateToProfileFollowerFollowingScreen: (String) -> Unit,
+    navigateToPostScreen: (String) -> Unit,
+    navigateToLoginScreen: () -> Unit,
+    logoutUser: () -> Unit,
 ) {
 
-
-    val sheetState = rememberBottomSheetState(
-        initialValue = BottomSheetValue.Collapsed
-    )
-    val scaffoldState = rememberBottomSheetScaffoldState(
-        bottomSheetState = sheetState
+    val snackbarHostState = SnackbarHostState()
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
     )
     val scope = rememberCoroutineScope()
-    BottomSheetScaffold(
-        scaffoldState = scaffoldState,
+    LaunchedEffect(key1 = networkStatus) {
+        when (networkStatus) {
+            is NetworkStatus.Unknown -> {}
+            is NetworkStatus.Connected -> {}
+            is NetworkStatus.Disconnected -> {
+                snackbarHostState.showSnackbar(
+                    message = "You are offline"
+                )
+            }
+        }
+    }
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
         modifier = Modifier
             .fillMaxSize()
             .background(Color.LightGray),
-        sheetContent = {
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-                    .fillMaxWidth()
-                    .height(300.dp)
-                    .background(lightGrayColor),
-                contentAlignment = Alignment.Center,
 
-                ) {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    BottomSheetItem(
-                        name = "Account",
-                        onClick = {
-
-                        },
-                        icon = Icons.Filled.Person
-                    )
-                    BottomSheetItem(
-                        name = "Notification Settings",
-                        onClick = {
-
-                        },
-                        icon = Icons.Filled.Settings
-                    )
-                    BottomSheetItem(
-                        name = "Help",
-                        onClick = {
-
-                        },
-                        icon = Icons.Filled.Help
-                    )
-                    BottomSheetItem(
-                        name = "Share",
-                        onClick = {
-
-                        },
-                        icon = Icons.Filled.Share
-                    )
-                    BottomSheetItem(
-                        name = "Log Out",
-                        onClick = {
-                            logoutUser()
-                        },
-                        icon = Icons.Filled.Logout
-                    )
-
-                }
-            }
-        },
-        sheetBackgroundColor = Color.White,
-        sheetPeekHeight = 0.dp,
-
-
-        ) {
-        when(uiState){
+        ) { paddingValues ->
+        when (uiState) {
             is ProfileScreenUiState.Loading -> {
                 LoadingComponent()
             }
+
             is ProfileScreenUiState.Error -> {
                 ErrorComponent(
                     retryCallback = { /*TODO*/ },
                     errorMessage = uiState.message
                 )
             }
+
             is ProfileScreenUiState.Empty -> {
                 Text(text = "User Not found")
 
             }
+
             is ProfileScreenUiState.Success -> {
                 val posts = uiState.posts
                 val user = uiState.user
@@ -175,7 +140,7 @@ fun ProfileScreenContent(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(Color.White)
-                            .padding(10.dp),
+                            .padding(defaultPadding),
                     ) {
                         item {
                             Column(
@@ -329,10 +294,10 @@ fun ProfileScreenContent(
                                     modifier = Modifier.fillMaxWidth(),
                                     onClick = {
                                         scope.launch {
-                                            if (sheetState.isCollapsed) {
-                                                sheetState.expand()
+                                            if (sheetState.isVisible) {
+                                                sheetState.hide()
                                             } else {
-                                                sheetState.collapse()
+                                                sheetState.expand()
                                             }
                                         }
                                     }) {
@@ -364,6 +329,63 @@ fun ProfileScreenContent(
                     }
                 }
             }
+        }
+
+        if (sheetState.isVisible) {
+            ModalBottomSheet(
+                onDismissRequest = { /*TODO*/ },
+                sheetState = sheetState,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+                        .fillMaxWidth()
+                        .height(300.dp)
+                        .background(lightGrayColor),
+                    contentAlignment = Alignment.Center,
+
+                    ) {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        BottomSheetItem(
+                            name = "Account",
+                            onClick = {
+
+                            },
+                            icon = Icons.Filled.Person
+                        )
+                        BottomSheetItem(
+                            name = "Notification Settings",
+                            onClick = {
+
+                            },
+                            icon = Icons.Filled.Settings
+                        )
+                        BottomSheetItem(
+                            name = "Help",
+                            onClick = {
+
+                            },
+                            icon = Icons.Filled.Help
+                        )
+                        BottomSheetItem(
+                            name = "Share",
+                            onClick = {
+
+                            },
+                            icon = Icons.Filled.Share
+                        )
+                        BottomSheetItem(
+                            name = "Log Out",
+                            onClick = {
+                                logoutUser()
+                            },
+                            icon = Icons.Filled.Logout
+                        )
+
+                    }
+                }
+            }
+
         }
     }
 

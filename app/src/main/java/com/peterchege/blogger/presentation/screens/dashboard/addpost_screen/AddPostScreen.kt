@@ -15,7 +15,7 @@
  */
 package com.peterchege.blogger.presentation.screens.dashboard.addpost_screen
 
-//import androidx.compose.runtime.livedata.observeAsState
+
 import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.activity.compose.BackHandler
@@ -23,24 +23,20 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import androidx.work.*
 import coil.annotation.ExperimentalCoilApi
-import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.core.util.UiEvent
-
+import com.peterchege.blogger.presentation.theme.defaultPadding
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -48,12 +44,12 @@ import kotlinx.coroutines.flow.collectLatest
 @ExperimentalCoilApi
 @Composable
 fun AddPostScreen(
-    navigateBack:() -> Unit,
+    navigateBack: () -> Unit,
     navigateToDraftScreen: () -> Unit,
-    navigateToDashboardScreen:() -> Unit,
+    navigateToDashboardScreen: () -> Unit,
     viewModel: AddPostScreenViewModel = hiltViewModel(),
 
-    ){
+    ) {
     val isUploading by viewModel.isUploading.collectAsStateWithLifecycle()
     val formState by viewModel.formState.collectAsStateWithLifecycle()
     val authUser by viewModel.authUser.collectAsStateWithLifecycle()
@@ -65,7 +61,12 @@ fun AddPostScreen(
         onChangePostTitle = { viewModel.onChangePostTitle(it) },
         onChangePostBody = { viewModel.onChangePostBody(it) },
         onChangeImageUri = { viewModel.onChangePhotoUri(it) },
-        onSubmit = { viewModel.postArticle(navigateToDashboardScreen = navigateToDashboardScreen,user = authUser) },
+        onSubmit = {
+            viewModel.postArticle(
+                navigateToDashboardScreen = navigateToDashboardScreen,
+                user = authUser
+            )
+        },
         navigateToDraftScreen = navigateToDraftScreen,
         onBackPress = { viewModel.onBackPress(navigateToDashboardScreen) },
         onSaveDraftConfirm = { viewModel.onSaveDraftConfirm(navigateBack) },
@@ -74,41 +75,42 @@ fun AddPostScreen(
     )
 
 
-
 }
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @ExperimentalCoilApi
 @Composable
 fun AddPostScreenContent(
-    navigateToDraftScreen:() -> Unit,
+    navigateToDraftScreen: () -> Unit,
     formState: AddPostFormState,
-    isUploading:Boolean,
-    eventFlow:SharedFlow<UiEvent>,
-    onChangePostTitle:(String) -> Unit,
-    onChangePostBody:(String) -> Unit,
+    isUploading: Boolean,
+    eventFlow: SharedFlow<UiEvent>,
+    onChangePostTitle: (String) -> Unit,
+    onChangePostBody: (String) -> Unit,
     onChangeImageUri: (Uri?) -> Unit,
-    onSubmit:() -> Unit,
-    onBackPress:() -> Unit,
+    onSubmit: () -> Unit,
+    onBackPress: () -> Unit,
     onSaveDraftConfirm: () -> Unit,
     onSaveDraftDismiss: () -> Unit,
     onCloseDialog: () -> Unit
 
 
-    ) {
-    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()
+) {
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         if (uri != null) {
             onChangeImageUri(uri)
         }
 
     }
-    val scaffoldState = rememberScaffoldState()
+    val snackbarHostState = SnackbarHostState()
+
     LaunchedEffect(key1 = true) {
         eventFlow.collectLatest { event ->
             when (event) {
                 is UiEvent.ShowSnackbar -> {
-                    scaffoldState.snackbarHostState.showSnackbar(
+                    snackbarHostState.showSnackbar(
                         message = event.message
                     )
                 }
@@ -120,7 +122,10 @@ fun AddPostScreenContent(
         }
     }
     Scaffold(
-        scaffoldState = scaffoldState
+        modifier = Modifier.fillMaxWidth(),
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
     ) {
 
         BackHandler() {
@@ -136,8 +141,8 @@ fun AddPostScreenContent(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(10.dp),
-
+                .padding(defaultPadding)
+            ,
             ) {
             LazyColumn() {
 
@@ -154,7 +159,7 @@ fun AddPostScreenContent(
                                     .fillMaxWidth(0.7f)
                                     .height(135.dp),
 
-                            )
+                                )
                         }
                         Column(
                             modifier = Modifier
@@ -231,7 +236,8 @@ fun AddPostScreenContent(
                                     onSubmit()
                                 }) {
                                 Text(
-                                    text = "Post")
+                                    text = "Post"
+                                )
                             }
                         }
 
@@ -246,81 +252,57 @@ fun AddPostScreenContent(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DraftConfirmBox(
     modifier: Modifier = Modifier,
-    onSaveDraftConfirm:() -> Unit,
-    onSaveDraftDismiss:() -> Unit,
-    onCloseDialog:() -> Unit,
+    onSaveDraftConfirm: () -> Unit,
+    onSaveDraftDismiss: () -> Unit,
+    onCloseDialog: () -> Unit,
 
-) {
-
-    val context = LocalContext.current
+    ) {
 
     AlertDialog(
-        modifier = modifier,
         onDismissRequest = {
             onCloseDialog()
         },
         title = {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = "Save Draft",
-                    style = MaterialTheme.typography.h6,
-                    textAlign = TextAlign.Center
-                )
-            }
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "Save Draft",
+                style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Center
+            )
         },
         text = {
-            Column {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "Do you want to save this draft ?",
 
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = "Do you want to save this draft ?",
+                textAlign = TextAlign.Center
+            )
+        },
+        confirmButton = {
+            TextButton(
 
-                    textAlign = TextAlign.Center
-                )
+                onClick = {
+                    onSaveDraftConfirm()
+                }
+            ) {
+                Text(text = "Save ".uppercase())
             }
         },
-        buttons = {
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 8.dp, vertical = 12.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
+        dismissButton = {
+            TextButton(
+
+                onClick = {
+                    onCloseDialog()
+                },
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.colorScheme.onSurface
+                )
             ) {
-                val buttonModifier = Modifier.align(Alignment.CenterVertically)
-                TextButton(
-                    modifier = buttonModifier,
-                    onClick = {
-                        onCloseDialog()
-                    },
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colors.onSurface
-                    )
-                ) {
-                    Text(text = "Close".uppercase())
-                }
-                TextButton(
-                    modifier = buttonModifier,
-                    onClick = {
-                        onSaveDraftDismiss()
-                    },
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colors.onSurface
-                    )
-                ) {
-                    Text(text = "Don't Save".uppercase())
-                }
-                TextButton(
-                    modifier = buttonModifier,
-                    onClick = {
-                        onSaveDraftConfirm()
-                    }
-                ) {
-                    Text(text = "Save ".uppercase())
-                }
+                Text(text = "Close".uppercase())
             }
         }
     )

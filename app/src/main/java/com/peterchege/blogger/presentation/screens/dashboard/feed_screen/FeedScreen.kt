@@ -21,7 +21,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
@@ -35,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -53,11 +55,12 @@ import com.peterchege.blogger.presentation.components.ArticleCard
 import com.peterchege.blogger.presentation.components.CategoryCard
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
+import com.peterchege.blogger.presentation.theme.defaultPadding
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 @ExperimentalCoilApi
 fun FeedScreen(
@@ -66,7 +69,7 @@ fun FeedScreen(
     navigateToAuthorProfileScreen: (String) -> Unit,
     navigateToSearchScreen: () -> Unit,
     navigateToAddPostScreen: () -> Unit,
-    navigateToCategoryScreen:(String) -> Unit,
+    navigateToCategoryScreen: (String) -> Unit,
     viewModel: FeedScreenViewModel = hiltViewModel()
 ) {
 
@@ -79,10 +82,6 @@ fun FeedScreen(
         refreshing = isSyncing,
         onRefresh = { viewModel.refreshFeed() }
     )
-
-//    LaunchedEffect(key1 = true) {
-//        viewModel.refreshFeed()
-//    }
 
     FeedScreenContent(
         navigateToPostScreen = navigateToPostScreen,
@@ -102,8 +101,8 @@ fun FeedScreen(
 }
 
 
-@OptIn(ExperimentalMaterialApi::class)
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 @ExperimentalCoilApi
 fun FeedScreenContent(
@@ -122,7 +121,7 @@ fun FeedScreenContent(
     retryCallback: () -> Unit,
 
     ) {
-    val scaffoldState = rememberScaffoldState()
+    val snackbarHostState = SnackbarHostState()
     LaunchedEffect(key1 = networkStatus) {
         when (networkStatus) {
             is NetworkStatus.Unknown -> {}
@@ -130,7 +129,7 @@ fun FeedScreenContent(
             is NetworkStatus.Connected -> {}
 
             is NetworkStatus.Disconnected -> {
-                scaffoldState.snackbarHostState.showSnackbar(
+                snackbarHostState.showSnackbar(
                     message = "You are offline"
                 )
             }
@@ -141,7 +140,7 @@ fun FeedScreenContent(
         eventFlow.collectLatest { event ->
             when (event) {
                 is UiEvent.ShowSnackbar -> {
-                    scaffoldState.snackbarHostState.showSnackbar(
+                    snackbarHostState.showSnackbar(
                         message = event.message
                     )
                 }
@@ -153,17 +152,22 @@ fun FeedScreenContent(
         }
     }
 
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
-        Modifier
+        modifier = Modifier
             .fillMaxSize()
-            .background(Color.DarkGray),
-        scaffoldState = scaffoldState,
+            .background(Color.DarkGray)
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+        ,
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
         topBar = {
             TopAppBar(
                 title = {
                     Text(
                         modifier = Modifier.fillMaxWidth(0.75f),
-                        text = "Blogger"
+                        text = "Blogger "
                     )
                 },
                 actions = {
@@ -174,13 +178,14 @@ fun FeedScreenContent(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Search,
-                            contentDescription = "Chats",
+                            contentDescription = "Search Posts",
                             modifier = Modifier.size(26.dp)
 
                         )
                     }
                 },
-                backgroundColor = MaterialTheme.colors.primary
+                scrollBehavior = scrollBehavior
+
             )
         },
         floatingActionButton = {
@@ -199,26 +204,28 @@ fun FeedScreenContent(
         }
     ) {
 
-        Box(
+        Column(
             modifier = Modifier
-                .pullRefresh(pullRefreshState)
                 .fillMaxSize()
+                .pullRefresh(pullRefreshState),
+            horizontalAlignment = Alignment.CenterHorizontally,
+
         ) {
             PullRefreshIndicator(
                 refreshing = true,
                 state = pullRefreshState,
-                modifier = Modifier.align(Alignment.TopCenter)
             )
+            Spacer(modifier = Modifier.height(10.dp))
             Column(
                 modifier = Modifier
-                    .pullRefresh(pullRefreshState)
                     .fillMaxSize()
                     .padding(5.dp),
             ) {
                 LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(5.dp)
+                        .padding(5.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     items(items = categories) { category ->
                         CategoryCard(
@@ -253,7 +260,7 @@ fun FeedScreenContent(
                             modifier = Modifier
                                 .pullRefresh(pullRefreshState)
                                 .fillMaxSize()
-                                .padding(5.dp)
+                                .padding(defaultPadding)
                         ) {
 
                             items(items = uiState.posts) { post ->
@@ -282,20 +289,4 @@ fun FeedScreenContent(
         }
 
     }
-}
-
-
-fun onProfileNavigate(
-    username: String,
-    bottomNavController: NavController,
-    authUser: User?,
-    navHostController: NavHostController
-) {
-    val loginUsername = authUser?.username ?: ""
-    if (loginUsername == username) {
-        bottomNavController.navigate(Screens.PROFILE_NAVIGATION)
-    } else {
-        navHostController.navigate(Screens.AUTHOR_PROFILE_SCREEN + "/$username")
-    }
-
 }

@@ -24,7 +24,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Message
@@ -38,6 +38,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.SecureFlagPolicy
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -113,13 +115,13 @@ fun PostScreenContent(
     postComment:() -> Unit,
 ) {
 
-    val scaffoldState = rememberScaffoldState()
+    val snackbarHostState = SnackbarHostState()
 
     LaunchedEffect(key1 = true) {
         eventFlow.collectLatest { event ->
             when (event) {
                 is UiEvent.ShowSnackbar -> {
-                    scaffoldState.snackbarHostState.showSnackbar(
+                    snackbarHostState.showSnackbar(
                         message = event.message
                     )
                 }
@@ -131,7 +133,9 @@ fun PostScreenContent(
         }
     }
     Scaffold(
-        scaffoldState = scaffoldState,
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
         modifier = Modifier.fillMaxSize(),
         floatingActionButton = {
             FloatingActionButton(
@@ -145,7 +149,7 @@ fun PostScreenContent(
                 )
             }
         }
-    ) {
+    ) { paddingValues ->
         when(uiState){
             is PostScreenUiState.Loading -> {
                 LoadingComponent()
@@ -177,7 +181,9 @@ fun PostScreenContent(
                         onChangeNewComment = { onChangeNewComment(it) },
                     )
                 }
-                LazyColumn() {
+                LazyColumn(
+                    modifier = Modifier.padding(paddingValues)
+                ) {
                     item {
                         Box(
                             Modifier.fillMaxSize()
@@ -360,6 +366,7 @@ fun PostScreenContent(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommentDialog(
     modifier: Modifier = Modifier,
@@ -368,73 +375,49 @@ fun CommentDialog(
     postComment:() -> Unit,
     closeCommentDialog: () -> Unit,
 ) {
-
-
-    val context = LocalContext.current
-
-
     AlertDialog(
-        modifier = modifier,
         onDismissRequest = {
             closeCommentDialog()
         },
+        title = {
+            Text(text = "Post Comment")
+        },
         text = {
-            Column {
-                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = "Comment....",
-                        style = MaterialTheme.typography.h6,
-                        textAlign = TextAlign.Center
-                    )
-                }
-                TextField(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    value = commentUiState.newComment,
-                    onValueChange = {
-                        onChangeNewComment(it)
-                    },
-                    singleLine = false,
-                    textStyle = MaterialTheme.typography.h6.copy(textAlign = TextAlign.Start),
-                    keyboardOptions = KeyboardOptions(
-                        autoCorrect = false,
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                value = commentUiState.newComment,
+                onValueChange = {
+                    onChangeNewComment(it)
+                },
+                singleLine = false,
+                textStyle = MaterialTheme.typography.bodySmall.copy(textAlign = TextAlign.Start),
+                keyboardOptions = KeyboardOptions(
+                    autoCorrect = false,
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
 
-                        }
-                    )
+                    }
                 )
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                   postComment()
+                }
+            ) {
+                Text(text = "Comment")
             }
         },
-        buttons = {
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 8.dp, vertical = 12.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    closeCommentDialog()
+                }
             ) {
-                val buttonModifier = Modifier.align(Alignment.CenterVertically)
-                TextButton(
-                    modifier = buttonModifier,
-                    onClick = {
-                        closeCommentDialog()
-                    },
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colors.onSurface
-                    )
-                ) {
-                    Text(text = "Cancel".uppercase())
-                }
-                TextButton(
-                    modifier = buttonModifier,
-                    onClick = {
-                        closeCommentDialog()
-                    }
-                ) {
-                    Text(text = "Comment".uppercase())
-                }
+                Text(text = "Cancel")
             }
         }
     )

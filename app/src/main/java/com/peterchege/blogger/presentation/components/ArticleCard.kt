@@ -19,10 +19,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
@@ -57,7 +57,6 @@ fun ArticleCard(
             .fillMaxWidth()
             .shadow(elevation = 2.dp, shape = RoundedCornerShape(15.dp), clip = true)
             .clickable { onItemClick(post) },
-        backgroundColor = Color.White,
         shape = RoundedCornerShape(15.dp),
 
         ) {
@@ -134,7 +133,7 @@ fun ArticleCard(
                     ) {
                         if (isProfile) {
                             Icon(
-                                Icons.Filled.Share,
+                                imageVector = Icons.Filled.Share,
                                 contentDescription = "Share",
                                 modifier = Modifier.clickable {
 
@@ -143,7 +142,7 @@ fun ArticleCard(
                         } else {
                             if (isLiked) {
                                 Icon(
-                                    Icons.Default.Favorite,
+                                    imageVector = Icons.Default.Favorite,
                                     contentDescription = "Like",
                                     modifier = Modifier.clickable {
 
@@ -151,7 +150,7 @@ fun ArticleCard(
                                 )
                             } else {
                                 Icon(
-                                    Icons.Default.FavoriteBorder,
+                                    imageVector = Icons.Default.FavoriteBorder,
                                     contentDescription = "Like",
                                     modifier = Modifier.clickable {
 
@@ -160,7 +159,7 @@ fun ArticleCard(
                             }
                             if (isSaved) {
                                 Icon(
-                                    Icons.Default.Bookmark,
+                                    imageVector = Icons.Default.Bookmark,
                                     contentDescription = "Saved",
                                     modifier = Modifier.clickable {
 
@@ -168,7 +167,7 @@ fun ArticleCard(
                                 )
                             } else {
                                 Icon(
-                                    Icons.Default.BookmarkBorder,
+                                    imageVector = Icons.Default.BookmarkBorder,
                                     contentDescription = "Saved",
                                     modifier = Modifier.clickable {
 

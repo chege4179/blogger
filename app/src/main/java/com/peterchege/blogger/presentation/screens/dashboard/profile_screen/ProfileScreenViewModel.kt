@@ -32,6 +32,8 @@ import com.peterchege.blogger.core.util.Resource
 import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.domain.models.PostUI
 import com.peterchege.blogger.domain.repository.AuthRepository
+import com.peterchege.blogger.domain.repository.NetworkInfoRepository
+import com.peterchege.blogger.domain.repository.NetworkStatus
 import com.peterchege.blogger.domain.use_case.GetProfileUseCase
 import com.peterchege.blogger.domain.use_case.LogoutUseCase
 import com.peterchege.blogger.presentation.screens.dashboard.feed_screen.FeedScreenUiState
@@ -62,7 +64,17 @@ class ProfileScreenViewModel @Inject constructor(
     private val profileUseCase: GetProfileUseCase,
     private val authRepository: AuthRepository,
     private val analyticsHelper: AnalyticsHelper,
+    private val networkInfoRepository: NetworkInfoRepository,
 ) : ViewModel() {
+
+    val networkStatus = networkInfoRepository.networkStatus
+        .stateIn(
+            scope = viewModelScope,
+            initialValue = NetworkStatus.Unknown,
+            started = SharingStarted.WhileSubscribed(5000L)
+        )
+
+
     val authUser = authRepository.getLoggedInUser()
         .stateIn(
             scope = viewModelScope,

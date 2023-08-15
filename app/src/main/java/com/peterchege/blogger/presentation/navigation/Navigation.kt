@@ -18,6 +18,7 @@ package com.peterchege.blogger.presentation.navigation
 import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -50,7 +51,7 @@ import com.peterchege.blogger.presentation.screens.signup.SignUpScreen
 
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalCoilApi::class)
-@ExperimentalMaterialApi
+@ExperimentalMaterial3Api
 @Composable
 fun Navigation(
     navController: NavHostController,

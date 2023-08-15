@@ -17,42 +17,30 @@ package com.peterchege.blogger.presentation.screens.dashboard
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navigation
 import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.presentation.components.BottomNavItem
-import com.peterchege.blogger.presentation.navigation.navigateToAddPostScreen
-import com.peterchege.blogger.presentation.navigation.navigateToAuthUserProfileScreen
-import com.peterchege.blogger.presentation.navigation.navigateToAuthorProfileScreen
-import com.peterchege.blogger.presentation.navigation.navigateToCategoryScreen
-import com.peterchege.blogger.presentation.navigation.navigateToLoginScreen
-import com.peterchege.blogger.presentation.navigation.navigateToPostScreen
-import com.peterchege.blogger.presentation.navigation.navigateToProfileFollowerFollowingScreen
-import com.peterchege.blogger.presentation.navigation.navigateToSearchScreen
-import com.peterchege.blogger.presentation.screens.dashboard.feed_screen.FeedScreen
-import com.peterchege.blogger.presentation.screens.dashboard.notifcations_screen.NotificationScreen
-import com.peterchege.blogger.presentation.screens.dashboard.profile_screen.ProfileScreen
-import com.peterchege.blogger.presentation.screens.dashboard.savedposts_screen.SavedPostScreen
 
 
-@ExperimentalMaterialApi
+@ExperimentalMaterial3Api
 @Composable
 fun BottomNavBar(
     items: List<BottomNavItem>,
@@ -61,52 +49,29 @@ fun BottomNavBar(
     onItemClick: (BottomNavItem) -> Unit
 ) {
     val backStackEntry = navController.currentBackStackEntryAsState()
-    BottomNavigation(
-        modifier = modifier,
-        backgroundColor = Color.DarkGray,
-        elevation = 5.dp
-    ) {
-        items.forEach { item ->
+    NavigationBar {
+        items.forEachIndexed { index, item ->
             val selected = item.route == backStackEntry.value?.destination?.route
-            BottomNavigationItem(
-                selected = selected,
-                selectedContentColor = Color.Blue,
-                unselectedContentColor = Color.Gray,
-                onClick = { onItemClick(item) },
+            NavigationBarItem(
                 icon = {
-                    Column(horizontalAlignment = CenterHorizontally) {
-                        Icon(
-                            imageVector = item.icon,
-                            contentDescription = item.name
-                        )
-                        if (selected) {
-                            Text(
-                                text = item.name,
-                                textAlign = TextAlign.Center,
-                                fontSize = 10.sp
-
-                            )
-                        }
-
-                    }
-
-                }
+                    Icon(
+                        imageVector = item.icon,
+                        contentDescription = item.name
+                    )
+                },
+                label = { Text(text = item.name) },
+                selected = selected,
+                onClick = { onItemClick(item) }
             )
         }
-
-
     }
-
-
 }
 
 
-@ExperimentalMaterialApi
+@ExperimentalMaterial3Api
 @Composable
 fun DashBoardScreen(
     navHostController: NavHostController,
-    viewModel: DashBoardViewModel = hiltViewModel()
-
 ) {
     val bottomNavController = rememberNavController()
     Scaffold(

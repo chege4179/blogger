@@ -16,7 +16,7 @@
 package com.peterchege.blogger.presentation.screens.dashboard.profile_screen
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -31,64 +31,39 @@ import com.peterchege.blogger.presentation.screens.post_screen.PostScreenViewMod
 @Composable
 fun DeleteBox(
     modifier: Modifier = Modifier,
-    post:Post,
-    closeDeleteDialog:() -> Unit,
-    deletePost:() -> Unit,
+    post: Post,
+    closeDeleteDialog: () -> Unit,
+    deletePost: () -> Unit,
 
     ) {
-
     AlertDialog(
-        modifier = modifier,
         onDismissRequest = {
-            closeDeleteDialog()
+
+        },
+        title = {
+            Text(text = "Delete '${post.postTitle}' ")
         },
         text = {
-            Column {
-                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = "Delete" + "${post?.postTitle}",
-                        style = MaterialTheme.typography.h6,
-                        textAlign = TextAlign.Center
-                    )
+            Text(text = "Are you sure you want to delete this comment")
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    deletePost()
                 }
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = "Are you sure you want to delete this post ?",
-                    style = MaterialTheme.typography.h6,
-                    textAlign = TextAlign.Center
-                )
+            ) {
+                Text("Delete ")
             }
         },
-        buttons = {
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 8.dp, vertical = 12.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    closeDeleteDialog()
+                }
             ) {
-                val buttonModifier = Modifier.align(Alignment.CenterVertically)
-                TextButton(
-                    modifier = buttonModifier,
-                    onClick = {
-                        closeDeleteDialog()
-                    },
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colors.onSurface
-                    )
-                ) {
-                    Text(text = "Cancel".uppercase())
-                }
-                TextButton(
-                    modifier = buttonModifier,
-                    onClick = {
-                        deletePost()
-
-                    }
-                ) {
-                    Text(text = "Delete".uppercase())
-                }
+                Text("Cancel")
             }
         }
     )
+
 }

@@ -17,22 +17,15 @@ package com.peterchege.blogger.presentation.screens.dashboard.profile_screen
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.domain.state.AuthorProfileFollowerFollowingUiState
 import com.peterchege.blogger.presentation.components.ErrorComponent
-import com.peterchege.blogger.presentation.components.FollowerCard
 import com.peterchege.blogger.presentation.components.FollowersList
-import com.peterchege.blogger.presentation.components.FollowingCard
 import com.peterchege.blogger.presentation.components.FollowingList
 import com.peterchege.blogger.presentation.components.LoadingComponent
 import java.util.*
@@ -40,7 +33,6 @@ import java.util.*
 
 @Composable
 fun ProfileFollowerFollowingScreen(
-
     viewModel: ProfileFollowerFollowingScreenViewModel = hiltViewModel(),
     profileViewModel: ProfileScreenViewModel = hiltViewModel(),
     navigateToAuthorProfileScreen:(String) -> Unit,
@@ -55,7 +47,8 @@ fun ProfileFollowerFollowingScreen(
 
 }
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ProfileFollowerFollowingScreenContent(
 
@@ -75,7 +68,7 @@ fun ProfileFollowerFollowingScreenContent(
                             .capitalize(Locale.ROOT),
                     )
                 },
-                backgroundColor = MaterialTheme.colors.primary)
+                )
         }
     ) {
         when(uiState){

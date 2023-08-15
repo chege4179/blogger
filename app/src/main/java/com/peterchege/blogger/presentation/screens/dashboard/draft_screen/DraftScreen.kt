@@ -21,10 +21,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -35,6 +36,7 @@ import androidx.navigation.NavController
 import com.peterchege.blogger.presentation.components.DraftCard
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
+import com.peterchege.blogger.presentation.theme.defaultPadding
 
 
 @Composable
@@ -51,7 +53,8 @@ fun DraftScreen(
 
 }
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun DraftScreenContent(
     navigateToAddPostScreen:(Int) -> Unit,
@@ -67,8 +70,7 @@ fun DraftScreenContent(
                         text= "My Drafts",
                     )
                 }
-                ,
-                backgroundColor = MaterialTheme.colors.primary)
+                )
         }
     ) {
         when(uiState){
@@ -92,7 +94,7 @@ fun DraftScreenContent(
                     }
                 }else{
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize().padding(defaultPadding)
                     ){
                         items(items = drafts){ draft ->
                             DraftCard(

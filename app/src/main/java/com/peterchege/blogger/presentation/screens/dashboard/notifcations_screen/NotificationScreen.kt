@@ -20,27 +20,24 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.peterchege.blogger.domain.state.NotificationScreenUiState
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.components.NotificationCard
+import com.peterchege.blogger.presentation.theme.defaultPadding
 
 
 @Composable
@@ -67,7 +64,8 @@ fun NotificationScreen(
 }
 
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun NotificationScreenContent(
     uiState:NotificationScreenUiState,
@@ -86,10 +84,9 @@ fun NotificationScreenContent(
                         text= "Notifications",
                     )
                 }
-                ,
-                backgroundColor = MaterialTheme.colors.primary)
+             )
         }
-    ) {
+    ) { paddingValues ->
         when(uiState){
             is NotificationScreenUiState.Loading -> {
                 LoadingComponent()
@@ -104,7 +101,8 @@ fun NotificationScreenContent(
                 val notifications = uiState.data.notifications
                 LazyColumn(modifier = Modifier
                     .fillMaxSize()
-                    .padding(15.dp)){
+                    .padding(defaultPadding)
+                ){
                     if (notifications.isEmpty()){
                         item{
                             Column(
