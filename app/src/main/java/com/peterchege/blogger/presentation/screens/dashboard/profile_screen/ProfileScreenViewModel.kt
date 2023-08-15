@@ -45,7 +45,7 @@ import javax.inject.Inject
 sealed interface ProfileScreenUiState {
     object Loading : ProfileScreenUiState
 
-    data class Success(val posts:List<PostUI>) : ProfileScreenUiState
+    data class Success(val posts:List<Post>,val user:User) : ProfileScreenUiState
 
     data class Error(val message: String) : ProfileScreenUiState
 
@@ -63,44 +63,45 @@ class ProfileScreenViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val analyticsHelper: AnalyticsHelper,
 ) : ViewModel() {
+    val authUser = authRepository.getLoggedInUser()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = null
+        )
 
+    val uiState = authRepository.getLoggedInUser()
+        .map<User?, ProfileScreenUiState> { user ->
+            if (user == null){
+                ProfileScreenUiState.Empty
+            }else{
+                val response = profileUseCase(username = user.username).last()
+                when(response){
+                    is Resource.Success -> {
+                        ProfileScreenUiState.Success(
+                            posts = response.data?.posts ?: emptyList(),
+                            user = response.data?.user ?: user,
+                        )
+                    }
+                    is Resource.Error -> {
+                        ProfileScreenUiState.Error(message = "Error")
+                    }
+                    is Resource.Loading -> {
+                        ProfileScreenUiState.Loading
+                    }
+                }
 
-
-
-    private var _isLoading = mutableStateOf(false)
-    var isLoading: State<Boolean> = _isLoading
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = ProfileScreenUiState.Loading
+        )
 
     private var _openDialogState = mutableStateOf(false)
     var openDialogState: State<Boolean> = _openDialogState
 
-    private var _success = mutableStateOf(false)
-    var success: State<Boolean> = _success
-
-    private var _isError = mutableStateOf(false)
-    var isError: State<Boolean> = _isError
-
-    private var _msg = mutableStateOf("")
-    var msg: State<String> = _msg
-
-    private var _posts = mutableStateOf<List<Post>>(emptyList())
-    var posts: State<List<Post>> = _posts
-
-    private var _user = MutableStateFlow<User?>(null)
-    var user: StateFlow<User?> = _user
-
-
-
-    private fun loadUser(){
-        viewModelScope.launch {
-            authRepository.getLoggedInUser().collectLatest {
-                _user.value = it
-            }
-        }
-    }
-    init {
-        loadUser()
-        getProfile()
-    }
 
     fun onDialogConfirm(scaffoldState: ScaffoldState, postTitle: String, postId: String) {
         _openDialogState.value = false
@@ -114,11 +115,11 @@ class ProfileScreenViewModel @Inject constructor(
         _openDialogState.value = false
     }
 
-    fun logoutUser(navigateToLoginScreen:() -> Unit) {
+    fun logoutUser(navigateToLoginScreen:() -> Unit,user: User) {
         val sharedPref: SharedPreferences? = null
 
-        val username = _user.value?.username ?: ""
-        val id = _user.value?._id ?: ""
+        val username = user.username ?: ""
+        val id = user._id ?: ""
         val token = ""
 
         val logoutUser = LogoutUser(
@@ -147,35 +148,4 @@ class ProfileScreenViewModel @Inject constructor(
 
     }
 
-
-    private fun getProfile() {
-        viewModelScope.launch {
-            profileUseCase(username = _user.value?.username ?: "").onEach { result ->
-                when (result) {
-                    is Resource.Success -> {
-                        _isLoading.value = false
-                        _msg.value = result.data!!.msg
-                        _success.value = result.data.success
-                        _posts.value = result.data.posts
-                        _user.value = result.data.user
-                        _isError.value = false
-
-                    }
-                    is Resource.Error -> {
-                        _isLoading.value = false
-                        result.message?.let {
-                            _isLoading.value = false
-                            _msg.value = it
-                            _success.value = false
-                            _posts.value = emptyList()
-                            _isError.value = true
-                        }
-                    }
-                    is Resource.Loading -> {
-                        _isLoading.value = true
-                    }
-                }
-            }.launchIn(this)
-        }
-    }
 }

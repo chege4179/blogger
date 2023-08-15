@@ -24,6 +24,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,25 +38,50 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
+import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.presentation.components.ArticleCard
 import com.peterchege.blogger.presentation.components.BottomSheetItem
+import com.peterchege.blogger.presentation.components.ErrorComponent
+import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.theme.lightGrayColor
 import kotlinx.coroutines.launch
 
-
-@OptIn(ExperimentalMaterialApi::class)
-@ExperimentalCoilApi
 @Composable
 fun ProfileScreen(
     viewModel: ProfileScreenViewModel = hiltViewModel(),
     navigateToProfileFollowerFollowingScreen:(String) -> Unit,
     navigateToPostScreen:(String) -> Unit,
     navigateToLoginScreen:() -> Unit
+){
+
+    val authUser by viewModel.authUser.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    ProfileScreenContent(
+        user = authUser,
+        uiState = uiState,
+        navigateToProfileFollowerFollowingScreen = navigateToProfileFollowerFollowingScreen,
+        navigateToPostScreen = navigateToPostScreen,
+        navigateToLoginScreen = navigateToLoginScreen,
+        logoutUser = { authUser?.let { viewModel.logoutUser(navigateToLoginScreen, it) } }
+    )
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@ExperimentalCoilApi
+@Composable
+fun ProfileScreenContent(
+    user: User?,
+    uiState: ProfileScreenUiState,
+    navigateToProfileFollowerFollowingScreen:(String) -> Unit,
+    navigateToPostScreen:(String) -> Unit,
+    navigateToLoginScreen:() -> Unit,
+    logoutUser:() -> Unit,
 ) {
 
-    val user = viewModel.user.collectAsStateWithLifecycle(initialValue = null)
+
     val sheetState = rememberBottomSheetState(
         initialValue = BottomSheetValue.Collapsed
     )
@@ -110,7 +136,7 @@ fun ProfileScreen(
                     BottomSheetItem(
                         name = "Log Out",
                         onClick = {
-                            viewModel.logoutUser(navigateToLoginScreen = navigateToLoginScreen)
+                            logoutUser()
                         },
                         icon = Icons.Filled.Logout
                     )
@@ -123,218 +149,217 @@ fun ProfileScreen(
 
 
         ) {
-
-
-        if (viewModel.isLoading.value) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        when(uiState){
+            is ProfileScreenUiState.Loading -> {
+                LoadingComponent()
             }
-        } else {
-            if (viewModel.isError.value) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    Text(
-                        modifier = Modifier.align(Alignment.Center),
-                        text = viewModel.msg.value
-                    )
+            is ProfileScreenUiState.Error -> {
+                ErrorComponent(
+                    retryCallback = { /*TODO*/ },
+                    errorMessage = uiState.message
+                )
+            }
+            is ProfileScreenUiState.Empty -> {
+                Text(text = "User Not found")
 
-                }
-            } else {
-                user.value?.let { user ->
-                    Box(
+            }
+            is ProfileScreenUiState.Success -> {
+                val posts = uiState.posts
+                val user = uiState.user
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.White)
+                ) {
+                    LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(Color.White)
+                            .padding(10.dp),
                     ) {
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(Color.White)
-                                .padding(10.dp),
-                        ) {
-                            item {
-                                Column(
+                        item {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(160.dp),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                            ) {
+                                Box(
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(160.dp),
+                                        .fillMaxWidth(0.3f)
+
+                                ) {
+                                    Image(
+                                        modifier = Modifier
+                                            .width(80.dp)
+                                            .height(80.dp)
+                                            .align(Alignment.Center),
+                                        painter = rememberImagePainter(
+                                            data = user.imageUrl,
+                                            builder = {
+                                                crossfade(true)
+
+                                            },
+                                        ),
+                                        contentDescription = "Profile Image"
+                                    )
+
+                                }
+                                Spacer(modifier = Modifier.height(5.dp))
+                                Column(
+                                    modifier = Modifier.fillMaxWidth(),
                                     verticalArrangement = Arrangement.Center,
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                 ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth(0.3f)
-
-                                    ) {
-                                        Image(
-                                            modifier = Modifier
-                                                .width(80.dp)
-                                                .height(80.dp)
-                                                .align(Alignment.Center),
-                                            painter = rememberImagePainter(
-                                                data = user.imageUrl,
-                                                builder = {
-                                                    crossfade(true)
-
-                                                },
-                                            ),
-                                            contentDescription = "Profile Image"
-                                        )
-
-                                    }
-                                    Spacer(modifier = Modifier.height(5.dp))
-                                    Column(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        verticalArrangement = Arrangement.Center,
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                    ) {
-                                        Text(
-                                            text = user.fullname,
-                                            fontWeight = FontWeight.ExtraBold,
-                                            fontSize = 20.sp
-                                        )
-                                        Spacer(modifier = Modifier.padding(3.dp))
-                                        Text(
-                                            text = "@" + user.username,
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 18.sp
-                                        )
-                                        Spacer(modifier = Modifier.height(3.dp))
-
-
-                                    }
-                                }
-                            }
-                            item {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(70.dp),
-                                    horizontalArrangement = Arrangement.SpaceEvenly,
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    Column(
-                                        verticalArrangement = Arrangement.Center,
-                                        horizontalAlignment = Alignment.CenterHorizontally
-
-                                    ) {
-                                        Text(
-                                            text = "${viewModel.posts.value.size}",
-                                            fontSize = 20.sp,
-                                            fontWeight = FontWeight.Bold,
-                                        )
-                                        Text(
-                                            text = "Articles",
-                                            fontSize = 17.sp,
-                                        )
-                                    }
-                                    Divider(
-                                        color = Color.LightGray,
-                                        thickness = 2.dp,
-                                        modifier = Modifier
-                                            .fillMaxHeight(0.7f)
-                                            .width(1.dp)
+                                    Text(
+                                        text = user.fullname,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        fontSize = 20.sp
                                     )
-
-                                    Column(
-                                        modifier = Modifier.clickable {
-                                            navigateToProfileFollowerFollowingScreen(Constants.FOLLOWER)
-
-                                        },
-                                        verticalArrangement = Arrangement.Center,
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        Text(
-                                            fontSize = 20.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            text = "${user.followers.size}"
-                                        )
-                                        Text(
-                                            text = "Followers",
-                                            fontSize = 17.sp,
-
-                                            )
-                                    }
-                                    Divider(
-                                        color = Color.LightGray,
-                                        thickness = 2.dp,
-                                        modifier = Modifier
-                                            .fillMaxHeight(0.7f)
-                                            .width(1.dp)
+                                    Spacer(modifier = Modifier.padding(3.dp))
+                                    Text(
+                                        text = "@" + user.username,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 18.sp
                                     )
+                                    Spacer(modifier = Modifier.height(3.dp))
 
-                                    Column(
-                                        modifier = Modifier.clickable {
-                                            navigateToProfileFollowerFollowingScreen(Constants.FOLLOWING)
-
-                                        },
-                                        verticalArrangement = Arrangement.Center,
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        Text(
-                                            text = "${user.following?.size}",
-                                            fontSize = 20.sp,
-                                            fontWeight = FontWeight.Bold,
-                                        )
-                                        Text(
-                                            text = "Following",
-                                            fontSize = 17.sp,
-
-                                            )
-                                    }
 
                                 }
                             }
-                            item {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(60.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceEvenly,
+                        }
+                        item {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(70.dp),
+                                horizontalArrangement = Arrangement.SpaceEvenly,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Column(
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+
                                 ) {
-                                    Button(
-                                        modifier = Modifier.fillMaxWidth(0.5f),
-                                        onClick = {
-
-                                        }) {
-                                        Text(text = "Edit Profile")
-                                    }
-                                    Spacer(modifier = Modifier.width(5.dp))
-                                    Button(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        onClick = {
-                                            scope.launch {
-                                                if (sheetState.isCollapsed) {
-                                                    sheetState.expand()
-                                                } else {
-                                                    sheetState.collapse()
-                                                }
-                                            }
-                                        }) {
-                                        Text(text = "Settings")
-                                    }
-
+                                    Text(
+                                        text = "${posts.size}",
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Bold,
+                                    )
+                                    Text(
+                                        text = "Articles",
+                                        fontSize = 17.sp,
+                                    )
                                 }
-                            }
-                            items(items = viewModel.posts.value) { post ->
-                                ArticleCard(
-                                    post = post,
-                                    onItemClick = {
-                                        navigateToPostScreen(post._id)
-
-                                    },
-                                    onProfileNavigate = { username ->
-
-                                    },
-                                    onDeletePost = {
-
-                                    },
-                                    profileImageUrl = user.imageUrl,
-                                    isLiked = false,
-                                    isSaved = false,
-                                    isProfile = true
+                                Divider(
+                                    color = Color.LightGray,
+                                    thickness = 2.dp,
+                                    modifier = Modifier
+                                        .fillMaxHeight(0.7f)
+                                        .width(1.dp)
                                 )
-                                Spacer(modifier = Modifier.padding(5.dp))
+
+                                Column(
+                                    modifier = Modifier.clickable {
+                                        navigateToProfileFollowerFollowingScreen(Constants.FOLLOWER)
+
+                                    },
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        text = "${user.followers.size}"
+                                    )
+                                    Text(
+                                        text = "Followers",
+                                        fontSize = 17.sp,
+
+                                        )
+                                }
+                                Divider(
+                                    color = Color.LightGray,
+                                    thickness = 2.dp,
+                                    modifier = Modifier
+                                        .fillMaxHeight(0.7f)
+                                        .width(1.dp)
+                                )
+
+                                Column(
+                                    modifier = Modifier.clickable {
+                                        navigateToProfileFollowerFollowingScreen(Constants.FOLLOWING)
+
+                                    },
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        text = "${user.following?.size}",
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Bold,
+                                    )
+                                    Text(
+                                        text = "Following",
+                                        fontSize = 17.sp,
+
+                                        )
+                                }
+
                             }
+                        }
+                        item {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(60.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceEvenly,
+                            ) {
+                                Button(
+                                    modifier = Modifier.fillMaxWidth(0.5f),
+                                    onClick = {
+
+                                    }) {
+                                    Text(text = "Edit Profile")
+                                }
+                                Spacer(modifier = Modifier.width(5.dp))
+                                Button(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    onClick = {
+                                        scope.launch {
+                                            if (sheetState.isCollapsed) {
+                                                sheetState.expand()
+                                            } else {
+                                                sheetState.collapse()
+                                            }
+                                        }
+                                    }) {
+                                    Text(text = "Settings")
+                                }
+
+                            }
+                        }
+                        items(items = posts) { post ->
+                            ArticleCard(
+                                post = post,
+                                onItemClick = {
+                                    navigateToPostScreen(post._id)
+
+                                },
+                                onProfileNavigate = { username ->
+
+                                },
+                                onDeletePost = {
+
+                                },
+                                profileImageUrl = user.imageUrl,
+                                isLiked = false,
+                                isSaved = false,
+                                isProfile = true
+                            )
+                            Spacer(modifier = Modifier.padding(5.dp))
                         }
                     }
                 }
