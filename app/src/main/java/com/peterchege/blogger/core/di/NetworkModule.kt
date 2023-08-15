@@ -30,6 +30,7 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 
@@ -55,6 +56,9 @@ object NetworkModule {
                     .alwaysReadResponseBody(enable = false)
                     .build()
             )
+            .connectTimeout(1, TimeUnit.MINUTES)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
             .build()
     }
 
@@ -63,7 +67,7 @@ object NetworkModule {
     @Singleton
     fun provideUserApi(
         client: OkHttpClient,
-        networkJson:Json,
+        networkJson: Json,
     ): BloggerApi {
         return Retrofit.Builder()
             .baseUrl(Constants.BASE_URL)
