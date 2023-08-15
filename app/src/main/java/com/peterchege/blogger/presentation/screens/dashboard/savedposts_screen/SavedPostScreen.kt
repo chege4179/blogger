@@ -19,10 +19,12 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -40,6 +42,8 @@ import com.peterchege.blogger.domain.mappers.toExternalModel
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.navigation.navigateToPostScreen
+import com.peterchege.blogger.presentation.theme.defaultPadding
+
 @Composable
 fun SavedPostScreen(
     navigateToPostScreen:(String) -> Unit,
@@ -54,8 +58,8 @@ fun SavedPostScreen(
 
 
 
-@OptIn(ExperimentalCoilApi::class)
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@OptIn(ExperimentalCoilApi::class, ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SavedPostScreenContent(
     navigateToPostScreen:(String) -> Unit,
@@ -70,11 +74,10 @@ fun SavedPostScreenContent(
                     Text(
                         text= "Your saved posts",
                     )
-                }
-                ,
-                backgroundColor = MaterialTheme.colors.primary)
+                },
+            )
         }
-    ) {
+    ) { paddingValues ->
         when(uiState){
             is SavedPostScreenUiState.Loading -> {
                 LoadingComponent()
@@ -92,7 +95,9 @@ fun SavedPostScreenContent(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(15.dp)
+                        .padding(defaultPadding)
+                    ,
+
                 ){
                     item{
                         Column(

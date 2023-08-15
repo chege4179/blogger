@@ -15,35 +15,18 @@
  */
 package com.peterchege.blogger.presentation.screens.author_profile
 
-import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
-import com.peterchege.blogger.core.api.responses.Follower
-import com.peterchege.blogger.core.api.responses.Following
-import com.peterchege.blogger.presentation.components.FollowerCard
-import com.peterchege.blogger.presentation.components.FollowingCard
 import com.peterchege.blogger.core.util.Constants
-import com.peterchege.blogger.core.util.Screens
-import com.peterchege.blogger.domain.state.AuthorProfileFollowerFollowingUi
 import com.peterchege.blogger.domain.state.AuthorProfileFollowerFollowingUiState
-import com.peterchege.blogger.domain.state.AuthorProfileScreenUiState
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.FollowersList
 import com.peterchege.blogger.presentation.components.FollowingList
@@ -68,7 +51,7 @@ fun AuthorFollowerFollowingScreen(
 }
 
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuthorFollowerFollowingScreenContent(
     uiState:AuthorProfileFollowerFollowingUiState,
@@ -85,10 +68,9 @@ fun AuthorFollowerFollowingScreenContent(
                             Locale.ROOT) + "s",
                     )
                 }
-                ,
-                backgroundColor = MaterialTheme.colors.primary)
+            )
         }
-    ){
+    ){ paddingValues ->
         when(uiState){
             is AuthorProfileFollowerFollowingUiState.Loading ->{
                 LoadingComponent()

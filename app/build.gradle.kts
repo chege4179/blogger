@@ -66,19 +66,21 @@ dependencies {
 
     implementation ("androidx.core:core-ktx:1.10.1")
     implementation ("androidx.appcompat:appcompat:1.6.1")
-    implementation ("com.google.android.material:material:1.9.0")
-    implementation ("androidx.compose.ui:ui:1.6.0-alpha02")
-    implementation ("androidx.compose.material:material:1.6.0-alpha01")
-    implementation ("androidx.compose.ui:ui-tooling-preview:1.6.0-alpha02")
+    implementation ("androidx.compose.ui:ui:1.6.0-alpha03")
+    implementation ("androidx.compose.material:material:1.6.0-alpha03")
+    implementation ("androidx.compose.ui:ui-tooling-preview:1.6.0-alpha03")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
     implementation ("androidx.activity:activity-compose:1.7.2")
     implementation("androidx.hilt:hilt-common:1.0.0")
     testImplementation ("junit:junit:4.13.2")
     androidTestImplementation ("androidx.test.ext:junit:1.1.5")
     androidTestImplementation ("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:1.6.0-alpha02")
-    debugImplementation ("androidx.compose.ui:ui-tooling:1.6.0-alpha02")
+    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:1.6.0-alpha03")
+    debugImplementation ("androidx.compose.ui:ui-tooling:1.6.0-alpha03")
 
+    implementation ("androidx.compose.material:material-icons-extended:1.6.0-alpha03")
+    implementation ("androidx.compose.material3:material3:1.2.0-alpha05")
+    implementation("androidx.compose.material3:material3-window-size-class:1.2.0-alpha05")
 
 
     // retrofit
@@ -104,35 +106,21 @@ dependencies {
     kapt ("com.google.dagger:hilt-android-compiler:2.46.1")
     kapt ("androidx.hilt:hilt-compiler:1.0.0")
     implementation ("androidx.hilt:hilt-navigation-compose:1.0.0")
-    implementation ("androidx.navigation:navigation-compose:2.6.0")
+    implementation ("androidx.navigation:navigation-compose:2.7.0")
 
-    // coil
-    implementation ("io.coil-kt:coil-compose:2.4.0")
-
-    // room 
+    // room
     implementation ("androidx.room:room-runtime:2.5.2")
     ksp ("androidx.room:room-compiler:2.5.2")
     implementation ("androidx.room:room-ktx:2.5.2")
 
-    // material icons extended
-    implementation ("androidx.compose.material:material-icons-extended:1.6.0-alpha01")
-
-    //glide
-    implementation ("dev.chrisbanes.accompanist:accompanist-glide:0.5.1")
-
-    //pager
-    implementation ("com.google.accompanist:accompanist-pager:0.28.0")
-    implementation ("com.google.accompanist:accompanist-pager-indicators:0.28.0")
-
-    // landscapist
+    // coil
+    implementation ("io.coil-kt:coil-compose:2.4.0")
     implementation ("com.github.skydoves:landscapist-glide:2.1.8")
-
     implementation ("com.google.accompanist:accompanist-flowlayout:0.30.1")
 
     // datastore (core and preferences)
     implementation ("androidx.datastore:datastore:1.0.0")
     implementation("androidx.datastore:datastore-preferences:1.0.0")
-
 
     implementation ("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5")
     implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
@@ -147,9 +135,9 @@ dependencies {
 
     implementation("com.github.skydoves:sealedx-core:1.0.1")
     ksp("com.github.skydoves:sealedx-processor:1.0.1")
-    //timber
-    implementation("com.jakewharton.timber:timber:5.0.1")
 
+
+    implementation("com.jakewharton.timber:timber:5.0.1")
     debugImplementation ("com.squareup.leakcanary:leakcanary-android:2.10")
 
 

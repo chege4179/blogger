@@ -19,21 +19,15 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import coil.annotation.ExperimentalCoilApi
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.components.ProfileCard
 import com.peterchege.blogger.presentation.screens.search_screen.SearchScreenUiState
-import com.peterchege.blogger.presentation.screens.search_screen.SearchScreenViewModel
 
 @OptIn(ExperimentalCoilApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -48,7 +42,7 @@ fun SearchUsersTab(
             .fillMaxSize()
             .padding(6.dp)
 
-    ) {
+    ) { paddingValues ->
         when (uiState) {
             is SearchScreenUiState.Idle -> {
 
@@ -70,7 +64,7 @@ fun SearchUsersTab(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(top = 10.dp)
+                        .padding(paddingValues)
                 ) {
                     items(items = searchUsers) { user ->
                         ProfileCard(

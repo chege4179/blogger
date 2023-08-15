@@ -22,34 +22,26 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.peterchege.blogger.core.api.responses.User
-import com.peterchege.blogger.presentation.components.ArticleCard
 import com.peterchege.blogger.core.util.Constants
-import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.domain.state.AuthorProfileScreenUiState
+import com.peterchege.blogger.presentation.components.ArticleCard
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
-import kotlinx.coroutines.launch
+import com.peterchege.blogger.presentation.theme.defaultPadding
 import java.util.*
 
 
@@ -76,7 +68,7 @@ fun AuthorProfileScreen(
 
 }
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalCoilApi::class)
 @Composable
 fun AuthorProfileScreenContent(
@@ -92,7 +84,7 @@ fun AuthorProfileScreenContent(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.LightGray),
-    ) {
+    ) { paddingValues ->
         when (uiState) {
             is AuthorProfileScreenUiState.Loading -> {
                 LoadingComponent()
@@ -113,7 +105,7 @@ fun AuthorProfileScreenContent(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(Color.White)
-                        .padding(10.dp),
+                        .padding(defaultPadding),
                 ) {
 
                     item {

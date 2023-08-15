@@ -16,21 +16,19 @@
 package com.peterchege.blogger.presentation.screens.category_screen
 
 import android.annotation.SuppressLint
-import android.util.Log
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import com.bumptech.glide.Glide.init
-import com.peterchege.blogger.core.util.Constants
+import com.peterchege.blogger.presentation.theme.defaultPadding
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun CategoryScreen(
-
     viewModel: CategoryScreenViewModel = hiltViewModel()
 ) {
     Scaffold(
@@ -39,9 +37,14 @@ fun CategoryScreen(
 
         }
     ) {
-        Text(
-            text = viewModel.category.value
-        )
+        Column(
+            modifier = Modifier.fillMaxSize().padding(defaultPadding)
+        ) {
+            Text(
+                text = viewModel.category.value
+            )
+        }
+
     }
 
 

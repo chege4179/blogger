@@ -22,26 +22,33 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.core.util.categoryItem
 
+@Preview
+@Composable
+fun CategoryCardPreview(){
+    CategoryCard(
+        navigateToCategoryScreen = {  },
+        categoryItem = categoryItem(1,"Health and Beauty")
+    )
+}
 
 @Composable
 fun CategoryCard(
     modifier: Modifier = Modifier,
     navigateToCategoryScreen:(String) -> Unit,
     categoryItem: categoryItem,
-    icon: ImageVector? = null
 ) {
     Row(
         horizontalArrangement = Arrangement.Center,
@@ -49,26 +56,21 @@ fun CategoryCard(
         modifier = modifier
             .border(
                 width = 1.dp,
-                color = Color.LightGray,
+                color = Color.Black,
                 shape = RoundedCornerShape(5.dp),
             )
-            .padding(6.dp)
-            .clickable{
+            .padding(4.dp)
+            .clickable {
                 navigateToCategoryScreen(categoryItem.name)
 
             }
     ) {
         Text(
+            style = MaterialTheme.typography.h3,
             text = categoryItem.name,
             fontWeight = FontWeight.SemiBold,
             fontSize = 14.sp
         )
-        if(icon != null) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = Color.Black
-            )
-        }
+
     }
 }

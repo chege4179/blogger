@@ -19,16 +19,15 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,11 +38,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.peterchege.blogger.R
-import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.domain.repository.NetworkStatus
+import com.peterchege.blogger.presentation.theme.defaultPadding
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
@@ -76,7 +74,7 @@ fun LoginScreen(
 }
 
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @ExperimentalComposeUiApi
 @Composable
 fun LoginScreenContent(
@@ -92,25 +90,19 @@ fun LoginScreenContent(
 
 
     ) {
-    val context = LocalContext.current
-
-    val scaffoldState = rememberScaffoldState()
+    val snackbarHostState = SnackbarHostState()
     val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(key1 = networkStatus) {
         when (networkStatus) {
-            is NetworkStatus.Unknown -> {
-
-            }
-
+            is NetworkStatus.Unknown -> {}
             is NetworkStatus.Connected -> {
-                scaffoldState.snackbarHostState.showSnackbar(
+                snackbarHostState.showSnackbar(
                     message = "Connected"
                 )
             }
-
             is NetworkStatus.Disconnected -> {
-                scaffoldState.snackbarHostState.showSnackbar(
+                snackbarHostState.showSnackbar(
                     message = "You are offline"
                 )
             }
@@ -121,29 +113,27 @@ fun LoginScreenContent(
         eventFlow.collectLatest { event ->
             when (event) {
                 is UiEvent.ShowSnackbar -> {
-                    scaffoldState.snackbarHostState.showSnackbar(
+                    snackbarHostState.showSnackbar(
                         message = event.message
                     )
                 }
-
-                is UiEvent.Navigate -> {
-
-                }
+                is UiEvent.Navigate -> {}
             }
         }
     }
-
     Scaffold(
-        scaffoldState = scaffoldState,
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxSize(),
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        }
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(20.dp),
-        ) {
+                .padding(defaultPadding),
 
+        ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,

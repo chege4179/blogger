@@ -15,29 +15,23 @@
  */
 package com.peterchege.blogger.presentation.screens.search_screen.tabs
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
-import com.peterchege.blogger.core.util.Constants
-import com.peterchege.blogger.core.util.Screens
+import coil.annotation.ExperimentalCoilApi
 import com.peterchege.blogger.presentation.components.ArticleCard
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
-import com.peterchege.blogger.presentation.screens.dashboard.feed_screen.onProfileNavigate
 import com.peterchege.blogger.presentation.screens.search_screen.SearchScreenUiState
-import com.peterchege.blogger.presentation.screens.search_screen.SearchScreenViewModel
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+
+@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun SearchPostsTab(
     navigateToPostScreen:(String) -> Unit,
@@ -48,7 +42,7 @@ fun SearchPostsTab(
             .fillMaxSize()
             .padding(6.dp)
 
-    ) {
+    ) { paddingValues ->
         when(uiState){
             is SearchScreenUiState.Idle -> {
                 
@@ -65,7 +59,7 @@ fun SearchPostsTab(
                 val searchPosts = uiState.posts
                 if (searchPosts.isEmpty()) {
                     Column(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier.fillMaxSize().padding(paddingValues),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
