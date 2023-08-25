@@ -203,88 +203,83 @@ fun FeedScreenContent(
             }
         }
     ) {
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .pullRefresh(pullRefreshState),
+                .pullRefresh(pullRefreshState)
+                .padding(paddingValues = it)
+
+            ,
             horizontalAlignment = Alignment.CenterHorizontally,
 
         ) {
-            PullRefreshIndicator(
-                refreshing = true,
-                state = pullRefreshState,
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            Column(
+//            PullRefreshIndicator(
+//                refreshing = isRefreshing,
+//                state = pullRefreshState,
+//            )
+            LazyRow(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .padding(5.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(5.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    items(items = categories) { category ->
-                        CategoryCard(
-                            navigateToCategoryScreen = navigateToCategoryScreen,
-                            categoryItem = category
-                        )
-                        Spacer(modifier = Modifier.width(10.dp))
+                items(items = categories) { category ->
+                    CategoryCard(
+                        modifier = Modifier.height(30.dp),
+                        navigateToCategoryScreen = navigateToCategoryScreen,
+                        categoryItem = category
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
 
-                    }
                 }
-                when (uiState) {
-                    is FeedScreenUiState.Empty -> {
-                        ErrorComponent(
-                            retryCallback = { retryCallback() },
-                            errorMessage = "No posts were found"
-                        )
-                    }
+            }
+            when (uiState) {
+                is FeedScreenUiState.Empty -> {
+                    ErrorComponent(
+                        retryCallback = { retryCallback() },
+                        errorMessage = "No posts were found"
+                    )
+                }
 
-                    is FeedScreenUiState.Loading -> {
-                        LoadingComponent()
-                    }
+                is FeedScreenUiState.Loading -> {
+                    LoadingComponent()
+                }
 
-                    is FeedScreenUiState.Error -> {
-                        ErrorComponent(
-                            retryCallback = { retryCallback() },
-                            errorMessage = uiState.message
-                        )
-                    }
+                is FeedScreenUiState.Error -> {
+                    ErrorComponent(
+                        retryCallback = { retryCallback() },
+                        errorMessage = uiState.message
+                    )
+                }
 
-                    is FeedScreenUiState.Success -> {
-                        LazyColumn(
-                            modifier = Modifier
-                                .pullRefresh(pullRefreshState)
-                                .fillMaxSize()
-                                .padding(defaultPadding)
-                        ) {
+                is FeedScreenUiState.Success -> {
+                    LazyColumn(
+                        modifier = Modifier
+                            .pullRefresh(pullRefreshState)
+                            .fillMaxSize()
+                            .padding(defaultPadding)
+                    ) {
 
-                            items(items = uiState.posts) { post ->
-                                ArticleCard(
-                                    post = post.toPost(),
-                                    onItemClick = {
-                                        navigateToPostScreen(it._id)
-                                    },
-                                    onProfileNavigate = {
-                                        navigateToAuthorProfileScreen(it)
-                                    },
-                                    onDeletePost = {},
-                                    isLiked = post.isLiked,
-                                    isSaved = post.isSaved,
-                                    isProfile = false,
-                                    profileImageUrl = "https://res.cloudinary.com/dhuqr5iyw/image/upload/v1640971757/mystory/profilepictures/default_y4mjwp.jpg"
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                            }
-
+                        items(items = uiState.posts) { post ->
+                            ArticleCard(
+                                post = post.toPost(),
+                                onItemClick = {
+                                    navigateToPostScreen(it._id)
+                                },
+                                onProfileNavigate = {
+                                    navigateToAuthorProfileScreen(it)
+                                },
+                                onDeletePost = {},
+                                isLiked = post.isLiked,
+                                isSaved = post.isSaved,
+                                isProfile = false,
+                                profileImageUrl = "https://res.cloudinary.com/dhuqr5iyw/image/upload/v1640971757/mystory/profilepictures/default_y4mjwp.jpg"
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
                         }
+
                     }
                 }
-
             }
         }
 

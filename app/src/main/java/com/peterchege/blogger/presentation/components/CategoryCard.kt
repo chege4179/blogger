@@ -18,11 +18,12 @@ package com.peterchege.blogger.presentation.components
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
+
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -37,36 +38,35 @@ import com.peterchege.blogger.core.util.categoryItem
 
 @Preview
 @Composable
-fun CategoryCardPreview(){
+fun CategoryCardPreview() {
     CategoryCard(
-        navigateToCategoryScreen = {  },
-        categoryItem = categoryItem(1,"Health and Beauty")
+        navigateToCategoryScreen = { },
+        categoryItem = categoryItem(1, "Health and Beauty")
     )
 }
 
 @Composable
 fun CategoryCard(
     modifier: Modifier = Modifier,
-    navigateToCategoryScreen:(String) -> Unit,
+    navigateToCategoryScreen: (String) -> Unit,
     categoryItem: categoryItem,
 ) {
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
+    Box(
         modifier = modifier
             .border(
                 width = 1.dp,
                 color = Color.Black,
                 shape = RoundedCornerShape(5.dp),
             )
-            .padding(4.dp)
+            .padding(3.dp)
             .clickable {
                 navigateToCategoryScreen(categoryItem.name)
 
             }
     ) {
         Text(
-            style = MaterialTheme.typography.h3,
+            modifier = Modifier.align(Alignment.Center),
+            style = MaterialTheme.typography.bodySmall,
             text = categoryItem.name,
             fontWeight = FontWeight.SemiBold,
             fontSize = 14.sp
