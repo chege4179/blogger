@@ -66,21 +66,20 @@ dependencies {
 
     implementation ("androidx.core:core-ktx:1.10.1")
     implementation ("androidx.appcompat:appcompat:1.6.1")
-    implementation ("androidx.compose.ui:ui:1.6.0-alpha03")
-    implementation ("androidx.compose.material:material:1.6.0-alpha03")
-    implementation ("androidx.compose.ui:ui-tooling-preview:1.6.0-alpha03")
+    implementation ("androidx.compose.ui:ui:1.6.0-alpha04")
+    implementation ("androidx.compose.ui:ui-tooling-preview:1.6.0-alpha04")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
     implementation ("androidx.activity:activity-compose:1.7.2")
     implementation("androidx.hilt:hilt-common:1.0.0")
     testImplementation ("junit:junit:4.13.2")
     androidTestImplementation ("androidx.test.ext:junit:1.1.5")
     androidTestImplementation ("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:1.6.0-alpha03")
-    debugImplementation ("androidx.compose.ui:ui-tooling:1.6.0-alpha03")
+    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:1.6.0-alpha04")
+    debugImplementation ("androidx.compose.ui:ui-tooling:1.6.0-alpha04")
 
-    implementation ("androidx.compose.material:material-icons-extended:1.6.0-alpha03")
-    implementation ("androidx.compose.material3:material3:1.2.0-alpha05")
-    implementation("androidx.compose.material3:material3-window-size-class:1.2.0-alpha05")
+    implementation ("androidx.compose.material:material-icons-extended:1.6.0-alpha04")
+    implementation ("androidx.compose.material3:material3:1.2.0-alpha06")
+    implementation("androidx.compose.material3:material3-window-size-class:1.2.0-alpha06")
 
 
     // retrofit
@@ -98,15 +97,15 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
 
     //coroutines
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.2")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
     // dagger hilt
     implementation ("com.google.dagger:hilt-android:2.47")
     kapt ("com.google.dagger:hilt-android-compiler:2.46.1")
     kapt ("androidx.hilt:hilt-compiler:1.0.0")
     implementation ("androidx.hilt:hilt-navigation-compose:1.0.0")
-    implementation ("androidx.navigation:navigation-compose:2.7.0")
+    implementation ("androidx.navigation:navigation-compose:2.7.1")
 
     // room
     implementation ("androidx.room:room-runtime:2.5.2")
@@ -129,20 +128,17 @@ dependencies {
     implementation("androidx.work:work-runtime-ktx:2.8.1")
     implementation("androidx.hilt:hilt-work:1.0.0")
 
-    implementation ("com.google.firebase:firebase-crashlytics-ktx:18.4.0")
+    implementation ("com.google.firebase:firebase-crashlytics-ktx:18.4.1")
     implementation ("com.google.firebase:firebase-analytics-ktx:21.3.0")
     implementation ("com.google.firebase:firebase-messaging:23.2.1")
 
-    implementation("com.github.skydoves:sealedx-core:1.0.1")
-    ksp("com.github.skydoves:sealedx-processor:1.0.1")
-
 
     implementation("com.jakewharton.timber:timber:5.0.1")
-    debugImplementation ("com.squareup.leakcanary:leakcanary-android:2.10")
+    debugImplementation ("com.squareup.leakcanary:leakcanary-android:2.12")
 
 
-    debugImplementation ("com.github.chuckerteam.chucker:library:3.5.2")
-    releaseImplementation("com.github.chuckerteam.chucker:library-no-op:3.5.2")
+    debugImplementation ("com.github.chuckerteam.chucker:library:4.0.0")
+    releaseImplementation("com.github.chuckerteam.chucker:library-no-op:4.0.0")
 
 
     implementation ("androidx.core:core-splashscreen:1.0.1")

@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.MaterialTheme
 
 import androidx.compose.material3.Text
@@ -51,26 +52,18 @@ fun CategoryCard(
     navigateToCategoryScreen: (String) -> Unit,
     categoryItem: categoryItem,
 ) {
-    Box(
-        modifier = modifier
-            .border(
-                width = 1.dp,
-                color = Color.Black,
-                shape = RoundedCornerShape(5.dp),
+    AssistChip(
+        onClick = {
+            navigateToCategoryScreen(categoryItem.name)
+        },
+        label = {
+            Text(
+                style = MaterialTheme.typography.bodySmall,
+                text = categoryItem.name,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 14.sp
             )
-            .padding(3.dp)
-            .clickable {
-                navigateToCategoryScreen(categoryItem.name)
-
-            }
-    ) {
-        Text(
-            modifier = Modifier.align(Alignment.Center),
-            style = MaterialTheme.typography.bodySmall,
-            text = categoryItem.name,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 14.sp
-        )
-
-    }
+        },
+        shape = RoundedCornerShape(10.dp),
+    )
 }

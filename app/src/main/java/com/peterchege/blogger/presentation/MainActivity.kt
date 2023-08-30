@@ -20,8 +20,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import coil.annotation.ExperimentalCoilApi
@@ -29,7 +27,6 @@ import com.peterchege.blogger.presentation.navigation.Navigation
 import com.peterchege.blogger.presentation.navigation.NavigationViewModel
 import com.peterchege.blogger.presentation.theme.BloggerTheme
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 
 @AndroidEntryPoint

@@ -21,16 +21,30 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.peterchege.blogger.core.api.requests.Notification
+import com.peterchege.blogger.core.api.responses.Post
 import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.Resource
 import com.peterchege.blogger.domain.repository.AuthRepository
-import com.peterchege.blogger.domain.state.NotificationScreenUi
-import com.peterchege.blogger.domain.state.NotificationScreenUiState
+
 import com.peterchege.blogger.domain.use_case.GetProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+sealed interface NotificationScreenUiState {
+
+    object UserNotLoggedIn:NotificationScreenUiState
+
+    object Loading : NotificationScreenUiState
+
+    data class Success(val notifications:List<Notification>) : NotificationScreenUiState
+
+    data class Error(val message: String) : NotificationScreenUiState
+
+
+}
+
 
 
 @HiltViewModel
@@ -43,6 +57,12 @@ class NotificationScreenViewModel @Inject constructor(
         MutableStateFlow<NotificationScreenUiState>(NotificationScreenUiState.Loading)
     val uiState = _uiState.asStateFlow()
 
+    val isUserLoggedIn  = authRepository.isUserLoggedIn
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = false
+        )
     val authUser = authRepository.getLoggedInUser()
         .stateIn(
             scope = viewModelScope,
@@ -50,31 +70,34 @@ class NotificationScreenViewModel @Inject constructor(
             initialValue = null
         )
 
-    fun getNotifications(username:String) {
-        getProfileUseCase(username = username).onEach { result ->
-            when (result) {
-                is Resource.Success -> {
-                    _uiState.value = NotificationScreenUiState.Success(
-                        data = NotificationScreenUi(
-                            notifications = result.data?.user?.notifications ?: emptyList()
-
+    fun getNotifications(username:String,isUserLoggedIn:Boolean) {
+        if (isUserLoggedIn){
+            getProfileUseCase(username = username).onEach { result ->
+                when (result) {
+                    is Resource.Success -> {
+                        _uiState.value = NotificationScreenUiState.Success(
+                            notifications = result.data?.user?.notifications ?: emptyList(),
                         )
-                    )
+                    }
 
+                    is Resource.Loading -> {
+                        _uiState.value = NotificationScreenUiState.Loading
+                    }
+
+                    is Resource.Error -> {
+                        _uiState.value = NotificationScreenUiState.Error(
+                            message = result.message ?: "An unexpected error occurred"
+                        )
+                    }
                 }
 
-                is Resource.Loading -> {
-                    _uiState.value = NotificationScreenUiState.Loading
-                }
+            }.launchIn(viewModelScope)
+        }else{
+            _uiState.value = NotificationScreenUiState.UserNotLoggedIn
+        }
 
-                is Resource.Error -> {
-                    _uiState.value = NotificationScreenUiState.Error(
-                        message = result.message ?: "An unexpected error occurred"
-                    )
-                }
-            }
 
-        }.launchIn(viewModelScope)
+
 
     }
 }

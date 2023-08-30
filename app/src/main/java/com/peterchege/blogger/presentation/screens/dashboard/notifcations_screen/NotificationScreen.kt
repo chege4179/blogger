@@ -33,7 +33,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.peterchege.blogger.domain.state.NotificationScreenUiState
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.components.NotificationCard
@@ -49,10 +48,11 @@ fun NotificationScreen(
 ){
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val authUser by viewModel.authUser.collectAsStateWithLifecycle()
+    val isUserLoggedIn by viewModel.isUserLoggedIn.collectAsStateWithLifecycle()
 
-    LaunchedEffect(key1 = authUser){
+    LaunchedEffect(key1 = authUser, key2 = isUserLoggedIn){
         authUser?.let {
-            viewModel.getNotifications(username = it.username)
+            viewModel.getNotifications(username = it.username,isUserLoggedIn = isUserLoggedIn)
         }
 
     }
@@ -88,6 +88,15 @@ fun NotificationScreenContent(
         }
     ) { paddingValues ->
         when(uiState){
+            is NotificationScreenUiState.UserNotLoggedIn -> {
+
+                Box( modifier = Modifier.fillMaxSize().padding(paddingValues) ){
+                    Text(
+                        text = "Log In to view your notifications",
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+            }
             is NotificationScreenUiState.Loading -> {
                 LoadingComponent()
             }
@@ -98,7 +107,7 @@ fun NotificationScreenContent(
                 )
             }
             is NotificationScreenUiState.Success -> {
-                val notifications = uiState.data.notifications
+                val notifications = uiState.notifications
                 LazyColumn(modifier = Modifier
                     .fillMaxSize()
                     .padding(defaultPadding)

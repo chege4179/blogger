@@ -17,6 +17,7 @@ package com.peterchege.blogger.presentation.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -32,10 +33,12 @@ import com.peterchege.blogger.core.api.responses.Follower
 fun FollowersList(
     followers:List<Follower>,
     navigateToAuthorProfileScreen:(String) -> Unit,
+    paddingValues:PaddingValues,
 ){
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
+            .padding(paddingValues)
             .padding(10.dp)
     ){
 

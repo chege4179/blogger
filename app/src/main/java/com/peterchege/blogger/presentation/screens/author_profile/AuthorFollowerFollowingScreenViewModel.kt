@@ -15,90 +15,93 @@
  */
 package com.peterchege.blogger.presentation.screens.author_profile
 
-import android.util.Log
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.peterchege.blogger.core.api.responses.Follower
 import com.peterchege.blogger.core.api.responses.Following
-import com.peterchege.blogger.core.api.responses.Post
-import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.Resource
-import com.peterchege.blogger.domain.state.AuthorProfileFollowerFollowingUi
-import com.peterchege.blogger.domain.state.AuthorProfileFollowerFollowingUiState
+import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.use_case.GetProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
+
+sealed interface AuthorProfileFollowerFollowingScreenUiState {
+
+    object Loading : AuthorProfileFollowerFollowingScreenUiState
+
+    data class Success(
+        val following:List<Following>,
+        val followers:List<Follower>,
+        val isUserLoggedIn:Boolean,
+        val type:String,
+    ) : AuthorProfileFollowerFollowingScreenUiState
+
+    data class Error(val message: String) : AuthorProfileFollowerFollowingScreenUiState
+
+
+}
+
+
+
 
 
 @HiltViewModel
 class AuthorFollowerFollowingScreenViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val profileUseCase: GetProfileUseCase,
+    private val authRepository: AuthRepository,
 
     ) : ViewModel() {
-    private val _type = mutableStateOf<String>("")
-    val type: State<String> = _type
-
-    private val _user = mutableStateOf<User?>(null)
-    val user: State<User?> = _user
+    private val type =  savedStateHandle.getStateFlow<String>(key = "type" , initialValue = "")
+    private val authorUsername = savedStateHandle.getStateFlow<String>(key = "username", initialValue = "")
 
 
-    private val _uiState = MutableStateFlow<AuthorProfileFollowerFollowingUiState>(
-        AuthorProfileFollowerFollowingUiState.Loading)
-    val uiState = _uiState.asStateFlow()
+    private val isUserLoggedIn = authRepository.isUserLoggedIn
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = false
+        )
+
+    private val authUser = authRepository.getLoggedInUser()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = null
+        )
 
 
-
-
-
-    init {
-        savedStateHandle.get<String>("username")?.let { username ->
-            getProfile(username = username)
-        }
-        getType()
-    }
-
-    private fun getType() {
-        savedStateHandle.get<String>("type")?.let {
-            _type.value = it
-
-        }
-    }
-
-    fun getIsFollowingStatus(username: String): Boolean {
-        val followingUsernames = _user.value?.following?.map { it.followedUsername }
-        return followingUsernames?.contains(username) ?: false
-    }
-
-    private fun getProfile(username: String) {
-        profileUseCase(username = username).onEach { result ->
-            when (result) {
-                is Resource.Success -> {
-                    _user.value = result.data?.user
-                    _uiState.value = AuthorProfileFollowerFollowingUiState.Success(
-                        AuthorProfileFollowerFollowingUi(
-                            followers = result.data?.user?.followers ?: emptyList(),
-                            following = result.data?.user?.following ?: emptyList()
-                        )
-                    )
-                }
-                is Resource.Error -> {
-                    _uiState.value = AuthorProfileFollowerFollowingUiState.Error(
-                        message = result.message ?: "An unexpected error occurred")
-                }
-                is Resource.Loading -> {
-                    _uiState.value = AuthorProfileFollowerFollowingUiState.Loading
-                }
+    val uiState = combine(
+        profileUseCase(username = authorUsername.value),
+        isUserLoggedIn,
+        authUser,
+        type,
+    ){ result, loggedIn, user,type ->
+        when (result) {
+            is Resource.Success -> {
+                AuthorProfileFollowerFollowingScreenUiState.Success(
+                    followers = result.data?.user?.followers ?: emptyList(),
+                    following = result.data?.user?.following ?: emptyList(),
+                    type = type,
+                    isUserLoggedIn = loggedIn
+                )
             }
+            is Resource.Error -> {
+                AuthorProfileFollowerFollowingScreenUiState.Error(
+                    message = result.message ?: "An unexpected error occurred")
+            }
+            is Resource.Loading -> {
+                AuthorProfileFollowerFollowingScreenUiState.Loading
+            }
+        }
 
-        }.launchIn(viewModelScope)
-
-    }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000L),
+        initialValue = AuthorProfileFollowerFollowingScreenUiState.Loading
+    )
 }

@@ -15,30 +15,34 @@
  */
 package com.peterchege.blogger.presentation.screens.author_profile
 
-import android.util.Log
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.peterchege.blogger.core.api.requests.FollowUser
 import com.peterchege.blogger.core.api.responses.Post
-import com.peterchege.blogger.core.api.responses.ProfileResponse
 import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.Resource
 import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.PostRepository
-import com.peterchege.blogger.domain.state.AuthorProfileScreenUi
-import com.peterchege.blogger.domain.state.AuthorProfileScreenUiState
 import com.peterchege.blogger.domain.use_case.GetProfileUseCase
-import com.skydoves.sealedx.core.Extensive
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 import javax.inject.Inject
 
+sealed interface AuthorProfileScreenUiState {
+
+    object Loading : AuthorProfileScreenUiState
+
+    data class Success(
+        val posts: List<Post>,
+        val user: User,
+        val isUserLoggedIn:Boolean
+    ) : AuthorProfileScreenUiState
+
+    data class Error(val message: String) : AuthorProfileScreenUiState
+
+
+}
 
 
 @HiltViewModel
@@ -47,8 +51,17 @@ class AuthorProfileViewModel @Inject constructor(
     private val profileUseCase: GetProfileUseCase,
     private val authRepository: AuthRepository,
     private val repository: PostRepository,
+) : ViewModel() {
 
-    ) : ViewModel() {
+    private val username =
+        savedStateHandle.getStateFlow<String>(key = "username", initialValue = "")
+
+    private val isUserLoggedIn = authRepository.isUserLoggedIn
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = false,
+        )
 
     val authUser = authRepository.getLoggedInUser()
         .stateIn(
@@ -58,17 +71,42 @@ class AuthorProfileViewModel @Inject constructor(
         )
 
 
-    private val _uiState = MutableStateFlow<AuthorProfileScreenUiState>(AuthorProfileScreenUiState.Loading)
-    val uiState = _uiState.asStateFlow()
 
-    init {
-        getProfile()
-    }
+    val uiState = combine(
+        profileUseCase(username = username.value),
+        isUserLoggedIn,
+    ) { result, loggedIn ->
+        when (result) {
+            is Resource.Success -> {
+                AuthorProfileScreenUiState.Success(
+                    posts = result.data?.posts ?: emptyList(),
+                    user = result.data!!.user,
+                    isUserLoggedIn = loggedIn
+                )
+            }
+
+            is Resource.Error -> {
+                AuthorProfileScreenUiState.Error(
+                    message = result.message ?: "An unexpected error occurred"
+                )
+            }
+
+            is Resource.Loading -> {
+                AuthorProfileScreenUiState.Loading
+            }
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000L),
+        initialValue = AuthorProfileScreenUiState.Loading
+    )
+
+
 
 
 
     fun followUser() {
-        try {
+        viewModelScope.launch {
 //            val username = _user.value?.username ?: ""
 //            val fullname = _user.value?.fullname ?: ""
 //            val userId = _user.value?._id ?: ""
@@ -85,69 +123,27 @@ class AuthorProfileViewModel @Inject constructor(
 //                    _isFollowing.value = true
 //                }
 //            }
-
-        } catch (e: HttpException) {
-
-        } catch (e: IOException) {
-
         }
     }
 
     fun unfollowUser() {
-        try {
-//            val username = _user.value?.username ?: ""
-//            val fullname = _user.value?.fullname ?: ""
-//            val userId = _user.value?._id ?: ""
-            viewModelScope.launch {
-//                val followResponse = repository.unfollowUser(
-//                    FollowUser(
-//                        followerUsername = username,
-//                        followerFullname = fullname,
-//                        followerId = userId,
-//                        followedUsername = _state.value.user!!.username,
-//                    )
+//        val username = _user.value?.username ?: ""
+//        val fullname = _user.value?.fullname ?: ""
+//        val userId = _user.value?._id ?: ""
+//        viewModelScope.launch {
+//            val followResponse = repository.unfollowUser(
+//                FollowUser(
+//                    followerUsername = username,
+//                    followerFullname = fullname,
+//                    followerId = userId,
+//                    followedUsername = _state.value.user!!.username,
 //                )
-//                if (followResponse.success) {
-//                    _isFollowing.value = false
-//                }
-            }
-
-        } catch (e: HttpException) {
-            Log.e("http error", e.localizedMessage ?: "A http error occurred")
-        } catch (e: IOException) {
-            Log.e("io error", e.localizedMessage ?: "An io error occurred")
-        }
-
+//            )
+//            if (followResponse.success) {
+//                _isFollowing.value = false
+//            }
     }
 
 
-    private fun getProfile() {
-        savedStateHandle.get<String>("username")?.let { username ->
-            profileUseCase(username = username).onEach { result ->
-                when (result) {
-                    is Resource.Success -> {
-                        _uiState.value = AuthorProfileScreenUiState.Success(
-                            data = AuthorProfileScreenUi(
-                                posts = result.data?.posts ?: emptyList(),
-                                user = result.data?.user
-                            )
-                        )
-
-
-                    }
-                    is Resource.Error -> {
-                        _uiState.value = AuthorProfileScreenUiState.Error(
-                            message = result.message ?: "An unexpected error occurred")
-                    }
-                    is Resource.Loading -> {
-
-                    }
-                }
-
-            }.launchIn(viewModelScope)
-        }
-
-
-    }
 
 }

@@ -17,33 +17,24 @@ package com.peterchege.blogger.presentation.navigation
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import coil.annotation.ExperimentalCoilApi
-import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.presentation.screens.author_profile.AuthorFollowerFollowingScreen
 import com.peterchege.blogger.presentation.screens.author_profile.AuthorProfileScreen
 import com.peterchege.blogger.presentation.screens.category_screen.CategoryScreen
 import com.peterchege.blogger.presentation.screens.dashboard.DashBoardScreen
-import com.peterchege.blogger.presentation.screens.dashboard.addpost_screen.AddPostScreen
+import com.peterchege.blogger.presentation.screens.dashboard.add_post_screen.AddPostScreen
 import com.peterchege.blogger.presentation.screens.dashboard.draft_screen.DraftScreen
-import com.peterchege.blogger.presentation.screens.dashboard.feed_screen.FeedScreen
-import com.peterchege.blogger.presentation.screens.dashboard.notifcations_screen.NotificationScreen
 import com.peterchege.blogger.presentation.screens.dashboard.profile_screen.ProfileFollowerFollowingScreen
-import com.peterchege.blogger.presentation.screens.dashboard.profile_screen.ProfileScreen
-import com.peterchege.blogger.presentation.screens.dashboard.savedposts_screen.SavedPostScreen
 import com.peterchege.blogger.presentation.screens.login.LoginScreen
 import com.peterchege.blogger.presentation.screens.post_screen.PostScreen
 import com.peterchege.blogger.presentation.screens.search_screen.SearchScreen
@@ -55,25 +46,13 @@ import com.peterchege.blogger.presentation.screens.signup.SignUpScreen
 @Composable
 fun Navigation(
     navController: NavHostController,
-    viewModel: NavigationViewModel = hiltViewModel(),
 ) {
     val activity = (LocalContext.current as? Activity)
-    val user = viewModel.user.collectAsStateWithLifecycle()
 
 
-    fun getInitialRoute(user: State<User?>):String {
-        if (user.value === null){
-            return Screens.LOGIN_SCREEN
-        }
-        return if (user.value!!.username != ""){
-            Screens.DASHBOARD_SCREEN
-        }else{
-            Screens.LOGIN_SCREEN
-        }
-    }
     NavHost(
         navController = navController,
-        startDestination = getInitialRoute(user = user)
+        startDestination = Screens.DASHBOARD_SCREEN
     ) {
         composable(route = Screens.LOGIN_SCREEN) {
             LoginScreen(
@@ -134,6 +113,8 @@ fun Navigation(
                 navigateBack = navController::navigateToDashBoard,
                 navigateToDraftScreen = navController::navigateToDraftScreen,
                 navigateToDashboardScreen = navController::navigateToDashBoard,
+                navigateToLoginScreen = navController::navigateToLoginScreen,
+                navigateToSignUpScreen = navController::navigateToSignUpScreen,
             )
 
         }

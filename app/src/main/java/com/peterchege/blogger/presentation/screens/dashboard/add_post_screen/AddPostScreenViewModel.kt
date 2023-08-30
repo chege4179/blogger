@@ -13,17 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.presentation.screens.dashboard.addpost_screen
+package com.peterchege.blogger.presentation.screens.dashboard.add_post_screen
 
 import android.net.Uri
-import androidx.compose.material.ScaffoldState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
-import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.api.requests.PostBody
 import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.room.entities.DraftRecord
@@ -39,6 +34,12 @@ import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
+sealed interface AddPostScreenUiState {
+    object LoggedIn:AddPostScreenUiState
+
+    object NotLoggedIn:AddPostScreenUiState
+}
+
 data class AddPostFormState(
     val postTitle: String = "",
     val postBody: String = "",
@@ -47,7 +48,6 @@ data class AddPostFormState(
     val isSaveDraftModalOpen: Boolean = false,
     val isFromDraft:Boolean = false,
     val draftId:Int? = null,
-
     )
 
 @HiltViewModel
@@ -57,6 +57,19 @@ class AddPostScreenViewModel @Inject constructor(
     private val uploadPostWorkManager: UploadPostWorkManager,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+
+    val uiState = authRepository.isUserLoggedIn.map {
+        if(it){
+            AddPostScreenUiState.LoggedIn
+        }else{
+            AddPostScreenUiState.NotLoggedIn
+        }
+    }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000L),
+            initialValue = AddPostScreenUiState.LoggedIn
+        )
 
     val isUploading = uploadPostWorkManager.isUploading
         .stateIn(

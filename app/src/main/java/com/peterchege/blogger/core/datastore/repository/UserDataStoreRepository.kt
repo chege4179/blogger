@@ -21,6 +21,7 @@ import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.datastore.serializers.UserInfoSerializer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 val Context.userDataStore by dataStore("user.json", UserInfoSerializer)
@@ -28,7 +29,14 @@ val Context.userDataStore by dataStore("user.json", UserInfoSerializer)
 class UserDataStoreRepository(
     @ApplicationContext private val context: Context
 ) {
-
+    val isUserLoggedIn:Flow<Boolean> =
+        context.userDataStore.data.map { user ->
+        if(user == null){
+            false
+        }else{
+            user._id != ""
+        }
+    }
     fun getLoggedInUser(): Flow<User?> {
         return context.userDataStore.data
     }

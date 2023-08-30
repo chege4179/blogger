@@ -37,7 +37,7 @@ import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.Constants
-import com.peterchege.blogger.domain.state.AuthorProfileScreenUiState
+import com.peterchege.blogger.presentation.screens.author_profile.AuthorProfileScreenUiState
 import com.peterchege.blogger.presentation.components.ArticleCard
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
@@ -99,8 +99,8 @@ fun AuthorProfileScreenContent(
             }
 
             is AuthorProfileScreenUiState.Success -> {
-                val user = uiState.data.user
-                val posts = uiState.data.posts
+                val user = uiState.user
+                val posts = uiState.posts
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
@@ -304,7 +304,6 @@ fun AuthorProfileScreenContent(
                                 onDeletePost = {
 
                                 },
-                                profileImageUrl = user?.imageUrl ?: "",
                                 isLiked = false,
                                 isSaved = false,
                                 isProfile = true

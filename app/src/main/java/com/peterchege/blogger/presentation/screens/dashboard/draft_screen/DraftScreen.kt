@@ -72,7 +72,7 @@ fun DraftScreenContent(
                 }
                 )
         }
-    ) {
+    ) { paddingValues ->
         when(uiState){
             is DraftsScreenUiState.Loading -> {
                 LoadingComponent()
@@ -94,7 +94,9 @@ fun DraftScreenContent(
                     }
                 }else{
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize().padding(defaultPadding)
+                        modifier = Modifier.fillMaxSize()
+                            .padding(paddingValues = paddingValues)
+                            .padding(defaultPadding)
                     ){
                         items(items = drafts){ draft ->
                             DraftCard(

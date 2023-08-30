@@ -40,6 +40,9 @@ class AuthRepositoryImpl  @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ): AuthRepository {
 
+    override val isUserLoggedIn: Flow<Boolean> =
+        userDataStoreRepository.isUserLoggedIn
+
     override suspend fun signUpUser(signUpUser: SignUpUser): NetworkResult<SignUpResponse> {
         return safeApiCall { api.signUpUser(signUpUser) }
     }
@@ -63,6 +66,7 @@ class AuthRepositoryImpl  @Inject constructor(
     override suspend fun unsetLoggedInUser() = withContext(context = ioDispatcher) {
         return@withContext userDataStoreRepository.unsetLoggedInUser()
     }
+
 
 
 }

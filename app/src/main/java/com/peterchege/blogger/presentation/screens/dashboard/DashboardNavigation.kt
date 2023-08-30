@@ -28,6 +28,7 @@ import com.peterchege.blogger.presentation.navigation.navigateToLoginScreen
 import com.peterchege.blogger.presentation.navigation.navigateToPostScreen
 import com.peterchege.blogger.presentation.navigation.navigateToProfileFollowerFollowingScreen
 import com.peterchege.blogger.presentation.navigation.navigateToSearchScreen
+import com.peterchege.blogger.presentation.navigation.navigateToSignUpScreen
 import com.peterchege.blogger.presentation.screens.dashboard.feed_screen.FeedScreen
 import com.peterchege.blogger.presentation.screens.dashboard.notifcations_screen.NotificationScreen
 import com.peterchege.blogger.presentation.screens.dashboard.profile_screen.ProfileScreen
@@ -78,6 +79,7 @@ fun DashboardNavigation(
             route = Screens.PROFILE_SCREEN
         ) {
             ProfileScreen(
+                navigateToSignUpScreen = navHostController::navigateToSignUpScreen,
                 navigateToLoginScreen = navHostController::navigateToLoginScreen,
                 navigateToProfileFollowerFollowingScreen = navHostController::navigateToProfileFollowerFollowingScreen,
                 navigateToPostScreen = navHostController::navigateToPostScreen,

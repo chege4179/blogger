@@ -179,6 +179,7 @@ fun PostScreenContent(
                         commentUiState = commentUiState,
                         postComment = { postComment() },
                         onChangeNewComment = { onChangeNewComment(it) },
+                        isUserLoggedIn = uiState.isUserLoggedIn,
                     )
                 }
                 LazyColumn(
@@ -369,6 +370,7 @@ fun PostScreenContent(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommentDialog(
+    isUserLoggedIn:Boolean,
     modifier: Modifier = Modifier,
     commentUiState:CommentUiState,
     onChangeNewComment: (String) -> Unit,
@@ -383,24 +385,29 @@ fun CommentDialog(
             Text(text = "Post Comment")
         },
         text = {
-            TextField(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                value = commentUiState.newComment,
-                onValueChange = {
-                    onChangeNewComment(it)
-                },
-                singleLine = false,
-                textStyle = MaterialTheme.typography.bodySmall.copy(textAlign = TextAlign.Start),
-                keyboardOptions = KeyboardOptions(
-                    autoCorrect = false,
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
+            if (isUserLoggedIn){
+                TextField(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    value = commentUiState.newComment,
+                    onValueChange = {
+                        onChangeNewComment(it)
+                    },
+                    singleLine = false,
+                    textStyle = MaterialTheme.typography.bodySmall.copy(textAlign = TextAlign.Start),
+                    keyboardOptions = KeyboardOptions(
+                        autoCorrect = false,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
 
-                    }
+                        }
+                    )
                 )
-            )
+            }else{
+                Text(text = "Log In to be able to comment")
+            }
+
         },
         confirmButton = {
             TextButton(

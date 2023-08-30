@@ -21,15 +21,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.PullRefreshState
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,18 +32,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import coil.annotation.ExperimentalCoilApi
+import com.peterchege.blogger.core.api.responses.Post
 import com.peterchege.blogger.core.api.responses.User
-import com.peterchege.blogger.core.util.Constants
-import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.core.util.categories
+import com.peterchege.blogger.core.util.pullRefresh.PullRefreshState
+import com.peterchege.blogger.core.util.pullRefresh.pullRefresh
+import com.peterchege.blogger.core.util.pullRefresh.rememberPullRefreshState
 import com.peterchege.blogger.domain.mappers.toPost
 import com.peterchege.blogger.domain.repository.NetworkStatus
 import com.peterchege.blogger.presentation.components.ArticleCard
@@ -60,7 +54,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @ExperimentalCoilApi
 fun FeedScreen(
@@ -96,12 +90,14 @@ fun FeedScreen(
         pullRefreshState = pullRefreshState,
         uiState = feedScreenUiState,
         isRefreshing = isSyncing,
-        retryCallback = { viewModel.refreshFeed() },
+        retryCallback = viewModel::refreshFeed,
+        bookmarkPost = viewModel::bookmarkPost,
+        unBookmarkPost = viewModel::unBookmarkPost
     )
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 @ExperimentalCoilApi
@@ -119,6 +115,8 @@ fun FeedScreenContent(
     networkStatus: NetworkStatus,
     pullRefreshState: PullRefreshState,
     retryCallback: () -> Unit,
+    bookmarkPost: (Post) -> Unit,
+    unBookmarkPost: (Post) -> Unit,
 
     ) {
     val snackbarHostState = SnackbarHostState()
@@ -157,8 +155,7 @@ fun FeedScreenContent(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.DarkGray)
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
-        ,
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
@@ -207,12 +204,10 @@ fun FeedScreenContent(
             modifier = Modifier
                 .fillMaxSize()
                 .pullRefresh(pullRefreshState)
-                .padding(paddingValues = it)
-
-            ,
+                .padding(paddingValues = it),
             horizontalAlignment = Alignment.CenterHorizontally,
 
-        ) {
+            ) {
 //            PullRefreshIndicator(
 //                refreshing = isRefreshing,
 //                state = pullRefreshState,
@@ -263,17 +258,22 @@ fun FeedScreenContent(
                         items(items = uiState.posts) { post ->
                             ArticleCard(
                                 post = post.toPost(),
-                                onItemClick = {
-                                    navigateToPostScreen(it._id)
+                                onItemClick = { post ->
+                                    navigateToPostScreen(post._id)
                                 },
-                                onProfileNavigate = {
-                                    navigateToAuthorProfileScreen(it)
+                                onProfileNavigate = { username ->
+                                    navigateToAuthorProfileScreen(username)
                                 },
                                 onDeletePost = {},
                                 isLiked = post.isLiked,
                                 isSaved = post.isSaved,
                                 isProfile = false,
-                                profileImageUrl = "https://res.cloudinary.com/dhuqr5iyw/image/upload/v1640971757/mystory/profilepictures/default_y4mjwp.jpg"
+                                onBookmarkPost = { post ->
+                                    bookmarkPost(post)
+                                },
+                                onUnBookmarkPost = { post ->
+                                    unBookmarkPost(post)
+                                },
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                         }

@@ -15,29 +15,37 @@
  */
 package com.peterchege.blogger.presentation.screens.dashboard.profile_screen
 
-import android.util.Log
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.peterchege.blogger.core.api.requests.FollowUser
 import com.peterchege.blogger.core.api.responses.Follower
 import com.peterchege.blogger.core.api.responses.Following
-import com.peterchege.blogger.core.api.responses.User
-import com.peterchege.blogger.core.util.Resource
 import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.PostRepository
-import com.peterchege.blogger.domain.state.AuthorProfileFollowerFollowingUi
-import com.peterchege.blogger.domain.state.AuthorProfileFollowerFollowingUiState
 import com.peterchege.blogger.domain.use_case.GetProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 import javax.inject.Inject
 
+
+sealed interface  ProfileFollowerFollowingScreenUiState {
+
+    object Loading : ProfileFollowerFollowingScreenUiState
+
+    data class Success(
+        val following:List<Following>,
+        val followers:List<Follower>,
+        val type:String,
+    ) : ProfileFollowerFollowingScreenUiState
+
+    data class Error(val message: String) : ProfileFollowerFollowingScreenUiState
+
+}
 
 @HiltViewModel
 class ProfileFollowerFollowingScreenViewModel @Inject constructor(
@@ -47,116 +55,74 @@ class ProfileFollowerFollowingScreenViewModel @Inject constructor(
     private val repository: PostRepository,
 
     ) : ViewModel() {
+
+    // follower or following
+    private val typeFlow = savedStateHandle.getStateFlow<String>(key = "type", initialValue = "")
+    private val authUser = authRepository.getLoggedInUser()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = null
+        )
+
+
+    val uiState = combine(typeFlow,authUser){type, user ->
+        if (user == null){
+            ProfileFollowerFollowingScreenUiState.Error("Info not found")
+        }else{
+            ProfileFollowerFollowingScreenUiState.Success(
+                type = type,
+                followers = user.followers,
+                following = user.following,
+            )
+        }
+    }
+        .onStart { ProfileFollowerFollowingScreenUiState.Loading }
+        .catch { ProfileFollowerFollowingScreenUiState.Error("An unexpected error occurred") }
+        .stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000L),
+        initialValue = ProfileFollowerFollowingScreenUiState.Loading
+    )
     
-    private var _type = mutableStateOf<String>("")
-    var type: State<String> = _type
 
-    private var _isLoading = mutableStateOf<Boolean>(false)
-    var isLoading: State<Boolean> = _isLoading
 
-    private var _user = MutableStateFlow<User?>(null)
-    var user: StateFlow<User?> = _user
 
-    private val _uiState = MutableStateFlow<AuthorProfileFollowerFollowingUiState>(
-        AuthorProfileFollowerFollowingUiState.Loading)
-    val uiState = _uiState.asStateFlow()
 
-    private fun loadUser(){
-        viewModelScope.launch {
-            authRepository.getLoggedInUser().collectLatest {
-                _user.value = it
-            }
-        }
-    }
 
-    init {
-        loadUser()
-        getType()
-        getProfile()
-    }
 
-    private fun getType() {
-        savedStateHandle.get<String>("type")?.let {
-            _type.value = it
-
-        }
-    }
 
     fun followUser(followedUsername: String) {
-        try {
-            val username = _user.value?.username ?: ""
-            val fullname = _user.value?.fullname ?: ""
-            val userId = _user.value?._id ?: ""
-            viewModelScope.launch {
-                val followResponse = repository.followUser(
-                    FollowUser(
-                        followerUsername = username,
-                        followerFullname = fullname,
-                        followerId = userId,
-                        followedUsername = followedUsername,
-                    )
-                )
-
-            }
-
-        } catch (e: HttpException) {
-            Log.e("http error", e.localizedMessage ?: "A http error occurred")
-        } catch (e: IOException) {
-            Log.e("io error", e.localizedMessage ?: "An io error occurred")
-        }
-
-
+//        viewModelScope.launch {
+//            val username = _user.value?.username ?: ""
+//            val fullname = _user.value?.fullname ?: ""
+//            val userId = _user.value?._id ?: ""
+//            val followResponse = repository.followUser(
+//                FollowUser(
+//                    followerUsername = username,
+//                    followerFullname = fullname,
+//                    followerId = userId,
+//                    followedUsername = followedUsername,
+//                )
+//            )
+//
+//        }
     }
 
     fun unfollowUser(followedUsername: String) {
-        try {
-            val username = _user.value?.username ?: ""
-            val fullname = _user.value?.fullname ?: ""
-            val userId = _user.value?._id ?: ""
-            viewModelScope.launch {
-                val followResponse = repository.unfollowUser(
-                    FollowUser(
-                        followerUsername = username,
-                        followerFullname = fullname,
-                        followerId = userId!!,
-                        followedUsername = followedUsername,
-                    )
-                )
-            }
-        } catch (e: HttpException) {
-            Log.e("http error", e.localizedMessage ?: "A http error occurred")
-        } catch (e: IOException) {
-            Log.e("io error", e.localizedMessage ?: "An io error occurred")
+        viewModelScope.launch {
+//            val username = _user.value?.username ?: ""
+//            val fullname = _user.value?.fullname ?: ""
+//            val userId = _user.value?._id ?: ""
+//            val followResponse = repository.unfollowUser(
+//                FollowUser(
+//                    followerUsername = username,
+//                    followerFullname = fullname,
+//                    followerId = userId!!,
+//                    followedUsername = followedUsername,
+//                )
+//            )
         }
-
     }
 
-
-    private fun getProfile() {
-        _isLoading.value = true
-        val username = _user.value?.username ?: ""
-
-        profileUseCase(username = username).onEach { result ->
-            when (result) {
-                is Resource.Success -> {
-                    _user.value = result.data?.user
-                    _uiState.value = AuthorProfileFollowerFollowingUiState.Success(
-                        AuthorProfileFollowerFollowingUi(
-                            followers = result.data?.user?.followers ?: emptyList(),
-                            following = result.data?.user?.following ?: emptyList()
-                        )
-                    )
-                }
-                is Resource.Error -> {
-                    _uiState.value = AuthorProfileFollowerFollowingUiState.Error(
-                        message = result.message ?: "An unexpected error occurred")
-                }
-                is Resource.Loading -> {
-                    _uiState.value = AuthorProfileFollowerFollowingUiState.Loading
-                }
-            }
-
-        }.launchIn(viewModelScope)
-
-    }
 }

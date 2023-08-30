@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.peterchege.blogger.core.util.Constants
-import com.peterchege.blogger.domain.state.AuthorProfileFollowerFollowingUiState
+
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.FollowersList
 import com.peterchege.blogger.presentation.components.FollowingList
@@ -44,7 +44,6 @@ fun AuthorFollowerFollowingScreen(
 
     AuthorFollowerFollowingScreenContent(
         uiState = uiState,
-        type = viewModel.type.value,
         navigateToAuthorProfileScreen = navigateToAuthorProfileScreen
     )
 
@@ -54,45 +53,49 @@ fun AuthorFollowerFollowingScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuthorFollowerFollowingScreenContent(
-    uiState:AuthorProfileFollowerFollowingUiState,
+    uiState:AuthorProfileFollowerFollowingScreenUiState,
     navigateToAuthorProfileScreen: (String) -> Unit,
-    type:String,
 ){
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text= "User's " + type.toLowerCase(Locale.ROOT).capitalize(
-                            Locale.ROOT) + "s",
-                    )
+                    if (uiState is AuthorProfileFollowerFollowingScreenUiState.Success){
+                        Text(
+                            text= "User's " + uiState.type.toLowerCase(Locale.ROOT).capitalize(
+                                Locale.ROOT) + "s",
+                        )
+                    }
+
                 }
             )
         }
     ){ paddingValues ->
         when(uiState){
-            is AuthorProfileFollowerFollowingUiState.Loading ->{
+            is AuthorProfileFollowerFollowingScreenUiState.Loading ->{
                 LoadingComponent()
             }
-            is AuthorProfileFollowerFollowingUiState.Error -> {
+            is AuthorProfileFollowerFollowingScreenUiState.Error -> {
                 ErrorComponent(
                     retryCallback = { /*TODO*/ },
                     errorMessage = uiState.message)
             }
-            is AuthorProfileFollowerFollowingUiState.Success -> {
+            is AuthorProfileFollowerFollowingScreenUiState.Success -> {
+                val type = uiState.type
                 when(type){
                     Constants.FOLLOWER -> {
                         FollowersList(
-                            followers = uiState.data.followers,
+                            followers = uiState.followers,
+                            paddingValues = paddingValues,
                             navigateToAuthorProfileScreen = navigateToAuthorProfileScreen
                         )
                     }
                     Constants.FOLLOWING -> {
                         FollowingList(
-                            following = uiState.data.following,
+                            following = uiState.following,
+                            paddingValues = paddingValues,
                             navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
-
                         )
                     }
                 }

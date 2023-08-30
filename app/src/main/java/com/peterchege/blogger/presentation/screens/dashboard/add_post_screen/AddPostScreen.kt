@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.presentation.screens.dashboard.addpost_screen
+package com.peterchege.blogger.presentation.screens.dashboard.add_post_screen
 
 
 import android.annotation.SuppressLint
@@ -36,6 +36,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.work.*
 import coil.annotation.ExperimentalCoilApi
 import com.peterchege.blogger.core.util.UiEvent
+import com.peterchege.blogger.presentation.components.NotLoggedInComponent
 import com.peterchege.blogger.presentation.theme.defaultPadding
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.flow.SharedFlow
@@ -47,14 +48,18 @@ fun AddPostScreen(
     navigateBack: () -> Unit,
     navigateToDraftScreen: () -> Unit,
     navigateToDashboardScreen: () -> Unit,
+    navigateToLoginScreen:() -> Unit,
+    navigateToSignUpScreen:() -> Unit,
     viewModel: AddPostScreenViewModel = hiltViewModel(),
 
     ) {
     val isUploading by viewModel.isUploading.collectAsStateWithLifecycle()
     val formState by viewModel.formState.collectAsStateWithLifecycle()
     val authUser by viewModel.authUser.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     AddPostScreenContent(
+        uiState = uiState,
         formState = formState,
         isUploading = isUploading,
         eventFlow = viewModel.eventFlow,
@@ -71,7 +76,9 @@ fun AddPostScreen(
         onBackPress = { viewModel.onBackPress(navigateToDashboardScreen) },
         onSaveDraftConfirm = { viewModel.onSaveDraftConfirm(navigateBack) },
         onSaveDraftDismiss = { viewModel.onSaveDraftDismiss(navigateBack) },
-        onCloseDialog = { viewModel.onCloseDialog() }
+        onCloseDialog = { viewModel.onCloseDialog() },
+        navigateToLoginScreen = navigateToLoginScreen,
+        navigateToSignUpScreen = navigateToSignUpScreen,
     )
 
 
@@ -81,6 +88,7 @@ fun AddPostScreen(
 @ExperimentalCoilApi
 @Composable
 fun AddPostScreenContent(
+    uiState:AddPostScreenUiState,
     navigateToDraftScreen: () -> Unit,
     formState: AddPostFormState,
     isUploading: Boolean,
@@ -92,7 +100,9 @@ fun AddPostScreenContent(
     onBackPress: () -> Unit,
     onSaveDraftConfirm: () -> Unit,
     onSaveDraftDismiss: () -> Unit,
-    onCloseDialog: () -> Unit
+    onCloseDialog: () -> Unit,
+    navigateToLoginScreen:() -> Unit,
+    navigateToSignUpScreen:() -> Unit,
 
 
 ) {
@@ -138,116 +148,126 @@ fun AddPostScreenContent(
                 onCloseDialog = onCloseDialog,
             )
         }
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(defaultPadding)
-            ,
-            ) {
-            LazyColumn() {
+        when(uiState){
+            is AddPostScreenUiState.NotLoggedIn -> {
+                NotLoggedInComponent(navigateToLoginScreen = { /*TODO*/ }) {
 
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-
-                    ) {
-                        formState.uri?.let {
-                            GlideImage(
-                                imageModel = { it },
-                                modifier = Modifier
-                                    .fillMaxWidth(0.7f)
-                                    .height(135.dp),
-
-                                )
-                        }
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight(0.2f),
-                            verticalArrangement = Arrangement.SpaceEvenly,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-
-                            Button(
-                                modifier = Modifier.fillMaxWidth(0.95f),
-                                onClick = {
-                                    launcher.launch("image/*")
-                                }) {
-                                Text("Select Image")
-                            }
-                            Spacer(modifier = Modifier.height(10.dp))
-                            Button(
-                                modifier = Modifier.fillMaxWidth(0.95f),
-                                onClick = {
-                                    onChangeImageUri(null)
-                                }) {
-                                Text("Remove Image")
-                            }
-                        }
-
-                    }
-                }
-                item {
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Column(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        OutlinedTextField(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            value = formState.postTitle,
-                            maxLines = 3,
-                            label = {
-                                Text("Post Title")
-                            },
-                            onValueChange = {
-                                onChangePostTitle(it)
-                            })
-                        Spacer(modifier = Modifier.height(10.dp))
-                        OutlinedTextField(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(400.dp),
-                            value = formState.postBody,
-                            maxLines = 70,
-                            label = {
-                                Text("Write your own story")
-                            },
-                            onValueChange = {
-                                onChangePostBody(it)
-                            })
-                        Spacer(modifier = Modifier.height(10.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                        ) {
-                            Button(
-                                onClick = {
-                                    navigateToDraftScreen()
-
-                                }) {
-                                Text(
-                                    text = "Go To Drafts"
-                                )
-                            }
-                            Button(
-                                onClick = {
-                                    onSubmit()
-                                }) {
-                                Text(
-                                    text = "Post"
-                                )
-                            }
-                        }
-
-                    }
                 }
             }
-            if (isUploading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            is AddPostScreenUiState.LoggedIn -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(defaultPadding)
+                    ,
+                ) {
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+
+                        item {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceEvenly
+
+                            ) {
+                                formState.uri?.let {
+                                    GlideImage(
+                                        imageModel = { it },
+                                        modifier = Modifier
+                                            .fillMaxWidth(0.7f)
+                                            .height(135.dp),
+
+                                        )
+                                }
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .fillMaxHeight(0.2f),
+                                    verticalArrangement = Arrangement.SpaceEvenly,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+
+                                    Button(
+                                        modifier = Modifier.fillMaxWidth(0.95f),
+                                        onClick = {
+                                            launcher.launch("image/*")
+                                        }) {
+                                        Text("Select Image")
+                                    }
+                                    Spacer(modifier = Modifier.height(10.dp))
+                                    Button(
+                                        modifier = Modifier.fillMaxWidth(0.95f),
+                                        onClick = {
+                                            onChangeImageUri(null)
+                                        }) {
+                                        Text("Remove Image")
+                                    }
+                                }
+
+                            }
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Column(
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                OutlinedTextField(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    value = formState.postTitle,
+                                    maxLines = 3,
+                                    label = {
+                                        Text("Post Title")
+                                    },
+                                    onValueChange = {
+                                        onChangePostTitle(it)
+                                    })
+                                Spacer(modifier = Modifier.height(10.dp))
+                                OutlinedTextField(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(400.dp),
+                                    value = formState.postBody,
+                                    maxLines = 70,
+                                    label = {
+                                        Text("Write your own story")
+                                    },
+                                    onValueChange = {
+                                        onChangePostBody(it)
+                                    })
+                                Spacer(modifier = Modifier.height(10.dp))
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                ) {
+                                    Button(
+                                        onClick = {
+                                            navigateToDraftScreen()
+
+                                        }) {
+                                        Text(
+                                            text = "Go To Drafts"
+                                        )
+                                    }
+                                    Button(
+                                        onClick = {
+                                            onSubmit()
+                                        }) {
+                                        Text(
+                                            text = "Post"
+                                        )
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                    if (isUploading) {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    }
+                }
             }
         }
+
     }
 }
 

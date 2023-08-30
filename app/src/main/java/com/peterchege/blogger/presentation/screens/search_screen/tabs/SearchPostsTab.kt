@@ -83,8 +83,7 @@ fun SearchPostsTab(
                                 isLiked = false,
                                 isSaved = false,
                                 isProfile = false,
-                                profileImageUrl = "https://res.cloudinary.com/dhuqr5iyw/image/upload/v1640971757/mystory/profilepictures/default_y4mjwp.jpg"
-                            )
+                                )
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                     }

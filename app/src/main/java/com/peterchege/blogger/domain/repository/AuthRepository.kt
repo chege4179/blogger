@@ -26,6 +26,7 @@ import com.peterchege.blogger.core.util.NetworkResult
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
+    val isUserLoggedIn :Flow<Boolean>
     suspend fun signUpUser(signUpUser: SignUpUser):NetworkResult <SignUpResponse>
 
     suspend fun loginUser(loginUser: LoginUser):NetworkResult<LoginResponse>
@@ -33,6 +34,7 @@ interface AuthRepository {
     suspend fun logoutUser(logoutUser: LogoutUser):NetworkResult<LogoutResponse>
 
     fun getLoggedInUser(): Flow<User?>
+
 
 
     suspend fun setLoggedInUser(user: User)

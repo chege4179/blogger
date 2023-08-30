@@ -45,7 +45,7 @@ import kotlin.collections.ArrayList
 sealed interface PostScreenUiState {
     object Loading : PostScreenUiState
 
-    data class Success(val post: PostUI) : PostScreenUiState
+    data class Success(val post: PostUI, val isUserLoggedIn:Boolean) : PostScreenUiState
 
     data class Error(val message: String) : PostScreenUiState
 
@@ -70,32 +70,32 @@ class PostScreenViewModel @Inject constructor(
     private val repository: PostRepository,
 ) : ViewModel() {
     val postId = savedStateHandle.get<String>("postId")
-    val postFlow = repository.getPostById(postId = postId ?: "")
+    private val postFlow = repository.getPostById(postId = postId ?: "")
     val authUserFlow = authRepository.getLoggedInUser()
-    val savedPostIdsFlow = repository.getSavedPostIds()
+    private val isUserLoggedIn = authRepository.isUserLoggedIn
+    private val savedPostIdsFlow = repository.getSavedPostIds()
 
-    val _commentUiState = MutableStateFlow(CommentUiState())
+    private val _commentUiState = MutableStateFlow(CommentUiState())
     val commentUiState = _commentUiState.asStateFlow()
 
-    val _deleteUiState = MutableStateFlow(DeletePostUiState())
+    private val _deleteUiState = MutableStateFlow(DeletePostUiState())
     val deletePostUiState = _deleteUiState.asStateFlow()
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
     val uiState: StateFlow<PostScreenUiState> =
-        combine(postFlow, savedPostIdsFlow, authUserFlow) { post, savedPostIds, authUser ->
+        combine(postFlow, savedPostIdsFlow, authUserFlow,isUserLoggedIn) { post, savedPostIds, authUser,loggedIn ->
             if (post == null) {
                 PostScreenUiState.PostNotFound
             } else {
-
                 val postUi = post.toDomain(
                     isProfile = false,
                     isSaved = savedPostIds.contains(postId),
-                    isLiked = post.likes.map { it.userId }.contains(authUser?._id),
+                    isLiked = if(loggedIn) post.likes.map { it.userId }.contains(authUser?._id) else false,
                 )
                 _commentUiState.value = _commentUiState.value.copy(comments = post.comments)
-                PostScreenUiState.Success(post = postUi)
+                PostScreenUiState.Success(post = postUi,isUserLoggedIn = loggedIn)
             }
         }.onStart {
             emit(PostScreenUiState.Loading)

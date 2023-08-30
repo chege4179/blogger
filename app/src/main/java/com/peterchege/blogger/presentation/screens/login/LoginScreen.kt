@@ -205,7 +205,6 @@ fun LoginScreenContent(
                     onClick = {
                         keyboardController?.hide()
                         onSubmit()
-
                     }
                 )
                 {

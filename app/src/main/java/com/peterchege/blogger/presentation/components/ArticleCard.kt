@@ -47,10 +47,12 @@ fun ArticleCard(
     onItemClick: (Post) -> Unit,
     onProfileNavigate: (String) -> Unit,
     onDeletePost: (Post) -> Unit,
-    profileImageUrl: String,
+
     isLiked: Boolean,
     isSaved: Boolean,
     isProfile: Boolean,
+    onBookmarkPost:(Post) -> Unit = {  },
+    onUnBookmarkPost:(Post) -> Unit = {  },
 ) {
     Card(
         modifier = Modifier
@@ -140,40 +142,25 @@ fun ArticleCard(
                                 }
                             )
                         } else {
-                            if (isLiked) {
-                                Icon(
-                                    imageVector = Icons.Default.Favorite,
-                                    contentDescription = "Like",
-                                    modifier = Modifier.clickable {
+                            Icon(
+                                imageVector =if(isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                contentDescription = "Like",
+                                modifier = Modifier.clickable {
 
+                                }
+                            )
+                            Icon(
+                                imageVector = if(isSaved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                                contentDescription = "Saved",
+                                modifier = Modifier.clickable {
+                                    if(isSaved){
+                                        onUnBookmarkPost(post)
+                                    }else{
+                                        onBookmarkPost(post)
                                     }
-                                )
-                            } else {
-                                Icon(
-                                    imageVector = Icons.Default.FavoriteBorder,
-                                    contentDescription = "Like",
-                                    modifier = Modifier.clickable {
 
-                                    }
-                                )
-                            }
-                            if (isSaved) {
-                                Icon(
-                                    imageVector = Icons.Default.Bookmark,
-                                    contentDescription = "Saved",
-                                    modifier = Modifier.clickable {
-
-                                    }
-                                )
-                            } else {
-                                Icon(
-                                    imageVector = Icons.Default.BookmarkBorder,
-                                    contentDescription = "Saved",
-                                    modifier = Modifier.clickable {
-
-                                    }
-                                )
-                            }
+                                }
+                            )
                         }
                     }
                 }

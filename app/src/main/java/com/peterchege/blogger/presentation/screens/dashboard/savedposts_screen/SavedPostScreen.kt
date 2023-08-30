@@ -126,7 +126,6 @@ fun SavedPostScreenContent(
                             onDeletePost = {
 
                             },
-                            profileImageUrl ="https://res.cloudinary.com/dhuqr5iyw/image/upload/v1640971757/mystory/profilepictures/default_y4mjwp.jpg",
                             isLiked = false,
                             isSaved =true,
                             isProfile = false

@@ -17,6 +17,7 @@ package com.peterchege.blogger.presentation.screens.dashboard.feed_screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.peterchege.blogger.core.api.responses.Post
 import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.core.work.sync_feed.SyncFeedWorkManager
 import com.peterchege.blogger.domain.models.PostUI
@@ -43,7 +44,7 @@ sealed interface FeedScreenUiState {
 
 @HiltViewModel
 class FeedScreenViewModel @Inject constructor(
-    postRepository: PostRepository,
+    private val postRepository: PostRepository,
     authRepository: AuthRepository,
     networkInfoRepository: NetworkInfoRepository,
     private val syncFeedWorkManager: SyncFeedWorkManager,
@@ -92,6 +93,19 @@ class FeedScreenViewModel @Inject constructor(
     fun refreshFeed(){
         viewModelScope.launch {
             syncFeedWorkManager.startSync()
+        }
+    }
+
+    fun bookmarkPost(post: Post){
+        viewModelScope.launch {
+            postRepository.insertSavedPost(post)
+            _eventFlow.emit(UiEvent.ShowSnackbar(message = "Post added to bookmarks"))
+        }
+    }
+    fun unBookmarkPost(post: Post){
+        viewModelScope.launch {
+            postRepository.deleteSavedPostById(post._id)
+            _eventFlow.emit(UiEvent.ShowSnackbar(message = "Post removed from bookmarks"))
         }
     }
 

@@ -15,6 +15,7 @@
  */
 package com.peterchege.blogger.presentation.screens.dashboard.profile_screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -45,6 +46,7 @@ import com.peterchege.blogger.presentation.components.ArticleCard
 import com.peterchege.blogger.presentation.components.BottomSheetItem
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
+import com.peterchege.blogger.presentation.components.NotLoggedInComponent
 import com.peterchege.blogger.presentation.theme.defaultPadding
 import com.peterchege.blogger.presentation.theme.lightGrayColor
 import kotlinx.coroutines.launch
@@ -55,7 +57,8 @@ fun ProfileScreen(
     viewModel: ProfileScreenViewModel = hiltViewModel(),
     navigateToProfileFollowerFollowingScreen: (String) -> Unit,
     navigateToPostScreen: (String) -> Unit,
-    navigateToLoginScreen: () -> Unit
+    navigateToLoginScreen: () -> Unit,
+    navigateToSignUpScreen: () -> Unit,
 ) {
 
     val authUser by viewModel.authUser.collectAsStateWithLifecycle()
@@ -69,10 +72,12 @@ fun ProfileScreen(
         navigateToProfileFollowerFollowingScreen = navigateToProfileFollowerFollowingScreen,
         navigateToPostScreen = navigateToPostScreen,
         navigateToLoginScreen = navigateToLoginScreen,
+        navigateToSignUpScreen = navigateToSignUpScreen,
         logoutUser = { authUser?.let { viewModel.logoutUser(navigateToLoginScreen, it) } }
     )
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @ExperimentalCoilApi
 @Composable
@@ -83,6 +88,7 @@ fun ProfileScreenContent(
     navigateToProfileFollowerFollowingScreen: (String) -> Unit,
     navigateToPostScreen: (String) -> Unit,
     navigateToLoginScreen: () -> Unit,
+    navigateToSignUpScreen:() -> Unit,
     logoutUser: () -> Unit,
 ) {
 
@@ -110,7 +116,7 @@ fun ProfileScreenContent(
             .fillMaxSize()
             .background(Color.LightGray),
 
-        ) { paddingValues ->
+        ) { _ ->
         when (uiState) {
             is ProfileScreenUiState.Loading -> {
                 LoadingComponent()
@@ -127,7 +133,12 @@ fun ProfileScreenContent(
                 Text(text = "User Not found")
 
             }
-
+            is ProfileScreenUiState.UserNotLoggedIn -> {
+                NotLoggedInComponent(
+                    navigateToLoginScreen = navigateToLoginScreen,
+                    navigateToSignUpScreen = navigateToSignUpScreen,
+                )
+            }
             is ProfileScreenUiState.Success -> {
                 val posts = uiState.posts
                 val user = uiState.user
@@ -319,7 +330,6 @@ fun ProfileScreenContent(
                                 onDeletePost = {
 
                                 },
-                                profileImageUrl = user.imageUrl,
                                 isLiked = false,
                                 isSaved = false,
                                 isProfile = true
@@ -340,8 +350,8 @@ fun ProfileScreenContent(
                     modifier = Modifier
                         .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
                         .fillMaxWidth()
-                        .height(300.dp)
-                        .background(lightGrayColor),
+                        .height(350.dp)
+                        ,
                     contentAlignment = Alignment.Center,
 
                     ) {

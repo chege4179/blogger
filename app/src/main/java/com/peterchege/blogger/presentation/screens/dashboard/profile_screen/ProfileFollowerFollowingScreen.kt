@@ -19,11 +19,11 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.peterchege.blogger.core.util.Constants
-import com.peterchege.blogger.domain.state.AuthorProfileFollowerFollowingUiState
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.FollowersList
 import com.peterchege.blogger.presentation.components.FollowingList
@@ -35,13 +35,12 @@ import java.util.*
 fun ProfileFollowerFollowingScreen(
     viewModel: ProfileFollowerFollowingScreenViewModel = hiltViewModel(),
     profileViewModel: ProfileScreenViewModel = hiltViewModel(),
-    navigateToAuthorProfileScreen:(String) -> Unit,
-){
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+    navigateToAuthorProfileScreen: (String) -> Unit,
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     ProfileFollowerFollowingScreenContent(
 
-        uiState = uiState.value,
-        type = viewModel.type.value,
+        uiState = uiState,
         navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
     )
 
@@ -51,46 +50,53 @@ fun ProfileFollowerFollowingScreen(
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ProfileFollowerFollowingScreenContent(
-
-    uiState:AuthorProfileFollowerFollowingUiState,
-    type:String,
-    navigateToAuthorProfileScreen:(String) -> Unit,
-
-) {
+    uiState: ProfileFollowerFollowingScreenUiState,
+    navigateToAuthorProfileScreen: (String) -> Unit,
+    ) {
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = "My " + type.toLowerCase(Locale.ROOT)
-                            .capitalize(Locale.ROOT),
-                    )
+                    if(uiState is ProfileFollowerFollowingScreenUiState.Success){
+                        Text(
+                            text = "My " + uiState.type.toLowerCase(Locale.ROOT)
+                                .capitalize(Locale.ROOT),
+                        )
+                    }
+
                 },
-                )
+            )
         }
-    ) {
-        when(uiState){
-            is AuthorProfileFollowerFollowingUiState.Loading ->{
+    ) { paddingValues ->
+        when (uiState) {
+            is ProfileFollowerFollowingScreenUiState.Loading -> {
                 LoadingComponent()
             }
-            is AuthorProfileFollowerFollowingUiState.Error -> {
+
+            is ProfileFollowerFollowingScreenUiState.Error -> {
                 ErrorComponent(
                     retryCallback = { /*TODO*/ },
-                    errorMessage = uiState.message)
+                    errorMessage = uiState.message
+                )
             }
-            is AuthorProfileFollowerFollowingUiState.Success -> {
-                when(type){
+
+            is ProfileFollowerFollowingScreenUiState.Success -> {
+                val type = uiState.type
+                when (type) {
                     Constants.FOLLOWER -> {
                         FollowersList(
-                            followers = uiState.data.followers,
+                            followers = uiState.followers,
+                            paddingValues = paddingValues,
                             navigateToAuthorProfileScreen = navigateToAuthorProfileScreen
                         )
                     }
+
                     Constants.FOLLOWING -> {
                         FollowingList(
-                            following = uiState.data.following,
+                            following = uiState.following,
+                            paddingValues = paddingValues,
                             navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
                         )
                     }

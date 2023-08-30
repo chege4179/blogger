@@ -51,15 +51,15 @@ class PostRepositoryImpl @Inject constructor(
         val cachedPosts = cachedPostsDataSource.getCachedPosts()
         val savedPostIds = savedPostsDataSource.getSavedPostIds()
         val authUser = authRepository.getLoggedInUser()
-        return combine(cachedPosts,savedPostIds,authUser){ posts, ids,user ->
+        val isUserLoggedIn = authRepository.isUserLoggedIn
+        return combine(cachedPosts,savedPostIds,authUser,isUserLoggedIn){ posts, ids,user,loggedIn ->
             posts.map { post ->
                 post.toDomain(
-                    isLiked = post.likes.map { it.userId }.contains(user?._id),
+                    isLiked = if (loggedIn) post.likes.map { it.userId }.contains(user?._id) else false,
                     isSaved = ids.contains(post._id),
                     isProfile = false
                 )
             }
-
         }
     }
 
