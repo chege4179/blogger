@@ -29,6 +29,7 @@ import com.peterchege.blogger.core.di.IoDispatcher
 import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.domain.repository.AuthRepository
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
@@ -41,7 +42,7 @@ class AuthRepositoryImpl  @Inject constructor(
 ): AuthRepository {
 
     override val isUserLoggedIn: Flow<Boolean> =
-        userDataStoreRepository.isUserLoggedIn
+        userDataStoreRepository.isUserLoggedIn.flowOn(Dispatchers.Main)
 
     override suspend fun signUpUser(signUpUser: SignUpUser): NetworkResult<SignUpResponse> {
         return safeApiCall { api.signUpUser(signUpUser) }
@@ -56,7 +57,7 @@ class AuthRepositoryImpl  @Inject constructor(
     }
 
     override fun getLoggedInUser(): Flow<User?> {
-        return userDataStoreRepository.getLoggedInUser().flowOn(ioDispatcher)
+        return userDataStoreRepository.getLoggedInUser().flowOn(Dispatchers.Main)
     }
 
     override suspend fun setLoggedInUser(user: User) = withContext(context = ioDispatcher) {

@@ -16,8 +16,10 @@
 package com.peterchege.blogger.presentation.screens.search_screen
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
@@ -29,6 +31,7 @@ import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -36,9 +39,11 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.peterchege.blogger.core.util.Constants
@@ -113,7 +118,6 @@ fun SearchScreenContent(
                             text = "Search",
                         )
                     },
-
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(Color.LightGray, shape = RoundedCornerShape(8.dp))
@@ -148,7 +152,7 @@ fun SearchScreenContent(
                 )
             }
         },
-    ) {
+    ) { paddingValues ->
         val pagerState = rememberPagerState(
             initialPage = 0,
             initialPageOffsetFraction = 0f,
@@ -157,7 +161,9 @@ fun SearchScreenContent(
         Column(
             modifier = Modifier
                 .background(Color.White)
-                .padding(defaultPadding)
+                .padding(paddingValues)
+                .padding(vertical = 5.dp)
+
             ,
         ) {
             Tabs(pagerState = pagerState)
@@ -181,18 +187,13 @@ fun Tabs(pagerState: PagerState) {
 
     TabRow(
         selectedTabIndex = pagerState.currentPage,
-        containerColor = Color.White,
-        contentColor = Color.White,
-        divider = {
-            TabRowDefaults.PrimaryIndicator(
-//                thickness = 2.dp,
-                color = Color.White
-            )
-        },
+        containerColor = Color.Transparent,
+        contentColor = Color.Transparent,
         indicator = { tabPositions ->
             SecondaryIndicator(
-                height = 2.dp,
-                color = testColor
+                modifier = Modifier
+                    .tabIndicatorOffset(tabPositions[pagerState.currentPage]),
+                height = 2.5.dp
             )
         }
     ) {
@@ -200,8 +201,11 @@ fun Tabs(pagerState: PagerState) {
             Tab(
                 text = {
                     Text(
-                        list[index],
-                        color = if (pagerState.currentPage == index) testColor else Color.LightGray
+                        text = list[index],
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 17.sp,
+                        color = if (pagerState.currentPage == index)
+                            MaterialTheme.colorScheme.primary else Color.LightGray
                     )
                 },
                 selected = pagerState.currentPage == index,
