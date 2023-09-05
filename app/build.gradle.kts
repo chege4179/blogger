@@ -1,12 +1,9 @@
 plugins {
     id ("com.android.application")
     id ("kotlin-android")
-    id ("kotlin-kapt")
-    id ("dagger.hilt.android.plugin")
     id ("com.google.gms.google-services")
     id ("com.google.firebase.crashlytics")
     id("org.jetbrains.kotlin.plugin.serialization")
-    id("com.google.devtools.ksp") version "1.8.20-1.0.11"
 }
 
 android {
@@ -47,7 +44,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.7"
+        kotlinCompilerExtensionVersion = "1.5.3"
 
     }
     packagingOptions {
@@ -57,11 +54,7 @@ android {
     }
     namespace = "com.peterchege.blogger"
 }
-kotlin {
-    sourceSets.configureEach {
-        kotlin.srcDir("$buildDir/generated/ksp/$name/kotlin/")
-    }
-}
+
 dependencies {
 
     implementation ("androidx.core:core-ktx:1.10.1")
@@ -101,9 +94,9 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
     // dagger hilt
-    implementation ("com.google.dagger:hilt-android:2.47")
-    kapt ("com.google.dagger:hilt-android-compiler:2.46.1")
-    kapt ("androidx.hilt:hilt-compiler:1.0.0")
+    implementation ("com.google.dagger:hilt-android:2.48")
+    ksp ("com.google.dagger:hilt-android-compiler:2.48")
+    ksp("androidx.hilt:hilt-compiler:1.0.0")
     implementation ("androidx.hilt:hilt-navigation-compose:1.0.0")
     implementation ("androidx.navigation:navigation-compose:2.7.1")
 
@@ -111,6 +104,7 @@ dependencies {
     implementation ("androidx.room:room-runtime:2.5.2")
     ksp ("androidx.room:room-compiler:2.5.2")
     implementation ("androidx.room:room-ktx:2.5.2")
+    implementation ("androidx.room:room-paging:2.5.2")
 
     // coil
     implementation ("io.coil-kt:coil-compose:2.4.0")
@@ -122,7 +116,7 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     implementation ("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5")
-    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
 
     implementation("androidx.work:work-runtime-ktx:2.8.1")

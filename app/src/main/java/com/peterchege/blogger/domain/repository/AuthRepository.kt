@@ -18,6 +18,7 @@ package com.peterchege.blogger.domain.repository
 import com.peterchege.blogger.core.api.requests.LoginUser
 import com.peterchege.blogger.core.api.requests.LogoutUser
 import com.peterchege.blogger.core.api.requests.SignUpUser
+import com.peterchege.blogger.core.api.responses.Following
 import com.peterchege.blogger.core.api.responses.LoginResponse
 import com.peterchege.blogger.core.api.responses.LogoutResponse
 import com.peterchege.blogger.core.api.responses.SignUpResponse
@@ -33,9 +34,11 @@ interface AuthRepository {
 
     suspend fun logoutUser(logoutUser: LogoutUser):NetworkResult<LogoutResponse>
 
+    suspend fun addUserFollowing(following: Following)
+
+    suspend fun removeUserFollowing(following: Following)
+
     fun getLoggedInUser(): Flow<User?>
-
-
 
     suspend fun setLoggedInUser(user: User)
 

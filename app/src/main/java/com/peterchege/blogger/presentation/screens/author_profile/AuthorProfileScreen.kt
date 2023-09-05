@@ -48,7 +48,7 @@ import java.util.*
 @Composable
 fun AuthorProfileScreen(
     navigateToAuthorFollowerFollowingScreen: (String, String) -> Unit,
-    navigateToPostScreen:(String) -> Unit,
+    navigateToPostScreen: (String) -> Unit,
     viewModel: AuthorProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -56,16 +56,31 @@ fun AuthorProfileScreen(
 
 
     AuthorProfileScreenContent(
-
-        followUser = { /*TODO*/ },
-        unfollowUser = { /*TODO*/ },
+        followUser = {
+            if (uiState is AuthorProfileScreenUiState.Success) {
+                authUser?.let {
+                    viewModel.followUser(
+                        userToBeFollowed = (uiState as AuthorProfileScreenUiState.Success).user,
+                        userFollowing = it
+                    )
+                }
+            }
+        },
+        unfollowUser = {
+            if (uiState is AuthorProfileScreenUiState.Success) {
+                authUser?.let {
+                    viewModel.unfollowUser(
+                        userToBeUnfollowed = (uiState as AuthorProfileScreenUiState.Success).user,
+                        userUnfollowing = it
+                    )
+                }
+            }
+        },
         uiState = uiState,
         navigateToAuthorFollowerFollowingScreen = navigateToAuthorFollowerFollowingScreen,
         navigateToPostScreen = navigateToPostScreen,
         authUser = authUser
     )
-
-
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -77,7 +92,7 @@ fun AuthorProfileScreenContent(
     unfollowUser: () -> Unit,
     uiState: AuthorProfileScreenUiState,
     navigateToAuthorFollowerFollowingScreen: (String, String) -> Unit,
-    navigateToPostScreen:(String) -> Unit,
+    navigateToPostScreen: (String) -> Unit,
 
     ) {
     Scaffold(
@@ -223,7 +238,8 @@ fun AuthorProfileScreenContent(
                                 modifier = Modifier.clickable {
                                     user?.username?.let { it1 ->
                                         navigateToAuthorFollowerFollowingScreen(
-                                            it1,Constants.FOLLOWING)
+                                            it1, Constants.FOLLOWING
+                                        )
                                     }
 
                                 },
@@ -252,8 +268,9 @@ fun AuthorProfileScreenContent(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceEvenly,
                         ) {
-                            val authUserFollowing = authUser?.following?.map { it.followedId } ?: emptyList()
-                            if(authUserFollowing.contains(user?._id)){
+                            val authUserFollowing =
+                                authUser?.following?.map { it.followedId } ?: emptyList()
+                            if (authUserFollowing.contains(user?._id)) {
                                 Button(
                                     modifier = Modifier.fillMaxWidth(0.5f),
                                     onClick = {
@@ -261,7 +278,7 @@ fun AuthorProfileScreenContent(
                                     }) {
                                     Text(text = "Un Follow")
                                 }
-                            }else{
+                            } else {
                                 Button(
                                     modifier = Modifier.fillMaxWidth(0.5f),
                                     onClick = {

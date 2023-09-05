@@ -18,8 +18,11 @@ package com.peterchege.blogger.presentation.screens.author_profile
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.peterchege.blogger.core.api.requests.FollowUser
+import com.peterchege.blogger.core.api.responses.Following
 import com.peterchege.blogger.core.api.responses.Post
 import com.peterchege.blogger.core.api.responses.User
+import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.core.util.Resource
 import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.PostRepository
@@ -36,7 +39,7 @@ sealed interface AuthorProfileScreenUiState {
     data class Success(
         val posts: List<Post>,
         val user: User,
-        val isUserLoggedIn:Boolean
+        val isUserLoggedIn: Boolean
     ) : AuthorProfileScreenUiState
 
     data class Error(val message: String) : AuthorProfileScreenUiState
@@ -71,7 +74,6 @@ class AuthorProfileViewModel @Inject constructor(
         )
 
 
-
     val uiState = combine(
         profileUseCase(username = username.value),
         isUserLoggedIn,
@@ -102,48 +104,74 @@ class AuthorProfileViewModel @Inject constructor(
     )
 
 
-
-
-
-    fun followUser() {
+    fun followUser(userToBeFollowed: User,userFollowing:User) {
         viewModelScope.launch {
-//            val username = _user.value?.username ?: ""
-//            val fullname = _user.value?.fullname ?: ""
-//            val userId = _user.value?._id ?: ""
-//            viewModelScope.launch {
-//                val followResponse = repository.followUser(
-//                    FollowUser(
-//                        followerUsername = username,
-//                        followerFullname = fullname,
-//                        followerId = userId,
-//                        followedUsername = _state.value.user!!.username,
-//                    )
-//                )
-//                if (followResponse.success) {
-//                    _isFollowing.value = true
-//                }
-//            }
+            val followResponse = repository.followUser(
+                FollowUser(
+                    followerUsername = userToBeFollowed.username,
+                    followerFullname = userToBeFollowed.fullname,
+                    followerId = userToBeFollowed._id,
+                    followedUsername = username.value,
+                )
+            )
+            when (followResponse) {
+                is NetworkResult.Success -> {
+                    if (followResponse.data.success) {
+                        authRepository.addUserFollowing(
+                            Following(
+                                followedUsername = userFollowing.username,
+                                followedFullname = userFollowing.fullname,
+                                followedId =userFollowing._id,
+                            )
+                        )
+                    }
+                }
+
+                is NetworkResult.Error -> {
+
+                }
+
+                is NetworkResult.Exception -> {
+
+                }
+            }
+
         }
     }
 
-    fun unfollowUser() {
-//        val username = _user.value?.username ?: ""
-//        val fullname = _user.value?.fullname ?: ""
-//        val userId = _user.value?._id ?: ""
-//        viewModelScope.launch {
-//            val followResponse = repository.unfollowUser(
-//                FollowUser(
-//                    followerUsername = username,
-//                    followerFullname = fullname,
-//                    followerId = userId,
-//                    followedUsername = _state.value.user!!.username,
-//                )
-//            )
-//            if (followResponse.success) {
-//                _isFollowing.value = false
-//            }
-    }
+    fun unfollowUser(userToBeUnfollowed:User,userUnfollowing:User) {
+        viewModelScope.launch {
+            val followResponse = repository.unfollowUser(
+                FollowUser(
+                    followerUsername = userToBeUnfollowed.username,
+                    followerFullname = userToBeUnfollowed.fullname,
+                    followerId = userToBeUnfollowed._id,
+                    followedUsername = username.value,
+                )
+            )
+            when (followResponse) {
+                is NetworkResult.Success -> {
+                    if (followResponse.data.success) {
+                        authRepository.addUserFollowing(
+                            Following(
+                                followedUsername = userUnfollowing.username,
+                                followedFullname = userUnfollowing.fullname,
+                                followedId =userUnfollowing._id,
+                            )
+                        )
+                    }
+                }
+                is NetworkResult.Error -> {
 
+                }
+
+                is NetworkResult.Exception -> {
+
+                }
+            }
+
+        }
+    }
 
 
 }

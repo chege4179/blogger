@@ -19,6 +19,7 @@ import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.api.requests.LoginUser
 import com.peterchege.blogger.core.api.requests.LogoutUser
 import com.peterchege.blogger.core.api.requests.SignUpUser
+import com.peterchege.blogger.core.api.responses.Following
 import com.peterchege.blogger.core.api.responses.LoginResponse
 import com.peterchege.blogger.core.api.responses.LogoutResponse
 import com.peterchege.blogger.core.api.responses.SignUpResponse
@@ -42,12 +43,19 @@ class AuthRepositoryImpl  @Inject constructor(
 ): AuthRepository {
 
     override val isUserLoggedIn: Flow<Boolean> =
-        userDataStoreRepository.isUserLoggedIn.flowOn(Dispatchers.Main)
+        userDataStoreRepository.isUserLoggedIn.flowOn(ioDispatcher)
 
     override suspend fun signUpUser(signUpUser: SignUpUser): NetworkResult<SignUpResponse> {
         return safeApiCall { api.signUpUser(signUpUser) }
     }
 
+    override suspend fun addUserFollowing(following: Following) {
+        return userDataStoreRepository.addUserFollowing(following)
+    }
+
+    override suspend fun removeUserFollowing(following: Following) {
+        return userDataStoreRepository.removeUserFollowing(following)
+    }
     override suspend fun loginUser(loginUser: LoginUser): NetworkResult<LoginResponse> {
         return safeApiCall { api.loginUser(loginUser) }
     }
