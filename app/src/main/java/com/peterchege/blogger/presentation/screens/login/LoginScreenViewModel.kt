@@ -100,15 +100,15 @@ class LoginScreenViewModel @Inject constructor(
                     when (response) {
                         is NetworkResult.Success -> {
                             _uiState.value = _uiState.value.copy(isLoading = false)
-                            if (!response.data.success) {
-                                _eventFlow.emit(UiEvent.ShowSnackbar(message = response.data.msg))
-                            }
                             if (response.data.success) {
                                 analyticsHelper.logLoginEvent(username = _uiState.value.username)
                                 response.data.user?.let {
                                     repository.setLoggedInUser(user = it)
                                 }
                                 navigateToDashBoard()
+                            }else{
+                                println(response.data.msg)
+                                _eventFlow.emit(UiEvent.ShowSnackbar(message = response.data.msg))
                             }
                         }
 

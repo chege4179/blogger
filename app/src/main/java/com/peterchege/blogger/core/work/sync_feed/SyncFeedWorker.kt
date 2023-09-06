@@ -50,7 +50,7 @@ class SyncFeedWorker @AssistedInject constructor(
         return ForegroundInfo(
             Random.nextInt(),
             NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL)
-                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setSmallIcon(R.mipmap.blogger_app_icon)
                 .setContentTitle("Syncing")
                 .build()
 

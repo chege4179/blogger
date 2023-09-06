@@ -81,7 +81,8 @@ data class CommentEntity(
 
     )
 
-@Entity(foreignKeys = [
+@Entity(
+    foreignKeys = [
         ForeignKey(
             entity = PostRecord::class,
             parentColumns = ["_id"],
@@ -92,9 +93,9 @@ data class CommentEntity(
 )
 data class ViewEntity(
     @PrimaryKey
-    val viewerId:String,
-    val viewerUsername:String,
-    val viewerFullname:String,
+    val viewerId: String,
+    val viewerUsername: String,
+    val viewerFullname: String,
 
     val postId: String,
 )

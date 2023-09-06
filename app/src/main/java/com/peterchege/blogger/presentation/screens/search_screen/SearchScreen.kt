@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -47,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.peterchege.blogger.core.util.Constants
+import com.peterchege.blogger.domain.repository.NetworkStatus
 import com.peterchege.blogger.presentation.screens.search_screen.tabs.SearchPostsTab
 import com.peterchege.blogger.presentation.screens.search_screen.tabs.SearchUsersTab
 import com.peterchege.blogger.presentation.theme.MainWhiteColor
@@ -63,6 +65,7 @@ fun SearchScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+    val networkStatus by viewModel.networkStatus.collectAsStateWithLifecycle()
 
 
     SearchScreenContent(
@@ -71,7 +74,7 @@ fun SearchScreen(
         onChangeSearchQuery = viewModel::onChangeSearchTerm,
         navigateToPostScreen = navigateToPostScreen,
         navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
-
+        networkStatus = networkStatus,
         )
 
 }
@@ -89,10 +92,24 @@ fun SearchScreenContent(
     onChangeSearchQuery: (String) -> Unit,
     navigateToPostScreen: (String) -> Unit,
     navigateToAuthorProfileScreen: (String) -> Unit,
-
+    networkStatus: NetworkStatus,
     ) {
 
+
     val snackbarHostState = SnackbarHostState()
+
+    LaunchedEffect(key1 = networkStatus){
+        when(networkStatus){
+            is NetworkStatus.Unknown -> {
+
+            }
+            is NetworkStatus.Disconnected -> {
+                snackbarHostState.showSnackbar(message = "Not connected")
+            }
+            is NetworkStatus.Connected -> {}
+        }
+
+    }
 
     Scaffold(
         snackbarHost = {

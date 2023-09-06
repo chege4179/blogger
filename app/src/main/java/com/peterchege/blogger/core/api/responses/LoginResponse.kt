@@ -21,5 +21,5 @@ import kotlinx.serialization.Serializable
 data class LoginResponse(
     val msg: String,
     val success: Boolean,
-    val user: User?
+    val user: User? = null,
 )

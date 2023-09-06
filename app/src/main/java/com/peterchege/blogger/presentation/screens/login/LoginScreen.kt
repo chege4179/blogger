@@ -66,8 +66,6 @@ fun LoginScreen(
         onChangePasswordVisibility = { viewModel.onChangePasswordVisibility() },
         onSubmit = { viewModel.initiateLogin(navigateToDashBoard = navigateToDashBoard) } ,
         navigateToSignUpScreen = navigateToSignUpScreen,
-
-
         )
 
 
@@ -109,12 +107,12 @@ fun LoginScreenContent(
         }
     }
 
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(key1 = Unit) {
         eventFlow.collectLatest { event ->
             when (event) {
                 is UiEvent.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
-                        message = event.message
+                        message = "jjjj"
                     )
                 }
                 is UiEvent.Navigate -> {}

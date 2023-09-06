@@ -87,30 +87,10 @@ class SearchScreenViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<SearchScreenUiState>(SearchScreenUiState.Idle)
     val uiState = _uiState.asStateFlow()
 
-
-    private val _searchPosts = mutableStateOf<List<Post>>(emptyList())
-    val searchPosts: State<List<Post>> = _searchPosts
-
-    private val _searchUsers = mutableStateOf<List<User>>(emptyList())
-    val searchUser: State<List<User>> = _searchUsers
-
-
     private var searchJob: Job? = null
 
     private var _user = MutableStateFlow<User?>(null)
     var user: StateFlow<User?> = _user
-
-
-
-
-    fun onProfileNavigate(
-        username: String,
-        bottomNavController: NavController,
-        navHostController: NavHostController
-    ) {
-        val loginUsername = _user.value?.username ?: ""
-        navHostController.navigate(Screens.AUTHOR_PROFILE_SCREEN + "/$username")
-    }
 
     fun onChangeSearchTerm(searchTerm: String) {
         _uiState.value = SearchScreenUiState.Searching
