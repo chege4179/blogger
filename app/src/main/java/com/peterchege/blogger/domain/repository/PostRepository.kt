@@ -33,6 +33,8 @@ interface PostRepository {
 
     fun getPostById(postId: String):Flow<Post?>
 
+    suspend fun syncFeed()
+
     suspend fun deletePostFromApi(postId: String):NetworkResult<DeleteResponse>
 
     suspend fun addView(viewer: Viewer):NetworkResult<ViewResponse>

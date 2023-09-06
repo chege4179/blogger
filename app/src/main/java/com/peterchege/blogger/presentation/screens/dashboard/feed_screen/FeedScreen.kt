@@ -40,6 +40,7 @@ import com.peterchege.blogger.core.api.responses.Post
 import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.core.util.categories
+import com.peterchege.blogger.core.util.pullRefresh.PullRefreshIndicator
 import com.peterchege.blogger.core.util.pullRefresh.PullRefreshState
 import com.peterchege.blogger.core.util.pullRefresh.pullRefresh
 import com.peterchege.blogger.core.util.pullRefresh.rememberPullRefreshState
@@ -187,6 +188,7 @@ fun FeedScreenContent(
         },
         floatingActionButton = {
             FloatingActionButton(
+                containerColor = MaterialTheme.colorScheme.primary,
                 onClick = {
                     navigateToAddPostScreen()
 

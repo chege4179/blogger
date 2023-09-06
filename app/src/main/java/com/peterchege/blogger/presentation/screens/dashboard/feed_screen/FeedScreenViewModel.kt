@@ -51,12 +51,8 @@ class FeedScreenViewModel @Inject constructor(
 
 ) : ViewModel() {
 
-    val isSyncing = syncFeedWorkManager.isSyncing
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000L),
-            initialValue = false
-        )
+    private val _isSyncing = MutableStateFlow(false)
+    val isSyncing = _isSyncing.asStateFlow()
 
     val feedScreenUiState = postRepository.getAllPosts()
         .map<List<PostUI>,FeedScreenUiState> {
@@ -91,8 +87,10 @@ class FeedScreenViewModel @Inject constructor(
 
 
     fun refreshFeed(){
+        _isSyncing.value = true
         viewModelScope.launch {
-            syncFeedWorkManager.startSync()
+            postRepository.syncFeed()
+            _isSyncing.value = false
         }
     }
 

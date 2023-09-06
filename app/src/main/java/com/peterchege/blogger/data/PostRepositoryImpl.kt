@@ -16,6 +16,7 @@
 package com.peterchege.blogger.data
 
 
+import androidx.work.ListenableWorker
 import com.peterchege.blogger.core.api.requests.FollowUser
 import com.peterchege.blogger.core.api.requests.LikePost
 import com.peterchege.blogger.core.api.requests.Viewer
@@ -100,6 +101,23 @@ class PostRepositoryImpl @Inject constructor(
     override fun getSavedPostIds(): Flow<List<String>> {
         return savedPostsDataSource.getSavedPostIds()
 
+    }
+
+
+    override suspend fun syncFeed() {
+        val remotePosts = remotePostsDataSource.getAllPosts()
+        when(remotePosts){
+            is NetworkResult.Success -> {
+                cachedPostsDataSource.deleteAllPostsFromCache()
+                cachedPostsDataSource.insertCachedPosts(posts = remotePosts.data.posts)
+            }
+            is NetworkResult.Error -> {
+
+            }
+            is NetworkResult.Exception -> {
+
+            }
+        }
     }
 
     override suspend fun deletePostFromApi(postId: String): NetworkResult<DeleteResponse> {
