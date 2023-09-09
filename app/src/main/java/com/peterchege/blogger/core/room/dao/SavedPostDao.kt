@@ -31,6 +31,7 @@ interface SavedPostDao {
     @Query("SELECT * FROM post")
     fun getAllLocalPosts(): Flow<List<PostRecordWithCommentsLikesViews>>
 
+    @Transaction
     @Query("SELECT * FROM post WHERE _id = :id")
     fun getPostById(id: String): Flow<PostRecordWithCommentsLikesViews?>
 

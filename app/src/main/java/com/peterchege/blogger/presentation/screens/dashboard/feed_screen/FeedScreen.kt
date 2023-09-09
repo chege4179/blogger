@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -169,6 +170,18 @@ fun FeedScreenContent(
                     )
                 },
                 actions = {
+                    IconButton(
+                        onClick = {
+                            retryCallback()
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Refresh,
+                            contentDescription = "Refresh Posts",
+                            modifier = Modifier.size(26.dp)
+
+                        )
+                    }
                     IconButton(
                         onClick = {
                             navigateToSearchScreen()

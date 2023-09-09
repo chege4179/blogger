@@ -45,6 +45,7 @@ interface CachedPostDao {
     @Query("SELECT * FROM postCache")
     fun getAllLocalPosts(): Flow<List<PostCacheRecordWithCommentsLikesViews>>
 
+    @Transaction
     @Query("SELECT * FROM postCache WHERE _id = :postId")
     fun getCachedPostById(postId:String):Flow<PostCacheRecordWithCommentsLikesViews?>
 

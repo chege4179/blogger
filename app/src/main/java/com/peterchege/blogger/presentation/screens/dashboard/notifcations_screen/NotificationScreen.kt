@@ -110,6 +110,7 @@ fun NotificationScreenContent(
                 val notifications = uiState.notifications
                 LazyColumn(modifier = Modifier
                     .fillMaxSize()
+                    .padding(paddingValues)
                     .padding(defaultPadding)
                 ){
                     if (notifications.isEmpty()){

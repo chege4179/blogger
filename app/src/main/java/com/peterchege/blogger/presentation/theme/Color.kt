@@ -36,3 +36,5 @@ val GrayColor = Color(0xFFF7F3F1)
 val lightGrayColor = Color(0xFFE6E6E6)
 
 val IconColor = Color(0xFF6462FC)
+
+val LightIconColor = Color(0xFFCBCBE0)
