@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -41,10 +42,6 @@ import com.peterchege.blogger.core.api.responses.Post
 import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.core.util.categories
-import com.peterchege.blogger.core.util.pullRefresh.PullRefreshIndicator
-import com.peterchege.blogger.core.util.pullRefresh.PullRefreshState
-import com.peterchege.blogger.core.util.pullRefresh.pullRefresh
-import com.peterchege.blogger.core.util.pullRefresh.rememberPullRefreshState
 import com.peterchege.blogger.domain.mappers.toPost
 import com.peterchege.blogger.domain.repository.NetworkStatus
 import com.peterchege.blogger.presentation.components.ArticleCard
@@ -52,6 +49,7 @@ import com.peterchege.blogger.presentation.components.CategoryCard
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.theme.defaultPadding
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
@@ -74,10 +72,12 @@ fun FeedScreen(
     val isSyncing by viewModel.isSyncing.collectAsStateWithLifecycle()
     val feedScreenUiState by viewModel.feedScreenUiState.collectAsStateWithLifecycle()
 
-    val pullRefreshState = rememberPullRefreshState(
-        refreshing = isSyncing,
-        onRefresh = { viewModel.refreshFeed() }
-    )
+    val pullRefreshState = rememberPullToRefreshState()
+    LaunchedEffect(key1 = pullRefreshState.isRefreshing){
+        viewModel.refreshFeed()
+        delay(1500)
+        pullRefreshState.endRefresh()
+    }
 
     FeedScreenContent(
         navigateToPostScreen = navigateToPostScreen,
@@ -115,7 +115,7 @@ fun FeedScreenContent(
     uiState: FeedScreenUiState,
     eventFlow: SharedFlow<UiEvent>,
     networkStatus: NetworkStatus,
-    pullRefreshState: PullRefreshState,
+    pullRefreshState: PullToRefreshState,
     retryCallback: () -> Unit,
     bookmarkPost: (Post) -> Unit,
     unBookmarkPost: (Post) -> Unit,
@@ -170,18 +170,7 @@ fun FeedScreenContent(
                     )
                 },
                 actions = {
-                    IconButton(
-                        onClick = {
-                            retryCallback()
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Refresh,
-                            contentDescription = "Refresh Posts",
-                            modifier = Modifier.size(26.dp)
 
-                        )
-                    }
                     IconButton(
                         onClick = {
                             navigateToSearchScreen()
@@ -215,88 +204,93 @@ fun FeedScreenContent(
             }
         }
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .pullRefresh(pullRefreshState)
-                .padding(paddingValues = it),
-            horizontalAlignment = Alignment.CenterHorizontally,
-
-            ) {
-//            PullRefreshIndicator(
-//                refreshing = isRefreshing,
-//                state = pullRefreshState,
-//            )
-            LazyRow(
+                .padding(paddingValues = it)
+                .nestedScroll(pullRefreshState.nestedScrollConnection)
+        ){
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                items(items = categories) { category ->
-                    CategoryCard(
-                        modifier = Modifier.height(30.dp),
-                        navigateToCategoryScreen = navigateToCategoryScreen,
-                        categoryItem = category
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-
-                }
-            }
-            when (uiState) {
-                is FeedScreenUiState.Empty -> {
-                    ErrorComponent(
-                        retryCallback = { retryCallback() },
-                        errorMessage = "No posts were found"
-                    )
-                }
-
-                is FeedScreenUiState.Loading -> {
-                    LoadingComponent()
-                }
-
-                is FeedScreenUiState.Error -> {
-                    ErrorComponent(
-                        retryCallback = { retryCallback() },
-                        errorMessage = uiState.message
-                    )
-                }
-
-                is FeedScreenUiState.Success -> {
-                    LazyColumn(
-                        modifier = Modifier
-                            .pullRefresh(pullRefreshState)
-                            .fillMaxSize()
-                            .padding(defaultPadding)
-                    ) {
-
-                        items(items = uiState.posts) { post ->
-                            ArticleCard(
-                                post = post.toPost(),
-                                onItemClick = { post ->
-                                    navigateToPostScreen(post._id)
-                                },
-                                onProfileNavigate = { username ->
-                                    navigateToAuthorProfileScreen(username)
-                                },
-                                onDeletePost = {},
-                                isLiked = post.isLiked,
-                                isSaved = post.isSaved,
-                                isProfile = false,
-                                onBookmarkPost = { post ->
-                                    bookmarkPost(post)
-                                },
-                                onUnBookmarkPost = { post ->
-                                    unBookmarkPost(post)
-                                },
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
+                    .fillMaxSize()
+                    ,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    items(items = categories) { category ->
+                        CategoryCard(
+                            modifier = Modifier.height(30.dp),
+                            navigateToCategoryScreen = navigateToCategoryScreen,
+                            categoryItem = category
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
 
                     }
                 }
+                when (uiState) {
+                    is FeedScreenUiState.Empty -> {
+                        ErrorComponent(
+                            retryCallback = { retryCallback() },
+                            errorMessage = "No posts were found"
+                        )
+                    }
+
+                    is FeedScreenUiState.Loading -> {
+                        LoadingComponent()
+                    }
+
+                    is FeedScreenUiState.Error -> {
+                        ErrorComponent(
+                            retryCallback = { retryCallback() },
+                            errorMessage = uiState.message
+                        )
+                    }
+
+                    is FeedScreenUiState.Success -> {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(defaultPadding)
+                        ) {
+
+                            items(items = uiState.posts) { post ->
+                                ArticleCard(
+                                    post = post.toPost(),
+                                    onItemClick = { post ->
+                                        navigateToPostScreen(post._id)
+                                    },
+                                    onProfileNavigate = { username ->
+                                        navigateToAuthorProfileScreen(username)
+                                    },
+                                    onDeletePost = {},
+                                    isLiked = post.isLiked,
+                                    isSaved = post.isSaved,
+                                    isProfile = false,
+                                    onBookmarkPost = { post ->
+                                        bookmarkPost(post)
+                                    },
+                                    onUnBookmarkPost = { post ->
+                                        unBookmarkPost(post)
+                                    },
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+
+                        }
+                    }
+                }
             }
+            PullToRefreshContainer(
+                state = pullRefreshState,
+                modifier = Modifier.align(Alignment.TopCenter),
+            )
         }
+
 
     }
 }
