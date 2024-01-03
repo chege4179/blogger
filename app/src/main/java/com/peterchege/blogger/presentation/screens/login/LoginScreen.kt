@@ -61,7 +61,7 @@ fun LoginScreen(
         uiState = uiState.value,
         networkStatus = networkStatus.value,
         eventFlow = viewModel.eventFlow,
-        onChangeUsername = { viewModel.onChangeUsername(it) },
+        onChangeEmail = { viewModel.onChangeEmail(it) },
         onChangePassword = { viewModel.onChangePassword(it) },
         onChangePasswordVisibility = { viewModel.onChangePasswordVisibility() },
         onSubmit = { viewModel.initiateLogin(navigateToDashBoard = navigateToDashBoard) } ,
@@ -79,9 +79,8 @@ fun LoginScreenContent(
     uiState: LoginFormState,
     networkStatus: NetworkStatus,
     navigateToSignUpScreen: () -> Unit,
-
     eventFlow: SharedFlow<UiEvent>,
-    onChangeUsername: (String) -> Unit,
+    onChangeEmail: (String) -> Unit,
     onChangePassword: (String) -> Unit,
     onChangePasswordVisibility: () -> Unit,
     onSubmit: () -> Unit,
@@ -159,12 +158,12 @@ fun LoginScreenContent(
                 Spacer(modifier = Modifier.height(15.dp))
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = uiState.username,
+                    value = uiState.email,
                     onValueChange = {
-                        onChangeUsername(it)
+                        onChangeEmail(it)
                         //state.username = it
                     },
-                    label = { Text("Username") }
+                    label = { Text("Email Address") }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(

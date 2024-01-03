@@ -39,7 +39,7 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 data class LoginFormState(
-    val username: String = "",
+    val email: String = "",
     val password: String = "",
     val isPasswordVisible: Boolean = false,
     val isLoading: Boolean = false,
@@ -71,8 +71,8 @@ class LoginScreenViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(isPasswordVisible = !initialState)
     }
 
-    fun onChangeUsername(text: String) {
-        _uiState.value = _uiState.value.copy(username = text)
+    fun onChangeEmail(text: String) {
+        _uiState.value = _uiState.value.copy(email = text)
     }
 
     fun onChangePassword(text: String) {
@@ -85,14 +85,14 @@ class LoginScreenViewModel @Inject constructor(
             try {
                 val token = FirebaseMessaging.getInstance().token.await()
                 _uiState.value = _uiState.value.copy(isLoading = true)
-                val username = _uiState.value.username
+                val email = _uiState.value.email
                 val password = _uiState.value.password
-                if (username.length < 5 || password.length < 5) {
+                if (email.length < 5 || password.length < 5) {
                     _uiState.value = _uiState.value.copy(isLoading = false)
                     _eventFlow.emit(UiEvent.ShowSnackbar(message = "Credentials should be at least 5 characters long"))
                 } else {
                     val loginUser = LoginUser(
-                        username = username.trim(),
+                        email = email.trim(),
                         password = password.trim(),
                         deviceToken = token!!
                     )
@@ -101,7 +101,7 @@ class LoginScreenViewModel @Inject constructor(
                         is NetworkResult.Success -> {
                             _uiState.value = _uiState.value.copy(isLoading = false)
                             if (response.data.success) {
-                                analyticsHelper.logLoginEvent(username = _uiState.value.username)
+                                analyticsHelper.logLoginEvent(username = _uiState.value.email)
                                 response.data.user?.let {
                                     repository.setLoggedInUser(user = it)
 

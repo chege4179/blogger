@@ -29,8 +29,8 @@ android {
         create("release") {
             storeFile = file("blogger.jks")
             keyAlias = "blogger"
-            keyPassword = "total10101man"
-            storePassword =  "total10101man"
+            keyPassword = "blogger"
+            storePassword =  "blogger"
         }
     }
     buildTypes {
