@@ -28,6 +28,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
     val isUserLoggedIn :Flow<Boolean>
+
+    suspend fun setAuthToken(token:String)
     suspend fun signUpUser(signUpUser: SignUpUser):NetworkResult <SignUpResponse>
 
     suspend fun loginUser(loginUser: LoginUser):NetworkResult<LoginResponse>

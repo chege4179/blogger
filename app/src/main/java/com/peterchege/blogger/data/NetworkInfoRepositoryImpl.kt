@@ -38,7 +38,6 @@ import javax.inject.Inject
 class NetworkInfoRepositoryImpl @Inject constructor(
     context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-
 ):NetworkInfoRepository{
 
     private val connectivityManager = context.getSystemService<ConnectivityManager>()

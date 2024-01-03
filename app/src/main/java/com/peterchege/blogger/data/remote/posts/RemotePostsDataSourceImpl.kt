@@ -47,7 +47,7 @@ class RemotePostsDataSourceImpl @Inject constructor(
     }
 
     override suspend fun uploadPost(body: RequestBody): NetworkResult<UploadPostResponse> {
-        return safeApiCall{ api.postImage(body = body) }
+        return safeApiCall{ api.createPost(body = body) }
     }
     override suspend fun getPostById(postId: String): NetworkResult<PostResponse> {
         return safeApiCall { api.getPostById(postId) }

@@ -33,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -103,7 +104,13 @@ fun DashBoardScreen(
                 ),
                 navController = bottomNavController,
                 onItemClick = {
-                    bottomNavController.navigate(it.route)
+                    bottomNavController.navigate(it.route){
+                        launchSingleTop = true
+                        restoreState = true
+                        popUpTo(bottomNavController.graph.findStartDestination().id){
+                            saveState = true
+                        }
+                    }
                 }
             )
         }

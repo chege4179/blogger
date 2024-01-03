@@ -21,28 +21,26 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.metrics.performance.JankStats
 import androidx.navigation.compose.rememberNavController
 import coil.annotation.ExperimentalCoilApi
 import com.peterchege.blogger.presentation.navigation.Navigation
 import com.peterchege.blogger.presentation.navigation.NavigationViewModel
 import com.peterchege.blogger.presentation.theme.BloggerTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
 @ExperimentalCoilApi
-
 class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var lazyStats: dagger.Lazy<JankStats>
 
-    private val viewModel : NavigationViewModel by viewModels()
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        installSplashScreen().apply {
-            setKeepOnScreenCondition {
-                viewModel.user.value != null
-            }
-        }
+        installSplashScreen()
         setContent {
             BloggerTheme {
                 val navController = rememberNavController()
@@ -51,6 +49,17 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        lazyStats.get().isTrackingEnabled = true
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+        lazyStats.get().isTrackingEnabled = false
     }
 }
 

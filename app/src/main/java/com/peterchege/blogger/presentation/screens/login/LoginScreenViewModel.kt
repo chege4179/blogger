@@ -94,7 +94,7 @@ class LoginScreenViewModel @Inject constructor(
                     val loginUser = LoginUser(
                         username = username.trim(),
                         password = password.trim(),
-                        token = token!!
+                        deviceToken = token!!
                     )
                     val response = repository.loginUser(loginUser)
                     when (response) {
@@ -104,6 +104,7 @@ class LoginScreenViewModel @Inject constructor(
                                 analyticsHelper.logLoginEvent(username = _uiState.value.username)
                                 response.data.user?.let {
                                     repository.setLoggedInUser(user = it)
+
                                 }
                                 navigateToDashBoard()
                             }else{

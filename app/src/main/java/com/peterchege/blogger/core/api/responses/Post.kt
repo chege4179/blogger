@@ -15,31 +15,25 @@
  */
 package com.peterchege.blogger.core.api.responses
 
-import com.peterchege.blogger.core.room.entities.PostRecord
+import com.peterchege.blogger.core.room.entities.SavePost
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class Post(
-    val _id: String,
+    val postId: String,
     val postTitle: String,
     val postBody:String,
-    val postAuthor:String,
+    val postAuthorId:String,
     val imageUrl: String,
-    val postedAt: String,
-    val postedOn: String,
-    val comments:List<Comment>,
-    val views:List<View>,
-    val likes:List<Like>
+    val createdAt: String,
+    val updatedAt: String,
+    val postAuthor:PostAuthor,
+    val _count:PostCount
     )
 
-fun Post.toPostRecord(): PostRecord {
-    return PostRecord(
-        _id,
-        postTitle,
-        postBody,
-        imageUrl,
-        postedAt,
-        postAuthor,
-        postedOn,
-    )
-}
+@Serializable
+data class PostCount(
+    val likes:Int,
+    val views:Int,
+    val comments:Int,
+)

@@ -27,8 +27,8 @@ import javax.inject.Inject
 class ProfileRepositoryImpl @Inject constructor(
     private val api: BloggerApi,
     ):ProfileRepository {
-    override suspend fun getProfile(username: String): NetworkResult<ProfileResponse> {
-        return safeApiCall{ api.getUserProfile(username = username) }
+    override suspend fun getProfile(userId: String): NetworkResult<ProfileResponse> {
+        return safeApiCall{ api.getUserProfile(userId = userId) }
     }
 
 }

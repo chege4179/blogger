@@ -21,4 +21,5 @@ import kotlinx.serialization.Serializable
 data class UploadPostResponse (
     val msg:String,
     val success:Boolean,
+    val post:Post?
 )

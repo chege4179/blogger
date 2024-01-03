@@ -22,18 +22,14 @@ import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.peterchege.blogger.R
-import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.di.IoDispatcher
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.NetworkResult
-import com.peterchege.blogger.data.local.posts.cached_posts.CachedPostsDataSource
+import com.peterchege.blogger.data.local.posts.cache.CachedPostsDataSource
 import com.peterchege.blogger.data.remote.posts.RemotePostsDataSource
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
-import retrofit2.HttpException
-import java.io.IOException
 import kotlin.random.Random
 
 

@@ -19,7 +19,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class LogoutUser(
-    val username:String,
-    val token:String,
-    val id:String,
+    val userId:String,
+    val deviceToken:String,
 )

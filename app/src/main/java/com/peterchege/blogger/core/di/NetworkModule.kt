@@ -20,12 +20,15 @@ import com.chuckerteam.chucker.api.ChuckerCollector
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.peterchege.blogger.core.api.BloggerApi
+import com.peterchege.blogger.core.api.interceptor.AuthInterceptor
+import com.peterchege.blogger.core.datastore.preferences.DefaultAuthTokenProvider
 import com.peterchege.blogger.core.util.Constants
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -48,8 +51,14 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideHttpClient(@ApplicationContext context: Context): OkHttpClient {
+    fun provideHttpClient(
+        @ApplicationContext context: Context,
+        defaultAuthTokenProvider: DefaultAuthTokenProvider,
+    ): OkHttpClient {
         return OkHttpClient.Builder()
+            .addInterceptor(
+                AuthInterceptor(authTokenProvider = defaultAuthTokenProvider)
+            )
             .addInterceptor(
                 ChuckerInterceptor.Builder(context = context)
                     .collector(ChuckerCollector(context = context))

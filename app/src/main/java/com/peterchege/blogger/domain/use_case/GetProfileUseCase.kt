@@ -30,9 +30,9 @@ class GetProfileUseCase @Inject constructor(
 
     ) {
 
-    operator fun invoke(username: String): Flow<Resource<ProfileResponse>> = flow {
+    operator fun invoke(userId: String): Flow<Resource<ProfileResponse>> = flow {
         emit(Resource.Loading<ProfileResponse>())
-        val profileResponse = repository.getProfile(username)
+        val profileResponse = repository.getProfile(userId)
         when(profileResponse){
             is NetworkResult.Success -> {
                 if (profileResponse.data.success) {

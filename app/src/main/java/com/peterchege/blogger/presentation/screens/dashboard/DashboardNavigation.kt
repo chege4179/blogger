@@ -29,10 +29,10 @@ import com.peterchege.blogger.presentation.navigation.navigateToPostScreen
 import com.peterchege.blogger.presentation.navigation.navigateToProfileFollowerFollowingScreen
 import com.peterchege.blogger.presentation.navigation.navigateToSearchScreen
 import com.peterchege.blogger.presentation.navigation.navigateToSignUpScreen
-import com.peterchege.blogger.presentation.screens.dashboard.feed_screen.FeedScreen
-import com.peterchege.blogger.presentation.screens.dashboard.notifcations_screen.NotificationScreen
-import com.peterchege.blogger.presentation.screens.dashboard.profile_screen.ProfileScreen
-import com.peterchege.blogger.presentation.screens.dashboard.savedposts_screen.SavedPostScreen
+import com.peterchege.blogger.presentation.screens.feed.FeedScreen
+import com.peterchege.blogger.presentation.screens.notifcations.NotificationScreen
+import com.peterchege.blogger.presentation.screens.profile.ProfileScreen
+import com.peterchege.blogger.presentation.screens.saved_posts.SavedPostScreen
 
 
 @Composable

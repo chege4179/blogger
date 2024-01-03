@@ -116,11 +116,11 @@ fun ArticleCard(
 //                                    }
                             )
                             Text(
-                                text = post.postAuthor,
+                                text = post.postAuthor.fullName,
                                 modifier = Modifier
                                     .padding(vertical = 7.dp)
                                     .clickable {
-                                        onProfileNavigate(post.postAuthor)
+                                        onProfileNavigate(post.postAuthor.userId)
                                     },
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp

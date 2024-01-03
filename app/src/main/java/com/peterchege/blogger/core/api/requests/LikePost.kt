@@ -18,10 +18,7 @@ package com.peterchege.blogger.core.api.requests
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class LikePost (
-    val userId:String,
-    val username:String,
-    val fullname:String,
-    val postAuthor:String,
-    val postId:String,
-        )
+data class LikePost(
+    val userId: String,
+    val postId: String,
+)

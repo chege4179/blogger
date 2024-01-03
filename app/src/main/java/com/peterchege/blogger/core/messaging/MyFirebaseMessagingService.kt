@@ -94,23 +94,23 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     private fun updateTokenToApi(newToken: String,oldToken:String){
         CoroutineScope(ioDispatcher).launch {
-            userDataStoreRepository.getLoggedInUser().collectLatest { user ->
-                user?.let {
-                    try {
-                        val updateToken = UpdateToken(
-                            newToken = newToken,
-                            oldToken = oldToken,
-                            userId = it._id
-                        )
-                        api.updateToken(updateToken = updateToken)
-                    }catch (e:HttpException){
-                        Timber.tag("Update Token http error").d(e)
-                    }catch (e:IOException){
-                        Timber.tag("Update Token io error").d(e)
-
-                    }
-                }
-            }
+//            userDataStoreRepository.getLoggedInUser().collectLatest { user ->
+//                user?.let {
+//                    try {
+//                        val updateToken = UpdateToken(
+//                            newToken = newToken,
+//                            oldToken = oldToken,
+//                            userId = it._id
+//                        )
+//                        api.updateToken(updateToken = updateToken)
+//                    }catch (e:HttpException){
+//                        Timber.tag("Update Token http error").d(e)
+//                    }catch (e:IOException){
+//                        Timber.tag("Update Token io error").d(e)
+//
+//                    }
+//                }
+//            }
 
 
         }

@@ -17,13 +17,14 @@ package com.peterchege.blogger.core.di
 
 import android.content.Context
 import com.peterchege.blogger.core.api.BloggerApi
+import com.peterchege.blogger.core.datastore.preferences.DefaultAuthTokenProvider
 import com.peterchege.blogger.core.datastore.repository.UserDataStoreRepository
 import com.peterchege.blogger.core.room.database.BloggerDatabase
 import com.peterchege.blogger.data.*
-import com.peterchege.blogger.data.local.posts.cached_posts.CachedPostsDataSource
-import com.peterchege.blogger.data.local.posts.cached_posts.CachedPostsDataSourceImpl
-import com.peterchege.blogger.data.local.posts.saved_posts.SavedPostsDataSource
-import com.peterchege.blogger.data.local.posts.saved_posts.SavedPostsDataSourceImpl
+import com.peterchege.blogger.data.local.posts.cache.CachedPostsDataSource
+import com.peterchege.blogger.data.local.posts.cache.CachedPostsDataSourceImpl
+import com.peterchege.blogger.data.local.posts.saved.SavedPostsDataSource
+import com.peterchege.blogger.data.local.posts.saved.SavedPostsDataSourceImpl
 import com.peterchege.blogger.data.remote.posts.RemotePostsDataSource
 import com.peterchege.blogger.data.remote.posts.RemotePostsDataSourceImpl
 import com.peterchege.blogger.domain.repository.*
@@ -45,11 +46,13 @@ object RepositoryModule {
     fun provideAuthRepository(
         api: BloggerApi,
         userDataStoreRepository: UserDataStoreRepository,
+        defaultAuthTokenProvider: DefaultAuthTokenProvider,
         @IoDispatcher ioDispatcher: CoroutineDispatcher
     ): AuthRepository {
         return AuthRepositoryImpl(
             api = api,
             userDataStoreRepository = userDataStoreRepository,
+            defaultAuthTokenProvider = defaultAuthTokenProvider,
             ioDispatcher = ioDispatcher,
         )
     }

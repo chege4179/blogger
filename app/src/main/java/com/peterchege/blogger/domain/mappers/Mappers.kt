@@ -15,145 +15,100 @@
  */
 package com.peterchege.blogger.domain.mappers
 
-import com.peterchege.blogger.core.api.responses.Comment
-import com.peterchege.blogger.core.api.responses.Like
 import com.peterchege.blogger.core.api.responses.Post
-import com.peterchege.blogger.core.api.responses.View
-import com.peterchege.blogger.core.room.entities.CommentCacheEntity
-import com.peterchege.blogger.core.room.entities.CommentEntity
-import com.peterchege.blogger.core.room.entities.LikeCacheEntity
-import com.peterchege.blogger.core.room.entities.LikeEntity
-import com.peterchege.blogger.core.room.entities.PostCacheRecordWithCommentsLikesViews
-import com.peterchege.blogger.core.room.entities.PostRecordWithCommentsLikesViews
-import com.peterchege.blogger.core.room.entities.ViewCacheEntity
-import com.peterchege.blogger.core.room.entities.ViewEntity
+import com.peterchege.blogger.core.room.entities.CachePost
+import com.peterchege.blogger.core.room.entities.SavePost
 import com.peterchege.blogger.domain.models.PostUI
 
-
-fun ViewEntity.toExternalModel(): View {
-    return View(
-        viewerUsername = viewerUsername,
-        viewerFullname = viewerFullname,
-        viewerId = viewerId,
-
-    )
-}
-
-fun LikeEntity.toExternalModel(): Like {
-    return Like(
-        username = username,
-        fullname = fullname,
-        userId = userId,
-    )
-}
-
-fun CommentEntity.toExternalModel():Comment{
-    return Comment(
-        username = username,
-        userId = userId,
+fun Post.toSavedEntity(): SavePost {
+    return SavePost(
+        postId = postId,
+        postTitle = postTitle,
+        postBody = postBody,
+        postAuthorId = postAuthorId,
         imageUrl = imageUrl,
-        commentId = id,
-        postedAt = postedAt,
-        postedOn = postedOn,
-        comment = comment
-
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        postAuthor = postAuthor,
+        _count = _count
     )
+
 }
 
 
-fun ViewCacheEntity.toExternalModel(): View {
-    return View(
-        viewerUsername = viewerUsername,
-        viewerFullname = viewerFullname,
-        viewerId = viewerId,
-
-        )
-}
-
-fun LikeCacheEntity.toExternalModel(): Like {
-    return Like(
-        username = username,
-        fullname = fullname,
-        userId = userId,
-    )
-}
-
-fun CommentCacheEntity.toExternalModel():Comment{
-    return Comment(
-        username = username,
-        userId = userId,
+fun Post.toCacheEntity(): CachePost {
+    return CachePost(
+        postId = postId,
+        postTitle = postTitle,
+        postBody = postBody,
+        postAuthorId = postAuthorId,
         imageUrl = imageUrl,
-        commentId = id,
-        postedAt = postedAt,
-        postedOn = postedOn,
-        comment = comment
-
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        postAuthor = postAuthor,
+        _count = _count
     )
 }
 
-
-fun PostRecordWithCommentsLikesViews.toExternalModel():Post{
+fun CachePost.toExternalModel():Post {
     return Post(
-        _id = post._id,
-        postTitle = post.postTitle,
-        postBody = post.postBody,
-        imageUrl = post.ImageUrl,
-        postedAt = post.postedAt,
-        postAuthor = post.postAuthor,
-        postedOn = post.postedOn,
-        views = views.map { it.toExternalModel() },
-        likes = likes.map { it.toExternalModel() },
-        comments = comments.map { it.toExternalModel() },
+        postId = postId,
+        postTitle = postTitle,
+        postBody = postBody,
+        postAuthorId = postAuthorId,
+        imageUrl = imageUrl,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        postAuthor = postAuthor,
+        _count = _count
+    )
+}
+
+fun SavePost.toExternalModel():Post {
+    return Post(
+        postId = postId,
+        postTitle = postTitle,
+        postBody = postBody,
+        postAuthorId = postAuthorId,
+        imageUrl = imageUrl,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        postAuthor = postAuthor,
+        _count = _count
     )
 }
 
 fun Post.toDomain(
-    isLiked:Boolean,
-    isProfile:Boolean,
-    isSaved:Boolean,
+    isLiked: Boolean,
+    isProfile: Boolean,
+    isSaved: Boolean,
 ): PostUI {
     return PostUI(
-        _id = _id,
+        postId = postId,
         postTitle = postTitle,
         postBody = postBody,
         imageUrl = imageUrl,
-        postedAt = postedAt,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
         postAuthor = postAuthor,
-        postedOn = postedOn,
-        views = views,
-        likes = likes,
-        comments = comments,
+        postAuthorId = postAuthorId,
+        _count = _count,
         isLiked = isLiked,
         isProfile = isProfile,
         isSaved = isSaved
     )
 }
-fun PostUI.toPost():Post{
+
+fun PostUI.toPost(): Post {
     return Post(
-        _id = _id,
+        postId = postId,
         postTitle = postTitle,
         postBody = postBody,
         imageUrl = imageUrl,
-        postedAt = postedAt,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
         postAuthor = postAuthor,
-        postedOn = postedOn,
-        views = views,
-        likes = likes,
-        comments = comments,
-    )
-}
-
-fun PostCacheRecordWithCommentsLikesViews.toExternalModel():Post{
-    return Post(
-        _id = post._id,
-        postTitle = post.postTitle,
-        postBody = post.postBody,
-        imageUrl = post.ImageUrl,
-        postedAt = post.postedAt,
-        postAuthor = post.postAuthor,
-        postedOn = post.postedOn,
-        views = views.map { it.toExternalModel() },
-        likes = likes.map { it.toExternalModel() },
-        comments = comments.map { it.toExternalModel() },
+        postAuthorId = postAuthorId,
+        _count = _count,
     )
 }

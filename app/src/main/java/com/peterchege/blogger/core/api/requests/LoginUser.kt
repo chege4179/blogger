@@ -21,5 +21,5 @@ import kotlinx.serialization.Serializable
 data class LoginUser(
     var username :String = "",
     var password:String = "",
-    var token:String = ""
+    var deviceToken:String = ""
 )

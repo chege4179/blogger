@@ -35,13 +35,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.peterchege.blogger.core.room.entities.DraftRecord
+import com.peterchege.blogger.core.room.entities.DraftPost
 
 
 @Composable
 fun DraftCard(
     navigateToAddPostScreen:(Int) -> Unit,
-    draftRecord: DraftRecord,
+    draftRecord: DraftPost,
     onDeleteDraft:(Int) -> Unit
 ){
     Card(

@@ -28,16 +28,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import coil.annotation.ExperimentalCoilApi
 import com.peterchege.blogger.core.util.Screens
-import com.peterchege.blogger.presentation.screens.author_profile.AuthorFollowerFollowingScreen
-import com.peterchege.blogger.presentation.screens.author_profile.AuthorProfileScreen
-import com.peterchege.blogger.presentation.screens.category_screen.CategoryScreen
+import com.peterchege.blogger.presentation.screens.author.AuthorFollowerFollowingScreen
+import com.peterchege.blogger.presentation.screens.author.AuthorProfileScreen
+import com.peterchege.blogger.presentation.screens.category.CategoryScreen
 import com.peterchege.blogger.presentation.screens.dashboard.DashBoardScreen
-import com.peterchege.blogger.presentation.screens.dashboard.add_post_screen.AddPostScreen
-import com.peterchege.blogger.presentation.screens.dashboard.draft_screen.DraftScreen
-import com.peterchege.blogger.presentation.screens.dashboard.profile_screen.ProfileFollowerFollowingScreen
+import com.peterchege.blogger.presentation.screens.add_post.AddPostScreen
+import com.peterchege.blogger.presentation.screens.draft.DraftScreen
+import com.peterchege.blogger.presentation.screens.profile.ProfileFollowerFollowingScreen
 import com.peterchege.blogger.presentation.screens.login.LoginScreen
-import com.peterchege.blogger.presentation.screens.post_screen.PostScreen
-import com.peterchege.blogger.presentation.screens.search_screen.SearchScreen
+import com.peterchege.blogger.presentation.screens.post.PostScreen
+import com.peterchege.blogger.presentation.screens.search.SearchScreen
 import com.peterchege.blogger.presentation.screens.signup.SignUpScreen
 
 
@@ -61,7 +61,6 @@ fun Navigation(
             )
             BackHandler(enabled = true) {
                 activity?.finish()
-
             }
         }
         composable(route = Screens.SIGNUP_SCREEN) {

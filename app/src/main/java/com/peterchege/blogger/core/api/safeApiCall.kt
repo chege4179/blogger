@@ -18,10 +18,12 @@ package com.peterchege.blogger.core.api
 import com.peterchege.blogger.core.util.NetworkResult
 import retrofit2.HttpException
 import retrofit2.Response
+import timber.log.Timber
 
 suspend fun <T : Any> safeApiCall(
     execute: suspend () -> Response<T>
 ): NetworkResult<T> {
+    val TAG = "Network Error"
     return try {
         val response = execute()
         val body = response.body()
@@ -31,9 +33,10 @@ suspend fun <T : Any> safeApiCall(
             NetworkResult.Error(code = response.code(), message = response.message())
         }
     } catch (e: HttpException) {
+        Timber.tag(TAG).i("The HTTP error causing this is -----> $e")
         NetworkResult.Error(code = e.code(), message = e.message())
     } catch (e: Throwable) {
-        println("The error causing this is ----->" + e.localizedMessage)
+        Timber.tag(TAG).i("The HTTP error causing this is -----> $e")
         NetworkResult.Exception(e)
     }
 }

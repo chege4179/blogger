@@ -45,7 +45,6 @@ import com.peterchege.blogger.core.api.responses.Comment
 @Composable
 fun CommentBox(
     comment: Comment,
-
 ) {
     Box(
         modifier = Modifier

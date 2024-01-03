@@ -23,9 +23,7 @@ import java.io.File
 data class PostBody (
     val postTitle:String,
     val postBody:String,
-    val postedBy:String,
-    val postedAt:String,
-    val postedOn:String,
+    val userId:String,
     val photo:String,
 
 

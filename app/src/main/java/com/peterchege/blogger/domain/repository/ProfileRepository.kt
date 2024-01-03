@@ -20,5 +20,5 @@ import com.peterchege.blogger.core.util.NetworkResult
 
 interface ProfileRepository {
 
-    suspend fun getProfile(username: String):NetworkResult<ProfileResponse>
+    suspend fun getProfile(userId: String):NetworkResult<ProfileResponse>
 }

@@ -18,10 +18,8 @@ package com.peterchege.blogger.core.api.requests
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Viewer (
-    val viewerUsername:String,
-    val viewerFullname:String,
-    val viewerId:String,
-    val postId:String,
+data class Viewer(
+    val userId: String,
+    val postId: String,
 
-        )
+    )

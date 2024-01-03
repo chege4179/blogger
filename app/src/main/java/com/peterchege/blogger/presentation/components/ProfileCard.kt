@@ -86,8 +86,8 @@ fun ProfileCard(
                     text = user.username,
                     fontWeight = FontWeight.Bold,
 
-                    )
-                Text(text = user.fullname)
+                )
+                Text(text = user.fullName)
 
             }
 

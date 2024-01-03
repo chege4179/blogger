@@ -30,7 +30,9 @@ fun NavController.navigateToPostScreen(postId:String){
 }
 
 fun NavController.navigateToDashBoard(){
-    this.navigate(route = Screens.DASHBOARD_SCREEN)
+    this.navigate(route = Screens.DASHBOARD_SCREEN){
+
+    }
 }
 
 fun NavController.navigateToDraftScreen(){

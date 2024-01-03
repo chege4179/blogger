@@ -20,16 +20,21 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class User(
-    val _id: String,
+    val userId: String,
     val email: String,
-    val fullname: String,
+    val fullName: String,
     val imageUrl: String,
     val password: String,
     val username: String,
-    val followers: List<Follower>,
-    val following: List<Following>,
-    val tokens: List<String>,
-    val notifications:List<Notification>,
-    val __v: Int,
+    val createdAt:String,
+    val updatedAt:String,
+    val deviceTokens:List<DeviceToken>,
+    val _count:UserCount,
 )
 
+
+@Serializable
+data class UserCount(
+    val followers:Int,
+    val post:Int
+)

@@ -28,94 +28,26 @@ import kotlinx.coroutines.flow.Flow
 interface SavedPostDao {
 
     @Transaction
-    @Query("SELECT * FROM post")
-    fun getAllLocalPosts(): Flow<List<PostRecordWithCommentsLikesViews>>
+    @Query("SELECT * FROM savePost")
+    fun getAllSavedPosts(): Flow<List<SavePost>>
 
     @Transaction
-    @Query("SELECT * FROM post WHERE _id = :id")
-    fun getPostById(id: String): Flow<PostRecordWithCommentsLikesViews?>
+    @Query("SELECT * FROM savePost WHERE postId = :id")
+    fun getSavedPostById(id: String): Flow<SavePost?>
 
-    @Query("SELECT _id FROM post")
+    @Query("SELECT postId FROM savePost")
     fun getSavedPostIds():Flow<List<String>>
 
-
-    @Transaction
-    suspend fun insertPost(post: Post) {
-        val postEntity = PostRecord(
-            _id = post._id,
-            postTitle = post.postTitle,
-            postBody = post.postBody,
-            postAuthor = post.postAuthor,
-            ImageUrl = post.imageUrl,
-            postedAt = post.postedAt,
-            postedOn = post.postedOn
-        )
-        insertPostRecord(post = postEntity)
-        insertPostWithComments(postEntity = postEntity,comments =  post.comments)
-        insertPostWithViews(postEntity = postEntity,views =  post.views)
-        insertPostWithLikes(postEntity = postEntity,likes =  post.likes)
-    }
-
-
-    @Query("DELETE FROM post WHERE _id = :id")
-    suspend fun deletePostById(id: String)
-
-    @Query("DELETE FROM post")
-    suspend fun deleteAllPosts()
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPostRecord(post:PostRecord)
+    suspend fun insertSavedPost(post:SavePost)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPostWithComments(postEntity: PostRecord, comments: List<Comment>) {
-        val commentEntities = comments.map {
-            CommentEntity(
-                postId = postEntity._id,
-                username = it.username,
-                userId = it.userId,
-                imageUrl = it.imageUrl,
-                id = it.commentId,
-                postedAt = it.postedAt,
-                postedOn = it.postedOn,
-                comment = it.comment
+    @Query("DELETE FROM savePost WHERE postId = :id")
+    suspend fun deleteSavedPostById(id: String)
 
-            )
-        }
-        insertComments(comments = commentEntities)
-    }
+    @Query("DELETE FROM savePost")
+    suspend fun deleteAllSavedPosts()
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertComments(comments: List<CommentEntity>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPostWithViews(postEntity: PostRecord, views: List<View>) {
-        val viewEntities = views.map {
-            ViewEntity(
-                postId = postEntity._id,
-                viewerFullname = it.viewerFullname,
-                viewerId = it.viewerId,
-                viewerUsername = it.viewerUsername
-            )
-        }
-        insertViews(views = viewEntities)
-    }
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertViews(views: List<ViewEntity>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPostWithLikes(postEntity: PostRecord, likes: List<Like>) {
-        val likeEntities = likes.map {
-            LikeEntity(
-                username = it.username,
-                postId = postEntity._id,
-                fullname = it.fullname,
-                userId = it.userId,
-            )
-        }
-        insertLikes(likes = likeEntities)
-    }
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertLikes(likes: List<LikeEntity>)
 }

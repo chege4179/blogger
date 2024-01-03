@@ -26,23 +26,20 @@ import retrofit2.http.*
 
 interface BloggerApi {
 
-    @POST("/user/login")
+    @POST("/auth/login")
     suspend fun loginUser(@Body user: LoginUser): Response<LoginResponse>
 
-    @POST("/user/logout")
+    @POST("/auth/logout")
     suspend fun logoutUser(@Body user: LogoutUser):Response<LogoutResponse>
 
-    @POST("/user/signup")
+    @POST("/auth/signup")
     suspend fun signUpUser(@Body user: SignUpUser):Response<SignUpResponse>
 
     @GET("/post/all")
     suspend fun getAllPosts():Response<AllPostsResponse>
 
-    @POST("/post/upload")
-    suspend fun uploadPost(@Body postBody: PostBody): Response<UploadPostResponse>
-
-    @POST("/post/add")
-    suspend fun postImage(
+    @POST("/post/create")
+    suspend fun createPost(
         @Body body: RequestBody
     ):Response<UploadPostResponse>
 
@@ -55,22 +52,22 @@ interface BloggerApi {
     @POST("/comment/add")
     suspend fun postComment(@Body commentbody: CommentBody):Response<CommentResponse>
 
-    @POST("/like/add")
+    @POST("/like/like")
     suspend fun likePost(@Body likePost: LikePost):Response<LikeResponse>
 
-    @POST("/like/remove")
+    @POST("/like/unlike")
     suspend fun unlikePost(@Body likePost: LikePost):Response<LikeResponse>
 
-    @POST("/follower/follow")
+    @POST("/follower/followUser")
     suspend fun followUser(@Body followUser: FollowUser):Response<FollowResponse>
 
-    @POST("/follower/unfollow")
+    @POST("/follower/unfollowUser")
     suspend fun unfollowUser(@Body followUser: FollowUser):Response<FollowResponse>
 
-    @GET("/user/profile/{username}")
-    suspend fun getUserProfile(@Path("username") username: String): Response<ProfileResponse>
+    @GET("/user/single/{username}")
+    suspend fun getUserProfile(@Path("userId") userId: String): Response<ProfileResponse>
 
-    @POST("/user/updateToken")
+    @POST("/auth/updateDeviceToken")
     suspend fun updateToken(@Body updateToken: UpdateToken):Response<UpdateTokenResponse>
 
     @GET("/post/search/{searchTerm}")

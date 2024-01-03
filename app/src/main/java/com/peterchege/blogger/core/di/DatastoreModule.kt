@@ -15,13 +15,12 @@
  */
 package com.peterchege.blogger.core.di
 
-import android.app.Application
 import android.content.Context
-import android.content.SharedPreferences
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import com.peterchege.blogger.core.datastore.preferences.DefaultAuthTokenProvider
 import com.peterchege.blogger.core.datastore.repository.UserDataStoreRepository
 import com.peterchege.blogger.core.util.Constants
 import dagger.Module
@@ -53,10 +52,11 @@ class DatastoreModule {
                 context.preferencesDataStoreFile(Constants.USER_PREFERENCES)
             }
         )
-//    @Provides
-//    @Singleton
-//    fun provideUserSettingPreferences(dataStore: DataStore<Preferences>): UserSettingsPreferences {
-//        return UserSettingsPreferences(dataStore = dataStore)
-//    }
+
+    @Provides
+    @Singleton
+    fun provideDefaultAuthTokenProvider(dataStore: DataStore<Preferences>): DefaultAuthTokenProvider {
+        return DefaultAuthTokenProvider(dataStore = dataStore)
+    }
 
 }

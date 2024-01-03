@@ -18,8 +18,13 @@ package com.peterchege.blogger.domain.repository
 import com.peterchege.blogger.core.api.requests.FollowUser
 import com.peterchege.blogger.core.api.requests.LikePost
 import com.peterchege.blogger.core.api.requests.Viewer
-import com.peterchege.blogger.core.api.responses.*
-import com.peterchege.blogger.core.room.entities.PostRecordWithCommentsLikesViews
+import com.peterchege.blogger.core.api.responses.DeleteResponse
+import com.peterchege.blogger.core.api.responses.FollowResponse
+import com.peterchege.blogger.core.api.responses.LikeResponse
+import com.peterchege.blogger.core.api.responses.Post
+import com.peterchege.blogger.core.api.responses.SearchPostResponse
+import com.peterchege.blogger.core.api.responses.UploadPostResponse
+import com.peterchege.blogger.core.api.responses.ViewResponse
 import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.domain.models.PostUI
 import kotlinx.coroutines.flow.Flow
@@ -61,5 +66,5 @@ interface PostRepository {
     fun getSavedPostIds():Flow<List<String>>
 
 
-    fun getAllSavedPosts(): Flow<List<PostRecordWithCommentsLikesViews>>
+    fun getAllSavedPosts(): Flow<List<Post>>
 }

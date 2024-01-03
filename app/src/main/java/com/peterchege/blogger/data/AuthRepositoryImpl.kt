@@ -25,6 +25,7 @@ import com.peterchege.blogger.core.api.responses.LogoutResponse
 import com.peterchege.blogger.core.api.responses.SignUpResponse
 import com.peterchege.blogger.core.api.responses.User
 import com.peterchege.blogger.core.api.safeApiCall
+import com.peterchege.blogger.core.datastore.preferences.DefaultAuthTokenProvider
 import com.peterchege.blogger.core.datastore.repository.UserDataStoreRepository
 import com.peterchege.blogger.core.di.IoDispatcher
 import com.peterchege.blogger.core.util.NetworkResult
@@ -36,14 +37,21 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class AuthRepositoryImpl  @Inject constructor(
+class AuthRepositoryImpl @Inject constructor(
     private val api: BloggerApi,
     private val userDataStoreRepository: UserDataStoreRepository,
+    private val defaultAuthTokenProvider: DefaultAuthTokenProvider,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-): AuthRepository {
+) : AuthRepository {
 
     override val isUserLoggedIn: Flow<Boolean> =
         userDataStoreRepository.isUserLoggedIn.flowOn(ioDispatcher)
+
+    override suspend fun setAuthToken(token: String) {
+        withContext(ioDispatcher) {
+            defaultAuthTokenProvider.setAuthToken(token)
+        }
+    }
 
     override suspend fun signUpUser(signUpUser: SignUpUser): NetworkResult<SignUpResponse> {
         return safeApiCall { api.signUpUser(signUpUser) }
@@ -56,6 +64,7 @@ class AuthRepositoryImpl  @Inject constructor(
     override suspend fun removeUserFollowing(following: Following) {
         return userDataStoreRepository.removeUserFollowing(following)
     }
+
     override suspend fun loginUser(loginUser: LoginUser): NetworkResult<LoginResponse> {
         return safeApiCall { api.loginUser(loginUser) }
     }
@@ -75,7 +84,6 @@ class AuthRepositoryImpl  @Inject constructor(
     override suspend fun unsetLoggedInUser() = withContext(context = ioDispatcher) {
         return@withContext userDataStoreRepository.unsetLoggedInUser()
     }
-
 
 
 }
