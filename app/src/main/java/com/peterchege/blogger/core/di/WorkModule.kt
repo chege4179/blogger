@@ -16,8 +16,6 @@
 package com.peterchege.blogger.core.di
 
 import android.content.Context
-import com.peterchege.blogger.core.work.sync_feed.SyncFeedWorkManager
-import com.peterchege.blogger.core.work.sync_feed.SyncFeedWorkManagerImpl
 import com.peterchege.blogger.core.work.sync_user_data.SyncUserDataWorkManager
 import com.peterchege.blogger.core.work.sync_user_data.SyncUserDataWorkManagerImpl
 import com.peterchege.blogger.core.work.upload_post.UploadPostWorkManager
@@ -43,17 +41,6 @@ object WorkModule {
         return UploadPostWorkManagerImpl(context = context)
 
     }
-
-
-    @Provides
-    @Singleton
-    fun provideSyncFeedWorkManager(
-        @ApplicationContext context: Context,
-    ): SyncFeedWorkManager {
-        return SyncFeedWorkManagerImpl(context = context)
-
-    }
-
 
     @Provides
     @Singleton

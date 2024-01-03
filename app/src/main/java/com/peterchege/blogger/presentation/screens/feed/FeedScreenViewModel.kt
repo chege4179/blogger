@@ -19,14 +19,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.peterchege.blogger.core.api.responses.Post
 import com.peterchege.blogger.core.util.UiEvent
-import com.peterchege.blogger.core.work.sync_feed.SyncFeedWorkManager
 import com.peterchege.blogger.domain.models.PostUI
 import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.NetworkInfoRepository
 import com.peterchege.blogger.domain.repository.NetworkStatus
 import com.peterchege.blogger.domain.repository.PostRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -47,7 +54,7 @@ class FeedScreenViewModel @Inject constructor(
     private val postRepository: PostRepository,
     authRepository: AuthRepository,
     networkInfoRepository: NetworkInfoRepository,
-    private val syncFeedWorkManager: SyncFeedWorkManager,
+
 
 ) : ViewModel() {
 

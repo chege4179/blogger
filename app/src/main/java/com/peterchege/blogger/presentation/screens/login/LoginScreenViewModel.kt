@@ -21,6 +21,8 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.peterchege.blogger.core.analytics.analytics.AnalyticsHelper
 import com.peterchege.blogger.core.analytics.analytics.logLoginEvent
 import com.peterchege.blogger.core.api.requests.LoginUser
+import com.peterchege.blogger.core.datastore.preferences.DefaultAuthTokenProvider
+import com.peterchege.blogger.core.datastore.preferences.DefaultFCMTokenProvider
 import com.peterchege.blogger.core.util.*
 import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.NetworkInfoRepository
@@ -36,6 +38,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import timber.log.Timber
 import javax.inject.Inject
 
 data class LoginFormState(
@@ -48,6 +51,8 @@ data class LoginFormState(
 @HiltViewModel
 class LoginScreenViewModel @Inject constructor(
     private val repository: AuthRepository,
+    private val defaultAuthTokenProvider: DefaultAuthTokenProvider,
+    private val defaultFCMTokenProvider: DefaultFCMTokenProvider,
     private val networkInfoRepository: NetworkInfoRepository,
     private val analyticsHelper: AnalyticsHelper,
 ) : ViewModel() {
@@ -97,18 +102,26 @@ class LoginScreenViewModel @Inject constructor(
                         deviceToken = token!!
                     )
                     val response = repository.loginUser(loginUser)
+                    Timber.tag(TAG).i("Login Response --> ${response}")
                     when (response) {
                         is NetworkResult.Success -> {
                             _uiState.value = _uiState.value.copy(isLoading = false)
                             if (response.data.success) {
                                 analyticsHelper.logLoginEvent(username = _uiState.value.email)
                                 response.data.user?.let {
+                                    Timber.tag(TAG).i("Logged In User : ${it}")
                                     repository.setLoggedInUser(user = it)
-
+                                }
+                                response.data.deviceToken?.let {
+                                    Timber.tag(TAG).i("Device Token : ${it}")
+                                    defaultFCMTokenProvider.setFcmToken(it)
+                                }
+                                response.data.jwtToken?.let {
+                                    Timber.tag(TAG).i("JWT Token : ${it}")
+                                    defaultAuthTokenProvider.setAuthToken(it)
                                 }
                                 navigateToDashBoard()
                             }else{
-                                println(response.data.msg)
                                 _eventFlow.emit(UiEvent.ShowSnackbar(message = response.data.msg))
                             }
                         }
@@ -139,5 +152,9 @@ class LoginScreenViewModel @Inject constructor(
                 _eventFlow.emit(UiEvent.ShowSnackbar(message = "Unexpected error "))
             }
         }
+    }
+    companion object {
+        val TAG = LoginScreenViewModel::class.java.simpleName
+
     }
 }

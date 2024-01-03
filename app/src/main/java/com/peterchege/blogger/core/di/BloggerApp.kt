@@ -33,7 +33,8 @@ import javax.inject.Inject
 
 
 @HiltAndroidApp
-class BloggerApp :Application(),Configuration.Provider {
+class BloggerApp :Application(),
+    Configuration.Provider {
 
 //    @Inject
 //    lateinit var workerFactory: HiltWorkerFactory
@@ -73,7 +74,7 @@ class BloggerApp :Application(),Configuration.Provider {
             val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(channel)
         }
-        WorkManager.initialize(applicationContext, workManagerConfiguration)
+//        WorkManager.initialize(applicationContext, workManagerConfiguration)
     }
 
 }

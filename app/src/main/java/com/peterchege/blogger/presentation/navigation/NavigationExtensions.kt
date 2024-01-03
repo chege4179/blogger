@@ -19,62 +19,62 @@ import androidx.navigation.NavController
 import com.peterchege.blogger.core.util.Screens
 
 fun NavController.navigateToLoginScreen(){
-    this.navigate(route = Screens.LOGIN_SCREEN)
+    navigate(route = Screens.LOGIN_SCREEN)
 }
 fun NavController.navigateToSignUpScreen(){
-    this.navigate(route = Screens.SIGNUP_SCREEN)
+    navigate(route = Screens.SIGNUP_SCREEN)
 }
 
 fun NavController.navigateToPostScreen(postId:String){
-    this.navigate(route = Screens.POST_SCREEN + "/$postId")
+    navigate(route = Screens.POST_SCREEN + "/$postId")
 }
 
 fun NavController.navigateToDashBoard(){
-    this.navigate(route = Screens.DASHBOARD_SCREEN){
+    navigate(route = Screens.DASHBOARD_SCREEN){
 
     }
 }
 
 fun NavController.navigateToDraftScreen(){
-    this.navigate(route = Screens.DRAFT_SCREEN)
+    navigate(route = Screens.DRAFT_SCREEN)
 }
 
 fun NavController.navigateToSearchScreen(){
-    this.navigate(route = Screens.SEARCH_SCREEN)
+    navigate(route = Screens.SEARCH_SCREEN)
 }
 
 fun NavController.navigateToCategoryScreen(category:String){
-    this.navigate(route = Screens.CATEGORY_SCREEN +"/$category")
+    navigate(route = Screens.CATEGORY_SCREEN +"/$category")
 }
 fun NavController.navigateToAuthorProfileScreen(username:String){
-    this.navigate(route = Screens.AUTHOR_PROFILE_SCREEN +"/$username")
+    navigate(route = Screens.AUTHOR_PROFILE_SCREEN +"/$username")
 }
 
 fun NavController.navigateToAuthorProfileFollowingScreen(username:String,type:String){
-    this.navigate(route = Screens.AUTHOR_FOLLOWER_FOLLOWING_SCREEN +"/$username" +"/$type")
+    navigate(route = Screens.AUTHOR_FOLLOWER_FOLLOWING_SCREEN +"/$username" +"/$type")
 }
 
 fun NavController.navigateToAddPostScreen(draftId:Int? = null){
     if (draftId == null){
-        this.navigate(route = Screens.ADD_NEW_POST_SCREEN)
+        navigate(route = Screens.ADD_NEW_POST_SCREEN)
     }else{
-        this.navigate(route = Screens.ADD_NEW_POST_SCREEN +"?draftId=${draftId}")
+        navigate(route = Screens.ADD_NEW_POST_SCREEN +"?draftId=${draftId}")
     }
 
 }
 fun NavController.navigateToProfileFollowerFollowingScreen(type:String){
     navigate(route = Screens.PROFILE_FOLLOWER_FOLLOWING_SCREEN + "/$type")
 }
-fun NavController.navigateToFeedScreen(){
-    this.navigate(route = Screens.FEED_SCREEN)
-}
-fun NavController.navigateToSavedPostScreen(){
-    this.navigate(route = Screens.SAVED_POST_SCREEN)
-}
-fun NavController.navigateToNotificationScreen(){
-    this.navigate(route = Screens.NOTIFICATION_SCREEN)
-}
+
 fun NavController.navigateToAuthUserProfileScreen(){
-    this.navigate(route = Screens.PROFILE_NAVIGATION)
+    navigate(route = Screens.PROFILE_NAVIGATION)
+}
+
+fun NavController.navigateToSettingsScreen(){
+    navigate(route = Screens.SETTINGS_SCREEN)
+}
+
+fun NavController.navigateToAboutScreen(){
+    navigate(route = Screens.ABOUT_SCREEN)
 }
 

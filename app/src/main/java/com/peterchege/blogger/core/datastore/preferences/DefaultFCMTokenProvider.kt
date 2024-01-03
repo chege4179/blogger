@@ -8,20 +8,20 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-
-class DefaultAuthTokenProvider @Inject constructor(
+class DefaultFCMTokenProvider @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) {
-    private val AUTH_TOKEN = stringPreferencesKey(name = "auth_token")
 
-    val authToken : Flow<String> = dataStore.data.map { preferences ->
-        preferences[AUTH_TOKEN] ?: ""
+    private val FCM_TOKEN = stringPreferencesKey(name = "fcm_token")
+
+
+    val fcmToken : Flow<String> = dataStore.data.map { preferences ->
+        preferences[FCM_TOKEN] ?: ""
     }
 
-    suspend fun setAuthToken(token: String) {
+    suspend fun setFcmToken(token: String) {
         dataStore.edit { preferences ->
-            preferences[AUTH_TOKEN] = token
+            preferences[FCM_TOKEN] = token
         }
     }
-
 }

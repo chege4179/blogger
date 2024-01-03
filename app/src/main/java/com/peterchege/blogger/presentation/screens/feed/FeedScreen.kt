@@ -68,23 +68,16 @@ fun FeedScreen(
     navigateToCategoryScreen: (String) -> Unit,
     viewModel: FeedScreenViewModel = hiltViewModel()
 ) {
-    val wakeLockPermissionState = rememberPermissionState(permission = android.Manifest.permission.WAKE_LOCK)
+//    val wakeLockPermissionState = rememberPermissionState(permission = android.Manifest.permission.WAKE_LOCK)
     val authUser by viewModel.authUser.collectAsStateWithLifecycle()
     val networkStatus by viewModel.networkStatus.collectAsStateWithLifecycle()
     val isSyncing by viewModel.isSyncing.collectAsStateWithLifecycle()
     val feedScreenUiState by viewModel.feedScreenUiState.collectAsStateWithLifecycle()
 
     val pullRefreshState = rememberPullToRefreshState()
-    LaunchedEffect(key1 = pullRefreshState.isRefreshing){
-        if (wakeLockPermissionState.status.isGranted){
-            viewModel.refreshFeed()
-            delay(1500)
-            pullRefreshState.endRefresh()
-        }else{
-            pullRefreshState.endRefresh()
-            wakeLockPermissionState.launchPermissionRequest()
-        }
-
+    LaunchedEffect(key1 = pullRefreshState.isRefreshing) {
+        viewModel.refreshFeed()
+        delay(1500)
     }
 
     FeedScreenContent(
@@ -217,13 +210,12 @@ fun FeedScreenContent(
                 .fillMaxSize()
                 .padding(paddingValues = it)
                 .nestedScroll(pullRefreshState.nestedScrollConnection)
-        ){
+        ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    ,
+                    .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
+            ) {
                 LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -266,7 +258,7 @@ fun FeedScreenContent(
                                 .padding(defaultPadding)
                         ) {
 
-                            items(items = uiState.posts) { post ->
+                            items(items = uiState.posts, key = { it.postId }) { post ->
                                 ArticleCard(
                                     post = post.toPost(),
                                     onItemClick = { post ->

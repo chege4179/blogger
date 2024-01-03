@@ -21,6 +21,7 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import com.peterchege.blogger.core.datastore.preferences.DefaultAuthTokenProvider
+import com.peterchege.blogger.core.datastore.preferences.DefaultFCMTokenProvider
 import com.peterchege.blogger.core.datastore.repository.UserDataStoreRepository
 import com.peterchege.blogger.core.util.Constants
 import dagger.Module
@@ -57,6 +58,12 @@ class DatastoreModule {
     @Singleton
     fun provideDefaultAuthTokenProvider(dataStore: DataStore<Preferences>): DefaultAuthTokenProvider {
         return DefaultAuthTokenProvider(dataStore = dataStore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDefaultFCMTokenProvider(dataStore: DataStore<Preferences>): DefaultFCMTokenProvider {
+        return DefaultFCMTokenProvider(dataStore = dataStore)
     }
 
 }

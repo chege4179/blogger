@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -87,17 +88,13 @@ fun LoginScreenContent(
 
 
     ) {
-    val snackbarHostState = SnackbarHostState()
+    val snackbarHostState = remember { SnackbarHostState() }
     val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(key1 = networkStatus) {
         when (networkStatus) {
             is NetworkStatus.Unknown -> {}
-            is NetworkStatus.Connected -> {
-                snackbarHostState.showSnackbar(
-                    message = "Connected"
-                )
-            }
+            is NetworkStatus.Connected -> {}
             is NetworkStatus.Disconnected -> {
                 snackbarHostState.showSnackbar(
                     message = "You are offline"
@@ -111,7 +108,7 @@ fun LoginScreenContent(
             when (event) {
                 is UiEvent.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
-                        message = "jjjj"
+                        message = event.message
                     )
                 }
                 is UiEvent.Navigate -> {}
@@ -173,7 +170,6 @@ fun LoginScreenContent(
                         onChangePassword(it)
                     },
                     trailingIcon = {
-
                         Icon(
                             imageVector = if (!uiState.isPasswordVisible)
                                 Icons.Filled.VisibilityOff
@@ -214,8 +210,8 @@ fun LoginScreenContent(
                         .height(50.dp),
                     onClick = {
                         navigateToSignUpScreen()
-
-                    }) {
+                    }
+                ) {
                     Text(text = "Sign Up")
                 }
             }

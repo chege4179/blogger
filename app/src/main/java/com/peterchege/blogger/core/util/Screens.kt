@@ -42,6 +42,9 @@ object Screens {
     const val CATEGORY_SCREEN = "CATEGORY_SCREEN"
 
     const val SEARCH_SCREEN = "SEARCH_SCREEN"
+
     const val SETTINGS_SCREEN = "SETTINGS_SCREEN"
+    const val ABOUT_SCREEN = "ABOUT_SCREEN"
+    const val ONBOARDING_SCREEN = "ONBOARDING_SCREEN"
 
 }

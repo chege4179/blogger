@@ -56,9 +56,9 @@ class UserDataStoreRepository(
 
     }
     suspend fun setLoggedInUser(user: User) {
-//        context.userDataStore.updateData {
-//            user
-//        }
+        context.userDataStore.updateData {
+            user
+        }
     }
     suspend fun unsetLoggedInUser() {
 //        context.userDataStore.updateData {

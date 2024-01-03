@@ -86,6 +86,7 @@ fun SavedPostScreenContent(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
+                        .padding(paddingValues)
                         .padding(defaultPadding)
                     ,
 

@@ -28,6 +28,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import coil.annotation.ExperimentalCoilApi
 import com.peterchege.blogger.core.util.Screens
+import com.peterchege.blogger.presentation.screens.about.AboutScreen
 import com.peterchege.blogger.presentation.screens.author.AuthorFollowerFollowingScreen
 import com.peterchege.blogger.presentation.screens.author.AuthorProfileScreen
 import com.peterchege.blogger.presentation.screens.category.CategoryScreen
@@ -38,13 +39,14 @@ import com.peterchege.blogger.presentation.screens.profile.ProfileFollowerFollow
 import com.peterchege.blogger.presentation.screens.login.LoginScreen
 import com.peterchege.blogger.presentation.screens.post.PostScreen
 import com.peterchege.blogger.presentation.screens.search.SearchScreen
+import com.peterchege.blogger.presentation.screens.settings.SettingsScreen
 import com.peterchege.blogger.presentation.screens.signup.SignUpScreen
 
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalCoilApi::class)
 @ExperimentalMaterial3Api
 @Composable
-fun Navigation(
+fun AppNavigation(
     navController: NavHostController,
 ) {
     val activity = (LocalContext.current as? Activity)
@@ -132,6 +134,18 @@ fun Navigation(
                 activity?.finish()
             }
             DashBoardScreen(navHostController = navController)
+
+        }
+        composable(
+            route = Screens.SETTINGS_SCREEN
+        ) {
+            SettingsScreen()
+
+        }
+        composable(
+            route = Screens.ABOUT_SCREEN
+        ) {
+            AboutScreen()
 
         }
     }

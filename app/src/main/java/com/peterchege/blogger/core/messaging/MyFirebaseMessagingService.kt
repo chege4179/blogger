@@ -30,6 +30,7 @@ import com.google.firebase.messaging.RemoteMessage
 import com.peterchege.blogger.R
 import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.api.requests.UpdateToken
+import com.peterchege.blogger.core.datastore.preferences.DefaultFCMTokenProvider
 import com.peterchege.blogger.core.datastore.repository.UserDataStoreRepository
 import com.peterchege.blogger.core.di.IoDispatcher
 import com.peterchege.blogger.core.util.Constants
@@ -54,6 +55,9 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     @Inject
     lateinit var userDataStoreRepository: UserDataStoreRepository
+
+    @Inject
+    lateinit var defaultFCMTokenProvider: DefaultFCMTokenProvider
 
     @Inject
     @IoDispatcher
