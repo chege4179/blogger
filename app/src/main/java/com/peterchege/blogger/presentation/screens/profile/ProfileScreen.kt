@@ -235,7 +235,6 @@ fun ProfileScreenContent(
                                         .fillMaxHeight(0.7f)
                                         .width(1.dp)
                                 )
-
                                 Column(
                                     modifier = Modifier.clickable {
                                         navigateToProfileFollowerFollowingScreen(Constants.FOLLOWER)
@@ -255,13 +254,6 @@ fun ProfileScreenContent(
 
                                         )
                                 }
-                                Divider(
-                                    color = Color.LightGray,
-                                    thickness = 2.dp,
-                                    modifier = Modifier
-                                        .fillMaxHeight(0.7f)
-                                        .width(1.dp)
-                                )
                             }
                         }
                         item {

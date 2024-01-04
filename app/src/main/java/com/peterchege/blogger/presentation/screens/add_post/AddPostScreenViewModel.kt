@@ -15,6 +15,7 @@
  */
 package com.peterchege.blogger.presentation.screens.add_post
 
+import android.content.Intent
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -22,6 +23,7 @@ import androidx.lifecycle.viewModelScope
 import com.peterchege.blogger.core.api.requests.PostBody
 import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.room.entities.DraftPost
+import com.peterchege.blogger.core.services.UploadPostService
 import com.peterchege.blogger.core.util.*
 import com.peterchege.blogger.core.work.upload_post.UploadPostWorkManager
 import com.peterchege.blogger.domain.repository.AuthRepository
@@ -178,14 +180,9 @@ class AddPostScreenViewModel @Inject constructor(
 
     fun postArticle(navigateToDashboardScreen: () -> Unit, user: User) {
         viewModelScope.launch {
-            val postBody = PostBody(
-                postTitle = _formState.value.postTitle,
-                postBody = _formState.value.postBody,
-                photo = _formState.value.postTitle,
-                userId = user.userId
-            )
-            _formState.value.uri?.let {
-                uploadPostWorkManager.startUpload(postBody = postBody, uri = it)
+
+            _formState.value.uri?.let { uri ->
+
                 navigateToDashboardScreen()
             }
         }

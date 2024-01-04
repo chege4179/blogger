@@ -17,6 +17,7 @@ package com.peterchege.blogger.presentation.screens.add_post
 
 
 import android.annotation.SuppressLint
+import android.content.*
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -29,12 +30,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.work.*
 import coil.annotation.ExperimentalCoilApi
+import com.peterchege.blogger.core.services.UploadPostService
 import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.presentation.components.NotLoggedInComponent
 import com.peterchege.blogger.presentation.theme.defaultPadding
@@ -57,6 +60,7 @@ fun AddPostScreen(
     val formState by viewModel.formState.collectAsStateWithLifecycle()
     val authUser by viewModel.authUser.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     AddPostScreenContent(
         uiState = uiState,
@@ -67,10 +71,18 @@ fun AddPostScreen(
         onChangePostBody = { viewModel.onChangePostBody(it) },
         onChangeImageUri = { viewModel.onChangePhotoUri(it) },
         onSubmit = {
-            authUser?.let {
+            authUser?.let { user ->
+                Intent(context,UploadPostService::class.java).also {
+                    it.action = UploadPostService.Actions.START.toString()
+                    it.putExtra("postTitle",viewModel.formState.value.postTitle)
+                    it.putExtra("postBody",viewModel.formState.value.postBody)
+                    it.putExtra("userId",user.userId)
+                    it.putExtra("uri",viewModel.formState.value.uri.toString())
+                    context.startService(it)
+                }
                 viewModel.postArticle(
                     navigateToDashboardScreen = navigateToDashboardScreen,
-                    user = it
+                    user = user
                 )
             }
         },

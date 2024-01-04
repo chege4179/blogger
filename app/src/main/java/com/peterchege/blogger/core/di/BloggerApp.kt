@@ -33,8 +33,7 @@ import javax.inject.Inject
 
 
 @HiltAndroidApp
-class BloggerApp :Application(),
-    Configuration.Provider {
+class BloggerApp :Application(){
 
 //    @Inject
 //    lateinit var workerFactory: HiltWorkerFactory
@@ -43,16 +42,10 @@ class BloggerApp :Application(),
     override fun onCreate() {
         super.onCreate()
         initTimber()
-        setUpWorkerManagerNotificationChannel()
-        WorkInitializer.initialize(context = this)
+        setUpNotificationChannel()
+
 
     }
-
-    override val workManagerConfiguration: Configuration =
-        Configuration.Builder()
-            .setMinimumLoggingLevel(android.util.Log.DEBUG)
-//            .setWorkerFactory(workerFactory)
-            .build()
 
 
     private fun initTimber() = when {
@@ -64,7 +57,7 @@ class BloggerApp :Application(),
         }
     }
 
-    private fun setUpWorkerManagerNotificationChannel(){
+    private fun setUpNotificationChannel(){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             val channel = NotificationChannel(
                 Constants.NOTIFICATION_CHANNEL,
@@ -74,7 +67,6 @@ class BloggerApp :Application(),
             val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(channel)
         }
-//        WorkManager.initialize(applicationContext, workManagerConfiguration)
     }
 
 }

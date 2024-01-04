@@ -15,14 +15,19 @@
  */
 package com.peterchege.blogger.presentation
 
+import android.Manifest
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.core.app.ActivityCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.metrics.performance.JankStats
 import androidx.navigation.compose.rememberNavController
 import coil.annotation.ExperimentalCoilApi
+import com.peterchege.blogger.core.services.UploadPostService
 import com.peterchege.blogger.presentation.navigation.AppNavigation
 import com.peterchege.blogger.presentation.theme.BloggerTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -39,7 +44,15 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                0
+            )
+        }
         setContent {
+
             BloggerTheme {
                 val navController = rememberNavController()
 
