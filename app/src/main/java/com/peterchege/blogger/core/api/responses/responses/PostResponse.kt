@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.core.api.responses
+package com.peterchege.blogger.core.api.responses.responses
 
+import com.peterchege.blogger.core.api.responses.models.Post
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class LoginResponse(
+data class PostResponse(
     val msg: String,
-    val success: Boolean,
-    val user: User? = null,
-    val deviceToken: String? ,
-    val jwtToken:String?,
+    val post: Post?,
+    val success: Boolean
 )

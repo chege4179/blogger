@@ -15,7 +15,7 @@
  */
 package com.peterchege.blogger.domain.mappers
 
-import com.peterchege.blogger.core.api.responses.Post
+import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.room.entities.CachePost
 import com.peterchege.blogger.core.room.entities.SavePost
 import com.peterchege.blogger.domain.models.PostUI
@@ -50,7 +50,7 @@ fun Post.toCacheEntity(): CachePost {
     )
 }
 
-fun CachePost.toExternalModel():Post {
+fun CachePost.toExternalModel(): Post {
     return Post(
         postId = postId,
         postTitle = postTitle,
@@ -64,7 +64,7 @@ fun CachePost.toExternalModel():Post {
     )
 }
 
-fun SavePost.toExternalModel():Post {
+fun SavePost.toExternalModel(): Post {
     return Post(
         postId = postId,
         postTitle = postTitle,

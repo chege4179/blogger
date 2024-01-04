@@ -19,8 +19,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.peterchege.blogger.core.api.BloggerApi
-import com.peterchege.blogger.core.api.responses.Post
-import com.peterchege.blogger.core.api.responses.User
+import com.peterchege.blogger.core.api.responses.models.Post
+import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.di.IoDispatcher
 import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.domain.repository.AuthRepository

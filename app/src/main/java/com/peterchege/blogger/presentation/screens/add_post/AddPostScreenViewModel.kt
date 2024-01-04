@@ -20,7 +20,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.peterchege.blogger.core.api.requests.PostBody
-import com.peterchege.blogger.core.api.responses.User
+import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.room.entities.DraftPost
 import com.peterchege.blogger.core.util.*
 import com.peterchege.blogger.core.work.upload_post.UploadPostWorkManager

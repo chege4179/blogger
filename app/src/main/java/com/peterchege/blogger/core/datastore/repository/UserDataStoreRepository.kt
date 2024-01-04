@@ -17,8 +17,7 @@ package com.peterchege.blogger.core.datastore.repository
 
 import android.content.Context
 import androidx.datastore.dataStore
-import com.peterchege.blogger.core.api.responses.Following
-import com.peterchege.blogger.core.api.responses.User
+import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.datastore.serializers.UserInfoSerializer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -40,30 +39,16 @@ class UserDataStoreRepository(
     fun getLoggedInUser(): Flow<User?> {
         return context.userDataStore.data
     }
-    suspend fun addUserFollowing(following: Following){
-//        context.userDataStore.updateData {
-//            val userFollowing = it?.following?.toMutableList()
-//            userFollowing?.add(following)
-//            it?.copy(following = userFollowing?.toList() ?: emptyList())
-//        }
-    }
-    suspend fun removeUserFollowing(following: Following){
-//        context.userDataStore.updateData {
-//            val userFollowing = it?.following?.toMutableList()
-//            val newFollowing = userFollowing?.filter { it.followedId != following.followedId } ?: emptyList()
-//            it?.copy(following = newFollowing)
-//        }
 
-    }
     suspend fun setLoggedInUser(user: User) {
         context.userDataStore.updateData {
             user
         }
     }
     suspend fun unsetLoggedInUser() {
-//        context.userDataStore.updateData {
-//            null
-//        }
+        context.userDataStore.updateData {
+            null
+        }
     }
 
 }

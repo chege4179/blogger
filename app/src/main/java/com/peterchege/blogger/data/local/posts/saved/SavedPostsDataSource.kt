@@ -15,7 +15,7 @@
  */
 package com.peterchege.blogger.data.local.posts.saved
 
-import com.peterchege.blogger.core.api.responses.Post
+import com.peterchege.blogger.core.api.responses.models.Post
 import kotlinx.coroutines.flow.Flow
 
 interface SavedPostsDataSource {

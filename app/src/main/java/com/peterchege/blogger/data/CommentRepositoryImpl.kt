@@ -17,7 +17,7 @@ package com.peterchege.blogger.data
 
 import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.api.requests.CommentBody
-import com.peterchege.blogger.core.api.responses.CommentResponse
+import com.peterchege.blogger.core.api.responses.responses.CommentResponse
 import com.peterchege.blogger.core.api.safeApiCall
 import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.domain.repository.CommentRepository

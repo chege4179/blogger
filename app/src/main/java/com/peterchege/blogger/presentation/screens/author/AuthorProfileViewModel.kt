@@ -18,11 +18,10 @@ package com.peterchege.blogger.presentation.screens.author
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.peterchege.blogger.core.api.responses.Post
-import com.peterchege.blogger.core.api.responses.User
+import com.peterchege.blogger.core.api.responses.models.Post
+import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.util.Resource
 import com.peterchege.blogger.domain.repository.AuthRepository
-import com.peterchege.blogger.domain.repository.PostRepository
 import com.peterchege.blogger.domain.use_case.GetProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -78,7 +77,7 @@ class AuthorProfileViewModel @Inject constructor(
         when (result) {
             is Resource.Success -> {
                 AuthorProfileScreenUiState.Success(
-                    posts = result.data?.posts ?: emptyList(),
+                    posts = emptyList(),
                     user = result.data!!.user,
                     isUserLoggedIn = loggedIn
                 )
@@ -101,7 +100,7 @@ class AuthorProfileViewModel @Inject constructor(
     )
 
 
-    fun followUser(userToBeFollowed: User,userFollowing:User) {
+    fun followUser(userToBeFollowed: User, userFollowing: User) {
         viewModelScope.launch {
 //            val followResponse = repository.followUser(
 //                FollowUser(
@@ -136,7 +135,7 @@ class AuthorProfileViewModel @Inject constructor(
         }
     }
 
-    fun unfollowUser(userToBeUnfollowed:User,userUnfollowing:User) {
+    fun unfollowUser(userToBeUnfollowed: User, userUnfollowing: User) {
         viewModelScope.launch {
 //            val followResponse = repository.unfollowUser(
 //                FollowUser(

@@ -16,7 +16,7 @@
 package com.peterchege.blogger.domain.repository
 
 import com.peterchege.blogger.core.api.requests.CommentBody
-import com.peterchege.blogger.core.api.responses.CommentResponse
+import com.peterchege.blogger.core.api.responses.responses.CommentResponse
 import com.peterchege.blogger.core.util.NetworkResult
 
 interface CommentRepository {

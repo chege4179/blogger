@@ -37,9 +37,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
-import com.peterchege.blogger.core.api.responses.User
+import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.domain.repository.NetworkStatus
 import com.peterchege.blogger.presentation.components.ArticleCard
@@ -139,7 +140,7 @@ fun ProfileScreenContent(
                 )
             }
             is ProfileScreenUiState.Success -> {
-                val posts = uiState.posts
+                val posts = uiState.posts.collectAsLazyPagingItems()
                 val user = uiState.user
                 Box(
                     modifier = Modifier
@@ -218,7 +219,7 @@ fun ProfileScreenContent(
 
                                 ) {
                                     Text(
-                                        text = "${posts.size}",
+                                        text = "${user._count.post}",
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,
                                     )
@@ -295,23 +296,25 @@ fun ProfileScreenContent(
 
                             }
                         }
-                        items(items = posts) { post ->
-                            ArticleCard(
-                                post = post,
-                                onItemClick = {
-                                    navigateToPostScreen(post.postId)
+                        items(count = posts.itemCount) { position ->
+                            val post = posts[position]
+                            if (post != null) {
+                                ArticleCard(
+                                    post = post,
+                                    onItemClick = {
+                                        navigateToPostScreen(post.postId)
+                                    },
+                                    onProfileNavigate = { username ->
 
-                                },
-                                onProfileNavigate = { username ->
+                                    },
+                                    onDeletePost = {
 
-                                },
-                                onDeletePost = {
-
-                                },
-                                isLiked = false,
-                                isSaved = false,
-                                isProfile = true
-                            )
+                                    },
+                                    isLiked = false,
+                                    isSaved = false,
+                                    isProfile = true
+                                )
+                            }
                             Spacer(modifier = Modifier.padding(5.dp))
                         }
                     }

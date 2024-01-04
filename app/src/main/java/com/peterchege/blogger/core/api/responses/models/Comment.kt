@@ -13,28 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.core.api.responses
+package com.peterchege.blogger.core.api.responses.models
 
-import com.peterchege.blogger.core.api.requests.Notification
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class User(
-    val userId: String,
-    val email: String,
-    val fullName: String,
-    val imageUrl: String,
-    val password: String,
-    val username: String,
-    val createdAt:String,
-    val updatedAt:String,
-    val deviceTokens:List<DeviceToken>,
-    val _count:UserCount,
-)
-
-
-@Serializable
-data class UserCount(
-    val followers:Int,
-    val post:Int
+data class Comment (
+    val comment:String,
+    val username:String,
+    val postedAt:String,
+    val postedOn:String,
+    val userId:String,
+    val imageUrl:String,
+    val commentId:String,
 )

@@ -27,11 +27,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.peterchege.blogger.core.api.responses.Follower
+import com.peterchege.blogger.core.api.responses.models.User
 
 @Composable
 fun FollowersList(
-    followers:List<Follower>,
+    followers:List<User>,
     navigateToAuthorProfileScreen:(String) -> Unit,
     paddingValues:PaddingValues,
 ){
@@ -57,7 +57,7 @@ fun FollowersList(
             items(items = followers){ follower ->
                 FollowerCard(
                     navigateToFollowerPage = {
-                        navigateToAuthorProfileScreen(follower.followerUsername)
+                        navigateToAuthorProfileScreen(follower.userId)
 
                     },
                     follower =follower,

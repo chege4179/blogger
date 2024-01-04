@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.core.api.responses
+package com.peterchege.blogger.core.api.responses.responses
 
+import com.peterchege.blogger.core.api.responses.models.Post
+import com.peterchege.blogger.core.api.responses.models.User
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Like(
-    val username:String,
-    val fullname:String,
-    val userId:String,
+data class ProfileResponse(
+    val msg:String,
+    val success:Boolean,
+    val user: User,
 )

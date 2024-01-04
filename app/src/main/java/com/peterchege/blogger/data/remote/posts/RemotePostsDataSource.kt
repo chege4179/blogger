@@ -17,17 +17,15 @@ package com.peterchege.blogger.data.remote.posts
 
 import com.peterchege.blogger.core.api.requests.FollowUser
 import com.peterchege.blogger.core.api.requests.LikePost
-import com.peterchege.blogger.core.api.requests.PostBody
 import com.peterchege.blogger.core.api.requests.Viewer
-import com.peterchege.blogger.core.api.responses.AllPostsResponse
-import com.peterchege.blogger.core.api.responses.DeleteResponse
-import com.peterchege.blogger.core.api.responses.FollowResponse
-import com.peterchege.blogger.core.api.responses.LikeResponse
-import com.peterchege.blogger.core.api.responses.Post
-import com.peterchege.blogger.core.api.responses.PostResponse
-import com.peterchege.blogger.core.api.responses.SearchPostResponse
-import com.peterchege.blogger.core.api.responses.UploadPostResponse
-import com.peterchege.blogger.core.api.responses.ViewResponse
+import com.peterchege.blogger.core.api.responses.responses.AllPostsResponse
+import com.peterchege.blogger.core.api.responses.responses.DeleteResponse
+import com.peterchege.blogger.core.api.responses.responses.FollowResponse
+import com.peterchege.blogger.core.api.responses.responses.LikeResponse
+import com.peterchege.blogger.core.api.responses.responses.PostResponse
+import com.peterchege.blogger.core.api.responses.responses.SearchPostResponse
+import com.peterchege.blogger.core.api.responses.responses.UploadPostResponse
+import com.peterchege.blogger.core.api.responses.responses.ViewResponse
 import com.peterchege.blogger.core.util.NetworkResult
 import okhttp3.RequestBody
 

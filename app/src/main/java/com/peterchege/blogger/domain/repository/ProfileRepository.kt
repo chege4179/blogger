@@ -15,10 +15,18 @@
  */
 package com.peterchege.blogger.domain.repository
 
-import com.peterchege.blogger.core.api.responses.ProfileResponse
+import androidx.paging.PagingData
+import com.peterchege.blogger.core.api.responses.models.Post
+import com.peterchege.blogger.core.api.responses.responses.GetPostsByUserIdResponse
+import com.peterchege.blogger.core.api.responses.responses.ProfileResponse
 import com.peterchege.blogger.core.util.NetworkResult
+import kotlinx.coroutines.flow.Flow
 
 interface ProfileRepository {
 
     suspend fun getProfile(userId: String):NetworkResult<ProfileResponse>
+
+    suspend fun getPostsByUserId(userId: String,page:Int):NetworkResult<GetPostsByUserIdResponse>
+
+
 }

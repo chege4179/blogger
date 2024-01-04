@@ -15,13 +15,13 @@
  */
 package com.peterchege.blogger.core.api.requests
 
-import com.peterchege.blogger.core.api.responses.User
+import com.peterchege.blogger.core.api.responses.models.User
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class Notification(
     val notificationType:String,
-    val notificationSender:User,
+    val notificationSender: User,
     val notificationReceiver: User,
     val senderId:String,
     val receiverId:String,

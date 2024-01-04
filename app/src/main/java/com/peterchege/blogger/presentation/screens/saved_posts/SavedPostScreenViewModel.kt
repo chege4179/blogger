@@ -17,9 +17,7 @@ package com.peterchege.blogger.presentation.screens.saved_posts
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.peterchege.blogger.core.api.responses.Post
-import com.peterchege.blogger.core.room.entities.SavePost
-import com.peterchege.blogger.domain.mappers.toExternalModel
+import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.PostRepository
 import dagger.hilt.android.lifecycle.HiltViewModel

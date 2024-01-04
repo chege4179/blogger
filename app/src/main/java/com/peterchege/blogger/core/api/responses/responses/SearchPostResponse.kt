@@ -13,12 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.core.api.responses
+package com.peterchege.blogger.core.api.responses.responses
 
+import com.peterchege.blogger.core.api.responses.models.Post
+import com.peterchege.blogger.core.api.responses.models.User
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ViewResponse (
+data class SearchPostResponse(
     val msg:String,
     val success:Boolean,
-        )
+    val users:List<User>,
+    val posts:List<Post>,
+)

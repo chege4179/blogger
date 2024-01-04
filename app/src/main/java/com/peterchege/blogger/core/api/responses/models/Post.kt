@@ -13,14 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.core.api.responses
+package com.peterchege.blogger.core.api.responses.models
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class View(
-    val viewerUsername:String,
-    val viewerFullname:String,
-    val viewerId:String
+data class Post(
+    val postId: String,
+    val postTitle: String,
+    val postBody:String,
+    val postAuthorId:String,
+    val imageUrl: String,
+    val createdAt: String,
+    val updatedAt: String,
+    val postAuthor: PostAuthor,
+    val _count: PostCount
+    )
 
+@Serializable
+data class PostCount(
+    val likes:Int,
+    val views:Int,
+    val comments:Int,
 )

@@ -15,7 +15,7 @@
  */
 package com.peterchege.blogger.data.local.posts.saved
 
-import com.peterchege.blogger.core.api.responses.Post
+import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.di.IoDispatcher
 import com.peterchege.blogger.core.room.database.BloggerDatabase
 import com.peterchege.blogger.domain.mappers.toExternalModel

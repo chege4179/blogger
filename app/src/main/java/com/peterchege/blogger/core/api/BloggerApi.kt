@@ -18,6 +18,24 @@ package com.peterchege.blogger.core.api
 
 import com.peterchege.blogger.core.api.requests.*
 import com.peterchege.blogger.core.api.responses.*
+import com.peterchege.blogger.core.api.responses.responses.AllPostsResponse
+import com.peterchege.blogger.core.api.responses.responses.CommentResponse
+import com.peterchege.blogger.core.api.responses.responses.DeleteResponse
+import com.peterchege.blogger.core.api.responses.responses.FollowResponse
+import com.peterchege.blogger.core.api.responses.responses.GetFollowersResponse
+import com.peterchege.blogger.core.api.responses.responses.GetPostLikesResponse
+import com.peterchege.blogger.core.api.responses.responses.GetPostsByUserIdResponse
+import com.peterchege.blogger.core.api.responses.responses.GetUserLikeResponse
+import com.peterchege.blogger.core.api.responses.responses.LikeResponse
+import com.peterchege.blogger.core.api.responses.responses.LoginResponse
+import com.peterchege.blogger.core.api.responses.responses.LogoutResponse
+import com.peterchege.blogger.core.api.responses.responses.PostResponse
+import com.peterchege.blogger.core.api.responses.responses.ProfileResponse
+import com.peterchege.blogger.core.api.responses.responses.SearchPostResponse
+import com.peterchege.blogger.core.api.responses.responses.SignUpResponse
+import com.peterchege.blogger.core.api.responses.responses.UpdateTokenResponse
+import com.peterchege.blogger.core.api.responses.responses.UploadPostResponse
+import com.peterchege.blogger.core.api.responses.responses.ViewResponse
 import okhttp3.RequestBody
 import retrofit2.Response
 
@@ -30,53 +48,76 @@ interface BloggerApi {
     suspend fun loginUser(@Body user: LoginUser): Response<LoginResponse>
 
     @POST("/auth/logout")
-    suspend fun logoutUser(@Body user: LogoutUser):Response<LogoutResponse>
+    suspend fun logoutUser(@Body user: LogoutUser): Response<LogoutResponse>
 
     @POST("/auth/signup")
-    suspend fun signUpUser(@Body user: SignUpUser):Response<SignUpResponse>
+    suspend fun signUpUser(@Body user: SignUpUser): Response<SignUpResponse>
 
     @GET("/post/all")
-    suspend fun getAllPosts():Response<AllPostsResponse>
+    suspend fun getAllPosts(): Response<AllPostsResponse>
 
     @POST("/post/create")
     suspend fun createPost(
         @Body body: RequestBody
-    ):Response<UploadPostResponse>
+    ): Response<UploadPostResponse>
 
     @GET("/post/single/{postId}")
-    suspend fun getPostById(@Path("postId") postId: String):Response<PostResponse>
+    suspend fun getPostById(@Path("postId") postId: String): Response<PostResponse>
 
     @DELETE("/post/delete/{postId}")
-    suspend fun getDeletePostById(@Path("postId") postId: String):Response<DeleteResponse>
+    suspend fun getDeletePostById(@Path("postId") postId: String): Response<DeleteResponse>
 
     @POST("/comment/add")
-    suspend fun postComment(@Body commentbody: CommentBody):Response<CommentResponse>
+    suspend fun postComment(@Body commentbody: CommentBody): Response<CommentResponse>
 
     @POST("/like/like")
-    suspend fun likePost(@Body likePost: LikePost):Response<LikeResponse>
+    suspend fun likePost(@Body likePost: LikePost): Response<LikeResponse>
 
     @POST("/like/unlike")
-    suspend fun unlikePost(@Body likePost: LikePost):Response<LikeResponse>
+    suspend fun unlikePost(@Body likePost: LikePost): Response<LikeResponse>
 
     @POST("/follower/followUser")
-    suspend fun followUser(@Body followUser: FollowUser):Response<FollowResponse>
+    suspend fun followUser(@Body followUser: FollowUser): Response<FollowResponse>
 
     @POST("/follower/unfollowUser")
-    suspend fun unfollowUser(@Body followUser: FollowUser):Response<FollowResponse>
+    suspend fun unfollowUser(@Body followUser: FollowUser): Response<FollowResponse>
 
-    @GET("/user/single/{username}")
+    @GET("/user/single/{userId}")
     suspend fun getUserProfile(@Path("userId") userId: String): Response<ProfileResponse>
 
     @POST("/auth/updateDeviceToken")
-    suspend fun updateToken(@Body updateToken: UpdateToken):Response<UpdateTokenResponse>
+    suspend fun updateToken(@Body updateToken: UpdateToken): Response<UpdateTokenResponse>
 
     @GET("/post/search/{searchTerm}")
-    suspend fun searchPost(@Path("searchTerm") searchTerm: String):Response<SearchPostResponse>
+    suspend fun searchPost(@Path("searchTerm") searchTerm: String): Response<SearchPostResponse>
 
     @POST("/view/add")
-    suspend fun addView(@Body viewer: Viewer):Response<ViewResponse>
+    suspend fun addView(@Body viewer: Viewer): Response<ViewResponse>
 
+    @GET("/follower/getFollowers/{userId}")
+    suspend fun getUserFollowers(
+        @Query("page") page: Int = 1,
+        @Query("limit") limit: Int = 1000,
+        @Path("userId") userId: String,
+    ): Response<GetFollowersResponse>
 
+    @GET("/post/likes/{postId}")
+    suspend fun getPostLikes(
+        @Path("postId") postId: String,
+        @Query("page") page: Int = 1,
+        @Query("limit") limit: Int = 20,
+    ): Response<GetPostLikesResponse>
 
+    @GET("/user/likes/{userId}")
+    suspend fun getUserLikes(
+        @Path("userId") userId: String
+    ): Response<GetUserLikeResponse>
+
+    @GET("/post/user/{userId}")
+    suspend fun getPostByUserId(
+        @Path("userId") userId: String,
+        @Query("page") page: Int = 1,
+        @Query("limit") limit: Int = 20,
+    ): Response<GetPostsByUserIdResponse>
 }
 

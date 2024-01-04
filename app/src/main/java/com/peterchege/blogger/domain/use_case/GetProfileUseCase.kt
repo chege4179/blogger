@@ -15,14 +15,12 @@
  */
 package com.peterchege.blogger.domain.use_case
 
-import com.peterchege.blogger.core.api.responses.ProfileResponse
+import com.peterchege.blogger.core.api.responses.responses.ProfileResponse
 import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.core.util.Resource
 import com.peterchege.blogger.domain.repository.ProfileRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import retrofit2.HttpException
-import java.io.IOException
 import javax.inject.Inject
 
 class GetProfileUseCase @Inject constructor(

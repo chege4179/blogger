@@ -124,6 +124,10 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     implementation("androidx.room:room-paging:2.6.1")
 
+    //paging 3 compose
+    implementation("androidx.paging:paging-compose:3.2.1")
+    implementation("androidx.paging:paging-runtime-ktx:3.2.1")
+
     // coil
     implementation("io.coil-kt:coil-compose:2.5.0")
     implementation("com.github.skydoves:landscapist-glide:2.1.8")

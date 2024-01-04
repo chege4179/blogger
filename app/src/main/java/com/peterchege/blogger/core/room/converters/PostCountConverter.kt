@@ -1,8 +1,7 @@
 package com.peterchege.blogger.core.room.converters
 
 import androidx.room.TypeConverter
-import com.peterchege.blogger.core.api.responses.PostAuthor
-import com.peterchege.blogger.core.api.responses.PostCount
+import com.peterchege.blogger.core.api.responses.models.PostCount
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 

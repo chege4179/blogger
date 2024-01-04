@@ -22,9 +22,9 @@ import com.peterchege.blogger.core.api.requests.CommentBody
 import com.peterchege.blogger.core.api.requests.FollowUser
 import com.peterchege.blogger.core.api.requests.LikePost
 import com.peterchege.blogger.core.api.requests.Viewer
-import com.peterchege.blogger.core.api.responses.Comment
-import com.peterchege.blogger.core.api.responses.Post
-import com.peterchege.blogger.core.api.responses.User
+import com.peterchege.blogger.core.api.responses.models.Comment
+import com.peterchege.blogger.core.api.responses.models.Post
+import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.domain.mappers.toDomain
@@ -37,8 +37,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
@@ -230,7 +228,7 @@ class PostScreenViewModel @Inject constructor(
         }
     }
 
-    fun followUser(user:User,postAuthorId: String) {
+    fun followUser(user: User, postAuthorId: String) {
         viewModelScope.launch {
             val followResponse = repository.followUser(
                 FollowUser(
@@ -242,7 +240,7 @@ class PostScreenViewModel @Inject constructor(
         }
     }
 
-    fun unfollowUser(user:User,postAuthorId: String) {
+    fun unfollowUser(user: User, postAuthorId: String) {
         viewModelScope.launch {
             val followResponse = repository.unfollowUser(
                 FollowUser(
@@ -252,7 +250,7 @@ class PostScreenViewModel @Inject constructor(
             )
         }
     }
-    fun likePost(user:User) {
+    fun likePost(user: User) {
         val userId = user.userId
         viewModelScope.launch {
             val likeResponse = repository.likePost(

@@ -1,18 +1,3 @@
-/*
- * Copyright 2023 Blogger
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.peterchege.blogger.presentation.components
 
 import androidx.compose.foundation.Image
@@ -42,13 +27,12 @@ import coil.compose.SubcomposeAsyncImage
 import com.peterchege.blogger.R
 import com.peterchege.blogger.core.api.responses.models.User
 
+
 @Composable
-fun FollowerCard(
-    navigateToFollowerPage:(String) ->Unit,
-    follower: User,
-    isFollowing: Boolean,
-    removeFollower: (follower: User) -> Unit,
-    followFollower: (follower: User) -> Unit,
+fun FollowingCard(
+    navigateToFollowingPage:(String) ->Unit,
+    following: User,
+    unFollowUser: (following: User) -> Unit,
     isYourProfile: Boolean,
 ) {
     Card(
@@ -57,7 +41,7 @@ fun FollowerCard(
             .padding(10.dp)
             .height(70.dp)
             .clickable {
-                navigateToFollowerPage(follower.userId)
+                navigateToFollowingPage(following.userId)
 
             },
         shape = RoundedCornerShape(15),
@@ -73,7 +57,7 @@ fun FollowerCard(
         ) {
             Spacer(modifier = Modifier.width(10.dp))
             SubcomposeAsyncImage(
-                model = follower.imageUrl,
+                model = following.imageUrl,
                 loading = {
                     Image(
                         painter = painterResource(id = R.mipmap.default_profile),
@@ -98,36 +82,25 @@ fun FollowerCard(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = follower.username,
+                    text = following.username,
                     fontWeight = FontWeight.Bold,
-
-                    )
-                Text(text = follower.fullName)
+                )
+                Text(text = following.fullName)
 
             }
             if (isYourProfile) {
                 Row(
-                    modifier = Modifier.fillMaxHeight(),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxHeight()
                 ) {
-                    if (isFollowing) {
-                        Button(onClick = {
-                            removeFollower(follower)
-
+                    Button(
+                        onClick = {
+                            unFollowUser(following)
                         }) {
-                            Text(text = "Un Follow")
-                        }
-                    } else {
-                        Button(onClick = {
-                            followFollower(follower)
-                        }) {
-                            Text(text = "Follow")
-                        }
+                        Text(text = "Un Follow")
                     }
-
                 }
             }
         }
     }
 }
-

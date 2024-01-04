@@ -18,11 +18,10 @@ package com.peterchege.blogger.domain.repository
 import com.peterchege.blogger.core.api.requests.LoginUser
 import com.peterchege.blogger.core.api.requests.LogoutUser
 import com.peterchege.blogger.core.api.requests.SignUpUser
-import com.peterchege.blogger.core.api.responses.Following
-import com.peterchege.blogger.core.api.responses.LoginResponse
-import com.peterchege.blogger.core.api.responses.LogoutResponse
-import com.peterchege.blogger.core.api.responses.SignUpResponse
-import com.peterchege.blogger.core.api.responses.User
+import com.peterchege.blogger.core.api.responses.models.User
+import com.peterchege.blogger.core.api.responses.responses.LoginResponse
+import com.peterchege.blogger.core.api.responses.responses.LogoutResponse
+import com.peterchege.blogger.core.api.responses.responses.SignUpResponse
 import com.peterchege.blogger.core.util.NetworkResult
 import kotlinx.coroutines.flow.Flow
 
@@ -36,9 +35,9 @@ interface AuthRepository {
 
     suspend fun logoutUser(logoutUser: LogoutUser):NetworkResult<LogoutResponse>
 
-    suspend fun addUserFollowing(following: Following)
+    suspend fun addUserFollowing(following: User)
 
-    suspend fun removeUserFollowing(following: Following)
+    suspend fun removeUserFollowing(following: User)
 
     fun getLoggedInUser(): Flow<User?>
 

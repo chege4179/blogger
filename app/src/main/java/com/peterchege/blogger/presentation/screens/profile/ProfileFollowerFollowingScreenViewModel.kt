@@ -18,8 +18,8 @@ package com.peterchege.blogger.presentation.screens.profile
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.peterchege.blogger.core.api.responses.Follower
-import com.peterchege.blogger.core.api.responses.Following
+import com.peterchege.blogger.core.api.responses.models.User
+
 import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.PostRepository
 import com.peterchege.blogger.domain.use_case.GetProfileUseCase
@@ -33,14 +33,14 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
-sealed interface  ProfileFollowerFollowingScreenUiState {
+sealed interface ProfileFollowerFollowingScreenUiState {
 
     object Loading : ProfileFollowerFollowingScreenUiState
 
     data class Success(
-        val following:List<Following>,
-        val followers:List<Follower>,
-        val type:String,
+        val following: List<User>,
+        val followers: List<User>,
+        val type: String,
     ) : ProfileFollowerFollowingScreenUiState
 
     data class Error(val message: String) : ProfileFollowerFollowingScreenUiState
@@ -66,10 +66,10 @@ class ProfileFollowerFollowingScreenViewModel @Inject constructor(
         )
 
 
-    val uiState = combine(typeFlow,authUser){type, user ->
-        if (user == null){
+    val uiState = combine(typeFlow, authUser) { type, user ->
+        if (user == null) {
             ProfileFollowerFollowingScreenUiState.Error("Info not found")
-        }else{
+        } else {
             ProfileFollowerFollowingScreenUiState.Success(
                 type = type,
                 // TODO Check here
@@ -81,16 +81,10 @@ class ProfileFollowerFollowingScreenViewModel @Inject constructor(
         .onStart { ProfileFollowerFollowingScreenUiState.Loading }
         .catch { ProfileFollowerFollowingScreenUiState.Error("An unexpected error occurred") }
         .stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000L),
-        initialValue = ProfileFollowerFollowingScreenUiState.Loading
-    )
-    
-
-
-
-
-
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = ProfileFollowerFollowingScreenUiState.Loading
+        )
 
 
     fun followUser(followedUsername: String) {

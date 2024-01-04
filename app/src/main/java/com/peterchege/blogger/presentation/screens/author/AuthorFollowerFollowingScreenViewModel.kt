@@ -18,8 +18,7 @@ package com.peterchege.blogger.presentation.screens.author
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.peterchege.blogger.core.api.responses.Follower
-import com.peterchege.blogger.core.api.responses.Following
+import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.util.Resource
 import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.use_case.GetProfileUseCase
@@ -34,8 +33,8 @@ sealed interface AuthorProfileFollowerFollowingScreenUiState {
     object Loading : AuthorProfileFollowerFollowingScreenUiState
 
     data class Success(
-        val following: List<Following>,
-        val followers: List<Follower>,
+        val following: List<User>,
+        val followers: List<User>,
         val isUserLoggedIn: Boolean,
         val type: String,
     ) : AuthorProfileFollowerFollowingScreenUiState

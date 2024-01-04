@@ -1,9 +1,8 @@
 package com.peterchege.blogger.core.room.converters
 
 import androidx.room.TypeConverter
-import com.peterchege.blogger.core.api.responses.PostAuthor
+import com.peterchege.blogger.core.api.responses.models.PostAuthor
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 class PostAuthorConverter {
@@ -13,7 +12,7 @@ class PostAuthorConverter {
         return Json.encodeToString<PostAuthor>(postAuthor)
     }
     @TypeConverter
-    fun fromString(postAuthorString:String):PostAuthor{
+    fun fromString(postAuthorString:String): PostAuthor {
         return Json.decodeFromString<PostAuthor>(postAuthorString)
     }
 }

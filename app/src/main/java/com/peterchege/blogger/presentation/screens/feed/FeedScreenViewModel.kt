@@ -17,7 +17,7 @@ package com.peterchege.blogger.presentation.screens.feed
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.peterchege.blogger.core.api.responses.Post
+import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.domain.models.PostUI
 import com.peterchege.blogger.domain.repository.AuthRepository

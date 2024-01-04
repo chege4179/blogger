@@ -16,9 +16,8 @@
 package com.peterchege.blogger.core.room.entities
 
 import androidx.room.*
-import com.peterchege.blogger.core.api.responses.Post
-import com.peterchege.blogger.core.api.responses.PostAuthor
-import com.peterchege.blogger.core.api.responses.PostCount
+import com.peterchege.blogger.core.api.responses.models.PostAuthor
+import com.peterchege.blogger.core.api.responses.models.PostCount
 
 
 @Entity(tableName = "savePost")

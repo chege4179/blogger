@@ -18,7 +18,7 @@ package com.peterchege.blogger.presentation.screens.profile
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.peterchege.blogger.core.api.responses.Post
+import com.peterchege.blogger.core.api.responses.models.Post
 
 @Composable
 fun DeleteBox(

@@ -16,9 +16,8 @@
 package com.peterchege.blogger.core.datastore.serializers
 
 import androidx.datastore.core.Serializer
-import com.peterchege.blogger.core.api.responses.PostCount
-import com.peterchege.blogger.core.api.responses.User
-import com.peterchege.blogger.core.api.responses.UserCount
+import com.peterchege.blogger.core.api.responses.models.User
+import com.peterchege.blogger.core.api.responses.models.UserCount
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import java.io.InputStream

@@ -1,5 +1,6 @@
-package com.peterchege.blogger.core.api.responses
+package com.peterchege.blogger.core.api.responses.responses
 
+import com.peterchege.blogger.core.api.responses.models.Post
 import kotlinx.serialization.Serializable
 
 @Serializable

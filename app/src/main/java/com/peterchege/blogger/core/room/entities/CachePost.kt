@@ -15,13 +15,10 @@
  */
 package com.peterchege.blogger.core.room.entities
 
-import androidx.room.Embedded
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import androidx.room.Relation
-import com.peterchege.blogger.core.api.responses.PostAuthor
-import com.peterchege.blogger.core.api.responses.PostCount
+import com.peterchege.blogger.core.api.responses.models.PostAuthor
+import com.peterchege.blogger.core.api.responses.models.PostCount
 
 
 @Entity(tableName = "cachePost")

@@ -15,11 +15,8 @@
  */
 package com.peterchege.blogger.domain.models
 
-import com.peterchege.blogger.core.api.responses.Comment
-import com.peterchege.blogger.core.api.responses.Like
-import com.peterchege.blogger.core.api.responses.PostAuthor
-import com.peterchege.blogger.core.api.responses.PostCount
-import com.peterchege.blogger.core.api.responses.View
+import com.peterchege.blogger.core.api.responses.models.PostAuthor
+import com.peterchege.blogger.core.api.responses.models.PostCount
 
 data class PostUI(
     val postId: String,
@@ -29,8 +26,8 @@ data class PostUI(
     val imageUrl: String,
     val createdAt: String,
     val updatedAt: String,
-    val postAuthor:PostAuthor,
-    val _count:PostCount,
+    val postAuthor: PostAuthor,
+    val _count: PostCount,
     val isSaved:Boolean = false,
     val isLiked:Boolean = false,
     val isProfile:Boolean = false,

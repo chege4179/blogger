@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.core.api.responses
+package com.peterchege.blogger.core.api.responses.responses
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UpdateTokenResponse (
+data class SignUpResponse (
     val msg:String,
     val success:Boolean,
 )

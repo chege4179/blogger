@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.core.api.responses
+package com.peterchege.blogger.core.api.responses.responses
 
+import com.peterchege.blogger.core.api.responses.models.Post
 import kotlinx.serialization.Serializable
 
-
 @Serializable
-data class AllPostsResponse(
-    val msg: String,
-    val posts: List<Post>,
-    val success: Boolean
+data class UploadPostResponse (
+    val msg:String,
+    val success:Boolean,
+    val post: Post?
 )

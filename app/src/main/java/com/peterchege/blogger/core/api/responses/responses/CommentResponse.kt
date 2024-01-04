@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.core.api.responses
+package com.peterchege.blogger.core.api.responses.responses
 
+import com.peterchege.blogger.core.api.responses.models.Comment
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class DeleteResponse (
+data class CommentResponse (
     val msg:String,
     val success:Boolean,
+    val comment: Comment,
+
     )

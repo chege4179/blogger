@@ -15,7 +15,7 @@
  */
 package com.peterchege.blogger.data.local.posts.cache
 
-import com.peterchege.blogger.core.api.responses.Post
+import com.peterchege.blogger.core.api.responses.models.Post
 import kotlinx.coroutines.flow.Flow
 
 interface CachedPostsDataSource {

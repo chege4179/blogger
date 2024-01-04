@@ -19,11 +19,11 @@ import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.api.requests.LoginUser
 import com.peterchege.blogger.core.api.requests.LogoutUser
 import com.peterchege.blogger.core.api.requests.SignUpUser
-import com.peterchege.blogger.core.api.responses.Following
-import com.peterchege.blogger.core.api.responses.LoginResponse
-import com.peterchege.blogger.core.api.responses.LogoutResponse
-import com.peterchege.blogger.core.api.responses.SignUpResponse
-import com.peterchege.blogger.core.api.responses.User
+
+import com.peterchege.blogger.core.api.responses.responses.LoginResponse
+import com.peterchege.blogger.core.api.responses.responses.LogoutResponse
+import com.peterchege.blogger.core.api.responses.responses.SignUpResponse
+import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.api.safeApiCall
 import com.peterchege.blogger.core.datastore.preferences.DefaultAuthTokenProvider
 import com.peterchege.blogger.core.datastore.repository.UserDataStoreRepository
@@ -57,12 +57,12 @@ class AuthRepositoryImpl @Inject constructor(
         return safeApiCall { api.signUpUser(signUpUser) }
     }
 
-    override suspend fun addUserFollowing(following: Following) {
-        return userDataStoreRepository.addUserFollowing(following)
+    override suspend fun addUserFollowing(following: User) {
+        // TODO
     }
 
-    override suspend fun removeUserFollowing(following: Following) {
-        return userDataStoreRepository.removeUserFollowing(following)
+    override suspend fun removeUserFollowing(following: User) {
+        //TODO
     }
 
     override suspend fun loginUser(loginUser: LoginUser): NetworkResult<LoginResponse> {

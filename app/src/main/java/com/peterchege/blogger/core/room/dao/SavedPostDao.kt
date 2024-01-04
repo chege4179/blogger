@@ -16,10 +16,6 @@
 package com.peterchege.blogger.core.room.dao
 
 import androidx.room.*
-import com.peterchege.blogger.core.api.responses.Comment
-import com.peterchege.blogger.core.api.responses.Like
-import com.peterchege.blogger.core.api.responses.Post
-import com.peterchege.blogger.core.api.responses.View
 import com.peterchege.blogger.core.room.entities.*
 
 import kotlinx.coroutines.flow.Flow

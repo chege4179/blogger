@@ -13,22 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.core.api.responses
+package com.peterchege.blogger.core.api.responses.responses
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Follower(
-    val followerUsername:String,
-    val followerFullname:String,
-    val followerId:String,
-
-)
-
-@Serializable
-data class Following(
-    val followedUsername: String,
-    val followedFullname:String,
-    val followedId:String,
-
+data class UpdateTokenResponse (
+    val msg:String,
+    val success:Boolean,
 )

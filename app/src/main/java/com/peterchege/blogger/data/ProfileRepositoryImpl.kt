@@ -15,13 +15,17 @@
  */
 package com.peterchege.blogger.data
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.peterchege.blogger.core.api.BloggerApi
-import com.peterchege.blogger.core.api.responses.ProfileResponse
+import com.peterchege.blogger.core.api.responses.models.Post
+import com.peterchege.blogger.core.api.responses.responses.GetPostsByUserIdResponse
+import com.peterchege.blogger.core.api.responses.responses.ProfileResponse
 import com.peterchege.blogger.core.api.safeApiCall
-import com.peterchege.blogger.core.di.IoDispatcher
 import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.domain.repository.ProfileRepository
-import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class ProfileRepositoryImpl @Inject constructor(
@@ -29,6 +33,10 @@ class ProfileRepositoryImpl @Inject constructor(
     ):ProfileRepository {
     override suspend fun getProfile(userId: String): NetworkResult<ProfileResponse> {
         return safeApiCall{ api.getUserProfile(userId = userId) }
+    }
+
+    override suspend fun getPostsByUserId(userId: String,page:Int): NetworkResult<GetPostsByUserIdResponse> {
+        return safeApiCall { api.getPostByUserId(userId = userId,page = page) }
     }
 
 }

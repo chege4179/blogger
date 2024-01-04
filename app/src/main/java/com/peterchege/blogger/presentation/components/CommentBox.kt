@@ -38,7 +38,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
-import com.peterchege.blogger.core.api.responses.Comment
+import com.peterchege.blogger.core.api.responses.models.Comment
 
 
 @ExperimentalCoilApi
