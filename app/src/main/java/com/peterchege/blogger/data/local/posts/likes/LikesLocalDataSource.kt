@@ -13,14 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.presentation.screens.about
+package com.peterchege.blogger.data.local.posts.likes
 
-import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.room.Insert
+import androidx.room.Query
+import com.peterchege.blogger.core.room.entities.LikeEntity
+import kotlinx.coroutines.flow.Flow
 
-@Composable
-fun AboutScreen(
-    viewModel: AboutScreenViewModel = hiltViewModel()
-) {
+interface LikesLocalDataSource {
 
+
+    suspend fun insertLikes(likes: List<LikeEntity>)
+
+
+    suspend fun insertLike(like: LikeEntity)
+
+
+    fun getAllLikes(): Flow<List<LikeEntity>>
+
+
+    suspend fun deleteLike(postId: String)
+
+    suspend fun deleteAllLikes()
 }

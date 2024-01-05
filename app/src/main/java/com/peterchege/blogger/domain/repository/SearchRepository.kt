@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.presentation.screens.about
+package com.peterchege.blogger.domain.repository
 
-import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
+import com.peterchege.blogger.core.api.responses.responses.SearchPostResponse
+import com.peterchege.blogger.core.api.responses.responses.SearchUserResponse
+import com.peterchege.blogger.core.util.NetworkResult
 
-@Composable
-fun AboutScreen(
-    viewModel: AboutScreenViewModel = hiltViewModel()
-) {
+interface SearchRepository {
+    suspend fun searchPosts(searchTerm:String): NetworkResult<SearchPostResponse>
+
+    suspend fun searchUsers(searchTerm:String): NetworkResult<SearchUserResponse>
 
 }

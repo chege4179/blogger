@@ -66,7 +66,7 @@ fun SearchUsersTab(
                         .fillMaxSize()
                         .padding(paddingValues)
                 ) {
-                    items(items = searchUsers) { user ->
+                    items(items = searchUsers, key = { it.userId }) { user ->
                         ProfileCard(
                             navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
                             user = user,

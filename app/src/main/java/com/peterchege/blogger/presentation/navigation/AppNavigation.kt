@@ -79,7 +79,7 @@ fun AppNavigation(
         composable(route = Screens.POST_SCREEN + "/{postId}") {
             PostScreen()
         }
-        composable(route = Screens.AUTHOR_PROFILE_SCREEN + "/{username}") {
+        composable(route = Screens.AUTHOR_PROFILE_SCREEN + "/{userId}") {
             AuthorProfileScreen(
                 navigateToPostScreen = navController::navigateToPostScreen,
                 navigateToAuthorFollowerFollowingScreen = navController::navigateToAuthorProfileFollowingScreen

@@ -25,6 +25,7 @@ import com.peterchege.blogger.core.api.responses.responses.FollowResponse
 import com.peterchege.blogger.core.api.responses.responses.LikeResponse
 import com.peterchege.blogger.core.api.responses.responses.PostResponse
 import com.peterchege.blogger.core.api.responses.responses.SearchPostResponse
+import com.peterchege.blogger.core.api.responses.responses.UnLikeResponse
 import com.peterchege.blogger.core.api.responses.responses.UploadPostResponse
 import com.peterchege.blogger.core.api.responses.responses.ViewResponse
 import com.peterchege.blogger.core.api.safeApiCall
@@ -70,7 +71,7 @@ class RemotePostsDataSourceImpl @Inject constructor(
 
 
 
-    override suspend fun unlikePost(likePost: LikePost): NetworkResult<LikeResponse> {
+    override suspend fun unlikePost(likePost: LikePost): NetworkResult<UnLikeResponse> {
         return safeApiCall { api.unlikePost(likePost = likePost) }
     }
 

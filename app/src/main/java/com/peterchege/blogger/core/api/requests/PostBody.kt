@@ -15,10 +15,8 @@
  */
 package com.peterchege.blogger.core.api.requests
 
-import android.graphics.Bitmap
-import android.net.Uri
 import kotlinx.serialization.Serializable
-import java.io.File
+
 @Serializable
 data class PostBody (
     val postTitle:String,

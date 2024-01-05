@@ -13,14 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.presentation.screens.about
+package com.peterchege.blogger.data.local.users
 
-import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
+import com.peterchege.blogger.core.api.responses.models.FollowerUser
+import kotlinx.coroutines.flow.Flow
 
-@Composable
-fun AboutScreen(
-    viewModel: AboutScreenViewModel = hiltViewModel()
-) {
+interface FollowersLocalDataSource {
 
+    suspend fun insertFollower(followerUser: FollowerUser)
+
+    suspend fun insertFollowers(followers:List<FollowerUser>)
+
+    fun getAllAuthUserFollowers():Flow<List<FollowerUser>>
+
+    fun getAllAuthUserFollowerIds(): Flow<List<String>>
+
+    suspend fun deleteFollowerByUserId(userId:String)
+
+
+    suspend fun deleteAllFollowers()
 }

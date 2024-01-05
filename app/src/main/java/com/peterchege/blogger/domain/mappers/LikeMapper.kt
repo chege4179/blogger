@@ -13,14 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.presentation.screens.about
+package com.peterchege.blogger.domain.mappers
 
-import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
+import com.peterchege.blogger.core.api.responses.models.Like
+import com.peterchege.blogger.core.room.entities.LikeEntity
 
-@Composable
-fun AboutScreen(
-    viewModel: AboutScreenViewModel = hiltViewModel()
-) {
+fun Like.toEntity(): LikeEntity {
+    return LikeEntity(
+        likeId = null,
+        likepostId = likepostId,
+        userId = userId
+    )
+}
 
+fun LikeEntity.toExternalModel(): Like {
+    return Like(
+
+        likepostId = likepostId,
+        userId = userId
+    )
 }

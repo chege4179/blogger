@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface SavedPostDao {
 
-    @Transaction
+
     @Query("SELECT * FROM savePost")
     fun getAllSavedPosts(): Flow<List<SavePost>>
 

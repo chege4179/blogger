@@ -72,8 +72,20 @@ fun PostScreen(
         uiState = uiState,
         commentUiState = commentUiState,
         deletePostUiState = deletePostUiState,
-        onLikePost = { it1, _ -> viewModel.likePost(it1) },
-        onUnlikePost = { it1, _ -> viewModel.unlikePost(it1) },
+        onLikePost = { it1->
+            authUser?.let { user ->
+                if (user.userId != "") {
+                    viewModel.likePost(post = it1, user = user)
+                }
+            }
+        },
+        onUnlikePost = { it1 ->
+            authUser?.let { user ->
+                if (user.userId != "") {
+                    viewModel.unLikePost(post = it1, user = user)
+                }
+            }
+        },
         onFollowUser = viewModel::followUser,
         onUnFollowUser = viewModel::unfollowUser,
         onChangeNewComment = viewModel::onChangeComment,
@@ -99,8 +111,8 @@ fun PostScreenContent(
     uiState: PostScreenUiState,
     commentUiState: CommentUiState,
     deletePostUiState: DeletePostUiState,
-    onLikePost: (User, String) -> Unit,
-    onUnlikePost: (User, String) -> Unit,
+    onLikePost: (Post) -> Unit,
+    onUnlikePost: (Post) -> Unit,
     onFollowUser: (User, String) -> Unit,
     onUnFollowUser: (User, String) -> Unit,
     onChangeNewComment: (String) -> Unit,
@@ -288,33 +300,31 @@ fun PostScreenContent(
 //                                                navController.navigate(Screens.AUTHOR_PROFILE_SCREEN + "/${state.post.postAuthor}")
                                             }
                                         )
-                                        if (post.isLiked) {
-                                            Icon(
-                                                imageVector = Icons.Default.Favorite,
-                                                contentDescription = "Un Like",
-                                                modifier = Modifier.clickable {
-                                                    if (user != null) {
-                                                        onUnlikePost(user, post.postAuthor.userId)
+                                        Icon(
+                                            imageVector = if (post.isLiked)
+                                                Icons.Default.Favorite
+                                            else
+                                                Icons.Default.FavoriteBorder,
+                                            contentDescription = if (post.isLiked)
+                                                "Un Like"
+                                            else
+                                                "Like",
+                                            modifier = Modifier.clickable {
+                                                if (user != null) {
+                                                    if (post.isLiked) {
+                                                        onUnlikePost(post.toPost())
+                                                    } else {
+                                                        onLikePost(post.toPost())
                                                     }
-                                                },
-                                                tint = Color.Red
-                                            )
-                                        } else {
-                                            Icon(
-                                                imageVector = Icons.Default.FavoriteBorder,
-                                                contentDescription = "Like",
-                                                modifier = Modifier.clickable {
-                                                    if (user != null) {
-                                                        onLikePost(user, post.postAuthor.userId)
-                                                    }
+
                                                 }
-                                            )
-                                        }
+                                            }
+                                        )
                                         Icon(
                                             imageVector = if (post.isSaved)
                                                 Icons.Default.Bookmark
                                             else
-                                                Icons.Default.Bookmark,
+                                                Icons.Default.BookmarkBorder,
                                             contentDescription = if (post.isSaved) "Un Save" else "Save",
                                             modifier = Modifier.clickable {
                                                 if (post.isSaved) {

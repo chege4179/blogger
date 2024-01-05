@@ -17,8 +17,13 @@ package com.peterchege.blogger.presentation.screens.feed
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.peterchege.blogger.core.api.requests.LikePost
 import com.peterchege.blogger.core.api.responses.models.Post
+import com.peterchege.blogger.core.api.responses.models.User
+import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.core.util.UiEvent
+import com.peterchege.blogger.data.local.posts.likes.LikesLocalDataSource
+import com.peterchege.blogger.domain.mappers.toEntity
 import com.peterchege.blogger.domain.models.PostUI
 import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.NetworkInfoRepository
@@ -52,6 +57,7 @@ sealed interface FeedScreenUiState {
 @HiltViewModel
 class FeedScreenViewModel @Inject constructor(
     private val postRepository: PostRepository,
+    private val likesLocalDataSource: LikesLocalDataSource,
     authRepository: AuthRepository,
     networkInfoRepository: NetworkInfoRepository,
 
@@ -96,7 +102,6 @@ class FeedScreenViewModel @Inject constructor(
     fun refreshFeed(){
         _isSyncing.value = true
         viewModelScope.launch {
-
             postRepository.syncFeed()
             _isSyncing.value = false
         }
@@ -112,6 +117,42 @@ class FeedScreenViewModel @Inject constructor(
         viewModelScope.launch {
             postRepository.deleteSavedPostById(post.postId)
             _eventFlow.emit(UiEvent.ShowSnackbar(message = "Post removed from bookmarks"))
+        }
+    }
+    fun likePost(post: Post,user:User){
+        viewModelScope.launch {
+            val likePost = LikePost(userId = user.userId,postId = post.postId)
+            val response = postRepository.likePost(likePost)
+            when(response){
+                is NetworkResult.Success -> {
+                    response.data.like?.let {
+                        likesLocalDataSource.insertLike(like = it.toEntity())
+                    }
+                }
+                is NetworkResult.Error -> {
+
+                }
+                is NetworkResult.Exception -> {
+
+                }
+            }
+        }
+    }
+    fun unLikePost(post: Post,user:User){
+        viewModelScope.launch {
+            val likePost = LikePost(userId = user.userId,postId = post.postId)
+            val response = postRepository.unlikePost(likePost)
+            when(response){
+                is NetworkResult.Success -> {
+                    likesLocalDataSource.deleteLike(postId = post.postId)
+                }
+                is NetworkResult.Error -> {
+
+                }
+                is NetworkResult.Exception -> {
+
+                }
+            }
         }
     }
 

@@ -15,10 +15,12 @@
  */
 package com.peterchege.blogger.core.api.responses.responses
 
+import com.peterchege.blogger.core.api.responses.models.Like
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class LikeResponse (
-    val msg:String,
-    val success:Boolean,
-    )
+data class LikeResponse(
+    val msg: String,
+    val success: Boolean,
+    val like: Like?,
+)

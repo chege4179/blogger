@@ -23,6 +23,7 @@ import com.peterchege.blogger.core.api.responses.responses.FollowResponse
 import com.peterchege.blogger.core.api.responses.responses.LikeResponse
 import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.api.responses.responses.SearchPostResponse
+import com.peterchege.blogger.core.api.responses.responses.UnLikeResponse
 import com.peterchege.blogger.core.api.responses.responses.UploadPostResponse
 import com.peterchege.blogger.core.api.responses.responses.ViewResponse
 import com.peterchege.blogger.core.util.NetworkResult
@@ -46,14 +47,11 @@ interface PostRepository {
 
     suspend fun likePost(likePost: LikePost):NetworkResult<LikeResponse>
 
-    suspend fun unlikePost(likePost: LikePost):NetworkResult<LikeResponse>
+    suspend fun unlikePost(likePost: LikePost):NetworkResult<UnLikeResponse>
 
     suspend fun followUser(followUser: FollowUser):NetworkResult<FollowResponse>
 
     suspend fun unfollowUser(followUser: FollowUser):NetworkResult<FollowResponse>
-
-    suspend fun searchPosts(searchTerm:String):NetworkResult<SearchPostResponse>
-
 
     suspend fun insertSavedPost(post: Post)
 

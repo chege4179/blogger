@@ -27,7 +27,9 @@ import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.core.util.UiEvent
+import com.peterchege.blogger.data.local.posts.likes.LikesLocalDataSource
 import com.peterchege.blogger.domain.mappers.toDomain
+import com.peterchege.blogger.domain.mappers.toEntity
 import com.peterchege.blogger.domain.models.PostUI
 import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.CommentRepository
@@ -43,7 +45,7 @@ import kotlin.collections.ArrayList
 sealed interface PostScreenUiState {
     object Loading : PostScreenUiState
 
-    data class Success(val post: PostUI, val isUserLoggedIn:Boolean) : PostScreenUiState
+    data class Success(val post: PostUI, val isUserLoggedIn: Boolean) : PostScreenUiState
 
     data class Error(val message: String) : PostScreenUiState
 
@@ -66,8 +68,9 @@ class PostScreenViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val authRepository: AuthRepository,
     private val repository: PostRepository,
+    private val likesLocalDataSource: LikesLocalDataSource,
 
-) : ViewModel() {
+    ) : ViewModel() {
 
     val postId = savedStateHandle.get<String>("postId")
 
@@ -76,6 +79,9 @@ class PostScreenViewModel @Inject constructor(
     val authUserFlow = authRepository.getLoggedInUser()
 
     private val isUserLoggedIn = authRepository.isUserLoggedIn
+
+    private val likedPostIdsFlow =
+        likesLocalDataSource.getAllLikes().map { it.map { it.likepostId } }
 
     private val savedPostIdsFlow = repository.getSavedPostIds()
 
@@ -89,19 +95,24 @@ class PostScreenViewModel @Inject constructor(
     val eventFlow = _eventFlow.asSharedFlow()
 
     val uiState: StateFlow<PostScreenUiState> =
-        combine(postFlow, savedPostIdsFlow, authUserFlow,isUserLoggedIn) { post, savedPostIds, authUser,loggedIn ->
+        combine(
+            postFlow,
+            savedPostIdsFlow,
+            authUserFlow,
+            isUserLoggedIn,
+            likedPostIdsFlow
+        ) { post, savedPostIds, authUser, loggedIn, likedPostIds ->
             if (post == null) {
                 PostScreenUiState.PostNotFound
             } else {
                 val postUi = post.toDomain(
                     isProfile = false,
                     isSaved = savedPostIds.contains(postId),
-                    // TODO : Check here
-                    isLiked = false,
+                    isLiked = likedPostIds.contains(postId),
                 )
                 // TODO : Check here too
                 _commentUiState.value = _commentUiState.value.copy(comments = emptyList())
-                PostScreenUiState.Success(post = postUi,isUserLoggedIn = loggedIn)
+                PostScreenUiState.Success(post = postUi, isUserLoggedIn = loggedIn)
             }
         }.onStart {
             emit(PostScreenUiState.Loading)
@@ -250,26 +261,41 @@ class PostScreenViewModel @Inject constructor(
             )
         }
     }
-    fun likePost(user: User) {
-        val userId = user.userId
+
+    fun likePost(post: Post,user:User){
         viewModelScope.launch {
-            val likeResponse = repository.likePost(
-                LikePost(
-                    userId = userId,
-                    postId = postId ?:""
-                )
-            )
+            val likePost = LikePost(userId = user.userId,postId = post.postId)
+            val response = repository.likePost(likePost)
+            when(response){
+                is NetworkResult.Success -> {
+                    response.data.like?.let {
+                        likesLocalDataSource.insertLike(like = it.toEntity())
+                    }
+                }
+                is NetworkResult.Error -> {
+
+                }
+                is NetworkResult.Exception -> {
+
+                }
+            }
         }
     }
-    fun unlikePost(user: User) {
-        val userId = user.userId
+    fun unLikePost(post: Post,user:User){
         viewModelScope.launch {
-            val likeResponse = repository.unlikePost(
-                LikePost(
-                    userId = userId,
-                    postId = postId ?:""
-                )
-            )
+            val likePost = LikePost(userId = user.userId,postId = post.postId)
+            val response = repository.unlikePost(likePost)
+            when(response){
+                is NetworkResult.Success -> {
+                    likesLocalDataSource.deleteLike(postId = post.postId)
+                }
+                is NetworkResult.Error -> {
+
+                }
+                is NetworkResult.Exception -> {
+
+                }
+            }
         }
     }
 
@@ -282,7 +308,7 @@ class PostScreenViewModel @Inject constructor(
     private fun postComment(commentBody: CommentBody) {
         viewModelScope.launch {
             val commentResponse = commentRepository.postComment(commentBody)
-            when(commentResponse){
+            when (commentResponse) {
                 is NetworkResult.Success -> {
                     _commentUiState.value = _commentUiState.value.copy(newComment = "")
                     if (commentResponse.data.success) {
@@ -291,10 +317,16 @@ class PostScreenViewModel @Inject constructor(
 
                     }
                 }
+
                 is NetworkResult.Exception -> {
-                    _eventFlow.emit(UiEvent.ShowSnackbar(message = commentResponse.e.message ?: "Your Comment was not sent"))
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            message = commentResponse.e.message ?: "Your Comment was not sent"
+                        )
+                    )
 
                 }
+
                 is NetworkResult.Error -> {
                     _eventFlow.emit(UiEvent.ShowSnackbar(message = "Could not reach server... Please check your internet connection"))
                 }

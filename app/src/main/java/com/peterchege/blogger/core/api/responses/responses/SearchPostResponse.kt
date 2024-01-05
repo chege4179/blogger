@@ -23,6 +23,5 @@ import kotlinx.serialization.Serializable
 data class SearchPostResponse(
     val msg:String,
     val success:Boolean,
-    val users:List<User>,
-    val posts:List<Post>,
+    val posts:List<Post>?,
 )

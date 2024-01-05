@@ -13,14 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.presentation.screens.about
+package com.peterchege.blogger.core.room.converters
 
-import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.room.TypeConverter
+import com.peterchege.blogger.core.api.responses.models.UserCount
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
-@Composable
-fun AboutScreen(
-    viewModel: AboutScreenViewModel = hiltViewModel()
-) {
-
+class UserCountConverter {
+    @TypeConverter
+    fun toString(userCount: UserCount):String{
+        return Json.encodeToString<UserCount>(userCount)
+    }
+    @TypeConverter
+    fun fromString(userCountString:String): UserCount {
+        return Json.decodeFromString<UserCount>(userCountString)
+    }
 }

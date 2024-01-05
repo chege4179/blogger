@@ -13,14 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.presentation.screens.about
+package com.peterchege.blogger.core.room.entities
 
-import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.peterchege.blogger.core.api.responses.models.DeviceToken
+import com.peterchege.blogger.core.api.responses.models.UserCount
 
-@Composable
-fun AboutScreen(
-    viewModel: AboutScreenViewModel = hiltViewModel()
-) {
-
-}
+@Entity(tableName = "followers")
+data class FollowerUserEntity(
+    @PrimaryKey
+    val userId: String,
+    val email: String,
+    val fullName: String,
+    val imageUrl: String,
+    val password: String,
+    val username: String,
+    val createdAt:String,
+    val updatedAt:String,
+    val _count: UserCount,
+)

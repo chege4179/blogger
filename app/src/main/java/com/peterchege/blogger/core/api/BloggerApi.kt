@@ -32,7 +32,9 @@ import com.peterchege.blogger.core.api.responses.responses.LogoutResponse
 import com.peterchege.blogger.core.api.responses.responses.PostResponse
 import com.peterchege.blogger.core.api.responses.responses.ProfileResponse
 import com.peterchege.blogger.core.api.responses.responses.SearchPostResponse
+import com.peterchege.blogger.core.api.responses.responses.SearchUserResponse
 import com.peterchege.blogger.core.api.responses.responses.SignUpResponse
+import com.peterchege.blogger.core.api.responses.responses.UnLikeResponse
 import com.peterchege.blogger.core.api.responses.responses.UpdateTokenResponse
 import com.peterchege.blogger.core.api.responses.responses.UploadPostResponse
 import com.peterchege.blogger.core.api.responses.responses.ViewResponse
@@ -74,7 +76,7 @@ interface BloggerApi {
     suspend fun likePost(@Body likePost: LikePost): Response<LikeResponse>
 
     @POST("/like/unlike")
-    suspend fun unlikePost(@Body likePost: LikePost): Response<LikeResponse>
+    suspend fun unlikePost(@Body likePost: LikePost): Response<UnLikeResponse>
 
     @POST("/follower/followUser")
     suspend fun followUser(@Body followUser: FollowUser): Response<FollowResponse>
@@ -90,6 +92,9 @@ interface BloggerApi {
 
     @GET("/post/search/{searchTerm}")
     suspend fun searchPost(@Path("searchTerm") searchTerm: String): Response<SearchPostResponse>
+
+    @GET("/user/search/{searchTerm}")
+    suspend fun searchUsers(@Path("searchTerm") searchTerm: String): Response<SearchUserResponse>
 
     @POST("/view/add")
     suspend fun addView(@Body viewer: Viewer): Response<ViewResponse>

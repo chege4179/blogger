@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
@@ -48,6 +49,7 @@ import com.peterchege.blogger.presentation.components.BottomSheetItem
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.components.NotLoggedInComponent
+import com.peterchege.blogger.presentation.components.PagingLoader
 import com.peterchege.blogger.presentation.theme.defaultPadding
 import kotlinx.coroutines.launch
 
@@ -308,6 +310,11 @@ fun ProfileScreenContent(
                                 )
                             }
                             Spacer(modifier = Modifier.padding(5.dp))
+                        }
+                        if (posts.loadState.append is LoadState.Loading) {
+                            item {
+                                PagingLoader()
+                            }
                         }
                     }
                 }

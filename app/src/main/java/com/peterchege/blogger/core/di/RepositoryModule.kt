@@ -23,8 +23,12 @@ import com.peterchege.blogger.core.room.database.BloggerDatabase
 import com.peterchege.blogger.data.*
 import com.peterchege.blogger.data.local.posts.cache.CachedPostsDataSource
 import com.peterchege.blogger.data.local.posts.cache.CachedPostsDataSourceImpl
+import com.peterchege.blogger.data.local.posts.likes.LikesLocalDataSource
+import com.peterchege.blogger.data.local.posts.likes.LikesLocalDataSourceImpl
 import com.peterchege.blogger.data.local.posts.saved.SavedPostsDataSource
 import com.peterchege.blogger.data.local.posts.saved.SavedPostsDataSourceImpl
+import com.peterchege.blogger.data.local.users.FollowersLocalDataSource
+import com.peterchege.blogger.data.local.users.FollowersLocalDataSourceImpl
 import com.peterchege.blogger.data.remote.posts.RemotePostsDataSource
 import com.peterchege.blogger.data.remote.posts.RemotePostsDataSourceImpl
 import com.peterchege.blogger.domain.repository.*
@@ -54,6 +58,40 @@ object RepositoryModule {
             userDataStoreRepository = userDataStoreRepository,
             defaultAuthTokenProvider = defaultAuthTokenProvider,
             ioDispatcher = ioDispatcher,
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideSearchRepository(
+        api: BloggerApi,
+    ): SearchRepository {
+        return SearchRepositoryImpl(
+            api = api,
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideFollowersLocalDataSource(
+        db:BloggerDatabase,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+    ): FollowersLocalDataSource {
+        return FollowersLocalDataSourceImpl(
+            db = db,
+            ioDispatcher = ioDispatcher
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideLikesLocalDataSource(
+        db:BloggerDatabase,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+    ): LikesLocalDataSource {
+        return LikesLocalDataSourceImpl(
+            db = db,
+            ioDispatcher = ioDispatcher
         )
     }
 
@@ -120,6 +158,7 @@ object RepositoryModule {
         cachedPostsDataSource: CachedPostsDataSource,
         remotePostsDataSource: RemotePostsDataSource,
         authRepository: AuthRepository,
+        likesLocalDataSource: LikesLocalDataSource,
         @IoDispatcher ioDispatcher: CoroutineDispatcher
 
     ): PostRepository {
@@ -128,7 +167,8 @@ object RepositoryModule {
             cachedPostsDataSource = cachedPostsDataSource,
             remotePostsDataSource = remotePostsDataSource,
             ioDispatcher = ioDispatcher,
-            authRepository = authRepository
+            authRepository = authRepository,
+            likesLocalDataSource = likesLocalDataSource,
         )
     }
 

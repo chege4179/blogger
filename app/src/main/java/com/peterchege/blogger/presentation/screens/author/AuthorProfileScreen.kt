@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.peterchege.blogger.core.api.responses.models.User
@@ -40,6 +42,7 @@ import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.presentation.components.ArticleCard
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
+import com.peterchege.blogger.presentation.components.PagingLoader
 import com.peterchege.blogger.presentation.theme.defaultPadding
 import java.util.*
 
@@ -114,7 +117,7 @@ fun AuthorProfileScreenContent(
 
             is AuthorProfileScreenUiState.Success -> {
                 val user = uiState.user
-                val posts = uiState.posts
+                val posts = uiState.posts.collectAsLazyPagingItems()
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
@@ -157,11 +160,11 @@ fun AuthorProfileScreenContent(
                                 verticalArrangement = Arrangement.Center,
                                 horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
-//                                Text(
-//                                    text = user?.fullname ?: "",
-//                                    fontWeight = FontWeight.ExtraBold,
-//                                    fontSize = 20.sp
-//                                )
+                                Text(
+                                    text = user.fullName,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    fontSize = 20.sp
+                                )
                                 Spacer(modifier = Modifier.padding(3.dp))
                                 Text(
                                     text = "@" + (user?.username?.toLowerCase(Locale.ROOT)
@@ -189,7 +192,7 @@ fun AuthorProfileScreenContent(
 
                             ) {
                                 Text(
-                                    text = "${posts.size}",
+                                    text = "${user._count.post}",
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
                                 )
@@ -219,86 +222,46 @@ fun AuthorProfileScreenContent(
                                 Text(
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
-                                    text = "${0}"
+                                    text = "${user._count.followers}"
                                 )
                                 Text(
                                     text = "Followers",
                                     fontSize = 17.sp,
-
-                                    )
+                                )
                             }
-                            Divider(
-                                color = Color.LightGray, thickness = 2.dp, modifier = Modifier
-                                    .fillMaxHeight(0.7f)
-                                    .width(1.dp)
-                            )
-
-                            Column(
-                                modifier = Modifier.clickable {
-                                    user?.username?.let { it1 ->
-                                        navigateToAuthorFollowerFollowingScreen(
-                                            it1, Constants.FOLLOWING
-                                        )
-                                    }
-
-                                },
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = Alignment.CenterHorizontally
+                        }
+                    }
+                    if(uiState.isUserLoggedIn){
+                        item {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(60.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceEvenly,
                             ) {
-//                                Text(
-//                                    text = "${user?.following?.size}",
-//                                    fontSize = 20.sp,
-//                                    fontWeight = FontWeight.Bold,
-//                                )
-                                Text(
-                                    text = "Following",
-                                    fontSize = 17.sp,
-
-                                    )
+                                if (uiState.isFollowingMe) {
+                                    Button(
+                                        modifier = Modifier.fillMaxWidth(0.5f),
+                                        onClick = {
+                                            followUser()
+                                        }) {
+                                        Text(text = "Follow Back")
+                                    }
+                                } else {
+                                    Button(
+                                        modifier = Modifier.fillMaxWidth(0.5f),
+                                        onClick = {
+                                            followUser()
+                                        }) {
+                                        Text(text = "Follow")
+                                    }
+                                }
                             }
-
                         }
                     }
-                    item {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(60.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceEvenly,
-                        ) {
-//                            val authUserFollowing =
-//                                authUser?.following?.map { it.followedId } ?: emptyList()
-//                            if (authUserFollowing.contains(user?._id)) {
-//                                Button(
-//                                    modifier = Modifier.fillMaxWidth(0.5f),
-//                                    onClick = {
-//                                        unfollowUser()
-//                                    }) {
-//                                    Text(text = "Un Follow")
-//                                }
-//                            } else {
-//                                Button(
-//                                    modifier = Modifier.fillMaxWidth(0.5f),
-//                                    onClick = {
-//                                        followUser()
-//                                    }) {
-//                                    Text(text = "Follow")
-//                                }
-//                            }
 
-                            Spacer(modifier = Modifier.width(5.dp))
-                            Button(
-                                modifier = Modifier.fillMaxWidth(),
-                                onClick = {
-
-                                }) {
-                                Text(text = "Message")
-                            }
-
-                        }
-                    }
-                    if (posts.isEmpty()) {
+                    if (posts.itemCount == 0) {
                         item {
                             Box(modifier = Modifier.fillMaxSize()) {
                                 Text(
@@ -308,26 +271,33 @@ fun AuthorProfileScreenContent(
                             }
                         }
                     } else {
-                        items(items = posts) { post ->
-                            ArticleCard(
-                                post = post,
-                                onItemClick = {
-                                    navigateToPostScreen(post.postId)
-                                },
-                                onProfileNavigate = { username ->
+                        items(count = posts.itemCount) { position ->
+                            val post = posts[position]
+                            if (post != null) {
+                                ArticleCard(
+                                    post = post,
+                                    onItemClick = {
+                                        navigateToPostScreen(post.postId)
+                                    },
+                                    onProfileNavigate = {
 
-                                },
-                                onDeletePost = {
+                                    },
+                                    onDeletePost = {
 
-                                },
-                                isLiked = false,
-                                isSaved = false,
-                                isProfile = true
-                            )
+                                    },
+                                    isLiked = false,
+                                    isSaved = false,
+                                    isProfile = false
+                                )
+                            }
                             Spacer(modifier = Modifier.padding(5.dp))
                         }
                     }
-
+                    if (posts.loadState.prepend is LoadState.Loading) {
+                        item {
+                            PagingLoader()
+                        }
+                    }
                 }
 
             }

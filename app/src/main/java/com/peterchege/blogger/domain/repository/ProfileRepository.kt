@@ -17,7 +17,9 @@ package com.peterchege.blogger.domain.repository
 
 import androidx.paging.PagingData
 import com.peterchege.blogger.core.api.responses.models.Post
+import com.peterchege.blogger.core.api.responses.responses.GetFollowersResponse
 import com.peterchege.blogger.core.api.responses.responses.GetPostsByUserIdResponse
+import com.peterchege.blogger.core.api.responses.responses.GetUserLikeResponse
 import com.peterchege.blogger.core.api.responses.responses.ProfileResponse
 import com.peterchege.blogger.core.util.NetworkResult
 import kotlinx.coroutines.flow.Flow
@@ -29,4 +31,7 @@ interface ProfileRepository {
     suspend fun getPostsByUserId(userId: String,page:Int):NetworkResult<GetPostsByUserIdResponse>
 
 
+    suspend fun getFollowers(page: Int, limit:Int,userId: String):NetworkResult<GetFollowersResponse>
+
+    suspend fun getUserLikes(userId: String):NetworkResult<GetUserLikeResponse>
 }

@@ -27,9 +27,11 @@ import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.NetworkInfoRepository
 import com.peterchege.blogger.domain.repository.NetworkStatus
 import com.peterchege.blogger.domain.repository.PostRepository
+import com.peterchege.blogger.domain.repository.SearchRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -51,9 +53,7 @@ sealed interface SearchScreenUiState {
 
 @HiltViewModel
 class SearchScreenViewModel @Inject constructor(
-    private val postRepository: PostRepository,
-    private val authRepository: AuthRepository,
-    private val api: BloggerApi,
+    private val searchRepository: SearchRepository,
     private val savedStateHandle: SavedStateHandle,
     private val networkInfoRepository: NetworkInfoRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
@@ -87,21 +87,16 @@ class SearchScreenViewModel @Inject constructor(
         if (searchTerm.length > 3) {
             searchJob?.cancel()
             searchJob = viewModelScope.launch {
-                val response = postRepository.searchPosts(searchTerm = searchTerm)
-                when (response) {
-                    is NetworkResult.Success -> {
-                        _uiState.value  = SearchScreenUiState.ResultsFound(
-                            posts = response.data.posts,
-                            users = response.data.users
-                        )
-                    }
+                val searchPostsResponse = async{ searchRepository.searchPosts(searchTerm = searchTerm) }.await()
+                val searchUsersResponse = async{ searchRepository.searchUsers(searchTerm = searchTerm) }.await()
 
-                    is NetworkResult.Error -> {
-                        _uiState.value = SearchScreenUiState.Error(message = "An unexpected error has occurred")
-                    }
-                    is NetworkResult.Exception -> {
-                        _uiState.value = SearchScreenUiState.Error(message = "An unexpected error has occurred")
-                    }
+                if(searchPostsResponse is NetworkResult.Success && searchUsersResponse is NetworkResult.Success){
+                    _uiState.value  = SearchScreenUiState.ResultsFound(
+                        posts = searchPostsResponse.data.posts ?: emptyList(),
+                        users = searchUsersResponse.data.users ?: emptyList()
+                    )
+                }else{
+                    _uiState.value = SearchScreenUiState.Error(message = "An unexpected error has occurred")
                 }
             }
         } else if (searchTerm.length < 2) {

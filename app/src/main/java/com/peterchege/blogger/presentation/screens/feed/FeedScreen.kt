@@ -85,15 +85,27 @@ fun FeedScreen(
         navigateToSearchScreen = navigateToSearchScreen,
         navigateToAddPostScreen = navigateToAddPostScreen,
         navigateToCategoryScreen = navigateToCategoryScreen,
-        authUser = authUser,
         eventFlow = viewModel.eventFlow,
         networkStatus = networkStatus,
         pullRefreshState = pullRefreshState,
         uiState = feedScreenUiState,
-        isRefreshing = isSyncing,
         retryCallback = viewModel::refreshFeed,
         bookmarkPost = viewModel::bookmarkPost,
-        unBookmarkPost = viewModel::unBookmarkPost
+        unBookmarkPost = viewModel::unBookmarkPost,
+        likePost = { post ->
+            authUser?.let { user ->
+                if (user.userId != "") {
+                    viewModel.likePost(post = post, user = user)
+                }
+            }
+        },
+        unLikePost = { post ->
+            authUser?.let { user ->
+                if (user.userId != "") {
+                    viewModel.unLikePost(post = post, user = user)
+                }
+            }
+        }
     )
 }
 
@@ -109,8 +121,6 @@ fun FeedScreenContent(
     navigateToAddPostScreen: () -> Unit,
     navigateToSearchScreen: () -> Unit,
     navigateToCategoryScreen: (String) -> Unit,
-    isRefreshing: Boolean,
-    authUser: User?,
     uiState: FeedScreenUiState,
     eventFlow: SharedFlow<UiEvent>,
     networkStatus: NetworkStatus,
@@ -118,6 +128,8 @@ fun FeedScreenContent(
     retryCallback: () -> Unit,
     bookmarkPost: (Post) -> Unit,
     unBookmarkPost: (Post) -> Unit,
+    likePost: (Post) -> Unit,
+    unLikePost: (Post) -> Unit,
 
     ) {
     val snackbarHostState = SnackbarHostState()
@@ -275,6 +287,13 @@ fun FeedScreenContent(
                                     onUnBookmarkPost = { post ->
                                         unBookmarkPost(post)
                                     },
+                                    onLikePost = {
+                                        likePost(it)
+                                    },
+                                    onUnlikePost = {
+                                        unLikePost(it)
+
+                                    }
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                             }

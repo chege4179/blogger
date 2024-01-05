@@ -44,7 +44,7 @@ fun ProfileCard(
             .padding(10.dp)
             .height(70.dp)
             .clickable {
-               navigateToAuthorProfileScreen(user.username)
+               navigateToAuthorProfileScreen(user.userId)
 
             },
         shape = RoundedCornerShape(15),

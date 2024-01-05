@@ -20,7 +20,9 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.api.responses.models.Post
+import com.peterchege.blogger.core.api.responses.responses.GetFollowersResponse
 import com.peterchege.blogger.core.api.responses.responses.GetPostsByUserIdResponse
+import com.peterchege.blogger.core.api.responses.responses.GetUserLikeResponse
 import com.peterchege.blogger.core.api.responses.responses.ProfileResponse
 import com.peterchege.blogger.core.api.safeApiCall
 import com.peterchege.blogger.core.util.NetworkResult
@@ -37,6 +39,18 @@ class ProfileRepositoryImpl @Inject constructor(
 
     override suspend fun getPostsByUserId(userId: String,page:Int): NetworkResult<GetPostsByUserIdResponse> {
         return safeApiCall { api.getPostByUserId(userId = userId,page = page) }
+    }
+
+    override suspend fun getFollowers(
+        page: Int,
+        limit: Int,
+        userId: String
+    ): NetworkResult<GetFollowersResponse> {
+        return safeApiCall { api.getUserFollowers(page = page,userId = userId) }
+    }
+
+    override suspend fun getUserLikes(userId: String): NetworkResult<GetUserLikeResponse> {
+        return safeApiCall { api.getUserLikes(userId) }
     }
 
 }

@@ -47,12 +47,13 @@ fun ArticleCard(
     onItemClick: (Post) -> Unit,
     onProfileNavigate: (String) -> Unit,
     onDeletePost: (Post) -> Unit,
-
     isLiked: Boolean,
     isSaved: Boolean,
     isProfile: Boolean,
-    onBookmarkPost:(Post) -> Unit = {  },
-    onUnBookmarkPost:(Post) -> Unit = {  },
+    onBookmarkPost: (Post) -> Unit = { },
+    onUnBookmarkPost: (Post) -> Unit = { },
+    onLikePost: (Post) -> Unit = { },
+    onUnlikePost: (Post) -> Unit = { }
 ) {
     Card(
         modifier = Modifier
@@ -143,19 +144,24 @@ fun ArticleCard(
                             )
                         } else {
                             Icon(
-                                imageVector =if(isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                                 contentDescription = "Like",
                                 modifier = Modifier.clickable {
+                                    if(isLiked){
+                                        onUnlikePost(post)
+                                    }else{
+                                        onLikePost(post)
+                                    }
 
                                 }
                             )
                             Icon(
-                                imageVector = if(isSaved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                                imageVector = if (isSaved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
                                 contentDescription = "Saved",
                                 modifier = Modifier.clickable {
-                                    if(isSaved){
+                                    if (isSaved) {
                                         onUnBookmarkPost(post)
-                                    }else{
+                                    } else {
                                         onBookmarkPost(post)
                                     }
 
