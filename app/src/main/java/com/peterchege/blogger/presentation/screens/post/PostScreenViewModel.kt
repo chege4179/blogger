@@ -18,11 +18,16 @@ package com.peterchege.blogger.presentation.screens.post
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.peterchege.blogger.core.api.requests.CommentBody
 import com.peterchege.blogger.core.api.requests.FollowUser
 import com.peterchege.blogger.core.api.requests.LikePost
 import com.peterchege.blogger.core.api.requests.Viewer
 import com.peterchege.blogger.core.api.responses.models.Comment
+import com.peterchege.blogger.core.api.responses.models.CommentWithUser
 import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.util.NetworkResult
@@ -31,6 +36,8 @@ import com.peterchege.blogger.data.local.posts.likes.LikesLocalDataSource
 import com.peterchege.blogger.domain.mappers.toDomain
 import com.peterchege.blogger.domain.mappers.toEntity
 import com.peterchege.blogger.domain.models.PostUI
+import com.peterchege.blogger.domain.paging.CommentsPagingSource
+import com.peterchege.blogger.domain.paging.ProfileScreenPostsPagingSource
 import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.CommentRepository
 import com.peterchege.blogger.domain.repository.PostRepository
@@ -45,7 +52,11 @@ import kotlin.collections.ArrayList
 sealed interface PostScreenUiState {
     object Loading : PostScreenUiState
 
-    data class Success(val post: PostUI, val isUserLoggedIn: Boolean) : PostScreenUiState
+    data class Success(
+        val post: PostUI,
+        val isUserLoggedIn: Boolean,
+        val comments: Flow<PagingData<CommentWithUser>>,
+    ) : PostScreenUiState
 
     data class Error(val message: String) : PostScreenUiState
 
@@ -53,9 +64,8 @@ sealed interface PostScreenUiState {
 }
 
 data class CommentUiState(
-    val comments: List<Comment> = emptyList(),
     val newComment: String = "",
-    val isCommentDialogOpen: Boolean = false
+    val isCommentsBottomSheetOpen: Boolean = false
 )
 
 data class DeletePostUiState(
@@ -72,9 +82,9 @@ class PostScreenViewModel @Inject constructor(
 
     ) : ViewModel() {
 
-    val postId = savedStateHandle.get<String>("postId")
+    val postId = savedStateHandle.getStateFlow(key = "postId", initialValue = "")
 
-    private val postFlow = repository.getPostById(postId = postId ?: "")
+    private val postFlow = repository.getPostById(postId = postId.value)
 
     val authUserFlow = authRepository.getLoggedInUser()
 
@@ -107,12 +117,14 @@ class PostScreenViewModel @Inject constructor(
             } else {
                 val postUi = post.toDomain(
                     isProfile = false,
-                    isSaved = savedPostIds.contains(postId),
-                    isLiked = likedPostIds.contains(postId),
+                    isSaved = savedPostIds.contains(postId.value),
+                    isLiked = likedPostIds.contains(postId.value),
                 )
-                // TODO : Check here too
-                _commentUiState.value = _commentUiState.value.copy(comments = emptyList())
-                PostScreenUiState.Success(post = postUi, isUserLoggedIn = loggedIn)
+                PostScreenUiState.Success(
+                    post = postUi,
+                    isUserLoggedIn = loggedIn,
+                    comments = getPaginatedPostsByPostId(postId = postId.value)
+                )
             }
         }.onStart {
             emit(PostScreenUiState.Loading)
@@ -127,7 +139,7 @@ class PostScreenViewModel @Inject constructor(
 
 
     fun onDialogConfirm(user: User) {
-        _commentUiState.value = _commentUiState.value.copy(isCommentDialogOpen = false)
+        _commentUiState.value = _commentUiState.value.copy(isCommentsBottomSheetOpen = false)
 
         savedStateHandle.get<String>("postId")?.let { postId ->
             postComment(
@@ -141,12 +153,12 @@ class PostScreenViewModel @Inject constructor(
     }
 
     fun onDialogOpen() {
-        _commentUiState.value = _commentUiState.value.copy(isCommentDialogOpen = true)
+        _commentUiState.value = _commentUiState.value.copy(isCommentsBottomSheetOpen = true)
 
     }
 
     fun onDialogDismiss() {
-        _commentUiState.value = _commentUiState.value.copy(isCommentDialogOpen = false)
+        _commentUiState.value = _commentUiState.value.copy(isCommentsBottomSheetOpen = false)
     }
 
     fun deletePost() {
@@ -154,10 +166,26 @@ class PostScreenViewModel @Inject constructor(
 
     }
 
+    @OptIn(ExperimentalPagingApi::class)
+    fun getPaginatedPostsByPostId(postId: String): Flow<PagingData<CommentWithUser>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 20,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                CommentsPagingSource(
+                    commentRepository = commentRepository,
+                    postId = postId
+                )
+            }
+        ).flow
+    }
+
     fun onDialogDeleteConfirm() {
         _deleteUiState.value = _deleteUiState.value.copy(isDeleteDialogOpen = false)
         viewModelScope.launch {
-            val response = repository.deletePostFromApi(postId = postId ?: "")
+            val response = repository.deletePostFromApi(postId = postId.value)
             when (response) {
                 is NetworkResult.Success -> {
                     _eventFlow.emit(UiEvent.ShowSnackbar(message = response.data.msg))
@@ -190,7 +218,7 @@ class PostScreenViewModel @Inject constructor(
             delay(3000L)
             val response = repository.addView(
                 Viewer(
-                    postId = postId ?: "",
+                    postId = postId.value ?: "",
                     userId = user.userId,
                 )
             )
@@ -262,36 +290,41 @@ class PostScreenViewModel @Inject constructor(
         }
     }
 
-    fun likePost(post: Post,user:User){
+    fun likePost(post: Post, user: User) {
         viewModelScope.launch {
-            val likePost = LikePost(userId = user.userId,postId = post.postId)
+            val likePost = LikePost(userId = user.userId, postId = post.postId)
             val response = repository.likePost(likePost)
-            when(response){
+            when (response) {
                 is NetworkResult.Success -> {
                     response.data.like?.let {
                         likesLocalDataSource.insertLike(like = it.toEntity())
                     }
                 }
+
                 is NetworkResult.Error -> {
 
                 }
+
                 is NetworkResult.Exception -> {
 
                 }
             }
         }
     }
-    fun unLikePost(post: Post,user:User){
+
+    fun unLikePost(post: Post, user: User) {
         viewModelScope.launch {
-            val likePost = LikePost(userId = user.userId,postId = post.postId)
+            val likePost = LikePost(userId = user.userId, postId = post.postId)
             val response = repository.unlikePost(likePost)
-            when(response){
+            when (response) {
                 is NetworkResult.Success -> {
                     likesLocalDataSource.deleteLike(postId = post.postId)
                 }
+
                 is NetworkResult.Error -> {
 
                 }
+
                 is NetworkResult.Exception -> {
 
                 }
@@ -300,9 +333,7 @@ class PostScreenViewModel @Inject constructor(
     }
 
     private fun addComment(comment: Comment) {
-        val comments = ArrayList(_commentUiState.value.comments)
-        comments.add(comment)
-        _commentUiState.value = _commentUiState.value.copy(comments = comments)
+
     }
 
     private fun postComment(commentBody: CommentBody) {

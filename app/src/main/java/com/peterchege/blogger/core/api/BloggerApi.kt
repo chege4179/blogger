@@ -19,9 +19,11 @@ package com.peterchege.blogger.core.api
 import com.peterchege.blogger.core.api.requests.*
 import com.peterchege.blogger.core.api.responses.*
 import com.peterchege.blogger.core.api.responses.responses.AllPostsResponse
-import com.peterchege.blogger.core.api.responses.responses.CommentResponse
+import com.peterchege.blogger.core.api.responses.responses.AddCommentResponse
+import com.peterchege.blogger.core.api.responses.responses.DeleteCommentResponse
 import com.peterchege.blogger.core.api.responses.responses.DeleteResponse
 import com.peterchege.blogger.core.api.responses.responses.FollowResponse
+import com.peterchege.blogger.core.api.responses.responses.GetCommentsResponse
 import com.peterchege.blogger.core.api.responses.responses.GetFollowersResponse
 import com.peterchege.blogger.core.api.responses.responses.GetPostLikesResponse
 import com.peterchege.blogger.core.api.responses.responses.GetPostsByUserIdResponse
@@ -68,9 +70,6 @@ interface BloggerApi {
 
     @DELETE("/post/delete/{postId}")
     suspend fun getDeletePostById(@Path("postId") postId: String): Response<DeleteResponse>
-
-    @POST("/comment/add")
-    suspend fun postComment(@Body commentbody: CommentBody): Response<CommentResponse>
 
     @POST("/like/like")
     suspend fun likePost(@Body likePost: LikePost): Response<LikeResponse>
@@ -124,5 +123,28 @@ interface BloggerApi {
         @Query("page") page: Int = 1,
         @Query("limit") limit: Int = 20,
     ): Response<GetPostsByUserIdResponse>
+
+    @POST("/comment/add")
+    suspend fun postComment(
+        @Body commentBody: CommentBody
+    ): Response<AddCommentResponse>
+
+    @POST("/comment/reply")
+    suspend fun replyToComment(
+        @Body commentBody: ReplyCommentBody
+    ): Response<AddCommentResponse>
+
+    @DELETE("/comment/remove")
+    suspend fun removeComment(
+        @Body commentBody: DeleteCommentBody
+    ): Response<DeleteCommentResponse>
+
+
+    @GET("/comment/all/{postId}")
+    suspend fun getAllComments(
+        @Path("postId") postId: String,
+        @Query("page") page: Int = 1,
+        @Query("limit") limit: Int = 20,
+    ):Response<GetCommentsResponse>
 }
 

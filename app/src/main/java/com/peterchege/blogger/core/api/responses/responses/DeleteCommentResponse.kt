@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Blogger
+ * Copyright 2024 Blogger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,11 @@
  */
 package com.peterchege.blogger.core.api.responses.responses
 
-import com.peterchege.blogger.core.api.responses.models.Comment
 import kotlinx.serialization.Serializable
 
+
 @Serializable
-data class CommentResponse (
+data class DeleteCommentResponse(
     val msg:String,
     val success:Boolean,
-    val comment: Comment,
-
-    )
+)

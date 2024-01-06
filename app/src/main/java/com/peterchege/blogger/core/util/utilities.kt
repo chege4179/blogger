@@ -22,8 +22,11 @@ import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.ui.text.capitalize
 import java.io.ByteArrayOutputStream
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 
@@ -61,7 +64,15 @@ fun generateAvatarURL(name:String):String{
     var splitname = name.split(" ").joinToString("+")
     var color = randomColorCode()
     return "https://ui-avatars.com/api/?background=${color}&color=fff&name=${splitname}&bold=true&fontsize=0.6&rounded=true"
-
 }
 
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun formatDateTime(dateStr: String): String {
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    val dateTime = LocalDateTime.parse(dateStr, formatter)
+
+    val formatted = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").format(dateTime)
+    return formatted
+}
 

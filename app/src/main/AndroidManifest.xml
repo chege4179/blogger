@@ -37,7 +37,7 @@
             android:foregroundServiceType="shortService"
             />
         <service
-            android:name=".core.messaging.MyFirebaseMessagingService"
+            android:name=".core.services.MyFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

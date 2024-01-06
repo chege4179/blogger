@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.core.messaging
+package com.peterchege.blogger.core.services
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -23,13 +23,11 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.media.RingtoneManager
 import android.os.Build
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.peterchege.blogger.R
 import com.peterchege.blogger.core.api.BloggerApi
-import com.peterchege.blogger.core.api.requests.UpdateToken
 import com.peterchege.blogger.core.datastore.preferences.DefaultFCMTokenProvider
 import com.peterchege.blogger.core.datastore.repository.UserDataStoreRepository
 import com.peterchege.blogger.core.di.IoDispatcher
@@ -38,13 +36,7 @@ import com.peterchege.blogger.presentation.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import timber.log.Timber
-import java.io.IOException
 import javax.inject.Inject
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Blogger
+ * Copyright 2024 Blogger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.core.api.responses.models
+package com.peterchege.blogger.core.api.requests
 
 import kotlinx.serialization.Serializable
 
-@Serializable
-data class Comment (
-    val commentId:String,
-    val message:String,
-    val commentUserId:String,
-    val commentPostId:String,
-    val parentId:String?,
-    val createdAt:String,
-    val updatedAt:String,
-    val _count:CommentCount
-)
 
 @Serializable
-data class CommentCount(
-    val commentLikes:Int,
+data class ReplyCommentBody(
+    val replyCommentId: String,
+    val replyCommentBody: String,
+    val postId: String,
+    val userId: String
 )

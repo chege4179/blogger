@@ -13,23 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.core.api.responses.models
+package com.peterchege.blogger.core.api.responses.responses
 
+import com.peterchege.blogger.core.api.responses.models.Comment
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Comment (
-    val commentId:String,
-    val message:String,
-    val commentUserId:String,
-    val commentPostId:String,
-    val parentId:String?,
-    val createdAt:String,
-    val updatedAt:String,
-    val _count:CommentCount
-)
+data class AddCommentResponse (
+    val msg:String,
+    val success:Boolean,
+    val comment: Comment,
 
-@Serializable
-data class CommentCount(
-    val commentLikes:Int,
-)
+    )

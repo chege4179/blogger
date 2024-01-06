@@ -27,24 +27,29 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.peterchege.blogger.core.api.responses.models.Comment
+import com.peterchege.blogger.core.api.responses.models.CommentWithUser
 
 
 @ExperimentalCoilApi
 @Composable
 fun CommentBox(
-    comment: Comment,
+    comment: CommentWithUser,
 ) {
     Box(
         modifier = Modifier
@@ -58,28 +63,30 @@ fun CommentBox(
             ) {
             Image(
                 modifier = Modifier
-                    .fillMaxWidth(0.15f)
-                    .height(60.dp),
+                    .padding(5.dp)
+                    .width(40.dp)
+                    .height(40.dp)
+                    .clip(CircleShape)
+
+                ,
                 painter = rememberImagePainter(
-                    data = comment.imageUrl,
+                    data = comment.user.imageUrl,
                     builder = {
                         crossfade(true)
-
                     },
                 ),
-
-                contentDescription = comment.comment
+                contentDescription = "Image of ${comment.user.fullName}"
             )
             Column(
-                Modifier.fillMaxHeight(0.1f)
-
+                modifier = Modifier.fillMaxHeight(0.1f)
             ) {
                 Text(
-                    fontWeight = FontWeight.Bold,
-                    text = comment.username,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 15.sp,
+                    text = comment.user.username,
                     modifier = Modifier
                         .padding(bottom = 5.dp)
-                        .clickable {  }
+                        .clickable { }
                 )
                 Box(
                     modifier = Modifier
@@ -95,7 +102,7 @@ fun CommentBox(
 
                 ) {
                     Text(
-                        text = comment.comment,
+                        text = comment.message,
                         textAlign = TextAlign.Start,
                         textDecoration = TextDecoration.None,
                         color = Color.Black,

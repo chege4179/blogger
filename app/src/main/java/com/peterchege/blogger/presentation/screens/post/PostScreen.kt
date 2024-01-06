@@ -46,15 +46,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.SubcomposeAsyncImage
 import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.util.UiEvent
+import com.peterchege.blogger.core.util.formatDateTime
 import com.peterchege.blogger.domain.mappers.toPost
 import com.peterchege.blogger.presentation.components.CommentBox
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
+import com.peterchege.blogger.presentation.components.PagingLoader
 import com.peterchege.blogger.presentation.screens.profile.DeleteBox
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -72,7 +76,7 @@ fun PostScreen(
         uiState = uiState,
         commentUiState = commentUiState,
         deletePostUiState = deletePostUiState,
-        onLikePost = { it1->
+        onLikePost = { it1 ->
             authUser?.let { user ->
                 if (user.userId != "") {
                     viewModel.likePost(post = it1, user = user)
@@ -104,6 +108,7 @@ fun PostScreen(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @ExperimentalCoilApi
 @Composable
@@ -127,7 +132,8 @@ fun PostScreenContent(
     postComment: () -> Unit,
 ) {
 
-    val snackbarHostState = SnackbarHostState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val commentsBottomSheetState = rememberModalBottomSheetState()
 
     LaunchedEffect(key1 = true) {
         eventFlow.collectLatest { event ->
@@ -183,6 +189,7 @@ fun PostScreenContent(
 
             is PostScreenUiState.Success -> {
                 val post = uiState.post
+                val comments = uiState.comments.collectAsLazyPagingItems()
                 if (deletePostUiState.isDeleteDialogOpen) {
                     DeleteBox(
                         post = post.toPost(),
@@ -190,22 +197,19 @@ fun PostScreenContent(
                         deletePost = { },
                     )
                 }
-                if (commentUiState.isCommentDialogOpen) {
-                    CommentDialog(
-                        closeCommentDialog = { closeCommentDialog() },
-                        commentUiState = commentUiState,
-                        postComment = { postComment() },
-                        onChangeNewComment = { onChangeNewComment(it) },
-                        isUserLoggedIn = uiState.isUserLoggedIn,
-                    )
-                }
+//                CommentDialog(
+//                    closeCommentDialog = { closeCommentDialog() },
+//                    commentUiState = commentUiState,
+//                    postComment = { postComment() },
+//                    onChangeNewComment = { onChangeNewComment(it) },
+//                    isUserLoggedIn = uiState.isUserLoggedIn,
+//                )
                 LazyColumn(
                     modifier = Modifier.padding(paddingValues)
                 ) {
-
                     item {
                         Box(
-                            Modifier.fillMaxSize()
+                            modifier = Modifier.fillMaxSize()
                         )
                         {
                             Column(
@@ -355,8 +359,8 @@ fun PostScreenContent(
                                         Alignment.CenterVertically
 
                                     ) {
-                                        Text(text = post.createdAt)
-                                        Text(text = post.updatedAt)
+                                        Text(text = formatDateTime(post.createdAt))
+
                                         Text(text = "${post._count.likes} like(s)")
                                         Text(text = "${post._count.views} view(s)")
 
@@ -367,10 +371,10 @@ fun PostScreenContent(
                                             .padding(15.dp)
                                     )
                                 }
-                                Divider(
-                                    color = Color.Blue,
+                                HorizontalDivider(
+                                    modifier = Modifier.padding(10.dp),
                                     thickness = 1.dp,
-                                    modifier = Modifier.padding(10.dp)
+                                    color = Color.Blue
                                 )
                                 Text(
                                     text = post.postBody,
@@ -393,24 +397,72 @@ fun PostScreenContent(
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 27.sp
                                 )
-                                Divider(
-                                    color = Color.Blue,
+                                HorizontalDivider(
+                                    modifier = Modifier.padding(10.dp),
                                     thickness = 1.dp,
-                                    modifier = Modifier.padding(10.dp)
+                                    color = Color.Blue
                                 )
 
                             }
                         }
                     }
-                    items(items = commentUiState.comments) { comment ->
-                        Column(
+                }
+                if (commentUiState.isCommentsBottomSheetOpen) {
+                    ModalBottomSheet(
+                        sheetState = commentsBottomSheetState,
+                        onDismissRequest = { /*TODO*/ },
+                    ) {
+                        Scaffold(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 15.dp)
-                        ) {
-                            CommentBox(comment = comment)
-                            Spacer(modifier = Modifier.height(10.dp))
+                                .fillMaxHeight(0.8f),
+                        ) { paddingValues ->
+                            Column(
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(60.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center,
+                                ) {
+                                    Text(text = "Comments ${comments.itemCount}")
+                                }
+                                HorizontalDivider(
+                                    color = Color.Blue,
+                                    thickness = 1.dp,
+                                    modifier = Modifier.padding(10.dp)
+                                )
+                                LazyColumn(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(paddingValues)
+                                ) {
+                                    items(
+                                        count = comments.itemCount,
+                                        key = { it }
+                                    ) { position ->
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 15.dp)
+                                        ) {
+                                            comments[position]?.let {
+                                                CommentBox(comment = it)
+                                            }
+                                            Spacer(modifier = Modifier.height(10.dp))
+                                        }
+                                    }
+                                    item {
+                                        if (comments.loadState.append is LoadState.Loading) {
+                                            PagingLoader()
+                                        }
+                                    }
+                                }
+                            }
                         }
+
                     }
                 }
             }
