@@ -13,25 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.presentation.screens.settings
+package com.peterchege.blogger.presentation.screens.edit_profile
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.peterchege.blogger.domain.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
-data class SettingScreenUiState(
-    val isSignOutDialogOpen:Boolean = false,
-    val isThemeDialogOpen:Boolean = false,
-
-)
 @HiltViewModel
-class SettingsScreenViewModel @Inject constructor(
+class EditProfileScreenViewModel @Inject constructor(
+    private val authRepository: AuthRepository,
+):ViewModel() {
 
-) : ViewModel(){
+    val authUser = authRepository.getLoggedInUser()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = null
+        )
 
-    private val _uiState = MutableStateFlow<SettingScreenUiState>(SettingScreenUiState())
-    val uiState = _uiState.asStateFlow()
+
+
 
 }

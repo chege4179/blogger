@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Blogger
+ * Copyright 2024 Blogger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.core.util
+package com.peterchege.blogger.presentation.alertDialogs
+
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.Composable
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ThemeDialog(
+    changeTheme: () -> Unit,
+    closeThemeDialog: () -> Unit,
+) {
+    BasicAlertDialog(
+        onDismissRequest = {
+
+        }
+    ) {
 
 
-import android.os.Build
-import androidx.annotation.RequiresApi
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+    }
 
-
-@RequiresApi(Build.VERSION_CODES.O)
-fun formatDateTime(dateStr: String): String {
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-    val dateTime = LocalDateTime.parse(dateStr, formatter)
-
-    val formatted = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").format(dateTime)
-    return formatted
 }
-

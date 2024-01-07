@@ -27,6 +27,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +41,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.annotation.ExperimentalCoilApi
+import coil.compose.SubcomposeAsyncImage
 import coil.compose.rememberImagePainter
 import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.util.Constants
@@ -50,6 +52,7 @@ import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.components.NotLoggedInComponent
 import com.peterchege.blogger.presentation.components.PagingLoader
+import com.peterchege.blogger.presentation.components.ProfileAvatar
 import com.peterchege.blogger.presentation.theme.defaultPadding
 import kotlinx.coroutines.launch
 
@@ -61,6 +64,8 @@ fun ProfileScreen(
     navigateToPostScreen: (String) -> Unit,
     navigateToLoginScreen: () -> Unit,
     navigateToSignUpScreen: () -> Unit,
+    navigateToSettingsScreen: () -> Unit,
+    navigateToEditProfileScreen: () -> Unit,
 ) {
 
     val authUser by viewModel.authUser.collectAsStateWithLifecycle()
@@ -69,13 +74,13 @@ fun ProfileScreen(
 
     ProfileScreenContent(
         networkStatus = networkStatus,
-        user = authUser,
         uiState = uiState,
         navigateToProfileFollowerFollowingScreen = navigateToProfileFollowerFollowingScreen,
         navigateToPostScreen = navigateToPostScreen,
         navigateToLoginScreen = navigateToLoginScreen,
         navigateToSignUpScreen = navigateToSignUpScreen,
-        logoutUser = { authUser?.let { viewModel.logoutUser(navigateToLoginScreen, it) } }
+        navigateToSettingsScreen = navigateToSettingsScreen,
+        navigateToEditProfileScreen = navigateToEditProfileScreen,
     )
 }
 
@@ -85,19 +90,18 @@ fun ProfileScreen(
 @Composable
 fun ProfileScreenContent(
     networkStatus: NetworkStatus,
-    user: User?,
     uiState: ProfileScreenUiState,
     navigateToProfileFollowerFollowingScreen: (String) -> Unit,
     navigateToPostScreen: (String) -> Unit,
     navigateToLoginScreen: () -> Unit,
-    navigateToSignUpScreen:() -> Unit,
-    logoutUser: () -> Unit,
-) {
+    navigateToSignUpScreen: () -> Unit,
+    navigateToSettingsScreen: () -> Unit,
+    navigateToEditProfileScreen: () -> Unit,
 
-    val snackbarHostState = SnackbarHostState()
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true,
-    )
+    ) {
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
     val scope = rememberCoroutineScope()
     LaunchedEffect(key1 = networkStatus) {
         when (networkStatus) {
@@ -117,8 +121,38 @@ fun ProfileScreenContent(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.LightGray),
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(text = "Blogger ")
+                },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            navigateToEditProfileScreen()
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Edit Profile",
 
-        ) { _ ->
+                            )
+                    }
+                    IconButton(
+                        onClick = {
+                            navigateToSettingsScreen()
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "Settings",
+
+                            )
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
         when (uiState) {
             is ProfileScreenUiState.Loading -> {
                 LoadingComponent()
@@ -135,18 +169,21 @@ fun ProfileScreenContent(
                 Text(text = "User Not found")
 
             }
+
             is ProfileScreenUiState.UserNotLoggedIn -> {
                 NotLoggedInComponent(
                     navigateToLoginScreen = navigateToLoginScreen,
                     navigateToSignUpScreen = navigateToSignUpScreen,
                 )
             }
+
             is ProfileScreenUiState.Success -> {
                 val posts = uiState.posts.collectAsLazyPagingItems()
                 val user = uiState.user
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
+                        .padding(paddingValues)
                         .background(Color.White)
                 ) {
                     LazyColumn(
@@ -166,23 +203,11 @@ fun ProfileScreenContent(
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth(0.3f)
-
                                 ) {
-                                    Image(
-                                        modifier = Modifier
-                                            .width(80.dp)
-                                            .height(80.dp)
-                                            .align(Alignment.Center),
-                                        painter = rememberImagePainter(
-                                            data = user.imageUrl,
-                                            builder = {
-                                                crossfade(true)
-
-                                            },
-                                        ),
-                                        contentDescription = "Profile Image"
+                                    ProfileAvatar(
+                                        imageUrl = user.imageUrl,
+                                        modifier = Modifier.align(Alignment.Center)
                                     )
-
                                 }
                                 Spacer(modifier = Modifier.height(5.dp))
                                 Column(
@@ -258,38 +283,6 @@ fun ProfileScreenContent(
                                 }
                             }
                         }
-                        item {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(60.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                            ) {
-                                Button(
-                                    modifier = Modifier.fillMaxWidth(0.5f),
-                                    onClick = {
-
-                                    }) {
-                                    Text(text = "Edit Profile")
-                                }
-                                Spacer(modifier = Modifier.width(5.dp))
-                                Button(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    onClick = {
-                                        scope.launch {
-                                            if (sheetState.isVisible) {
-                                                sheetState.hide()
-                                            } else {
-                                                sheetState.expand()
-                                            }
-                                        }
-                                    }) {
-                                    Text(text = "Settings")
-                                }
-
-                            }
-                        }
                         items(count = posts.itemCount) { position ->
                             val post = posts[position]
                             if (post != null) {
@@ -320,63 +313,5 @@ fun ProfileScreenContent(
                 }
             }
         }
-
-        if (sheetState.isVisible) {
-            ModalBottomSheet(
-                onDismissRequest = { /*TODO*/ },
-                sheetState = sheetState,
-            ) {
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-                        .fillMaxWidth()
-                        .height(350.dp)
-                        ,
-                    contentAlignment = Alignment.Center,
-
-                    ) {
-                    Column(modifier = Modifier.fillMaxSize()) {
-                        BottomSheetItem(
-                            name = "Account",
-                            onClick = {
-
-                            },
-                            icon = Icons.Filled.Person
-                        )
-                        BottomSheetItem(
-                            name = "Notification Settings",
-                            onClick = {
-
-                            },
-                            icon = Icons.Filled.Settings
-                        )
-                        BottomSheetItem(
-                            name = "Help",
-                            onClick = {
-
-                            },
-                            icon = Icons.Filled.Help
-                        )
-                        BottomSheetItem(
-                            name = "Share",
-                            onClick = {
-
-                            },
-                            icon = Icons.Filled.Share
-                        )
-                        BottomSheetItem(
-                            name = "Log Out",
-                            onClick = {
-                                logoutUser()
-                            },
-                            icon = Icons.Filled.Logout
-                        )
-
-                    }
-                }
-            }
-
-        }
     }
-
 }

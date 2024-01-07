@@ -78,3 +78,10 @@ fun NavController.navigateToAboutScreen(){
     navigate(route = Screens.ABOUT_SCREEN)
 }
 
+fun NavController.navigateToEditProfileScreen(){
+    navigate(route = Screens.EDIT_PROFILE_SCREEN)
+}
+
+fun NavController.navigateToEditPostScreen(postId: String){
+    navigate(route = Screens.EDIT_POST_SCREEN + "/$postId")
+}

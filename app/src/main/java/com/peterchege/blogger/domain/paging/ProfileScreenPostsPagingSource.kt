@@ -21,7 +21,6 @@ import androidx.paging.PagingState
 import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.domain.repository.ProfileRepository
-import javax.inject.Inject
 
 
 @ExperimentalPagingApi

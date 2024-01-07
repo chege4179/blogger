@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Blogger"
 include (":app")
+include(":benchmark")

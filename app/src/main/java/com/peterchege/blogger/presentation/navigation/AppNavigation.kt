@@ -35,6 +35,8 @@ import com.peterchege.blogger.presentation.screens.category.CategoryScreen
 import com.peterchege.blogger.presentation.screens.dashboard.DashBoardScreen
 import com.peterchege.blogger.presentation.screens.add_post.AddPostScreen
 import com.peterchege.blogger.presentation.screens.draft.DraftScreen
+import com.peterchege.blogger.presentation.screens.edit_post.EditPostScreen
+import com.peterchege.blogger.presentation.screens.edit_profile.EditProfileScreen
 import com.peterchege.blogger.presentation.screens.profile.ProfileFollowerFollowingScreen
 import com.peterchege.blogger.presentation.screens.login.LoginScreen
 import com.peterchege.blogger.presentation.screens.post.PostScreen
@@ -146,7 +148,17 @@ fun AppNavigation(
             route = Screens.ABOUT_SCREEN
         ) {
             AboutScreen()
+        }
+        composable(
+            route = Screens.EDIT_PROFILE_SCREEN
+        ){
+            EditProfileScreen()
+        }
 
+        composable(
+            route = Screens.EDIT_POST_SCREEN + "/{postId}",
+        ){
+            EditPostScreen()
         }
     }
 

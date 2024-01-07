@@ -24,10 +24,12 @@ import com.peterchege.blogger.presentation.navigation.navigateToAddPostScreen
 import com.peterchege.blogger.presentation.navigation.navigateToAuthUserProfileScreen
 import com.peterchege.blogger.presentation.navigation.navigateToAuthorProfileScreen
 import com.peterchege.blogger.presentation.navigation.navigateToCategoryScreen
+import com.peterchege.blogger.presentation.navigation.navigateToEditProfileScreen
 import com.peterchege.blogger.presentation.navigation.navigateToLoginScreen
 import com.peterchege.blogger.presentation.navigation.navigateToPostScreen
 import com.peterchege.blogger.presentation.navigation.navigateToProfileFollowerFollowingScreen
 import com.peterchege.blogger.presentation.navigation.navigateToSearchScreen
+import com.peterchege.blogger.presentation.navigation.navigateToSettingsScreen
 import com.peterchege.blogger.presentation.navigation.navigateToSignUpScreen
 import com.peterchege.blogger.presentation.screens.feed.FeedScreen
 import com.peterchege.blogger.presentation.screens.notifcations.NotificationScreen
@@ -40,7 +42,6 @@ fun DashboardNavigation(
     navHostController: NavHostController,
     bottomNavController:NavHostController
 ) {
-
 
     NavHost(
         navController = bottomNavController,
@@ -83,6 +84,8 @@ fun DashboardNavigation(
                 navigateToLoginScreen = navHostController::navigateToLoginScreen,
                 navigateToProfileFollowerFollowingScreen = navHostController::navigateToProfileFollowerFollowingScreen,
                 navigateToPostScreen = navHostController::navigateToPostScreen,
+                navigateToEditProfileScreen = navHostController::navigateToEditProfileScreen,
+                navigateToSettingsScreen = navHostController::navigateToSettingsScreen
             )
         }
     }

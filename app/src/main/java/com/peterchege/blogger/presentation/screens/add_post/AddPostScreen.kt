@@ -37,6 +37,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.work.*
 import coil.annotation.ExperimentalCoilApi
+import coil.compose.SubcomposeAsyncImage
 import com.peterchege.blogger.core.services.UploadPostService
 import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.presentation.components.NotLoggedInComponent
@@ -164,9 +165,14 @@ fun AddPostScreenContent(
         }
         when(uiState){
             is AddPostScreenUiState.NotLoggedIn -> {
-                NotLoggedInComponent(navigateToLoginScreen = { /*TODO*/ }) {
+                NotLoggedInComponent(
+                    navigateToLoginScreen = {
 
-                }
+                    },
+                    navigateToSignUpScreen ={
+
+                    }
+                )
             }
             is AddPostScreenUiState.LoggedIn -> {
                 Box(
@@ -184,6 +190,7 @@ fun AddPostScreenContent(
 
                             ) {
                                 formState.uri?.let {
+
                                     GlideImage(
                                         imageModel = { it },
                                         modifier = Modifier

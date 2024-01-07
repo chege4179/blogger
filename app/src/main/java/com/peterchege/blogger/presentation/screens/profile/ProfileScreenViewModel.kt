@@ -21,6 +21,7 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.peterchege.blogger.core.analytics.analytics.AnalyticsHelper
 import com.peterchege.blogger.core.analytics.analytics.logLogOutEvent
 import com.peterchege.blogger.core.api.requests.LogoutUser
@@ -204,7 +205,7 @@ class ProfileScreenViewModel @Inject constructor(
                     userId = userId
                 )
             }
-        ).flow
+        ).flow.cachedIn(viewModelScope)
     }
 
 

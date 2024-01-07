@@ -13,25 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.presentation.screens.settings
+package com.peterchege.blogger.presentation.screens.edit_post
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
-data class SettingScreenUiState(
-    val isSignOutDialogOpen:Boolean = false,
-    val isThemeDialogOpen:Boolean = false,
-
-)
 @HiltViewModel
-class SettingsScreenViewModel @Inject constructor(
-
+class EditPostScreenViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel(){
 
-    private val _uiState = MutableStateFlow<SettingScreenUiState>(SettingScreenUiState())
-    val uiState = _uiState.asStateFlow()
+    val postId = savedStateHandle.getStateFlow(key = "postId",initialValue = "")
+
 
 }

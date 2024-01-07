@@ -15,12 +15,75 @@
  */
 package com.peterchege.blogger.presentation.screens.settings
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.peterchege.blogger.presentation.components.SettingsRow
 
 @Composable
 fun SettingsScreen(
     viewModel: SettingsScreenViewModel = hiltViewModel()
 ) {
-    
+
+}
+
+@Composable
+fun SettingsScreenContent(
+    openSignOutDialog:() -> Unit,
+) {
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
+                SettingsRow(
+                    title = "Dark Mode",
+                    checked = false,
+                    onCheckedChange = {
+
+                    }
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(5.dp)
+            ) {
+                Button(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .align(Alignment.Center),
+                    onClick = {
+
+                    }
+                ) {
+                    Text(text = "Sign Out")
+                }
+            }
+
+
+        }
+    }
+
 }

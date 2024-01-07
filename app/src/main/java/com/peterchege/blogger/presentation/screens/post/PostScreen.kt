@@ -53,8 +53,11 @@ import coil.compose.SubcomposeAsyncImage
 import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.util.UiEvent
+import com.peterchege.blogger.core.util.calculateDoubleTapOffset
+import com.peterchege.blogger.core.util.calculateNewOffset
 import com.peterchege.blogger.core.util.formatDateTime
 import com.peterchege.blogger.domain.mappers.toPost
+import com.peterchege.blogger.presentation.bottomsheets.CommentsBottomSheet
 import com.peterchege.blogger.presentation.components.CommentBox
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
@@ -239,9 +242,9 @@ fun PostScreenContent(
                                                 onDoubleTap = { tapOffset ->
                                                     zoom = if (zoom > 1f) 1f else 2f
                                                     offset = calculateDoubleTapOffset(
-                                                        zoom,
-                                                        size,
-                                                        tapOffset
+                                                        zoom = zoom,
+                                                        size = size,
+                                                        tapOffset = tapOffset
                                                     )
 
                                                 }
@@ -251,7 +254,11 @@ fun PostScreenContent(
                                             detectTransformGestures(
                                                 onGesture = { centroid, pan, gestureZoom, _ ->
                                                     offset = offset.calculateNewOffset(
-                                                        centroid, pan, zoom, gestureZoom, size
+                                                        centroid = centroid,
+                                                        pan = pan,
+                                                        zoom = zoom,
+                                                        gestureZoom = gestureZoom,
+                                                        size = size
                                                     )
                                                     zoom = maxOf(a = 1f, b = zoom * gestureZoom)
                                                 }
@@ -408,156 +415,12 @@ fun PostScreenContent(
                     }
                 }
                 if (commentUiState.isCommentsBottomSheetOpen) {
-                    ModalBottomSheet(
-                        sheetState = commentsBottomSheetState,
-                        onDismissRequest = { /*TODO*/ },
-                    ) {
-                        Scaffold(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight(0.8f),
-                        ) { paddingValues ->
-                            Column(
-                                modifier = Modifier.fillMaxSize()
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(60.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center,
-                                ) {
-                                    Text(text = "Comments ${comments.itemCount}")
-                                }
-                                HorizontalDivider(
-                                    color = Color.Blue,
-                                    thickness = 1.dp,
-                                    modifier = Modifier.padding(10.dp)
-                                )
-                                LazyColumn(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(paddingValues)
-                                ) {
-                                    items(
-                                        count = comments.itemCount,
-                                        key = { it }
-                                    ) { position ->
-                                        Column(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(horizontal = 15.dp)
-                                        ) {
-                                            comments[position]?.let {
-                                                CommentBox(comment = it)
-                                            }
-                                            Spacer(modifier = Modifier.height(10.dp))
-                                        }
-                                    }
-                                    item {
-                                        if (comments.loadState.append is LoadState.Loading) {
-                                            PagingLoader()
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                    }
+                    CommentsBottomSheet(
+                        comments = comments,
+                        commentsBottomSheetState = commentsBottomSheetState
+                    )
                 }
             }
         }
     }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CommentDialog(
-    isUserLoggedIn: Boolean,
-    modifier: Modifier = Modifier,
-    commentUiState: CommentUiState,
-    onChangeNewComment: (String) -> Unit,
-    postComment: () -> Unit,
-    closeCommentDialog: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = {
-            closeCommentDialog()
-        },
-        title = {
-            Text(text = "Post Comment")
-        },
-        text = {
-            if (isUserLoggedIn) {
-                TextField(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    value = commentUiState.newComment,
-                    onValueChange = {
-                        onChangeNewComment(it)
-                    },
-                    singleLine = false,
-                    textStyle = MaterialTheme.typography.bodySmall.copy(textAlign = TextAlign.Start),
-                    keyboardOptions = KeyboardOptions(
-                        autoCorrect = false,
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-
-                        }
-                    )
-                )
-            } else {
-                Text(text = "Log In to be able to comment")
-            }
-
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    postComment()
-                }
-            ) {
-                Text(text = "Comment")
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    closeCommentDialog()
-                }
-            ) {
-                Text(text = "Cancel")
-            }
-        }
-    )
-}
-
-fun Offset.calculateNewOffset(
-    centroid: Offset,
-    pan: Offset,
-    zoom: Float,
-    gestureZoom: Float,
-    size: IntSize
-): Offset {
-    val newScale = maxOf(1f, zoom * gestureZoom)
-    val newOffset = (this + centroid / zoom) -
-            (centroid / newScale + pan / zoom)
-    return Offset(
-        newOffset.x.coerceIn(0f, (size.width / zoom) * (zoom - 1f)),
-        newOffset.y.coerceIn(0f, (size.height / zoom) * (zoom - 1f))
-    )
-}
-
-fun calculateDoubleTapOffset(
-    zoom: Float,
-    size: IntSize,
-    tapOffset: Offset
-): Offset {
-    val newOffset = Offset(tapOffset.x, tapOffset.y)
-    return Offset(
-        newOffset.x.coerceIn(0f, (size.width / zoom) * (zoom - 1f)),
-        newOffset.y.coerceIn(0f, (size.height / zoom) * (zoom - 1f))
-    )
 }
