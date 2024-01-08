@@ -53,6 +53,7 @@ import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.components.NotLoggedInComponent
 import com.peterchege.blogger.presentation.components.PagingLoader
 import com.peterchege.blogger.presentation.components.ProfileAvatar
+import com.peterchege.blogger.presentation.components.ProfileInfoCount
 import com.peterchege.blogger.presentation.theme.defaultPadding
 import kotlinx.coroutines.launch
 
@@ -205,6 +206,7 @@ fun ProfileScreenContent(
                                         .fillMaxWidth(0.3f)
                                 ) {
                                     ProfileAvatar(
+                                        size = 80,
                                         imageUrl = user.imageUrl,
                                         modifier = Modifier.align(Alignment.Center)
                                     )
@@ -240,47 +242,42 @@ fun ProfileScreenContent(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                Column(
-                                    verticalArrangement = Arrangement.Center,
-                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ProfileInfoCount(
+                                    name =  "Articles",
+                                    count = user._count.post,
+                                    onClick = {
 
-                                ) {
-                                    Text(
-                                        text = "${user._count.post}",
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Bold,
-                                    )
-                                    Text(
-                                        text = "Articles",
-                                        fontSize = 17.sp,
-                                    )
-                                }
-                                Divider(
-                                    color = Color.LightGray,
-                                    thickness = 2.dp,
+                                    }
+                                )
+                                HorizontalDivider(
                                     modifier = Modifier
                                         .fillMaxHeight(0.7f)
-                                        .width(1.dp)
+                                        .width(1.dp),
+                                    thickness = 2.dp,
+                                    color = Color.LightGray
                                 )
-                                Column(
-                                    modifier = Modifier.clickable {
+                                ProfileInfoCount(
+                                    name =  "Followers",
+                                    count = user._count.followers,
+                                    onClick = {
                                         navigateToProfileFollowerFollowingScreen(Constants.FOLLOWER)
+                                    }
+                                )
+                                HorizontalDivider(
+                                    modifier = Modifier
+                                        .fillMaxHeight(0.7f)
+                                        .width(1.dp),
+                                    thickness = 2.dp,
+                                    color = Color.LightGray
+                                )
+                                ProfileInfoCount(
+                                    name =   "Following",
+                                    count = user._count.following,
+                                    onClick = {
+                                        navigateToProfileFollowerFollowingScreen(Constants.FOLLOWING)
+                                    }
+                                )
 
-                                    },
-                                    verticalArrangement = Arrangement.Center,
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text(
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        text = "${user._count.followers}"
-                                    )
-                                    Text(
-                                        text = "Followers",
-                                        fontSize = 17.sp,
-
-                                        )
-                                }
                             }
                         }
                         items(count = posts.itemCount) { position ->

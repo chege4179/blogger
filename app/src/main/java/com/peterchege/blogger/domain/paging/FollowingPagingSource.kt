@@ -18,32 +18,32 @@ package com.peterchege.blogger.domain.paging
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.peterchege.blogger.core.api.responses.models.CommentWithUser
+import com.peterchege.blogger.core.api.responses.models.FollowerUser
 import com.peterchege.blogger.core.util.NetworkResult
-import com.peterchege.blogger.domain.repository.CommentRepository
+import com.peterchege.blogger.domain.repository.ProfileRepository
 
 @ExperimentalPagingApi
-class CommentsPagingSource(
-    val postId: String,
-    val commentRepository: CommentRepository,
-) : PagingSource<Int, CommentWithUser>() {
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, CommentWithUser> {
+class FollowingPagingSource (
+    val userId:String,
+    private val profileRepository: ProfileRepository,
+): PagingSource<Int, FollowerUser>() {
+
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, FollowerUser> {
         val pageNumber = params.key ?: 1
-        val response =
-            commentRepository.getAllComments(limit = 30, page = pageNumber, postId = postId)
+        val response = profileRepository.getFollowing(limit = 30, page = pageNumber, userId = userId)
         when (response) {
             is NetworkResult.Success -> {
                 val prevKey = if (pageNumber > 0) pageNumber - 1 else null
                 val nextKey = response.data.nextPage
-                val pageData = response.data.comments ?: emptyList()
+                val pageData = response.data.following ?: emptyList()
                 if (pageData.isNotEmpty()){
                     return LoadResult.Page(
-                        data = response.data.comments ?: emptyList(),
+                        data = response.data.following ?: emptyList(),
                         nextKey = nextKey,
                         prevKey = prevKey,
                     )
                 }else{
-                    return LoadResult.Error(Throwable(message = "No more comments found"))
+                    return LoadResult.Error(Throwable(message = "No more results found"))
                 }
 
             }
@@ -58,12 +58,10 @@ class CommentsPagingSource(
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, CommentWithUser>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, FollowerUser>): Int? {
         return state.anchorPosition?.let {
             state.closestPageToPosition(it)?.prevKey?.plus(1)
                 ?: state.closestPageToPosition(it)?.nextKey?.minus(1)
         }
     }
-
-
 }

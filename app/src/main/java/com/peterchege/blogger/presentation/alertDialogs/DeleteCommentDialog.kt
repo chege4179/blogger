@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.presentation.screens.profile
+package com.peterchege.blogger.presentation.alertDialogs
 
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import com.peterchege.blogger.core.api.responses.models.Post
 
 @Composable
-fun DeleteBox(
+fun DeleteCommentDialog(
     modifier: Modifier = Modifier,
     post: Post,
     closeDeleteDialog: () -> Unit,

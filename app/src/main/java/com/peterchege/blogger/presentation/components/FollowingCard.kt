@@ -45,7 +45,7 @@ import com.peterchege.blogger.core.api.responses.models.User
 
 @Composable
 fun FollowingCard(
-    navigateToFollowingPage:(String) ->Unit,
+    navigateToFollowingPage: (String) -> Unit,
     following: User,
     unFollowUser: (following: User) -> Unit,
     isYourProfile: Boolean,
@@ -71,23 +71,13 @@ fun FollowingCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Spacer(modifier = Modifier.width(10.dp))
-            SubcomposeAsyncImage(
-                model = following.imageUrl,
-                loading = {
-                    Image(
-                        painter = painterResource(id = R.mipmap.default_profile),
-                        contentDescription = "Default Profile Picture",
-                        modifier = Modifier
-                            .width(48.dp)
-                            .height(48.dp)
-                    )
-                },
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .width(48.dp)
-                    .height(48.dp),
-                contentDescription = "Profile Photo URL"
+
+            ProfileAvatar(
+                imageUrl = following.imageUrl,
+                modifier = Modifier,
+                size = 48
             )
+
             Spacer(modifier = Modifier.width(10.dp))
             Column(
                 modifier = Modifier

@@ -43,6 +43,8 @@ import com.peterchege.blogger.presentation.components.ArticleCard
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.components.PagingLoader
+import com.peterchege.blogger.presentation.components.ProfileAvatar
+import com.peterchege.blogger.presentation.components.ProfileInfoCount
 import com.peterchege.blogger.presentation.theme.defaultPadding
 import java.util.*
 
@@ -136,23 +138,12 @@ fun AuthorProfileScreenContent(
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth(0.3f)
-
                             ) {
-                                Image(
-                                    modifier = Modifier
-                                        .width(80.dp)
-                                        .height(80.dp)
-                                        .align(Alignment.Center),
-                                    painter = rememberImagePainter(
-                                        data = user?.imageUrl,
-                                        builder = {
-                                            crossfade(true)
-
-                                        },
-                                    ),
-                                    contentDescription = "Profile Image"
+                                ProfileAvatar(
+                                    size = 80,
+                                    imageUrl = user.imageUrl,
+                                    modifier = Modifier.align(Alignment.Center)
                                 )
-
                             }
                             Spacer(modifier = Modifier.height(5.dp))
                             Column(
@@ -186,49 +177,42 @@ fun AuthorProfileScreenContent(
                             horizontalArrangement = Arrangement.SpaceEvenly,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Column(
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = Alignment.CenterHorizontally
+                            ProfileInfoCount(
+                                name =  "Articles",
+                                count = user._count.post,
+                                onClick = {
 
-                            ) {
-                                Text(
-                                    text = "${user._count.post}",
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Bold,
-                                )
-                                Text(
-                                    text = "Articles",
-                                    fontSize = 17.sp,
-                                )
-                            }
-                            Divider(
-                                color = Color.LightGray, thickness = 2.dp, modifier = Modifier
+                                }
+                            )
+                            HorizontalDivider(
+                                modifier = Modifier
                                     .fillMaxHeight(0.7f)
-                                    .width(1.dp)
+                                    .width(1.dp),
+                                thickness = 2.dp,
+                                color = Color.LightGray
+                            )
+                            ProfileInfoCount(
+                                name =  "Followers",
+                                count = user._count.followers,
+                                onClick = {
+                                    navigateToAuthorFollowerFollowingScreen(user.userId,Constants.FOLLOWER)
+                                }
+                            )
+                            HorizontalDivider(
+                                modifier = Modifier
+                                    .fillMaxHeight(0.7f)
+                                    .width(1.dp),
+                                thickness = 2.dp,
+                                color = Color.LightGray
+                            )
+                            ProfileInfoCount(
+                                name =   "Following",
+                                count = user._count.following,
+                                onClick = {
+                                    navigateToAuthorFollowerFollowingScreen(user.userId,Constants.FOLLOWING)
+                                }
                             )
 
-                            Column(
-                                modifier = Modifier.clickable {
-                                    user?.username?.let { it1 ->
-                                        navigateToAuthorFollowerFollowingScreen(
-                                            it1,
-                                            Constants.FOLLOWER
-                                        )
-                                    }
-                                },
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    text = "${user._count.followers}"
-                                )
-                                Text(
-                                    text = "Followers",
-                                    fontSize = 17.sp,
-                                )
-                            }
                         }
                     }
                     if(uiState.isUserLoggedIn){

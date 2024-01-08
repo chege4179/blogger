@@ -72,22 +72,10 @@ fun FollowerCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Spacer(modifier = Modifier.width(10.dp))
-            SubcomposeAsyncImage(
-                model = follower.imageUrl,
-                loading = {
-                    Image(
-                        painter = painterResource(id = R.mipmap.default_profile),
-                        contentDescription = "Default Profile Picture",
-                        modifier = Modifier
-                            .width(48.dp)
-                            .height(48.dp)
-                    )
-                },
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .width(48.dp)
-                    .height(48.dp),
-                contentDescription = "Profile Photo URL"
+            ProfileAvatar(
+                imageUrl = follower.imageUrl,
+                modifier = Modifier,
+                size = 48
             )
             Spacer(modifier = Modifier.width(10.dp))
             Column(

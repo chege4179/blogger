@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.FollowersList
@@ -34,14 +35,15 @@ import java.util.*
 @Composable
 fun ProfileFollowerFollowingScreen(
     viewModel: ProfileFollowerFollowingScreenViewModel = hiltViewModel(),
-    profileViewModel: ProfileScreenViewModel = hiltViewModel(),
     navigateToAuthorProfileScreen: (String) -> Unit,
+    type: String
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    ProfileFollowerFollowingScreenContent(
 
+    ProfileFollowerFollowingScreenContent(
         uiState = uiState,
         navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
+        type = type,
     )
 
 }
@@ -52,6 +54,7 @@ fun ProfileFollowerFollowingScreen(
 fun ProfileFollowerFollowingScreenContent(
     uiState: ProfileFollowerFollowingScreenUiState,
     navigateToAuthorProfileScreen: (String) -> Unit,
+    type:String,
     ) {
 
     Scaffold(
@@ -59,12 +62,9 @@ fun ProfileFollowerFollowingScreenContent(
         topBar = {
             TopAppBar(
                 title = {
-                    if(uiState is ProfileFollowerFollowingScreenUiState.Success){
-                        Text(
-                            text = "My " + uiState.type.toLowerCase(Locale.ROOT)
-                                .capitalize(Locale.ROOT),
-                        )
-                    }
+                    Text(
+                        text = "My " + type.toLowerCase(Locale.ROOT).capitalize(Locale.ROOT),
+                    )
 
                 },
             )
@@ -82,25 +82,22 @@ fun ProfileFollowerFollowingScreenContent(
                 )
             }
 
-            is ProfileFollowerFollowingScreenUiState.Success -> {
-                val type = uiState.type
-                when (type) {
-                    Constants.FOLLOWER -> {
-                        FollowersList(
-                            followers = uiState.followers,
-                            paddingValues = paddingValues,
-                            navigateToAuthorProfileScreen = navigateToAuthorProfileScreen
-                        )
-                    }
+            is ProfileFollowerFollowingScreenUiState.Followers -> {
+                val followers = uiState.followers.collectAsLazyPagingItems()
+                FollowersList(
+                    followers =followers,
+                    paddingValues = paddingValues,
+                    navigateToAuthorProfileScreen = navigateToAuthorProfileScreen
+                )
 
-                    Constants.FOLLOWING -> {
-                        FollowingList(
-                            following = uiState.following,
-                            paddingValues = paddingValues,
-                            navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
-                        )
-                    }
-                }
+            }
+            is ProfileFollowerFollowingScreenUiState.Following -> {
+                val following = uiState.following.collectAsLazyPagingItems()
+                FollowingList(
+                    followings = following,
+                    paddingValues = paddingValues,
+                    navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
+                )
             }
         }
 

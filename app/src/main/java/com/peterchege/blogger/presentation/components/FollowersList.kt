@@ -27,22 +27,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
+import com.peterchege.blogger.core.api.responses.models.FollowerUser
 import com.peterchege.blogger.core.api.responses.models.User
+import com.peterchege.blogger.domain.mappers.toUser
 
 @Composable
 fun FollowersList(
-    followers:List<User>,
-    navigateToAuthorProfileScreen:(String) -> Unit,
-    paddingValues:PaddingValues,
-){
+    followers: LazyPagingItems<FollowerUser>,
+    navigateToAuthorProfileScreen: (String) -> Unit,
+    paddingValues: PaddingValues,
+) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues)
             .padding(10.dp)
-    ){
+    ) {
 
-        if (followers.isEmpty()){
+        if (followers.itemCount == 0) {
             item {
                 Column(
                     modifier = Modifier.fillMaxSize(),
@@ -53,24 +56,25 @@ fun FollowersList(
 
                 }
             }
-        }else{
-            items(items = followers){ follower ->
-                FollowerCard(
-                    navigateToFollowerPage = {
-                        navigateToAuthorProfileScreen(follower.userId)
+        } else {
+            items(count = followers.itemCount) { position ->
+                val follower = followers[position]
+                if (follower != null) {
+                    FollowerCard(
+                        navigateToFollowerPage = {
+                            navigateToAuthorProfileScreen(follower.userId)
+                        },
+                        follower = follower.toUser(),
+                        isFollowing = false,
+                        removeFollower = {
 
-                    },
-                    follower =follower,
-                    isFollowing = false,
-                    removeFollower = {
+                        },
+                        followFollower = {
 
-                    },
-                    followFollower = {
-
-
-                    },
-                    isYourProfile = false
-                )
+                        },
+                        isYourProfile = false
+                    )
+                }
             }
         }
     }

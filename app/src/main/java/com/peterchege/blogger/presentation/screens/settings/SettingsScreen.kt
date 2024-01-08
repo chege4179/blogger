@@ -21,32 +21,56 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.peterchege.blogger.presentation.alertDialogs.SignOutDialog
 import com.peterchege.blogger.presentation.components.SettingsRow
 
 @Composable
 fun SettingsScreen(
     viewModel: SettingsScreenViewModel = hiltViewModel()
 ) {
-
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    SettingsScreenContent (
+        uiState = uiState,
+        openSignOutDialog= viewModel::toggleSignOutDialog,
+        signOutUser = viewModel::signOutUser
+    )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreenContent(
-    openSignOutDialog:() -> Unit,
+    uiState: SettingScreenUiState,
+    openSignOutDialog: () -> Unit,
+    signOutUser:() -> Unit,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
+            TopAppBar(
+                title = {
+                    Text(text = "Settings")
+                }
+            )
 
         }
     ) { paddingValues ->
+        if(uiState.isSignOutDialogOpen){
+            SignOutDialog(
+                signOut = signOutUser,
+                closeSignOutDialog = openSignOutDialog
+            )
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -57,13 +81,7 @@ fun SettingsScreenContent(
                     .fillMaxWidth()
                     .weight(1f)
             ) {
-                SettingsRow(
-                    title = "Dark Mode",
-                    checked = false,
-                    onCheckedChange = {
 
-                    }
-                )
             }
             Box(
                 modifier = Modifier
@@ -72,10 +90,10 @@ fun SettingsScreenContent(
             ) {
                 Button(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxWidth()
                         .align(Alignment.Center),
                     onClick = {
-
+                        openSignOutDialog()
                     }
                 ) {
                     Text(text = "Sign Out")

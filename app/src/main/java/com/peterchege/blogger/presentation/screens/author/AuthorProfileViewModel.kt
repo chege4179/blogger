@@ -76,7 +76,7 @@ class AuthorProfileViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000L),
             initialValue = null,
         )
-    val followerUserIds = followersLocalDataSource.getAllAuthUserFollowerIds()
+    private val followerUserIds = followersLocalDataSource.getAllAuthUserFollowerIds()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000L),

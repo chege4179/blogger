@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Blogger
+ * Copyright 2024 Blogger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,28 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.core.api.responses.models
+package com.peterchege.blogger.core.api.responses.responses
 
+import com.peterchege.blogger.core.api.responses.models.FollowerUser
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class User(
-    val userId: String,
-    val email: String,
-    val fullName: String,
-    val imageUrl: String,
-    val password: String,
-    val username: String,
-    val createdAt:String,
-    val updatedAt:String,
-    val deviceTokens:List<DeviceToken>,
-    val _count: UserCount,
-)
-
-
-@Serializable
-data class UserCount(
-    val followers:Int,
-    val post:Int,
-    val following:Int,
+data class GetFollowingResponse(
+    val msg:String,
+    val success:Boolean,
+    val followingCount:Int?,
+    val nextPage:Int?,
+    val following:List<FollowerUser>?
 )

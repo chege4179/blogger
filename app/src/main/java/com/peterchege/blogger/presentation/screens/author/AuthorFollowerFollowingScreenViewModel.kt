@@ -18,11 +18,22 @@ package com.peterchege.blogger.presentation.screens.author
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import com.peterchege.blogger.core.api.responses.models.FollowerUser
 import com.peterchege.blogger.core.api.responses.models.User
+import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.Resource
+import com.peterchege.blogger.domain.paging.FollowersPagingSource
+import com.peterchege.blogger.domain.paging.FollowingPagingSource
 import com.peterchege.blogger.domain.repository.AuthRepository
+import com.peterchege.blogger.domain.repository.ProfileRepository
 import com.peterchege.blogger.domain.use_case.GetProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
@@ -32,9 +43,13 @@ sealed interface AuthorProfileFollowerFollowingScreenUiState {
 
     object Loading : AuthorProfileFollowerFollowingScreenUiState
 
-    data class Success(
-        val following: List<User>,
-        val followers: List<User>,
+    data class Followers(
+        val followers: Flow<PagingData<FollowerUser>>,
+        val isUserLoggedIn: Boolean,
+        val type: String,
+    ):AuthorProfileFollowerFollowingScreenUiState
+    data class Following(
+        val following: Flow<PagingData<FollowerUser>>,
         val isUserLoggedIn: Boolean,
         val type: String,
     ) : AuthorProfileFollowerFollowingScreenUiState
@@ -49,11 +64,11 @@ class AuthorFollowerFollowingScreenViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val profileUseCase: GetProfileUseCase,
     private val authRepository: AuthRepository,
+    private val profileRepository: ProfileRepository,
 
     ) : ViewModel() {
     private val type = savedStateHandle.getStateFlow<String>(key = "type", initialValue = "")
-    private val authorUsername =
-        savedStateHandle.getStateFlow<String>(key = "username", initialValue = "")
+    private val userId = savedStateHandle.getStateFlow<String>(key = "userId", initialValue = "")
 
 
     private val isUserLoggedIn = authRepository.isUserLoggedIn
@@ -72,19 +87,27 @@ class AuthorFollowerFollowingScreenViewModel @Inject constructor(
 
 
     val uiState = combine(
-        profileUseCase(userId = authorUsername.value),
+        profileUseCase(userId = userId.value),
         isUserLoggedIn,
         authUser,
         type,
     ) { result, loggedIn, user, type ->
         when (result) {
             is Resource.Success -> {
-                AuthorProfileFollowerFollowingScreenUiState.Success(
-                    followers = emptyList(),
-                    following = emptyList(),
-                    type = type,
-                    isUserLoggedIn = loggedIn
-                )
+                if (type == Constants.FOLLOWER){
+                    AuthorProfileFollowerFollowingScreenUiState.Followers(
+                        followers = getUserFollowersById(userId.value),
+                        type = type,
+                        isUserLoggedIn = loggedIn
+                    )
+                }else{
+                    AuthorProfileFollowerFollowingScreenUiState.Following(
+                        following = getUserFollowingsById(userId.value),
+                        type = type,
+                        isUserLoggedIn = loggedIn
+                    )
+                }
+
             }
 
             is Resource.Error -> {
@@ -103,4 +126,37 @@ class AuthorFollowerFollowingScreenViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5000L),
         initialValue = AuthorProfileFollowerFollowingScreenUiState.Loading
     )
+
+
+    @OptIn(ExperimentalPagingApi::class)
+    private fun getUserFollowersById(userId: String): Flow<PagingData<FollowerUser>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 20,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                FollowersPagingSource(
+                    profileRepository = profileRepository,
+                    userId = userId
+                )
+            }
+        ).flow.cachedIn(viewModelScope)
+    }
+
+    @OptIn(ExperimentalPagingApi::class)
+    private fun getUserFollowingsById(userId: String): Flow<PagingData<FollowerUser>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 20,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                FollowingPagingSource(
+                    profileRepository = profileRepository,
+                    userId = userId
+                )
+            }
+        ).flow.cachedIn(viewModelScope)
+    }
 }

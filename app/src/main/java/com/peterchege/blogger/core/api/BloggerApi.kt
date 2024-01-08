@@ -25,6 +25,7 @@ import com.peterchege.blogger.core.api.responses.responses.DeleteResponse
 import com.peterchege.blogger.core.api.responses.responses.FollowResponse
 import com.peterchege.blogger.core.api.responses.responses.GetCommentsResponse
 import com.peterchege.blogger.core.api.responses.responses.GetFollowersResponse
+import com.peterchege.blogger.core.api.responses.responses.GetFollowingResponse
 import com.peterchege.blogger.core.api.responses.responses.GetPostLikesResponse
 import com.peterchege.blogger.core.api.responses.responses.GetPostsByUserIdResponse
 import com.peterchege.blogger.core.api.responses.responses.GetUserLikeResponse
@@ -100,10 +101,18 @@ interface BloggerApi {
 
     @GET("/follower/getFollowers/{userId}")
     suspend fun getUserFollowers(
+        @Path("userId") userId: String,
         @Query("page") page: Int = 1,
         @Query("limit") limit: Int = 1000,
-        @Path("userId") userId: String,
     ): Response<GetFollowersResponse>
+
+    @GET("/follower/getFollowing/{userId}")
+    suspend fun getUserFollowing(
+        @Path("userId") userId: String,
+        @Query("page") page: Int = 1,
+        @Query("limit") limit: Int = 1000,
+
+    ): Response<GetFollowingResponse>
 
     @GET("/post/likes/{postId}")
     suspend fun getPostLikes(

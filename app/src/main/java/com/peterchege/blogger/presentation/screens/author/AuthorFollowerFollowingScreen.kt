@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.peterchege.blogger.core.util.Constants
 
 import com.peterchege.blogger.presentation.components.ErrorComponent
@@ -35,8 +36,9 @@ import java.util.*
 
 @Composable
 fun AuthorFollowerFollowingScreen(
-
     navigateToAuthorProfileScreen:(String) -> Unit,
+    type:String,
+    userId:String,
     viewModel: AuthorFollowerFollowingScreenViewModel = hiltViewModel()
 ){
 
@@ -44,7 +46,9 @@ fun AuthorFollowerFollowingScreen(
 
     AuthorFollowerFollowingScreenContent(
         uiState = uiState,
-        navigateToAuthorProfileScreen = navigateToAuthorProfileScreen
+        navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
+        type = type,
+        userId = userId,
     )
 
 }
@@ -55,19 +59,18 @@ fun AuthorFollowerFollowingScreen(
 fun AuthorFollowerFollowingScreenContent(
     uiState:AuthorProfileFollowerFollowingScreenUiState,
     navigateToAuthorProfileScreen: (String) -> Unit,
+    type:String,
+    userId:String,
 ){
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = {
-                    if (uiState is AuthorProfileFollowerFollowingScreenUiState.Success){
-                        Text(
-                            text= "User's " + uiState.type.toLowerCase(Locale.ROOT).capitalize(
-                                Locale.ROOT) + "s",
-                        )
-                    }
-
+                    Text(
+                        text= "User's " + type.toLowerCase(Locale.ROOT).capitalize(
+                            Locale.ROOT) + "s",
+                    )
                 }
             )
         }
@@ -81,24 +84,22 @@ fun AuthorFollowerFollowingScreenContent(
                     retryCallback = { /*TODO*/ },
                     errorMessage = uiState.message)
             }
-            is AuthorProfileFollowerFollowingScreenUiState.Success -> {
-                val type = uiState.type
-                when(type){
-                    Constants.FOLLOWER -> {
-                        FollowersList(
-                            followers = uiState.followers,
-                            paddingValues = paddingValues,
-                            navigateToAuthorProfileScreen = navigateToAuthorProfileScreen
-                        )
-                    }
-                    Constants.FOLLOWING -> {
-                        FollowingList(
-                            following = uiState.following,
-                            paddingValues = paddingValues,
-                            navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
-                        )
-                    }
-                }
+            is AuthorProfileFollowerFollowingScreenUiState.Followers -> {
+                val followers = uiState.followers.collectAsLazyPagingItems()
+                FollowersList(
+                    followers =followers,
+                    paddingValues = paddingValues,
+                    navigateToAuthorProfileScreen = navigateToAuthorProfileScreen
+                )
+
+            }
+            is AuthorProfileFollowerFollowingScreenUiState.Following -> {
+                val following = uiState.following.collectAsLazyPagingItems()
+                FollowingList(
+                    followings = following,
+                    paddingValues = paddingValues,
+                    navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
+                )
             }
         }
 

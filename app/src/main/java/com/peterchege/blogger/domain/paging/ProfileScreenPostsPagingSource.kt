@@ -24,26 +24,34 @@ import com.peterchege.blogger.domain.repository.ProfileRepository
 
 
 @ExperimentalPagingApi
-class ProfileScreenPostsPagingSource (
+class ProfileScreenPostsPagingSource(
     private val profileRepository: ProfileRepository,
     val userId: String,
-): PagingSource<Int, Post>(){
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int,Post> {
+) : PagingSource<Int, Post>() {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Post> {
         val pageNumber = params.key ?: 1
-        val response = profileRepository.getPostsByUserId(userId = userId,page = pageNumber)
-        when(response){
+        val response = profileRepository.getPostsByUserId(userId = userId, page = pageNumber)
+        when (response) {
             is NetworkResult.Success -> {
                 val prevKey = if (pageNumber > 0) pageNumber - 1 else null
                 val nextKey = response.data.nextPage
-                return LoadResult.Page(
-                    data = response.data.posts ?: emptyList(),
-                    nextKey = nextKey,
-                    prevKey = prevKey,
-                )
+                val pageData = response.data.posts ?: emptyList()
+                if (pageData.isNotEmpty()) {
+                    return LoadResult.Page(
+                        data = response.data.posts ?: emptyList(),
+                        nextKey = nextKey,
+                        prevKey = prevKey,
+                    )
+                } else {
+                    return LoadResult.Error(Throwable(message = "No more posts found"))
+                }
+
             }
+
             is NetworkResult.Error -> {
                 return LoadResult.Error(Throwable(message = response.message))
             }
+
             is NetworkResult.Exception -> {
                 return LoadResult.Error(Throwable(message = response.e.message))
             }

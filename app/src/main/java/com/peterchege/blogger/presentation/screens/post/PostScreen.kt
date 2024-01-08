@@ -22,9 +22,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -41,12 +38,10 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.SubcomposeAsyncImage
@@ -58,11 +53,9 @@ import com.peterchege.blogger.core.util.calculateNewOffset
 import com.peterchege.blogger.core.util.formatDateTime
 import com.peterchege.blogger.domain.mappers.toPost
 import com.peterchege.blogger.presentation.bottomsheets.CommentsBottomSheet
-import com.peterchege.blogger.presentation.components.CommentBox
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
-import com.peterchege.blogger.presentation.components.PagingLoader
-import com.peterchege.blogger.presentation.screens.profile.DeleteBox
+import com.peterchege.blogger.presentation.alertDialogs.DeleteCommentDialog
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
@@ -194,7 +187,7 @@ fun PostScreenContent(
                 val post = uiState.post
                 val comments = uiState.comments.collectAsLazyPagingItems()
                 if (deletePostUiState.isDeleteDialogOpen) {
-                    DeleteBox(
+                    DeleteCommentDialog(
                         post = post.toPost(),
                         closeDeleteDialog = { closeDeleteDialog() },
                         deletePost = { },

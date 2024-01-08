@@ -35,7 +35,7 @@ import com.peterchege.blogger.core.api.responses.models.User
 @ExperimentalCoilApi
 @Composable
 fun ProfileCard(
-    navigateToAuthorProfileScreen:(String) -> Unit,
+    navigateToAuthorProfileScreen: (String) -> Unit,
     user: User,
 ) {
     Card(
@@ -44,7 +44,7 @@ fun ProfileCard(
             .padding(10.dp)
             .height(70.dp)
             .clickable {
-               navigateToAuthorProfileScreen(user.userId)
+                navigateToAuthorProfileScreen(user.userId)
 
             },
         shape = RoundedCornerShape(15),
@@ -59,18 +59,10 @@ fun ProfileCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Spacer(modifier = Modifier.width(10.dp))
-            Image(
-                modifier = Modifier
-                    .width(48.dp)
-                    .height(48.dp),
-                painter = rememberImagePainter(
-                    data = user.imageUrl,
-                    builder = {
-                        crossfade(true)
-
-                    },
-                ),
-                contentDescription = ""
+            ProfileAvatar(
+                imageUrl = user.imageUrl,
+                modifier = Modifier,
+                size = 48
             )
             Spacer(modifier = Modifier.width(10.dp))
             Column(
@@ -84,7 +76,7 @@ fun ProfileCard(
                     text = user.username,
                     fontWeight = FontWeight.Bold,
 
-                )
+                    )
                 Text(text = user.fullName)
 
             }

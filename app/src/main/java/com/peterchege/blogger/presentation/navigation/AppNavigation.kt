@@ -87,18 +87,26 @@ fun AppNavigation(
                 navigateToAuthorFollowerFollowingScreen = navController::navigateToAuthorProfileFollowingScreen
             )
         }
-        composable(route = Screens.AUTHOR_FOLLOWER_FOLLOWING_SCREEN + "/{username}" + "/{type}") {
+        composable(route = Screens.AUTHOR_FOLLOWER_FOLLOWING_SCREEN + "/{userId}" + "/{type}") {
+            val type = it.arguments?.getString("type")
+                ?: throw IllegalStateException("Type data missing.")
+            val userId = it.arguments?.getString("type")
+                ?: throw IllegalStateException("User ID data missing.")
             AuthorFollowerFollowingScreen(
-                navigateToAuthorProfileScreen = navController::navigateToAuthorProfileScreen
+                navigateToAuthorProfileScreen = navController::navigateToAuthorProfileScreen,
+                type = type,
+                userId = userId,
             )
         }
         composable(route = Screens.CATEGORY_SCREEN + "/{category}") {
             CategoryScreen()
         }
         composable(route = Screens.PROFILE_FOLLOWER_FOLLOWING_SCREEN + "/{type}"){
+            val type = it.arguments?.getString("type")
+                ?: throw IllegalStateException("Type data missing.")
             ProfileFollowerFollowingScreen(
                 navigateToAuthorProfileScreen = navController::navigateToAuthorProfileScreen,
-
+                type = type
             )
         }
 
