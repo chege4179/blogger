@@ -56,12 +56,12 @@ fun SignUpScreen(
         navigateToLoginScreen = navigateToLoginScreen,
         uiState = uiState.value,
         eventFlow = viewModel.eventFlow,
-        onChangeUsername = { viewModel.onChangeUsername(it) },
-        onChangeEmail = { viewModel.onChangeEmail(it) },
-        onChangeFullName = { viewModel.onChangeFullName(it) },
-        onChangePassword = { viewModel.onChangePassword(it) },
-        onChangeConfirmPassword = { viewModel.onChangePasswordConfirm(it) },
-        onChangePasswordVisibility = { viewModel.onChangePasswordVisibility() },
+        onChangeUsername = viewModel::onChangeUsername ,
+        onChangeEmail = viewModel::onChangeEmail,
+        onChangeFullName = viewModel::onChangeFullName,
+        onChangePassword = viewModel::onChangePassword,
+        onChangeConfirmPassword =viewModel::onChangePasswordConfirm,
+        onChangePasswordVisibility = viewModel::onChangePasswordVisibility,
         onSubmit = { viewModel.signUpUser(navigateToLoginScreen = navigateToLoginScreen) }
     )
 
@@ -146,7 +146,6 @@ fun SignUpScreenContent(
                     value = uiState.fullName ,
                     onValueChange ={
                         onChangeFullName(it)
-
                     },
                     label = { Text("Full Name") }
                 )

@@ -49,7 +49,4 @@ interface RemotePostsDataSource {
 
     suspend fun unlikePost(likePost: LikePost):NetworkResult<UnLikeResponse>
 
-    suspend fun followUser(followUser: FollowUser):NetworkResult<FollowResponse>
-
-    suspend fun unfollowUser(followUser: FollowUser):NetworkResult<FollowResponse>
 }

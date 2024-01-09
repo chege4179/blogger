@@ -31,3 +31,21 @@ fun formatDateTime(dateStr: String): String {
     return formatted
 }
 
+// date string by default in prisma are in UTC
+// we need to support different time zones
+@RequiresApi(Build.VERSION_CODES.O)
+fun addThreeHoursToDateString(dateString: String): String {
+    // Define the date format of the input string
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+
+    // Parse the input string to LocalDateTime
+    val dateTime = LocalDateTime.parse(dateString, formatter)
+
+    // Add 3 hours to the date
+    val updatedDateTime = dateTime.plusHours(3)
+
+    // Format the updated date to the same string format
+    val updatedDateString = updatedDateTime.format(formatter)
+
+    return updatedDateString
+}

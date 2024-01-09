@@ -30,8 +30,8 @@ import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.core.util.Resource
 import com.peterchege.blogger.data.local.posts.likes.LikesLocalDataSource
-import com.peterchege.blogger.data.local.posts.likes.LikesLocalDataSourceImpl
-import com.peterchege.blogger.data.local.users.FollowersLocalDataSource
+import com.peterchege.blogger.data.local.users.follower.FollowersLocalDataSource
+import com.peterchege.blogger.data.local.users.following.FollowingLocalDataSource
 import com.peterchege.blogger.domain.mappers.toEntity
 import com.peterchege.blogger.domain.paging.ProfileScreenPostsPagingSource
 import com.peterchege.blogger.domain.repository.AuthRepository
@@ -39,7 +39,6 @@ import com.peterchege.blogger.domain.repository.NetworkInfoRepository
 import com.peterchege.blogger.domain.repository.NetworkStatus
 import com.peterchege.blogger.domain.repository.ProfileRepository
 import com.peterchege.blogger.domain.use_case.GetProfileUseCase
-import com.peterchege.blogger.domain.use_case.LogoutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -74,13 +73,13 @@ sealed interface ProfileScreenUiState {
 
 @HiltViewModel
 class ProfileScreenViewModel @Inject constructor(
-    private val logoutUseCase: LogoutUseCase,
     private val profileUseCase: GetProfileUseCase,
     private val authRepository: AuthRepository,
     private val profileRepository: ProfileRepository,
     private val analyticsHelper: AnalyticsHelper,
     private val networkInfoRepository: NetworkInfoRepository,
     private val followersLocalDataSource: FollowersLocalDataSource,
+    private val followingLocalDataSource: FollowingLocalDataSource,
     private val likesLocalDataSource: LikesLocalDataSource,
 ) : ViewModel() {
 
@@ -108,11 +107,10 @@ class ProfileScreenViewModel @Inject constructor(
     val uiState = combine(authUser, isUserLoggedIn) { user, loggedIn ->
         if (loggedIn) {
             val response = profileUseCase(userId = user?.userId ?: "").last()
-
             when (response) {
                 is Resource.Success -> {
                     if (response.data?.user != null) {
-                        saveUserLikes(userId = user?.userId ?:"")
+
                         ProfileScreenUiState.Success(
                             posts = getPaginatedPostsByUserId(userId = response.data.user.userId),
                             user = response.data.user,
@@ -144,7 +142,7 @@ class ProfileScreenViewModel @Inject constructor(
             initialValue = ProfileScreenUiState.Loading
         )
 
-    private fun saveUserLikes(userId: String) {
+    fun saveUserLikes(userId: String) {
         viewModelScope.launch {
             val response = profileRepository.getUserLikes(userId)
             when (response) {
@@ -165,21 +163,45 @@ class ProfileScreenViewModel @Inject constructor(
         }
     }
 
+    fun saveUserFollowing(userId: String) {
+        viewModelScope.launch {
+            val savedLocalFollowing = followingLocalDataSource.getAllAuthUserFollowings().first()
+            val response = profileRepository.getFollowing(page = 1, limit = 3000, userId = userId)
+            when (response) {
+                is NetworkResult.Success -> {
+                    val followersCount = response.data.followingCount
+                    if (followersCount != savedLocalFollowing.size) {
+                        response.data.following?.let {
+                            followingLocalDataSource.deleteAllFollowing()
+                            followingLocalDataSource.insertFollowings(followers = it)
+                        }
+                    }
+                }
+                is NetworkResult.Error -> {
+
+                }
+
+                is NetworkResult.Exception -> {
+
+                }
+            }
+        }
+    }
+
     fun saveUserFollowers(userId: String) {
         viewModelScope.launch {
-            val savedLocalFollowers = followersLocalDataSource.getAllAuthUserFollowers().first()
+            val savedLocalFollowing = followersLocalDataSource.getAllAuthUserFollowers().first()
             val response = profileRepository.getFollowers(page = 1, limit = 3000, userId = userId)
             when (response) {
                 is NetworkResult.Success -> {
                     val followersCount = response.data.followersCount
-                    if (followersCount != savedLocalFollowers.size) {
+                    if (followersCount != savedLocalFollowing.size) {
                         response.data.followers?.let {
                             followersLocalDataSource.deleteAllFollowers()
                             followersLocalDataSource.insertFollowers(followers = it)
                         }
                     }
                 }
-
                 is NetworkResult.Error -> {
 
                 }
@@ -207,37 +229,4 @@ class ProfileScreenViewModel @Inject constructor(
             }
         ).flow.cachedIn(viewModelScope)
     }
-
-
-    fun logoutUser(navigateToLoginScreen: () -> Unit, user: User) {
-        // fix here
-        val username = user.username
-        val id = user.userId
-        val token = ""
-        val logoutUser = LogoutUser(
-            deviceToken = token,
-            userId = id
-        )
-        logoutUseCase(logoutUser).onEach { result ->
-            when (result) {
-                is Resource.Success -> {
-                    analyticsHelper.logLogOutEvent(username = username)
-                    authRepository.unsetLoggedInUser()
-                    navigateToLoginScreen()
-                }
-
-                is Resource.Loading -> {
-
-                }
-
-                is Resource.Error -> {
-
-                }
-            }
-
-        }.launchIn(viewModelScope)
-
-
-    }
-
 }

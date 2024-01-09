@@ -69,10 +69,19 @@ fun ProfileScreen(
     navigateToEditProfileScreen: () -> Unit,
 ) {
 
+
     val authUser by viewModel.authUser.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val networkStatus by viewModel.networkStatus.collectAsStateWithLifecycle()
-
+    LaunchedEffect(key1 = authUser){
+        authUser?.let {
+            if (it.userId != ""){
+                viewModel.saveUserLikes(userId = it.userId )
+                viewModel.saveUserFollowing(userId = it.userId)
+                viewModel.saveUserFollowers(userId = it.userId)
+            }
+        }
+    }
     ProfileScreenContent(
         networkStatus = networkStatus,
         uiState = uiState,

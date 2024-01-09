@@ -24,6 +24,7 @@ import com.peterchege.blogger.core.room.converters.UserCountConverter
 import com.peterchege.blogger.core.room.dao.CachedPostDao
 import com.peterchege.blogger.core.room.dao.DraftPostDao
 import com.peterchege.blogger.core.room.dao.FollowerDao
+import com.peterchege.blogger.core.room.dao.FollowingDao
 import com.peterchege.blogger.core.room.dao.LikeDao
 import com.peterchege.blogger.core.room.dao.SavedPostDao
 import com.peterchege.blogger.core.room.entities.*
@@ -39,7 +40,8 @@ import com.peterchege.blogger.core.room.entities.*
         SavePost::class,
         CachePost::class,
         FollowerUserEntity::class,
-        LikeEntity::class
+        LikeEntity::class,
+        FollowingUserEntity::class,
     ],
     version = 1,
     exportSchema = true
@@ -51,6 +53,7 @@ abstract class BloggerDatabase : RoomDatabase() {
     abstract val cachedPostDao: CachedPostDao
     abstract val followerDao: FollowerDao
     abstract val likeDao: LikeDao
+    abstract val followingDao:FollowingDao
 
 
 }

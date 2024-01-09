@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.domain.repository.NetworkStatus
 import com.peterchege.blogger.presentation.screens.search.tabs.SearchPostsTab
@@ -63,6 +64,7 @@ fun SearchScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val networkStatus by viewModel.networkStatus.collectAsStateWithLifecycle()
+    val authUser by viewModel.authUser.collectAsStateWithLifecycle()
 
 
     SearchScreenContent(
@@ -84,6 +86,7 @@ fun SearchScreen(
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SearchScreenContent(
+
     uiState: SearchScreenUiState,
     searchQuery: String,
     onChangeSearchQuery: (String) -> Unit,
@@ -155,7 +158,7 @@ fun SearchScreenContent(
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Search,
-                            contentDescription = "Search Product",
+                            contentDescription = "Search",
                             modifier = Modifier
                                 .size(24.dp)
                                 .clickable {
@@ -239,7 +242,7 @@ fun TabsContent(
     pagerState: PagerState,
     uiState: SearchScreenUiState,
     navigateToAuthorProfileScreen: (String) -> Unit,
-    navigateToPostScreen: (String) -> Unit
+    navigateToPostScreen: (String) -> Unit,
 ) {
     HorizontalPager(state = pagerState) {
         AnimatedContent(

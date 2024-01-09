@@ -48,6 +48,7 @@ import coil.compose.SubcomposeAsyncImage
 import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.util.UiEvent
+import com.peterchege.blogger.core.util.addThreeHoursToDateString
 import com.peterchege.blogger.core.util.calculateDoubleTapOffset
 import com.peterchege.blogger.core.util.calculateNewOffset
 import com.peterchege.blogger.core.util.formatDateTime
@@ -359,7 +360,7 @@ fun PostScreenContent(
                                         Alignment.CenterVertically
 
                                     ) {
-                                        Text(text = formatDateTime(post.createdAt))
+                                        Text(text = formatDateTime(addThreeHoursToDateString(post.createdAt)))
 
                                         Text(text = "${post._count.likes} like(s)")
                                         Text(text = "${post._count.views} view(s)")

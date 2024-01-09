@@ -17,6 +17,7 @@ package com.peterchege.blogger.core.room.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.peterchege.blogger.core.room.entities.FollowerUserEntity
 import com.peterchege.blogger.core.room.entities.SavePost
@@ -32,10 +33,10 @@ interface FollowerDao {
     @Query("SELECT userId FROM followers")
     fun getAllFollowerIds():Flow<List<String>>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFollowers(followers:List<FollowerUserEntity>)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFollower(follower:FollowerUserEntity)
 
     @Query("DELETE FROM followers WHERE userId =:userId")

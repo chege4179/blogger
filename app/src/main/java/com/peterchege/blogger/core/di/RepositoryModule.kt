@@ -18,6 +18,7 @@ package com.peterchege.blogger.core.di
 import android.content.Context
 import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.datastore.preferences.DefaultAuthTokenProvider
+import com.peterchege.blogger.core.datastore.preferences.DefaultFCMTokenProvider
 import com.peterchege.blogger.core.datastore.repository.UserDataStoreRepository
 import com.peterchege.blogger.core.room.database.BloggerDatabase
 import com.peterchege.blogger.data.*
@@ -27,8 +28,10 @@ import com.peterchege.blogger.data.local.posts.likes.LikesLocalDataSource
 import com.peterchege.blogger.data.local.posts.likes.LikesLocalDataSourceImpl
 import com.peterchege.blogger.data.local.posts.saved.SavedPostsDataSource
 import com.peterchege.blogger.data.local.posts.saved.SavedPostsDataSourceImpl
-import com.peterchege.blogger.data.local.users.FollowersLocalDataSource
-import com.peterchege.blogger.data.local.users.FollowersLocalDataSourceImpl
+import com.peterchege.blogger.data.local.users.follower.FollowersLocalDataSource
+import com.peterchege.blogger.data.local.users.follower.FollowersLocalDataSourceImpl
+import com.peterchege.blogger.data.local.users.following.FollowingLocalDataSource
+import com.peterchege.blogger.data.local.users.following.FollowingLocalDataSourceImpl
 import com.peterchege.blogger.data.remote.posts.RemotePostsDataSource
 import com.peterchege.blogger.data.remote.posts.RemotePostsDataSourceImpl
 import com.peterchege.blogger.domain.repository.*
@@ -51,13 +54,17 @@ object RepositoryModule {
         api: BloggerApi,
         userDataStoreRepository: UserDataStoreRepository,
         defaultAuthTokenProvider: DefaultAuthTokenProvider,
-        @IoDispatcher ioDispatcher: CoroutineDispatcher
+        defaultFCMTokenProvider: DefaultFCMTokenProvider,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+        followingLocalDataSource: FollowingLocalDataSource,
     ): AuthRepository {
         return AuthRepositoryImpl(
             api = api,
             userDataStoreRepository = userDataStoreRepository,
             defaultAuthTokenProvider = defaultAuthTokenProvider,
             ioDispatcher = ioDispatcher,
+            fcmTokenProvider = defaultFCMTokenProvider,
+            followingLocalDataSource = followingLocalDataSource,
         )
     }
 
@@ -78,6 +85,18 @@ object RepositoryModule {
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
     ): FollowersLocalDataSource {
         return FollowersLocalDataSourceImpl(
+            db = db,
+            ioDispatcher = ioDispatcher
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideFollowingLocalDataSource(
+        db:BloggerDatabase,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+    ): FollowingLocalDataSource {
+        return FollowingLocalDataSourceImpl(
             db = db,
             ioDispatcher = ioDispatcher
         )

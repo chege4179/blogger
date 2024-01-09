@@ -16,6 +16,7 @@
 package com.peterchege.blogger.presentation.screens.author
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -41,6 +42,7 @@ import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.presentation.components.ArticleCard
 import com.peterchege.blogger.presentation.components.ErrorComponent
+import com.peterchege.blogger.presentation.components.FollowButtonSection
 import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.components.PagingLoader
 import com.peterchege.blogger.presentation.components.ProfileAvatar
@@ -64,8 +66,8 @@ fun AuthorProfileScreen(
             if (uiState is AuthorProfileScreenUiState.Success) {
                 authUser?.let {
                     viewModel.followUser(
-                        userToBeFollowed = (uiState as AuthorProfileScreenUiState.Success).user,
-                        userFollowing = it
+                        userIdToBeFollowed = (uiState as AuthorProfileScreenUiState.Success).user.userId,
+                        userId = it.userId
                     )
                 }
             }
@@ -74,8 +76,8 @@ fun AuthorProfileScreen(
             if (uiState is AuthorProfileScreenUiState.Success) {
                 authUser?.let {
                     viewModel.unfollowUser(
-                        userToBeUnfollowed = (uiState as AuthorProfileScreenUiState.Success).user,
-                        userUnfollowing = it
+                        unfollowedUserId = (uiState as AuthorProfileScreenUiState.Success).user.userId,
+                        userId = it.userId
                     )
                 }
             }
@@ -215,36 +217,17 @@ fun AuthorProfileScreenContent(
 
                         }
                     }
+
                     if(uiState.isUserLoggedIn){
                         item {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(60.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                            ) {
-                                if (uiState.isFollowingMe) {
-                                    Button(
-                                        modifier = Modifier.fillMaxWidth(0.5f),
-                                        onClick = {
-                                            followUser()
-                                        }) {
-                                        Text(text = "Follow Back")
-                                    }
-                                } else {
-                                    Button(
-                                        modifier = Modifier.fillMaxWidth(0.5f),
-                                        onClick = {
-                                            followUser()
-                                        }) {
-                                        Text(text = "Follow")
-                                    }
-                                }
-                            }
+                            FollowButtonSection(
+                                followUser = followUser,
+                                unfollowUser = unfollowUser,
+                                isFollowingMe = uiState.isFollowingMe,
+                                isAuthUserFollowingBack = uiState.isAuthUserFollowingBack
+                            )
                         }
                     }
-
                     if (posts.itemCount == 0) {
                         item {
                             Box(modifier = Modifier.fillMaxSize()) {

@@ -28,6 +28,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.peterchege.blogger.R
 import com.peterchege.blogger.core.api.BloggerApi
+import com.peterchege.blogger.core.api.requests.UpdateToken
 import com.peterchege.blogger.core.datastore.preferences.DefaultFCMTokenProvider
 import com.peterchege.blogger.core.datastore.repository.UserDataStoreRepository
 import com.peterchege.blogger.core.di.IoDispatcher
@@ -36,7 +37,11 @@ import com.peterchege.blogger.presentation.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import timber.log.Timber
+import java.io.IOException
 import javax.inject.Inject
 
 
@@ -69,9 +74,11 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(newToken: String) {
         super.onNewToken(newToken)
-        updateTokenToApi(newToken = newToken, oldToken = token)
-        token = newToken
-
+        CoroutineScope(ioDispatcher).launch{
+            defaultFCMTokenProvider.setFcmToken(newToken)
+            updateTokenToApi(newToken = newToken, oldToken = token)
+            token = newToken
+        }
     }
 
 
@@ -90,23 +97,26 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     private fun updateTokenToApi(newToken: String,oldToken:String){
         CoroutineScope(ioDispatcher).launch {
-//            userDataStoreRepository.getLoggedInUser().collectLatest { user ->
-//                user?.let {
-//                    try {
-//                        val updateToken = UpdateToken(
-//                            newToken = newToken,
-//                            oldToken = oldToken,
-//                            userId = it._id
-//                        )
-//                        api.updateToken(updateToken = updateToken)
-//                    }catch (e:HttpException){
-//                        Timber.tag("Update Token http error").d(e)
-//                    }catch (e:IOException){
-//                        Timber.tag("Update Token io error").d(e)
-//
-//                    }
-//                }
-//            }
+            userDataStoreRepository.getLoggedInUser().collectLatest { user ->
+                user?.let {
+                    try {
+                        if (it.userId != ""){
+                            val updateToken = UpdateToken(
+                                newToken = newToken,
+                                oldToken = oldToken,
+                                userId = it.userId
+                            )
+                            api.updateToken(updateToken = updateToken)
+                        }
+
+                    }catch (e: HttpException){
+                        Timber.tag("Update Token http error").d(e)
+                    }catch (e: IOException){
+                        Timber.tag("Update Token io error").d(e)
+
+                    }
+                }
+            }
 
 
         }

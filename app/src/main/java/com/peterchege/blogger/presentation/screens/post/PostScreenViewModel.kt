@@ -269,24 +269,24 @@ class PostScreenViewModel @Inject constructor(
 
     fun followUser(user: User, postAuthorId: String) {
         viewModelScope.launch {
-            val followResponse = repository.followUser(
-                FollowUser(
-                    followerUserId = user.userId,
-                    followedUserId = postAuthorId
-                )
-            )
+//            val followResponse = repository.followUser(
+//                FollowUser(
+//                    followerUserId = user.userId,
+//                    followedUserId = postAuthorId
+//                )
+//            )
 
         }
     }
 
     fun unfollowUser(user: User, postAuthorId: String) {
         viewModelScope.launch {
-            val followResponse = repository.unfollowUser(
-                FollowUser(
-                    followerUserId = user.userId,
-                    followedUserId = postAuthorId
-                )
-            )
+//            val followResponse = repository.unfollowUser(
+//                FollowUser(
+//                    followerUserId = user.userId,
+//                    followedUserId = postAuthorId
+//                )
+//            )
         }
     }
 

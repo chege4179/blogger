@@ -69,18 +69,7 @@ class RemotePostsDataSourceImpl @Inject constructor(
         return@withContext safeApiCall { api.likePost(likePost = likePost) }
     }
 
-
-
     override suspend fun unlikePost(likePost: LikePost): NetworkResult<UnLikeResponse> {
         return safeApiCall { api.unlikePost(likePost = likePost) }
     }
-
-    override suspend fun followUser(followUser: FollowUser): NetworkResult<FollowResponse> {
-        return safeApiCall { api.followUser(followUser = followUser) }
-    }
-
-    override suspend fun unfollowUser(followUser: FollowUser): NetworkResult<FollowResponse> {
-        return safeApiCall { api.unfollowUser(followUser = followUser) }
-    }
-
 }

@@ -139,7 +139,6 @@ dependencies {
 
     // coil
     implementation("io.coil-kt:coil-compose:2.5.0")
-    implementation("com.github.skydoves:landscapist-glide:2.1.8")
     implementation ("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
 
     // datastore (core and preferences)

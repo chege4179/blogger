@@ -26,11 +26,11 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CachedPostDao {
-    @Transaction
+
     @Query("SELECT * FROM cachePost")
     fun getAllCachedPosts(): Flow<List<CachePost>>
 
-    @Transaction
+
     @Query("SELECT * FROM cachePost WHERE postId = :postId")
     fun getCachedPostById(postId:String):Flow<CachePost?>
 

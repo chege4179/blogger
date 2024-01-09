@@ -149,7 +149,9 @@ fun AppNavigation(
         composable(
             route = Screens.SETTINGS_SCREEN
         ) {
-            SettingsScreen()
+            SettingsScreen(
+                navigateHome = navController::navigateToDashBoard
+            )
 
         }
         composable(

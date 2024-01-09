@@ -16,12 +16,16 @@
 package com.peterchege.blogger.domain.repository
 
 import androidx.paging.PagingData
+import com.peterchege.blogger.core.api.requests.FollowUser
+import com.peterchege.blogger.core.api.requests.UnFollowUser
 import com.peterchege.blogger.core.api.responses.models.Post
+import com.peterchege.blogger.core.api.responses.responses.FollowResponse
 import com.peterchege.blogger.core.api.responses.responses.GetFollowersResponse
 import com.peterchege.blogger.core.api.responses.responses.GetFollowingResponse
 import com.peterchege.blogger.core.api.responses.responses.GetPostsByUserIdResponse
 import com.peterchege.blogger.core.api.responses.responses.GetUserLikeResponse
 import com.peterchege.blogger.core.api.responses.responses.ProfileResponse
+import com.peterchege.blogger.core.api.responses.responses.UnfollowResponse
 import com.peterchege.blogger.core.util.NetworkResult
 import kotlinx.coroutines.flow.Flow
 
@@ -37,4 +41,8 @@ interface ProfileRepository {
     suspend fun getFollowing(page: Int, limit:Int,userId: String):NetworkResult<GetFollowingResponse>
 
     suspend fun getUserLikes(userId: String):NetworkResult<GetUserLikeResponse>
+
+    suspend fun unfollowUser(unfollowUser: UnFollowUser): NetworkResult<UnfollowResponse>
+
+    suspend fun followUser(followUser: FollowUser): NetworkResult<FollowResponse>
 }

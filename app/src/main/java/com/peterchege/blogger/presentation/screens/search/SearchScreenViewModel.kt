@@ -56,9 +56,11 @@ class SearchScreenViewModel @Inject constructor(
     private val searchRepository: SearchRepository,
     private val savedStateHandle: SavedStateHandle,
     private val networkInfoRepository: NetworkInfoRepository,
+    private val authRepository: AuthRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 
-    ) : ViewModel() {
+) : ViewModel() {
+
 
     val networkStatus = networkInfoRepository.networkStatus
         .onStart { emit(NetworkStatus.Unknown) }
@@ -76,10 +78,14 @@ class SearchScreenViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<SearchScreenUiState>(SearchScreenUiState.Idle)
     val uiState = _uiState.asStateFlow()
 
-    private var searchJob: Job? = null
+    val authUser = authRepository.getLoggedInUser()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = null
+        )
 
-    private var _user = MutableStateFlow<User?>(null)
-    var user: StateFlow<User?> = _user
+    private var searchJob: Job? = null
 
     fun onChangeSearchTerm(searchTerm: String) {
         _uiState.value = SearchScreenUiState.Searching
@@ -87,16 +93,27 @@ class SearchScreenViewModel @Inject constructor(
         if (searchTerm.length > 3) {
             searchJob?.cancel()
             searchJob = viewModelScope.launch {
-                val searchPostsResponse = async{ searchRepository.searchPosts(searchTerm = searchTerm) }.await()
-                val searchUsersResponse = async{ searchRepository.searchUsers(searchTerm = searchTerm) }.await()
+                val searchPostsResponse =
+                    async { searchRepository.searchPosts(searchTerm = searchTerm) }.await()
+                val searchUsersResponse =
+                    async { searchRepository.searchUsers(searchTerm = searchTerm) }.await()
 
-                if(searchPostsResponse is NetworkResult.Success && searchUsersResponse is NetworkResult.Success){
-                    _uiState.value  = SearchScreenUiState.ResultsFound(
+                if (searchPostsResponse is NetworkResult.Success && searchUsersResponse is NetworkResult.Success) {
+                    val users = when(authUser.first()){
+                        null -> {
+                            searchUsersResponse.data.users ?: emptyList<User>()
+                        }
+                        else -> {
+                            searchUsersResponse.data.users?.filterNot { user ->  user.userId == authUser.first()!!.userId }
+                        }
+                    }
+                    _uiState.value = SearchScreenUiState.ResultsFound(
                         posts = searchPostsResponse.data.posts ?: emptyList(),
-                        users = searchUsersResponse.data.users ?: emptyList()
+                        users = users ?: emptyList()
                     )
-                }else{
-                    _uiState.value = SearchScreenUiState.Error(message = "An unexpected error has occurred")
+                } else {
+                    _uiState.value =
+                        SearchScreenUiState.Error(message = "An unexpected error has occurred")
                 }
             }
         } else if (searchTerm.length < 2) {

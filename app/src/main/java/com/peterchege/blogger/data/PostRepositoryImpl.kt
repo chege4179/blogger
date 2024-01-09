@@ -157,14 +157,6 @@ class PostRepositoryImpl @Inject constructor(
         return remotePostsDataSource.unlikePost(likePost = likePost)
     }
 
-    override suspend fun followUser(followUser: FollowUser): NetworkResult<FollowResponse> {
-        return remotePostsDataSource.followUser(followUser = followUser)
-    }
-
-    override suspend fun unfollowUser(followUser: FollowUser): NetworkResult<FollowResponse> {
-        return remotePostsDataSource.unfollowUser(followUser = followUser)
-    }
-
 
     override suspend fun insertSavedPost(post: Post) = withContext(ioDispatcher) {
         savedPostsDataSource.insertSavedPost(post = post)

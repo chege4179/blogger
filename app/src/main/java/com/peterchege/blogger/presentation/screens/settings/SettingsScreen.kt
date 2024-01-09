@@ -37,13 +37,26 @@ import com.peterchege.blogger.presentation.components.SettingsRow
 
 @Composable
 fun SettingsScreen(
-    viewModel: SettingsScreenViewModel = hiltViewModel()
+    viewModel: SettingsScreenViewModel = hiltViewModel(),
+    navigateHome:() -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val authUser by viewModel.authUser.collectAsStateWithLifecycle()
+    val fcmToken by viewModel.fcmToken.collectAsStateWithLifecycle()
     SettingsScreenContent (
         uiState = uiState,
         openSignOutDialog= viewModel::toggleSignOutDialog,
-        signOutUser = viewModel::signOutUser
+        signOutUser = {
+            authUser?.let {
+                if (it.userId !=""){
+                    viewModel.signOutUser(
+                        userId = it.userId,
+                        fcmToken = fcmToken,
+                        navigateToHome = navigateHome
+                    )
+                }
+            }
+        }
     )
 }
 

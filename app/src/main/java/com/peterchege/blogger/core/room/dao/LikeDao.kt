@@ -17,16 +17,17 @@ package com.peterchege.blogger.core.room.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.peterchege.blogger.core.room.entities.LikeEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LikeDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertLikes(likes: List<LikeEntity>)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertLike(like:LikeEntity)
 
     @Query("SELECT * FROM likes")

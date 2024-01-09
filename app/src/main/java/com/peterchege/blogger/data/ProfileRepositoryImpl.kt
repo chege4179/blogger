@@ -19,12 +19,16 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.peterchege.blogger.core.api.BloggerApi
+import com.peterchege.blogger.core.api.requests.FollowUser
+import com.peterchege.blogger.core.api.requests.UnFollowUser
 import com.peterchege.blogger.core.api.responses.models.Post
+import com.peterchege.blogger.core.api.responses.responses.FollowResponse
 import com.peterchege.blogger.core.api.responses.responses.GetFollowersResponse
 import com.peterchege.blogger.core.api.responses.responses.GetFollowingResponse
 import com.peterchege.blogger.core.api.responses.responses.GetPostsByUserIdResponse
 import com.peterchege.blogger.core.api.responses.responses.GetUserLikeResponse
 import com.peterchege.blogger.core.api.responses.responses.ProfileResponse
+import com.peterchege.blogger.core.api.responses.responses.UnfollowResponse
 import com.peterchege.blogger.core.api.safeApiCall
 import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.domain.repository.ProfileRepository
@@ -40,6 +44,14 @@ class ProfileRepositoryImpl @Inject constructor(
 
     override suspend fun getPostsByUserId(userId: String,page:Int): NetworkResult<GetPostsByUserIdResponse> {
         return safeApiCall { api.getPostByUserId(userId = userId,page = page) }
+    }
+
+    override suspend fun followUser(followUser: FollowUser): NetworkResult<FollowResponse> {
+        return safeApiCall{ api.followUser(followUser = followUser) }
+    }
+
+    override suspend fun unfollowUser(unfollowUser: UnFollowUser): NetworkResult<UnfollowResponse> {
+        return safeApiCall{ api.unfollowUser(unFollowUser = unfollowUser) }
     }
 
     override suspend fun getFollowers(

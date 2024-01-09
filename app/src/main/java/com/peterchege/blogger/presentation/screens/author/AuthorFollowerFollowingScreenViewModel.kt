@@ -27,6 +27,8 @@ import com.peterchege.blogger.core.api.responses.models.FollowerUser
 import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.Resource
+import com.peterchege.blogger.data.local.users.follower.FollowersLocalDataSource
+import com.peterchege.blogger.data.local.users.following.FollowingLocalDataSource
 import com.peterchege.blogger.domain.paging.FollowersPagingSource
 import com.peterchege.blogger.domain.paging.FollowingPagingSource
 import com.peterchege.blogger.domain.repository.AuthRepository
@@ -65,10 +67,26 @@ class AuthorFollowerFollowingScreenViewModel @Inject constructor(
     private val profileUseCase: GetProfileUseCase,
     private val authRepository: AuthRepository,
     private val profileRepository: ProfileRepository,
+    private val followingLocalDataSource: FollowingLocalDataSource,
+    private val followersLocalDataSource: FollowersLocalDataSource,
 
     ) : ViewModel() {
     private val type = savedStateHandle.getStateFlow<String>(key = "type", initialValue = "")
     private val userId = savedStateHandle.getStateFlow<String>(key = "userId", initialValue = "")
+
+    val followingUserIds = followingLocalDataSource.getAllAuthUserFollowingsIds()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = emptyList()
+        )
+
+    val followerUserIds = followersLocalDataSource.getAllAuthUserFollowerIds()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = emptyList()
+        )
 
 
     private val isUserLoggedIn = authRepository.isUserLoggedIn

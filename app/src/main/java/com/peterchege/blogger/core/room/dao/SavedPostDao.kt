@@ -27,7 +27,7 @@ interface SavedPostDao {
     @Query("SELECT * FROM savePost")
     fun getAllSavedPosts(): Flow<List<SavePost>>
 
-    @Transaction
+
     @Query("SELECT * FROM savePost WHERE postId = :id")
     fun getSavedPostById(id: String): Flow<SavePost?>
 

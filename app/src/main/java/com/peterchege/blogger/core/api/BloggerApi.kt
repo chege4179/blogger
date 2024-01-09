@@ -38,6 +38,7 @@ import com.peterchege.blogger.core.api.responses.responses.SearchPostResponse
 import com.peterchege.blogger.core.api.responses.responses.SearchUserResponse
 import com.peterchege.blogger.core.api.responses.responses.SignUpResponse
 import com.peterchege.blogger.core.api.responses.responses.UnLikeResponse
+import com.peterchege.blogger.core.api.responses.responses.UnfollowResponse
 import com.peterchege.blogger.core.api.responses.responses.UpdateTokenResponse
 import com.peterchege.blogger.core.api.responses.responses.UploadPostResponse
 import com.peterchege.blogger.core.api.responses.responses.ViewResponse
@@ -76,13 +77,19 @@ interface BloggerApi {
     suspend fun likePost(@Body likePost: LikePost): Response<LikeResponse>
 
     @POST("/like/unlike")
-    suspend fun unlikePost(@Body likePost: LikePost): Response<UnLikeResponse>
+    suspend fun unlikePost(
+        @Body likePost: LikePost
+    ): Response<UnLikeResponse>
 
     @POST("/follower/followUser")
-    suspend fun followUser(@Body followUser: FollowUser): Response<FollowResponse>
+    suspend fun followUser(
+        @Body followUser: FollowUser
+    ): Response<FollowResponse>
 
     @POST("/follower/unfollowUser")
-    suspend fun unfollowUser(@Body followUser: FollowUser): Response<FollowResponse>
+    suspend fun unfollowUser(
+        @Body unFollowUser: UnFollowUser
+    ): Response<UnfollowResponse>
 
     @GET("/user/single/{userId}")
     suspend fun getUserProfile(@Path("userId") userId: String): Response<ProfileResponse>
@@ -112,7 +119,7 @@ interface BloggerApi {
         @Query("page") page: Int = 1,
         @Query("limit") limit: Int = 1000,
 
-    ): Response<GetFollowingResponse>
+        ): Response<GetFollowingResponse>
 
     @GET("/post/likes/{postId}")
     suspend fun getPostLikes(
@@ -154,6 +161,6 @@ interface BloggerApi {
         @Path("postId") postId: String,
         @Query("page") page: Int = 1,
         @Query("limit") limit: Int = 20,
-    ):Response<GetCommentsResponse>
+    ): Response<GetCommentsResponse>
 }
 

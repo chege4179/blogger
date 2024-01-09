@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.data.local.users
+package com.peterchege.blogger.data.local.users.follower
 
 import com.peterchege.blogger.core.api.responses.models.FollowerUser
 import kotlinx.coroutines.flow.Flow

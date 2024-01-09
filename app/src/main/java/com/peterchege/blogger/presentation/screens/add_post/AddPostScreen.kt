@@ -42,7 +42,6 @@ import com.peterchege.blogger.core.services.UploadPostService
 import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.presentation.components.NotLoggedInComponent
 import com.peterchege.blogger.presentation.theme.defaultPadding
-import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
@@ -190,13 +189,12 @@ fun AddPostScreenContent(
 
                             ) {
                                 formState.uri?.let {
-
-                                    GlideImage(
-                                        imageModel = { it },
+                                    SubcomposeAsyncImage(
+                                        model = it ,
                                         modifier = Modifier
                                             .fillMaxWidth(0.7f)
                                             .height(135.dp),
-
+                                        contentDescription = "Add Post Image"
                                         )
                                 }
                                 Column(
