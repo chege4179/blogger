@@ -71,9 +71,9 @@ class SearchScreenViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000L),
             initialValue = NetworkStatus.Unknown
         )
-    private val SEARCH_QUERY = "searchQuery"
 
-    val searchQuery = savedStateHandle.getStateFlow(SEARCH_QUERY, "")
+
+    val searchQuery = savedStateHandle.getStateFlow(key = "searchQuery",initialValue =  "")
 
     private val _uiState = MutableStateFlow<SearchScreenUiState>(SearchScreenUiState.Idle)
     val uiState = _uiState.asStateFlow()
@@ -89,7 +89,7 @@ class SearchScreenViewModel @Inject constructor(
 
     fun onChangeSearchTerm(searchTerm: String) {
         _uiState.value = SearchScreenUiState.Searching
-        savedStateHandle[SEARCH_QUERY] = searchTerm
+        savedStateHandle["searchQuery"] = searchTerm
         if (searchTerm.length > 3) {
             searchJob?.cancel()
             searchJob = viewModelScope.launch {

@@ -22,8 +22,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.peterchege.blogger.presentation.theme.defaultPadding
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -31,17 +33,21 @@ import com.peterchege.blogger.presentation.theme.defaultPadding
 fun CategoryScreen(
     viewModel: CategoryScreenViewModel = hiltViewModel()
 ) {
+    val category by viewModel.category.collectAsStateWithLifecycle()
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
 
         }
-    ) {
+    ) { paddingValues ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(defaultPadding)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(defaultPadding)
         ) {
             Text(
-                text = viewModel.category.value
+                text = category
             )
         }
 

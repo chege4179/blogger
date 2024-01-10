@@ -28,12 +28,8 @@ class CategoryScreenViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
 
     ) : ViewModel() {
-    private var _category = mutableStateOf("")
-    var category: State<String> = _category
 
-    init {
-        savedStateHandle.get<String>("category")?.let { category ->
-            _category.value = category
-        }
-    }
+
+    val category = savedStateHandle.getStateFlow(key = "category", initialValue = "")
+
 }

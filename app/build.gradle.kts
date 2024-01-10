@@ -7,6 +7,7 @@ plugins {
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
     id("com.google.firebase.firebase-perf")
+    id("com.google.android.gms.oss-licenses-plugin")
 }
 
 android {
@@ -150,6 +151,9 @@ dependencies {
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
 
     implementation("androidx.work:work-runtime-ktx:2.9.0")
+
+    // Play services OSS
+    implementation("com.google.android.gms:play-services-oss-licenses:17.0.1")
 
 
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))

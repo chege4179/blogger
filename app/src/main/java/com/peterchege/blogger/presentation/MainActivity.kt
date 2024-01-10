@@ -23,10 +23,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.metrics.performance.JankStats
 import androidx.navigation.compose.rememberNavController
 import coil.annotation.ExperimentalCoilApi
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.peterchege.blogger.core.services.UploadPostService
 import com.peterchege.blogger.presentation.navigation.AppNavigation
 import com.peterchege.blogger.presentation.theme.BloggerTheme
@@ -56,7 +58,12 @@ class MainActivity : ComponentActivity() {
             BloggerTheme {
                 val navController = rememberNavController()
 
-                AppNavigation(navController = navController)
+                AppNavigation(
+                    navController = navController,
+                    startOSSActivity = {
+                        startActivity(Intent(this, OssLicensesMenuActivity::class.java))
+                    }
+                )
             }
         }
 

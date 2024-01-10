@@ -50,6 +50,7 @@ import com.peterchege.blogger.presentation.screens.signup.SignUpScreen
 @Composable
 fun AppNavigation(
     navController: NavHostController,
+    startOSSActivity:() -> Unit,
 ) {
     val activity = (LocalContext.current as? Activity)
 
@@ -150,7 +151,8 @@ fun AppNavigation(
             route = Screens.SETTINGS_SCREEN
         ) {
             SettingsScreen(
-                navigateHome = navController::navigateToDashBoard
+                navigateHome = navController::navigateToDashBoard,
+                startOSSActivity = startOSSActivity,
             )
 
         }

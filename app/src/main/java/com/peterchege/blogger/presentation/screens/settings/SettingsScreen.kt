@@ -15,6 +15,8 @@
  */
 package com.peterchege.blogger.presentation.screens.settings
 
+import android.content.Intent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,26 +31,31 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.peterchege.blogger.presentation.alertDialogs.SignOutDialog
 import com.peterchege.blogger.presentation.components.SettingsRow
 
 @Composable
 fun SettingsScreen(
     viewModel: SettingsScreenViewModel = hiltViewModel(),
-    navigateHome:() -> Unit,
+    navigateHome: () -> Unit,
+    startOSSActivity: () -> Unit,
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val authUser by viewModel.authUser.collectAsStateWithLifecycle()
     val fcmToken by viewModel.fcmToken.collectAsStateWithLifecycle()
-    SettingsScreenContent (
+    SettingsScreenContent(
         uiState = uiState,
-        openSignOutDialog= viewModel::toggleSignOutDialog,
+        openSignOutDialog = viewModel::toggleSignOutDialog,
         signOutUser = {
             authUser?.let {
-                if (it.userId !=""){
+                if (it.userId != "") {
                     viewModel.signOutUser(
                         userId = it.userId,
                         fcmToken = fcmToken,
@@ -56,7 +63,8 @@ fun SettingsScreen(
                     )
                 }
             }
-        }
+        },
+        openOSSMenu = startOSSActivity
     )
 }
 
@@ -65,7 +73,8 @@ fun SettingsScreen(
 fun SettingsScreenContent(
     uiState: SettingScreenUiState,
     openSignOutDialog: () -> Unit,
-    signOutUser:() -> Unit,
+    signOutUser: () -> Unit,
+    openOSSMenu: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -78,7 +87,7 @@ fun SettingsScreenContent(
 
         }
     ) { paddingValues ->
-        if(uiState.isSignOutDialogOpen){
+        if (uiState.isSignOutDialogOpen) {
             SignOutDialog(
                 signOut = signOutUser,
                 closeSignOutDialog = openSignOutDialog
@@ -94,7 +103,12 @@ fun SettingsScreenContent(
                     .fillMaxWidth()
                     .weight(1f)
             ) {
-
+                Text(
+                    modifier = Modifier.clickable {
+                        openOSSMenu()
+                    },
+                    text = "Licenses"
+                )
             }
             Box(
                 modifier = Modifier

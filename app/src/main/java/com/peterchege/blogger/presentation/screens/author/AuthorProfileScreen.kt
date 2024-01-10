@@ -214,7 +214,6 @@ fun AuthorProfileScreenContent(
                                     navigateToAuthorFollowerFollowingScreen(user.userId,Constants.FOLLOWING)
                                 }
                             )
-
                         }
                     }
 
