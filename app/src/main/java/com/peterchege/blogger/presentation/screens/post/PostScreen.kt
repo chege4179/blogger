@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -52,6 +53,7 @@ import com.peterchege.blogger.core.util.addThreeHoursToDateString
 import com.peterchege.blogger.core.util.calculateDoubleTapOffset
 import com.peterchege.blogger.core.util.calculateNewOffset
 import com.peterchege.blogger.core.util.formatDateTime
+import com.peterchege.blogger.core.util.toast
 import com.peterchege.blogger.domain.mappers.toPost
 import com.peterchege.blogger.presentation.bottomsheets.CommentsBottomSheet
 import com.peterchege.blogger.presentation.components.ErrorComponent
@@ -68,15 +70,20 @@ fun PostScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val commentUiState by viewModel.commentUiState.collectAsStateWithLifecycle()
     val deletePostUiState by viewModel.deletePostUiState.collectAsStateWithLifecycle()
-
+    val context = LocalContext.current
     PostScreenContent(
         uiState = uiState,
         commentUiState = commentUiState,
         deletePostUiState = deletePostUiState,
         onLikePost = { it1 ->
+            if (authUser == null){
+                context.toast(msg = "Login or create an account to like a post")
+            }
             authUser?.let { user ->
                 if (user.userId != "") {
                     viewModel.likePost(post = it1, user = user)
+                }else{
+                    context.toast(msg = "Login or create an account to like a post")
                 }
             }
         },
@@ -84,6 +91,8 @@ fun PostScreen(
             authUser?.let { user ->
                 if (user.userId != "") {
                     viewModel.unLikePost(post = it1, user = user)
+                }else{
+                    context.toast(msg = "Login or create an account to like a post")
                 }
             }
         },

@@ -25,10 +25,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,8 +41,11 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
+import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.util.Constants
+import com.peterchege.blogger.core.util.UiEvent
+import com.peterchege.blogger.core.util.toast
 import com.peterchege.blogger.presentation.components.ArticleCard
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.FollowButtonSection
@@ -48,6 +54,8 @@ import com.peterchege.blogger.presentation.components.PagingLoader
 import com.peterchege.blogger.presentation.components.ProfileAvatar
 import com.peterchege.blogger.presentation.components.ProfileInfoCount
 import com.peterchege.blogger.presentation.theme.defaultPadding
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.collectLatest
 import java.util.*
 
 
@@ -57,11 +65,47 @@ fun AuthorProfileScreen(
     navigateToPostScreen: (String) -> Unit,
     viewModel: AuthorProfileViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val authUser by viewModel.authUser.collectAsStateWithLifecycle()
+    val likedPostIds by viewModel.likedPostIds.collectAsStateWithLifecycle()
+    val savedPostIds by viewModel.savedPostIds.collectAsStateWithLifecycle()
 
 
     AuthorProfileScreenContent(
+        uiState = uiState,
+        navigateToAuthorFollowerFollowingScreen = navigateToAuthorFollowerFollowingScreen,
+        navigateToPostScreen = navigateToPostScreen,
+        authUser = authUser,
+        savedPostIds = savedPostIds,
+        likedPostIds = likedPostIds,
+        bookmarkPost = viewModel::bookmarkPost,
+        unBookmarkPost = viewModel::unBookmarkPost,
+        eventFlow = viewModel.eventFlow,
+        likePost = { post ->
+            if (authUser == null){
+                context.toast(msg = "Login or create an account to like a post")
+            }
+            authUser?.let { user ->
+                if (user.userId != "") {
+                    viewModel.likePost(post = post, user = user)
+                }else{
+                    context.toast(msg = "Login or create an account to like a post")
+                }
+            }
+        },
+        unLikePost = { post ->
+            if (authUser == null){
+                context.toast(msg = "Login or create an account to like a post")
+            }
+            authUser?.let { user ->
+                if (user.userId != "") {
+                    viewModel.unLikePost(post = post, user = user)
+                }else{
+                    context.toast(msg = "Login or create an account to like a post")
+                }
+            }
+        },
         followUser = {
             if (uiState is AuthorProfileScreenUiState.Success) {
                 authUser?.let {
@@ -82,10 +126,6 @@ fun AuthorProfileScreen(
                 }
             }
         },
-        uiState = uiState,
-        navigateToAuthorFollowerFollowingScreen = navigateToAuthorFollowerFollowingScreen,
-        navigateToPostScreen = navigateToPostScreen,
-        authUser = authUser
     )
 }
 
@@ -99,12 +139,39 @@ fun AuthorProfileScreenContent(
     uiState: AuthorProfileScreenUiState,
     navigateToAuthorFollowerFollowingScreen: (String, String) -> Unit,
     navigateToPostScreen: (String) -> Unit,
+    savedPostIds: List<String>,
+    likedPostIds: List<String>,
+    eventFlow: SharedFlow<UiEvent>,
+    bookmarkPost: (Post) -> Unit,
+    unBookmarkPost: (Post) -> Unit,
+    likePost: (Post) -> Unit,
+    unLikePost: (Post) -> Unit,
 
     ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(key1 = true) {
+        eventFlow.collectLatest { event ->
+            when (event) {
+                is UiEvent.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(
+                        message = event.message
+                    )
+                }
+
+                is UiEvent.Navigate -> {
+
+                }
+            }
+        }
+    }
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.LightGray),
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
     ) { paddingValues ->
         when (uiState) {
             is AuthorProfileScreenUiState.Loading -> {
@@ -180,7 +247,7 @@ fun AuthorProfileScreenContent(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             ProfileInfoCount(
-                                name =  "Articles",
+                                name = "Articles",
                                 count = user._count.post,
                                 onClick = {
 
@@ -194,10 +261,13 @@ fun AuthorProfileScreenContent(
                                 color = Color.LightGray
                             )
                             ProfileInfoCount(
-                                name =  "Followers",
+                                name = "Followers",
                                 count = user._count.followers,
                                 onClick = {
-                                    navigateToAuthorFollowerFollowingScreen(user.userId,Constants.FOLLOWER)
+                                    navigateToAuthorFollowerFollowingScreen(
+                                        user.userId,
+                                        Constants.FOLLOWER
+                                    )
                                 }
                             )
                             HorizontalDivider(
@@ -208,16 +278,19 @@ fun AuthorProfileScreenContent(
                                 color = Color.LightGray
                             )
                             ProfileInfoCount(
-                                name =   "Following",
+                                name = "Following",
                                 count = user._count.following,
                                 onClick = {
-                                    navigateToAuthorFollowerFollowingScreen(user.userId,Constants.FOLLOWING)
+                                    navigateToAuthorFollowerFollowingScreen(
+                                        user.userId,
+                                        Constants.FOLLOWING
+                                    )
                                 }
                             )
                         }
                     }
 
-                    if(uiState.isUserLoggedIn){
+                    if (uiState.isUserLoggedIn) {
                         item {
                             FollowButtonSection(
                                 followUser = followUser,
@@ -242,18 +315,21 @@ fun AuthorProfileScreenContent(
                             if (post != null) {
                                 ArticleCard(
                                     post = post,
+                                    isLiked = likedPostIds.contains(post.postId),
+                                    isSaved = savedPostIds.contains(post.postId),
+                                    isProfile = false,
                                     onItemClick = {
                                         navigateToPostScreen(post.postId)
                                     },
                                     onProfileNavigate = {
 
                                     },
-                                    onDeletePost = {
+                                    onDeletePost = {},
+                                    onBookmarkPost = bookmarkPost,
+                                    onUnBookmarkPost = unBookmarkPost,
+                                    onLikePost = likePost,
+                                    onUnlikePost = unLikePost
 
-                                    },
-                                    isLiked = false,
-                                    isSaved = false,
-                                    isProfile = false
                                 )
                             }
                             Spacer(modifier = Modifier.padding(5.dp))

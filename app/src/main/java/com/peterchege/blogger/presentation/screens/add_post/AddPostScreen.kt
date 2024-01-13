@@ -30,6 +30,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -40,6 +41,7 @@ import coil.annotation.ExperimentalCoilApi
 import coil.compose.SubcomposeAsyncImage
 import com.peterchege.blogger.core.services.UploadPostService
 import com.peterchege.blogger.core.util.UiEvent
+import com.peterchege.blogger.presentation.alertDialogs.DraftConfirmDialog
 import com.peterchege.blogger.presentation.components.NotLoggedInComponent
 import com.peterchege.blogger.presentation.theme.defaultPadding
 import kotlinx.coroutines.flow.SharedFlow
@@ -67,9 +69,9 @@ fun AddPostScreen(
         formState = formState,
         isUploading = isUploading,
         eventFlow = viewModel.eventFlow,
-        onChangePostTitle = { viewModel.onChangePostTitle(it) },
-        onChangePostBody = { viewModel.onChangePostBody(it) },
-        onChangeImageUri = { viewModel.onChangePhotoUri(it) },
+        onChangePostTitle = viewModel::onChangePostTitle,
+        onChangePostBody = viewModel::onChangePostBody,
+        onChangeImageUri = viewModel::onChangePhotoUri ,
         onSubmit = {
             authUser?.let { user ->
                 Intent(context,UploadPostService::class.java).also {
@@ -156,7 +158,7 @@ fun AddPostScreenContent(
             onBackPress()
         }
         if (formState.isSaveDraftModalOpen) {
-            DraftConfirmBox(
+            DraftConfirmDialog(
                 onSaveDraftDismiss = onSaveDraftDismiss,
                 onSaveDraftConfirm = onSaveDraftConfirm,
                 onCloseDialog = onCloseDialog,
@@ -165,12 +167,8 @@ fun AddPostScreenContent(
         when(uiState){
             is AddPostScreenUiState.NotLoggedIn -> {
                 NotLoggedInComponent(
-                    navigateToLoginScreen = {
-
-                    },
-                    navigateToSignUpScreen ={
-
-                    }
+                    navigateToLoginScreen = navigateToLoginScreen,
+                    navigateToSignUpScreen =navigateToSignUpScreen
                 )
             }
             is AddPostScreenUiState.LoggedIn -> {
@@ -194,8 +192,9 @@ fun AddPostScreenContent(
                                         modifier = Modifier
                                             .fillMaxWidth(0.7f)
                                             .height(135.dp),
-                                        contentDescription = "Add Post Image"
-                                        )
+                                        contentDescription = "Add Post Image",
+                                        contentScale = ContentScale.FillBounds
+                                    )
                                 }
                                 Column(
                                     modifier = Modifier
@@ -290,59 +289,3 @@ fun AddPostScreenContent(
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DraftConfirmBox(
-    modifier: Modifier = Modifier,
-    onSaveDraftConfirm: () -> Unit,
-    onSaveDraftDismiss: () -> Unit,
-    onCloseDialog: () -> Unit,
-
-    ) {
-
-    AlertDialog(
-        onDismissRequest = {
-            onCloseDialog()
-        },
-        title = {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = "Save Draft",
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center
-            )
-        },
-        text = {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = "Do you want to save this draft ?",
-
-                textAlign = TextAlign.Center
-            )
-        },
-        confirmButton = {
-            TextButton(
-
-                onClick = {
-                    onSaveDraftConfirm()
-                }
-            ) {
-                Text(text = "Save ".uppercase())
-            }
-        },
-        dismissButton = {
-            TextButton(
-
-                onClick = {
-                    onCloseDialog()
-                },
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                )
-            ) {
-                Text(text = "Close".uppercase())
-            }
-        }
-    )
-}

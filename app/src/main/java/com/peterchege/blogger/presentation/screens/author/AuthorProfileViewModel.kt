@@ -23,15 +23,21 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.peterchege.blogger.core.api.requests.FollowUser
+import com.peterchege.blogger.core.api.requests.LikePost
 import com.peterchege.blogger.core.api.requests.UnFollowUser
 import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.core.util.Resource
+import com.peterchege.blogger.core.util.UiEvent
+import com.peterchege.blogger.data.local.posts.likes.LikesLocalDataSource
+import com.peterchege.blogger.data.local.posts.saved.SavedPostsDataSource
 import com.peterchege.blogger.data.local.users.follower.FollowersLocalDataSource
 import com.peterchege.blogger.data.local.users.following.FollowingLocalDataSource
+import com.peterchege.blogger.domain.mappers.toEntity
 import com.peterchege.blogger.domain.paging.ProfileScreenPostsPagingSource
 import com.peterchege.blogger.domain.repository.AuthRepository
+import com.peterchege.blogger.domain.repository.PostRepository
 import com.peterchege.blogger.domain.repository.ProfileRepository
 import com.peterchege.blogger.domain.use_case.GetProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -65,9 +71,15 @@ class AuthorProfileViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val followersLocalDataSource: FollowersLocalDataSource,
     private val followingLocalDataSource:FollowingLocalDataSource,
+    private val likesLocalDataSource: LikesLocalDataSource,
+    private val savedPostsDataSource: SavedPostsDataSource,
+    private val postRepository: PostRepository,
 ) : ViewModel() {
 
     private val userId = savedStateHandle.getStateFlow(key = "userId", initialValue = "")
+
+    private val _eventFlow = MutableSharedFlow<UiEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
 
     private val isUserLoggedIn = authRepository.isUserLoggedIn
         .stateIn(
@@ -91,6 +103,21 @@ class AuthorProfileViewModel @Inject constructor(
         )
 
     private val followerUserIds = followersLocalDataSource.getAllAuthUserFollowerIds()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = emptyList()
+        )
+
+    val likedPostIds = likesLocalDataSource.getAllLikes()
+        .map { it.map { it.likepostId } }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000L),
+                initialValue = emptyList()
+            )
+
+    val savedPostIds = savedPostsDataSource.getSavedPostIds()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000L),
@@ -201,9 +228,61 @@ class AuthorProfileViewModel @Inject constructor(
 
                 }
             }
-
         }
     }
+
+    fun bookmarkPost(post: Post){
+        viewModelScope.launch {
+            postRepository.insertSavedPost(post)
+            _eventFlow.emit(UiEvent.ShowSnackbar(message = "Post added to bookmarks"))
+        }
+    }
+    fun unBookmarkPost(post: Post){
+        viewModelScope.launch {
+            postRepository.deleteSavedPostById(post.postId)
+            _eventFlow.emit(UiEvent.ShowSnackbar(message = "Post removed from bookmarks"))
+        }
+    }
+    fun likePost(post: Post,user:User){
+        viewModelScope.launch {
+            val likePost = LikePost(userId = user.userId,postId = post.postId)
+            val response = postRepository.likePost(likePost)
+            when(response){
+                is NetworkResult.Success -> {
+                    response.data.like?.let {
+                        likesLocalDataSource.insertLike(like = it.toEntity())
+                    }
+                }
+                is NetworkResult.Error -> {
+
+                }
+                is NetworkResult.Exception -> {
+
+                }
+            }
+        }
+    }
+    fun unLikePost(post: Post,user:User){
+        viewModelScope.launch {
+            val likePost = LikePost(userId = user.userId,postId = post.postId)
+            val response = postRepository.unlikePost(likePost)
+            when(response){
+                is NetworkResult.Success -> {
+                    likesLocalDataSource.deleteLike(postId = post.postId)
+                }
+                is NetworkResult.Error -> {
+
+                }
+                is NetworkResult.Exception -> {
+
+                }
+            }
+        }
+    }
+
+
+
+
 
 
 }

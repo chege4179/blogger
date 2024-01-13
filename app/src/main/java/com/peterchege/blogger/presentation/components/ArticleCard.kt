@@ -30,15 +30,57 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.SubcomposeAsyncImage
 import com.peterchege.blogger.core.api.responses.models.Post
+import com.peterchege.blogger.core.api.responses.models.PostAuthor
+import com.peterchege.blogger.core.api.responses.models.PostCount
 import com.peterchege.blogger.presentation.theme.LightIconColor
 
+@OptIn(ExperimentalCoilApi::class)
+@Preview
+@Composable
+fun ArticleCardPreview(){
+    ArticleCard(
+        post = Post(
+            postId = "",
+            postTitle = "djdjdj",
+            postBody = "",
+            postAuthorId = "",
+            createdAt = "",
+            updatedAt = "",
+            imageUrl = "http://res.cloudinary.com/dhuqr5iyw/image/upload/v1705085833/instamall/6a15b8866642626f0c1e6d69ceab2240.jpg",
+            postAuthor = PostAuthor(
+                userId = "",
+                email = "",
+                username = "",
+                password = "",
+                createdAt = "",
+                updatedAt = "",
+                imageUrl = "",
+                fullName = "Peter Chege"
+            ),
+            _count = PostCount(
+                likes = 0,
+                views = 0,
+                comments = 0
+            )
+        ),
+        onItemClick = {  },
+        onProfileNavigate ={  } ,
+        onDeletePost = {  },
+        isLiked = false,
+        isSaved = false,
+        isProfile = false
+    )
+}
 
 @ExperimentalCoilApi
 @Composable
@@ -104,16 +146,14 @@ fun ArticleCard(
                         Row(
                             modifier = Modifier.fillMaxWidth()
                         ) {
+                            val annotatedText = buildAnnotatedString {
+                                append("By: ")
+                                pushStyle(SpanStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp))
+                                append(post.postAuthor.fullName)
+                                pop()
+                            }
                             Text(
-                                text = "By : ",
-                                modifier = Modifier
-                                    .padding(vertical = 7.dp)
-//                                    .clickable {
-//                                        onProfileNavigate(post.postAuthor)
-//                                    }
-                            )
-                            Text(
-                                text = post.postAuthor.fullName,
+                                text = annotatedText,
                                 modifier = Modifier
                                     .padding(vertical = 7.dp)
                                     .clickable {

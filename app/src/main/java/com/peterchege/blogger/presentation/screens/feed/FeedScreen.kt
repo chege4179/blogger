@@ -29,10 +29,12 @@ import androidx.compose.material3.pulltorefresh.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -42,6 +44,7 @@ import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.core.util.categories
+import com.peterchege.blogger.core.util.toast
 import com.peterchege.blogger.domain.mappers.toPost
 import com.peterchege.blogger.domain.repository.NetworkStatus
 import com.peterchege.blogger.presentation.components.ArticleCard
@@ -71,7 +74,7 @@ fun FeedScreen(
     val networkStatus by viewModel.networkStatus.collectAsStateWithLifecycle()
     val isSyncing by viewModel.isSyncing.collectAsStateWithLifecycle()
     val feedScreenUiState by viewModel.feedScreenUiState.collectAsStateWithLifecycle()
-
+    val context = LocalContext.current
     val pullRefreshState = rememberPullToRefreshState()
     LaunchedEffect(key1 = pullRefreshState.isRefreshing) {
         viewModel.refreshFeed()
@@ -93,16 +96,26 @@ fun FeedScreen(
         bookmarkPost = viewModel::bookmarkPost,
         unBookmarkPost = viewModel::unBookmarkPost,
         likePost = { post ->
+            if (authUser == null){
+                context.toast(msg = "Login or create an account to like a post")
+            }
             authUser?.let { user ->
                 if (user.userId != "") {
                     viewModel.likePost(post = post, user = user)
+                }else{
+                    context.toast(msg = "Login or create an account to like a post")
                 }
             }
         },
         unLikePost = { post ->
+            if (authUser == null){
+                context.toast(msg = "Login or create an account to like a post")
+            }
             authUser?.let { user ->
                 if (user.userId != "") {
                     viewModel.unLikePost(post = post, user = user)
+                }else{
+                    context.toast(msg = "Login or create an account to like a post")
                 }
             }
         }
@@ -132,7 +145,7 @@ fun FeedScreenContent(
     unLikePost: (Post) -> Unit,
 
     ) {
-    val snackbarHostState = SnackbarHostState()
+    val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(key1 = networkStatus) {
         when (networkStatus) {
             is NetworkStatus.Unknown -> {}
@@ -274,8 +287,8 @@ fun FeedScreenContent(
                                     onItemClick = { post ->
                                         navigateToPostScreen(post.postId)
                                     },
-                                    onProfileNavigate = { username ->
-                                        navigateToAuthorProfileScreen(username)
+                                    onProfileNavigate = { userId ->
+                                        navigateToAuthorProfileScreen(userId)
                                     },
                                     onDeletePost = {},
                                     isLiked = post.isLiked,

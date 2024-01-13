@@ -16,7 +16,10 @@
 package com.peterchege.blogger.core.util
 
 
+import android.content.Context
+import android.health.connect.datatypes.units.Length
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -48,4 +51,17 @@ fun addThreeHoursToDateString(dateString: String): String {
     val updatedDateString = updatedDateTime.format(formatter)
 
     return updatedDateString
+}
+
+fun Context.toast(msg:String){
+    Toast.makeText(this,msg,Toast.LENGTH_LONG).show()
+}
+
+
+fun truncateString(str: String, n: Int): String {
+    return if ((str?.length ?: 0) > n) {
+        "${str.substring(0, n - 1)}...."
+    } else {
+        str
+    }
 }
