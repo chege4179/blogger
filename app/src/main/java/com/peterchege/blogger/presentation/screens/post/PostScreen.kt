@@ -17,6 +17,7 @@ package com.peterchege.blogger.presentation.screens.post
 
 
 import android.annotation.SuppressLint
+import android.view.Window
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -41,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -66,6 +68,7 @@ import kotlinx.coroutines.flow.collectLatest
 fun PostScreen(
     viewModel: PostScreenViewModel = hiltViewModel()
 ) {
+
     val authUser by viewModel.authUserFlow.collectAsStateWithLifecycle(initialValue = null)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val commentUiState by viewModel.commentUiState.collectAsStateWithLifecycle()

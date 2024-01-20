@@ -69,8 +69,7 @@ import com.peterchege.blogger.presentation.components.PagingLoader
 @Composable
 fun CommentsBottomSheetPreview() {
     CommentsBottomSheet(
-        comments =
-        Pager(
+        comments = Pager(
             config = PagingConfig(
                 pageSize = 20,
                 enablePlaceholders = false
@@ -100,9 +99,48 @@ fun CommentsBottomSheet(
         Scaffold(
             modifier = Modifier
                 .fillMaxSize(),
+            bottomBar = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+
+                ) {
+                    val comment = remember {
+                        mutableStateOf("Comment.....")
+                    }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        OutlinedTextField(
+                            modifier = Modifier.fillMaxSize(),
+                            value = comment.value,
+                            onValueChange = {
+                                comment.value = it
+                            },
+                            trailingIcon = {
+                                IconButton(
+                                    onClick = {
+
+                                    }
+                                ) {
+                                    Icon(
+                                        modifier = Modifier.size(30.dp),
+                                        imageVector = Icons.AutoMirrored.Filled.Send,
+                                        contentDescription = "Send"
+                                    )
+                                }
+                            }
+                        )
+                    }
+                }
+            }
         ) { paddingValues ->
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
             ) {
                 Row(
                     modifier = Modifier
@@ -149,41 +187,7 @@ fun CommentsBottomSheet(
                         }
                     }
                 }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
 
-                ) {
-                    val comment = remember {
-                        mutableStateOf("some text ")
-                    }
-                    Row(
-                        modifier = Modifier
-                            .fillMaxSize()
-                    ) {
-                        OutlinedTextField(
-                            modifier = Modifier.fillMaxSize(),
-                            value = comment.value,
-                            onValueChange = {
-                                comment.value = it
-                            },
-                            trailingIcon = {
-                                IconButton(
-                                    onClick = {
-
-                                    }
-                                ) {
-                                    Icon(
-                                        modifier = Modifier.size(30.dp),
-                                        imageVector = Icons.AutoMirrored.Filled.Send,
-                                        contentDescription = "Send"
-                                    )
-                                }
-                            }
-                        )
-                    }
-                }
             }
         }
     }

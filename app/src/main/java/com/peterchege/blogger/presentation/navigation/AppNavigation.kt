@@ -16,6 +16,7 @@
 package com.peterchege.blogger.presentation.navigation
 
 import android.app.Activity
+import android.view.Window
 import androidx.activity.compose.BackHandler
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
