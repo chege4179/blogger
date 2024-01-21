@@ -17,16 +17,15 @@ package com.peterchege.blogger.presentation.screens.post
 
 
 import android.annotation.SuppressLint
-import android.view.Window
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Message
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.Message
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,12 +41,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.SubcomposeAsyncImage
+import com.peterchege.blogger.core.api.responses.models.CommentWithUser
 import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.util.UiEvent
@@ -57,27 +56,30 @@ import com.peterchege.blogger.core.util.calculateNewOffset
 import com.peterchege.blogger.core.util.formatDateTime
 import com.peterchege.blogger.core.util.toast
 import com.peterchege.blogger.domain.mappers.toPost
-import com.peterchege.blogger.presentation.bottomsheets.CommentsBottomSheet
+import com.peterchege.blogger.presentation.alertDialogs.CommentDialog
+import com.peterchege.blogger.presentation.alertDialogs.DeleteCommentDialog
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
-import com.peterchege.blogger.presentation.alertDialogs.DeleteCommentDialog
+import com.peterchege.blogger.presentation.components.postCommentsSection
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
+@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun PostScreen(
     viewModel: PostScreenViewModel = hiltViewModel()
 ) {
 
-    val authUser by viewModel.authUserFlow.collectAsStateWithLifecycle(initialValue = null)
+    val authUser by viewModel.authUserFlow.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val commentUiState by viewModel.commentUiState.collectAsStateWithLifecycle()
-    val deletePostUiState by viewModel.deletePostUiState.collectAsStateWithLifecycle()
+
     val context = LocalContext.current
+
+
     PostScreenContent(
         uiState = uiState,
         commentUiState = commentUiState,
-        deletePostUiState = deletePostUiState,
         onLikePost = { it1 ->
             if (authUser == null){
                 context.toast(msg = "Login or create an account to like a post")
@@ -99,20 +101,19 @@ fun PostScreen(
                 }
             }
         },
-        onFollowUser = viewModel::followUser,
-        onUnFollowUser = viewModel::unfollowUser,
         onChangeNewComment = viewModel::onChangeComment,
         savePost = viewModel::savePostToRoom,
         unSavePost = viewModel::deletePostFromRoom,
-        openCommentDialog = viewModel::onDialogOpen,
-        closeCommentDialog = viewModel::onDialogDismiss,
-        openDeleteDialog = viewModel::onDialogDeleteOpen,
-        closeDeleteDialog = viewModel::onDialogDeleteDismiss,
+        openCommentDialog = viewModel::onCommentDialogOpen,
+        closeCommentDialog = viewModel::onCommentDialogDismiss,
         eventFlow = viewModel.eventFlow,
         user = authUser,
+        toggleDeleteCommentDialog = viewModel::toggleDeleteCommentDialog,
         postComment = {
-            viewModel.onDialogConfirm(authUser!!)
-        }
+            viewModel.onCommentDialogConfirm(authUser!!,it)
+        },
+        deleteComment = viewModel::deleteComment,
+        setCommentToBeDeleted = viewModel::setCommentToBeDeleted
     )
 }
 
@@ -124,21 +125,19 @@ fun PostScreen(
 fun PostScreenContent(
     uiState: PostScreenUiState,
     commentUiState: CommentUiState,
-    deletePostUiState: DeletePostUiState,
+    toggleDeleteCommentDialog:() -> Unit,
     onLikePost: (Post) -> Unit,
     onUnlikePost: (Post) -> Unit,
-    onFollowUser: (User, String) -> Unit,
-    onUnFollowUser: (User, String) -> Unit,
     onChangeNewComment: (String) -> Unit,
     savePost: (Post) -> Unit,
     unSavePost: (String) -> Unit,
     openCommentDialog: () -> Unit,
     closeCommentDialog: () -> Unit,
-    openDeleteDialog: () -> Unit,
-    closeDeleteDialog: () -> Unit,
     eventFlow: SharedFlow<UiEvent>,
     user: User?,
-    postComment: () -> Unit,
+    postComment: (() -> Unit) -> Unit,
+    deleteComment:(() -> Unit) -> Unit,
+    setCommentToBeDeleted:(CommentWithUser) -> Unit,
 ) {
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -171,7 +170,7 @@ fun PostScreenContent(
                 }
             ) {
                 Icon(
-                    imageVector = Icons.Outlined.Message,
+                    imageVector = Icons.AutoMirrored.Outlined.Message,
                     contentDescription = "Add a comment"
                 )
             }
@@ -199,20 +198,27 @@ fun PostScreenContent(
             is PostScreenUiState.Success -> {
                 val post = uiState.post
                 val comments = uiState.comments.collectAsLazyPagingItems()
-                if (deletePostUiState.isDeleteDialogOpen) {
+
+                if (commentUiState.isDeleteCommentDialogVisible &&(commentUiState.commentToBeDeleted != null)) {
                     DeleteCommentDialog(
-                        post = post.toPost(),
-                        closeDeleteDialog = { closeDeleteDialog() },
-                        deletePost = { },
+                        comment = commentUiState.commentToBeDeleted,
+                        closeDeleteDialog = toggleDeleteCommentDialog,
+                        deleteComment = {
+                            deleteComment{ comments.refresh() }
+                        }
                     )
                 }
-//                CommentDialog(
-//                    closeCommentDialog = { closeCommentDialog() },
-//                    commentUiState = commentUiState,
-//                    postComment = { postComment() },
-//                    onChangeNewComment = { onChangeNewComment(it) },
-//                    isUserLoggedIn = uiState.isUserLoggedIn,
-//                )
+
+                if (commentUiState.isCommentDialogVisible){
+                    CommentDialog(
+                        closeCommentDialog = { closeCommentDialog() },
+                        commentUiState = commentUiState,
+                        postComment = { postComment{ comments.refresh() } },
+                        onChangeNewComment = { onChangeNewComment(it) },
+                        isUserLoggedIn = uiState.isUserLoggedIn,
+                    )
+                }
+
                 LazyColumn(
                     modifier = Modifier.padding(paddingValues)
                 ) {
@@ -313,9 +319,7 @@ fun PostScreenContent(
                                         Text(
                                             text = post.postAuthor.fullName,
                                             fontWeight = FontWeight.Bold,
-                                            modifier = Modifier.clickable {
-//                                                navController.navigate(Screens.AUTHOR_PROFILE_SCREEN + "/${state.post.postAuthor}")
-                                            }
+                                            modifier = Modifier.clickable {}
                                         )
                                         Icon(
                                             imageVector = if (post.isLiked)
@@ -401,29 +405,15 @@ fun PostScreenContent(
                                         .height(8.dp)
                                         .padding(15.dp)
                                 )
-                                Text(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 15.dp),
-                                    text = "Comments (${post._count.comments})",
-                                    textAlign = TextAlign.Start,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 27.sp
-                                )
-                                HorizontalDivider(
-                                    modifier = Modifier.padding(10.dp),
-                                    thickness = 1.dp,
-                                    color = Color.Blue
-                                )
-
                             }
                         }
                     }
-                }
-                if (commentUiState.isCommentsBottomSheetOpen) {
-                    CommentsBottomSheet(
+                    postCommentsSection(
                         comments = comments,
-                        commentsBottomSheetState = commentsBottomSheetState
+                        postAuthorId = post.postAuthorId,
+                        authUser = user,
+                        toggleDeleteCommentDialog = toggleDeleteCommentDialog,
+                        setCommentToBeDeleted = setCommentToBeDeleted
                     )
                 }
             }

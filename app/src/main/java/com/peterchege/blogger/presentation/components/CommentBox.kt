@@ -15,8 +15,10 @@
  */
 package com.peterchege.blogger.presentation.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,51 +52,42 @@ import coil.compose.rememberImagePainter
 import com.peterchege.blogger.core.api.responses.models.CommentCount
 import com.peterchege.blogger.core.api.responses.models.CommentUser
 import com.peterchege.blogger.core.api.responses.models.CommentWithUser
+import com.peterchege.blogger.core.api.responses.models.User
 import java.util.UUID
 
-@Preview
-@Composable
-fun CommentBoxPreview() {
-    CommentBox(
-        comment = CommentWithUser(
-            commentId = UUID.randomUUID().toString() ,
-            message = "Dummy Text is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum",
-            commentUserId = UUID.randomUUID().toString(),
-            commentPostId = UUID.randomUUID().toString(),
-            parentId = null,
-            createdAt = "2023-12-02T18:55:36.935Z",
-            updatedAt = "2023-12-02T18:55:36.935Z",
-            _count = CommentCount(commentLikes = 23),
-            user = CommentUser(
-                userId = UUID.randomUUID().toString(),
-                email = "peter@gmail.com",
-                fullName = "peter",
-                username = "peter",
-                imageUrl = "https://ui-avatars.com/api/?background=719974&color=fff&name=Peter+Chege&bold=true&fontsize=0.6",
-                createdAt = "2023-12-02T18:55:36.935Z",
-                updatedAt = "2023-12-02T18:55:36.935Z",
-                password = "2023-12-02T18:55:36.935Z",
-            )
-        )
-    )
 
-}
-
+@OptIn(ExperimentalFoundationApi::class)
 @ExperimentalCoilApi
 @Composable
 fun CommentBox(
+    postAuthorId:String,
     comment: CommentWithUser,
+    authUser: User?,
+    openDeleteCommentDialog: () -> Unit,
+    setCommentToBeDeleted:(CommentWithUser) -> Unit,
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight()
-            ,
+            .fillMaxHeight(),
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    onClick = {
 
-            ) {
+                    },
+                    onLongClick ={
+                        if (authUser != null && authUser.userId != ""){
+                            if (postAuthorId == authUser.userId){
+                                setCommentToBeDeleted(comment)
+                                openDeleteCommentDialog()
+                            }
+                        }
+                    }
+                ),
+        ) {
             Image(
                 modifier = Modifier
                     .padding(5.dp)
@@ -155,5 +148,38 @@ fun CommentBox(
         }
 
     }
+
+}
+
+
+@Preview
+@Composable
+fun CommentBoxPreview() {
+    CommentBox(
+        comment = CommentWithUser(
+            commentId = UUID.randomUUID().toString(),
+            message = "Dummy Text is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum",
+            commentUserId = UUID.randomUUID().toString(),
+            commentPostId = UUID.randomUUID().toString(),
+            parentId = null,
+            createdAt = "2023-12-02T18:55:36.935Z",
+            updatedAt = "2023-12-02T18:55:36.935Z",
+            _count = CommentCount(commentLikes = 23),
+            user = CommentUser(
+                userId = UUID.randomUUID().toString(),
+                email = "peter@gmail.com",
+                fullName = "peter",
+                username = "peter",
+                imageUrl = "https://ui-avatars.com/api/?background=719974&color=fff&name=Peter+Chege&bold=true&fontsize=0.6",
+                createdAt = "2023-12-02T18:55:36.935Z",
+                updatedAt = "2023-12-02T18:55:36.935Z",
+                password = "2023-12-02T18:55:36.935Z",
+            )
+        ),
+        authUser = null,
+        postAuthorId = "",
+        openDeleteCommentDialog = { },
+        setCommentToBeDeleted = { }
+    )
 
 }

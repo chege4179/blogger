@@ -23,6 +23,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.peterchege.blogger.core.api.requests.CommentBody
+import com.peterchege.blogger.core.api.requests.DeleteCommentBody
 import com.peterchege.blogger.core.api.requests.FollowUser
 import com.peterchege.blogger.core.api.requests.LikePost
 import com.peterchege.blogger.core.api.requests.Viewer
@@ -65,12 +66,11 @@ sealed interface PostScreenUiState {
 
 data class CommentUiState(
     val newComment: String = "",
-    val isCommentsBottomSheetOpen: Boolean = false
+    val isCommentDialogVisible: Boolean = false,
+    val isDeleteCommentDialogVisible: Boolean = false,
+    val commentToBeDeleted: CommentWithUser? = null,
 )
 
-data class DeletePostUiState(
-    val isDeleteDialogOpen: Boolean = false,
-)
 
 @HiltViewModel
 class PostScreenViewModel @Inject constructor(
@@ -87,6 +87,11 @@ class PostScreenViewModel @Inject constructor(
     private val postFlow = repository.getPostById(postId = postId.value)
 
     val authUserFlow = authRepository.getLoggedInUser()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = null,
+        )
 
     private val isUserLoggedIn = authRepository.isUserLoggedIn
 
@@ -97,9 +102,6 @@ class PostScreenViewModel @Inject constructor(
 
     private val _commentUiState = MutableStateFlow(CommentUiState())
     val commentUiState = _commentUiState.asStateFlow()
-
-    private val _deleteUiState = MutableStateFlow(DeletePostUiState())
-    val deletePostUiState = _deleteUiState.asStateFlow()
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -138,32 +140,28 @@ class PostScreenViewModel @Inject constructor(
             )
 
 
-    fun onDialogConfirm(user: User) {
-        _commentUiState.value = _commentUiState.value.copy(isCommentsBottomSheetOpen = false)
+    fun onCommentDialogConfirm(user: User, refresh: () -> Unit) {
+        onCommentDialogDismiss()
+        postComment(
+            CommentBody(
+                commentBody = _commentUiState.value.newComment,
+                userId = user.userId,
+                commentPostId = postId.value
+            ),
+            refresh = refresh
+        )
+    }
 
-        savedStateHandle.get<String>("postId")?.let { postId ->
-            postComment(
-                CommentBody(
-                    commentBody = _commentUiState.value.newComment,
-                    userId = user.userId,
-                    commentPostId = postId
-                ),
-            )
+    fun onCommentDialogOpen() {
+        _commentUiState.update {
+            it.copy(isCommentDialogVisible = true)
         }
     }
 
-    fun onDialogOpen() {
-        _commentUiState.value = _commentUiState.value.copy(isCommentsBottomSheetOpen = true)
-
-    }
-
-    fun onDialogDismiss() {
-        _commentUiState.value = _commentUiState.value.copy(isCommentsBottomSheetOpen = false)
-    }
-
-    fun deletePost() {
-
-
+    fun onCommentDialogDismiss() {
+        _commentUiState.update {
+            it.copy(isCommentDialogVisible = false)
+        }
     }
 
     @OptIn(ExperimentalPagingApi::class)
@@ -182,37 +180,6 @@ class PostScreenViewModel @Inject constructor(
         ).flow
     }
 
-    fun onDialogDeleteConfirm() {
-        _deleteUiState.value = _deleteUiState.value.copy(isDeleteDialogOpen = false)
-        viewModelScope.launch {
-            val response = repository.deletePostFromApi(postId = postId.value)
-            when (response) {
-                is NetworkResult.Success -> {
-                    _eventFlow.emit(UiEvent.ShowSnackbar(message = response.data.msg))
-                }
-
-                is NetworkResult.Exception -> {
-                    _eventFlow.emit(
-                        UiEvent.ShowSnackbar(
-                            message =
-                            response.e.message ?: response.e.localizedMessage
-                        )
-                    )
-                }
-
-                is NetworkResult.Error -> {
-                    _eventFlow.emit(
-                        UiEvent.ShowSnackbar(
-                            message = response.message ?: "An unexpected error occurred"
-                        )
-                    )
-                }
-
-            }
-
-        }
-    }
-
     private fun addViewCount(user: User) {
         viewModelScope.launch {
             delay(3000L)
@@ -226,17 +193,65 @@ class PostScreenViewModel @Inject constructor(
 
     }
 
-    fun onDialogDeleteOpen() {
-        _deleteUiState.value = _deleteUiState.value.copy(isDeleteDialogOpen = true)
-
+    fun toggleDeleteCommentDialog() {
+        val initialState = _commentUiState.value.isDeleteCommentDialogVisible
+        _commentUiState.update {
+            it.copy(isDeleteCommentDialogVisible = !initialState)
+        }
     }
 
-    fun onDialogDeleteDismiss() {
-        _deleteUiState.value = _deleteUiState.value.copy(isDeleteDialogOpen = false)
+    fun setCommentToBeDeleted(commentToBeDeleted: CommentWithUser?) {
+        _commentUiState.update {
+            it.copy(commentToBeDeleted = commentToBeDeleted)
+        }
     }
 
     fun onChangeComment(text: String) {
-        _commentUiState.value = _commentUiState.value.copy(newComment = text)
+        _commentUiState.update {
+            it.copy(newComment = text)
+        }
+    }
+
+    fun deleteComment(refresh: () -> Unit) {
+        val commentId = _commentUiState.value.commentToBeDeleted?.commentId ?: return
+        viewModelScope.launch {
+            val requestBody = DeleteCommentBody(commentId = commentId)
+            val response = commentRepository.deleteComment(deleteCommentBody = requestBody)
+            when (response) {
+                is NetworkResult.Success -> {
+                    if (response.data.success) {
+                        _eventFlow.emit(
+                            UiEvent.ShowSnackbar(
+                                message = "Comment deleted successfully")
+                        )
+                        refresh()
+                    } else {
+                        _eventFlow.emit(
+                            UiEvent.ShowSnackbar(
+                                message = "An unexpected error occurred")
+                        )
+                    }
+                }
+
+                is NetworkResult.Exception -> {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            message = "An exception occurred"
+                        )
+                    )
+
+                }
+
+                is NetworkResult.Error -> {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            message = "An error occurred"
+                        )
+                    )
+                }
+            }
+        }
+
     }
 
     fun savePostToRoom(post: Post) {
@@ -264,29 +279,6 @@ class PostScreenViewModel @Inject constructor(
             } catch (e: IOException) {
                 _eventFlow.emit(UiEvent.ShowSnackbar(message = "An error occurred deleting your saved Post"))
             }
-        }
-    }
-
-    fun followUser(user: User, postAuthorId: String) {
-        viewModelScope.launch {
-//            val followResponse = repository.followUser(
-//                FollowUser(
-//                    followerUserId = user.userId,
-//                    followedUserId = postAuthorId
-//                )
-//            )
-
-        }
-    }
-
-    fun unfollowUser(user: User, postAuthorId: String) {
-        viewModelScope.launch {
-//            val followResponse = repository.unfollowUser(
-//                FollowUser(
-//                    followerUserId = user.userId,
-//                    followedUserId = postAuthorId
-//                )
-//            )
         }
     }
 
@@ -332,11 +324,8 @@ class PostScreenViewModel @Inject constructor(
         }
     }
 
-    private fun addComment(comment: Comment) {
 
-    }
-
-    private fun postComment(commentBody: CommentBody) {
+    private fun postComment(commentBody: CommentBody, refresh: () -> Unit) {
         viewModelScope.launch {
             val commentResponse = commentRepository.postComment(commentBody)
             when (commentResponse) {
@@ -344,7 +333,7 @@ class PostScreenViewModel @Inject constructor(
                     _commentUiState.value = _commentUiState.value.copy(newComment = "")
                     if (commentResponse.data.success) {
                         _eventFlow.emit(UiEvent.ShowSnackbar(message = commentResponse.data.msg))
-                        addComment(commentResponse.data.comment)
+                        refresh()
 
                     }
                 }

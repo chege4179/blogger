@@ -16,6 +16,7 @@
 package com.peterchege.blogger.presentation.navigation
 
 import androidx.navigation.NavController
+import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.util.Screens
 
 fun NavController.navigateToLoginScreen(){
@@ -82,6 +83,7 @@ fun NavController.navigateToEditProfileScreen(){
     navigate(route = Screens.EDIT_PROFILE_SCREEN)
 }
 
-fun NavController.navigateToEditPostScreen(postId: String){
-    navigate(route = Screens.EDIT_POST_SCREEN + "/$postId")
+fun NavController.navigateToEditPostScreen(post: Post){
+    currentBackStackEntry?.savedStateHandle?.set(key = "post",value = post)
+    navigate(route = Screens.EDIT_POST_SCREEN)
 }

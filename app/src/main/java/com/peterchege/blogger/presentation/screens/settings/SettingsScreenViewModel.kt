@@ -18,6 +18,8 @@ package com.peterchege.blogger.presentation.screens.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.peterchege.blogger.core.api.requests.LogoutUser
+import com.peterchege.blogger.core.datastore.preferences.DefaultThemeProvider
+import com.peterchege.blogger.core.util.ThemeConfig
 import com.peterchege.blogger.data.local.posts.likes.LikesLocalDataSource
 import com.peterchege.blogger.data.local.users.follower.FollowersLocalDataSource
 import com.peterchege.blogger.domain.repository.AuthRepository
@@ -26,6 +28,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -41,10 +44,18 @@ class SettingsScreenViewModel @Inject constructor(
     private val followersLocalDataSource: FollowersLocalDataSource,
     private val followingLocalDataSource: FollowersLocalDataSource,
     private val likesLocalDataSource: LikesLocalDataSource,
+    private val defaultThemeProvider: DefaultThemeProvider,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingScreenUiState())
     val uiState = _uiState.asStateFlow()
+
+    val theme = defaultThemeProvider.theme
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = ThemeConfig.FOLLOW_SYSTEM
+        )
 
     val fcmToken = authRepository.fcmToken
         .stateIn(
@@ -63,13 +74,18 @@ class SettingsScreenViewModel @Inject constructor(
 
     fun toggleSignOutDialog() {
         val currentState = _uiState.value.isSignOutDialogOpen
-        _uiState.value = _uiState.value.copy(isSignOutDialogOpen = !currentState)
+        _uiState.update {
+            it.copy(isSignOutDialogOpen = !currentState)
+        }
+
 
     }
 
     fun toggleThemeDialog() {
         val currentState = _uiState.value.isThemeDialogOpen
-        _uiState.value = _uiState.value.copy(isThemeDialogOpen = !currentState)
+        _uiState.update {
+            it.copy(isThemeDialogOpen = !currentState)
+        }
     }
 
     fun signOutUser(userId:String, fcmToken:String,navigateToHome: () -> Unit) {
@@ -85,6 +101,12 @@ class SettingsScreenViewModel @Inject constructor(
             followersLocalDataSource.deleteAllFollowers()
             followingLocalDataSource.deleteAllFollowers()
             navigateToHome()
+        }
+    }
+
+    fun changeTheme(newTheme:String){
+        viewModelScope.launch {
+            defaultThemeProvider.setTheme(themeValue = newTheme)
         }
     }
 

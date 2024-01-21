@@ -37,6 +37,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
@@ -52,6 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.SecureFlagPolicy
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadState
 import androidx.paging.Pager
@@ -95,6 +97,11 @@ fun CommentsBottomSheet(
     ModalBottomSheet(
         sheetState = commentsBottomSheetState,
         onDismissRequest = { /*TODO*/ },
+        properties = ModalBottomSheetProperties(
+            shouldDismissOnBackPress = true,
+            isFocusable = true,
+            securePolicy = SecureFlagPolicy.SecureOn
+        )
     ) {
         Scaffold(
             modifier = Modifier
@@ -137,58 +144,7 @@ fun CommentsBottomSheet(
                 }
             }
         ) { paddingValues ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(30.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
-                ) {
-                    Text(
-                        text = "Comments (${comments.itemCount})",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                    )
-                }
-                HorizontalDivider(
-                    color = Color.Blue,
-                    thickness = 1.dp,
-                    modifier = Modifier.padding(vertical = 10.dp, horizontal = 0.dp)
-                )
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f)
-                ) {
-                    items(
-                        count = comments.itemCount,
-                        key = { it }
-                    ) { position ->
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 15.dp)
-                        ) {
-                            comments[position]?.let {
-                                CommentBox(comment = it)
-                            }
-                            Spacer(modifier = Modifier.height(10.dp))
-                        }
-                    }
 
-                    item {
-                        if (comments.loadState.prepend is LoadState.Loading) {
-                            PagingLoader()
-                        }
-                    }
-                }
-
-            }
         }
     }
 }

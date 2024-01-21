@@ -17,16 +17,29 @@ package com.peterchege.blogger.core.datastore.preferences
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import com.peterchege.blogger.core.util.ThemeConfig
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-enum class ThemeConfig {
-    FOLLOW_SYSTEM,
-    LIGHT,
-    DARK,
-}
+
 class DefaultThemeProvider @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) {
+
+    private val THEME = stringPreferencesKey(name = "theme")
+
+    val theme = dataStore.data.map { preferences ->
+        preferences[THEME] ?: ThemeConfig.FOLLOW_SYSTEM
+    }
+
+    suspend fun setTheme(themeValue:String){
+        dataStore.edit { preferences ->
+            preferences[THEME] = themeValue
+        }
+    }
+
 
 
 }

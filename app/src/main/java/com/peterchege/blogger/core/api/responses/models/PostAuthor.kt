@@ -15,8 +15,12 @@
  */
 package com.peterchege.blogger.core.api.responses.models
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
+
+@Parcelize
 @Serializable
 data class PostAuthor(
     val userId: String,
@@ -27,4 +31,4 @@ data class PostAuthor(
     val imageUrl: String,
     val createdAt: String,
     val updatedAt: String,
-)
+):Parcelable

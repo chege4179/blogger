@@ -150,7 +150,7 @@ interface BloggerApi {
         @Body commentBody: ReplyCommentBody
     ): Response<AddCommentResponse>
 
-    @DELETE("/comment/remove")
+    @POST("/comment/remove")
     suspend fun removeComment(
         @Body commentBody: DeleteCommentBody
     ): Response<DeleteCommentResponse>

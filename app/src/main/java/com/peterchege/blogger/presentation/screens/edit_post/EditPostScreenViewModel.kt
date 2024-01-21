@@ -17,7 +17,15 @@ package com.peterchege.blogger.presentation.screens.edit_post
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.peterchege.blogger.core.api.responses.models.Post
+import com.peterchege.blogger.core.api.responses.models.PostAuthor
+import com.peterchege.blogger.core.api.responses.models.PostCount
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,7 +33,28 @@ class EditPostScreenViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel(){
 
-    val postId = savedStateHandle.getStateFlow(key = "postId",initialValue = "")
+    private val _editPost = MutableStateFlow<Post?>(null)
+    val editPost = _editPost.asStateFlow()
 
 
+    fun setEditPost(post: Post){
+        _editPost.update { post }
+    }
+
+    fun onChangePostBody(text:String){
+        _editPost.update {
+            it?.copy(postBody = text)
+        }
+    }
+    fun onChangePostTitle(text:String){
+        _editPost.update {
+            it?.copy(postTitle = text)
+        }
+    }
+
+    fun updatePost(){
+        viewModelScope.launch {
+
+        }
+    }
 }

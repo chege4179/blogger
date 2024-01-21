@@ -21,15 +21,21 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.metrics.performance.JankStats
 import androidx.navigation.compose.rememberNavController
 import coil.annotation.ExperimentalCoilApi
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.peterchege.blogger.core.services.UploadPostService
+import com.peterchege.blogger.core.util.ThemeConfig
 import com.peterchege.blogger.presentation.navigation.AppNavigation
 import com.peterchege.blogger.presentation.theme.BloggerTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -54,8 +60,11 @@ class MainActivity : ComponentActivity() {
             )
         }
         setContent {
-
-            BloggerTheme {
+            val viewModel: MainActivityViewModel = hiltViewModel()
+            val theme by viewModel.theme.collectAsStateWithLifecycle()
+            BloggerTheme(
+                darkTheme = shouldUseDarkTheme(theme = theme)
+            ) {
                 val navController = rememberNavController()
 
                 AppNavigation(
@@ -81,3 +90,13 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+
+@Composable
+private fun shouldUseDarkTheme(
+    theme: String,
+): Boolean = when (theme) {
+    ThemeConfig.FOLLOW_SYSTEM -> isSystemInDarkTheme()
+    ThemeConfig.LIGHT -> false
+    ThemeConfig.DARK -> true
+    else -> isSystemInDarkTheme()
+}

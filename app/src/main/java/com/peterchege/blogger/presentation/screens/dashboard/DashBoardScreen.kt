@@ -65,6 +65,7 @@ fun BottomNavBar(
                     )
                 },
                 label = { Text(text = item.name) },
+
                 selected = selected,
                 onClick = { onItemClick(item) }
             )
@@ -90,7 +91,7 @@ fun DashBoardScreen(
                         unselectedIcon = Icons.Outlined.Home,
                     ),
                     BottomNavItem(
-                        name = "Saved Posts",
+                        name = "Saved",
                         route = Screens.SAVED_POST_SCREEN,
                         selectedIcon = Icons.Default.Favorite,
                         unselectedIcon = Icons.Default.FavoriteBorder
@@ -114,10 +115,6 @@ fun DashBoardScreen(
                 onItemClick = {
                     bottomNavController.navigate(it.route) {
                         launchSingleTop = true
-                        restoreState = true
-                        popUpTo(bottomNavController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
                     }
                 }
             )

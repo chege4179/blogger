@@ -15,7 +15,9 @@
  */
 package com.peterchege.blogger.presentation.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,10 +27,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -47,7 +51,7 @@ import com.peterchege.blogger.presentation.theme.LightIconColor
 @OptIn(ExperimentalCoilApi::class)
 @Preview
 @Composable
-fun ArticleCardPreview(){
+fun ArticleCardPreview() {
     ArticleCard(
         post = Post(
             postId = "",
@@ -73,9 +77,9 @@ fun ArticleCardPreview(){
                 comments = 0
             )
         ),
-        onItemClick = {  },
-        onProfileNavigate ={  } ,
-        onDeletePost = {  },
+        onItemClick = { },
+        onProfileNavigate = { },
+        onDeletePost = { },
         isLiked = false,
         isSaved = false,
         isProfile = false
@@ -95,7 +99,9 @@ fun ArticleCard(
     onBookmarkPost: (Post) -> Unit = { },
     onUnBookmarkPost: (Post) -> Unit = { },
     onLikePost: (Post) -> Unit = { },
-    onUnlikePost: (Post) -> Unit = { }
+    onUnlikePost: (Post) -> Unit = { },
+    openDeleteDialog: (Post) -> Unit = { },
+    navigateToEditPostScreen: (Post) -> Unit = {},
 ) {
     Card(
         modifier = Modifier
@@ -132,17 +138,14 @@ fun ArticleCard(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column(
-                        modifier = Modifier.fillMaxWidth(0.8f)
-
+                        modifier = Modifier.fillMaxWidth(0.6f)
                     ) {
                         Text(
                             modifier = Modifier.fillMaxWidth(),
                             text = post.postTitle,
                             textAlign = TextAlign.Start,
                             fontWeight = FontWeight.Bold,
-
-
-                            )
+                        )
                         Row(
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -164,48 +167,59 @@ fun ArticleCard(
 
                             )
                         }
-
-
                     }
                     Row(
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .padding(end = 15.dp)
+                            .padding(end = 5.dp)
+                            .fillMaxWidth()
                             .fillMaxHeight()
+
                     ) {
                         if (isProfile) {
-                            Icon(
+                            CustomIconButton(
+                                imageVector = Icons.Default.Edit,
+                                onClick = {
+                                    navigateToEditPostScreen(post)
+                                },
+                                contentDescription = "Edit Post"
+                            )
+
+                            CustomIconButton(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = "Delete Article",
+                                onClick = { openDeleteDialog(post) },
+                            )
+                            CustomIconButton(
                                 imageVector = Icons.Filled.Share,
                                 contentDescription = "Share",
-                                modifier = Modifier.clickable {
-
+                                onClick = {
+                                    TODO("implement share logic")
                                 }
                             )
                         } else {
-                            Icon(
+                            CustomIconButton(
                                 imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                                contentDescription = "Like",
-                                modifier = Modifier.clickable {
-                                    if(isLiked){
+                                onClick = {
+                                    if (isLiked) {
                                         onUnlikePost(post)
-                                    }else{
+                                    } else {
                                         onLikePost(post)
                                     }
-
-                                }
+                                },
+                                contentDescription = "Like",
                             )
-                            Icon(
+                            CustomIconButton(
                                 imageVector = if (isSaved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                                contentDescription = "Saved",
-                                modifier = Modifier.clickable {
+                                onClick = {
                                     if (isSaved) {
                                         onUnBookmarkPost(post)
                                     } else {
                                         onBookmarkPost(post)
                                     }
-
-                                }
+                                },
+                                contentDescription = "Saved",
                             )
                         }
                     }

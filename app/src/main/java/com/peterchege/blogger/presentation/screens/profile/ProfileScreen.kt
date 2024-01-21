@@ -43,9 +43,12 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.rememberImagePainter
+import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.util.Constants
+import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.domain.repository.NetworkStatus
+import com.peterchege.blogger.presentation.alertDialogs.DeletePostDialog
 import com.peterchege.blogger.presentation.components.ArticleCard
 import com.peterchege.blogger.presentation.components.BottomSheetItem
 import com.peterchege.blogger.presentation.components.ErrorComponent
@@ -55,6 +58,8 @@ import com.peterchege.blogger.presentation.components.PagingLoader
 import com.peterchege.blogger.presentation.components.ProfileAvatar
 import com.peterchege.blogger.presentation.components.ProfileInfoCount
 import com.peterchege.blogger.presentation.theme.defaultPadding
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoilApi::class)
@@ -67,30 +72,38 @@ fun ProfileScreen(
     navigateToSignUpScreen: () -> Unit,
     navigateToSettingsScreen: () -> Unit,
     navigateToEditProfileScreen: () -> Unit,
+    navigateToEditPostScreen: (Post) -> Unit,
 ) {
-
-
+    val deletePostUiState by viewModel.deletePostUiState.collectAsStateWithLifecycle()
     val authUser by viewModel.authUser.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val networkStatus by viewModel.networkStatus.collectAsStateWithLifecycle()
-    LaunchedEffect(key1 = authUser){
+    LaunchedEffect(key1 = authUser) {
         authUser?.let {
-            if (it.userId != ""){
-                viewModel.saveUserLikes(userId = it.userId )
+            if (it.userId != "") {
+                viewModel.saveUserLikes(userId = it.userId)
                 viewModel.saveUserFollowing(userId = it.userId)
                 viewModel.saveUserFollowers(userId = it.userId)
             }
         }
     }
     ProfileScreenContent(
+        deletePostUiState = deletePostUiState,
         networkStatus = networkStatus,
         uiState = uiState,
+        eventFlow = viewModel.eventFlow,
         navigateToProfileFollowerFollowingScreen = navigateToProfileFollowerFollowingScreen,
         navigateToPostScreen = navigateToPostScreen,
         navigateToLoginScreen = navigateToLoginScreen,
         navigateToSignUpScreen = navigateToSignUpScreen,
         navigateToSettingsScreen = navigateToSettingsScreen,
         navigateToEditProfileScreen = navigateToEditProfileScreen,
+        navigateToEditPostScreen = navigateToEditPostScreen,
+        toggleDeletePostDialog = viewModel::toggleDeletePostDialogState,
+        setDeletePost = viewModel::setPostToBeDeleted,
+        deletePost = {
+            viewModel.deletePost { it() }
+        }
     )
 }
 
@@ -99,6 +112,9 @@ fun ProfileScreen(
 @ExperimentalCoilApi
 @Composable
 fun ProfileScreenContent(
+    deletePostUiState: DeletePostUiState,
+    toggleDeletePostDialog: () -> Unit,
+    setDeletePost: (Post) -> Unit,
     networkStatus: NetworkStatus,
     uiState: ProfileScreenUiState,
     navigateToProfileFollowerFollowingScreen: (String) -> Unit,
@@ -107,7 +123,9 @@ fun ProfileScreenContent(
     navigateToSignUpScreen: () -> Unit,
     navigateToSettingsScreen: () -> Unit,
     navigateToEditProfileScreen: () -> Unit,
-
+    navigateToEditPostScreen:(Post) -> Unit,
+    deletePost:(() -> Unit) -> Unit,
+    eventFlow:SharedFlow<UiEvent>
     ) {
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -121,6 +139,21 @@ fun ProfileScreenContent(
                 snackbarHostState.showSnackbar(
                     message = "You are offline"
                 )
+            }
+        }
+    }
+    LaunchedEffect(key1 = true) {
+        eventFlow.collectLatest { event ->
+            when (event) {
+                is UiEvent.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(
+                        message = event.message
+                    )
+                }
+
+                is UiEvent.Navigate -> {
+
+                }
             }
         }
     }
@@ -190,6 +223,13 @@ fun ProfileScreenContent(
             is ProfileScreenUiState.Success -> {
                 val posts = uiState.posts.collectAsLazyPagingItems()
                 val user = uiState.user
+                if (deletePostUiState.isDeletePostDialogOpen && deletePostUiState.post != null) {
+                    DeletePostDialog(
+                        post = deletePostUiState.post,
+                        closeDeleteDialog = toggleDeletePostDialog,
+                        deletePost = { deletePost{ posts.refresh() } }
+                    )
+                }
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -252,7 +292,7 @@ fun ProfileScreenContent(
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 ProfileInfoCount(
-                                    name =  "Articles",
+                                    name = "Articles",
                                     count = user._count.post,
                                     onClick = {
 
@@ -266,7 +306,7 @@ fun ProfileScreenContent(
                                     color = Color.LightGray
                                 )
                                 ProfileInfoCount(
-                                    name =  "Followers",
+                                    name = "Followers",
                                     count = user._count.followers,
                                     onClick = {
                                         navigateToProfileFollowerFollowingScreen(Constants.FOLLOWER)
@@ -280,7 +320,7 @@ fun ProfileScreenContent(
                                     color = Color.LightGray
                                 )
                                 ProfileInfoCount(
-                                    name =   "Following",
+                                    name = "Following",
                                     count = user._count.following,
                                     onClick = {
                                         navigateToProfileFollowerFollowingScreen(Constants.FOLLOWING)
@@ -296,6 +336,11 @@ fun ProfileScreenContent(
                                     post = post,
                                     onItemClick = {
                                         navigateToPostScreen(post.postId)
+                                    },
+                                    navigateToEditPostScreen = navigateToEditPostScreen,
+                                    openDeleteDialog = {
+                                        setDeletePost(it)
+                                        toggleDeletePostDialog()
                                     },
                                     onProfileNavigate = { username ->
 

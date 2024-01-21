@@ -28,6 +28,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import coil.annotation.ExperimentalCoilApi
+import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.presentation.screens.about.AboutScreen
 import com.peterchege.blogger.presentation.screens.author.AuthorFollowerFollowingScreen
@@ -169,9 +170,10 @@ fun AppNavigation(
         }
 
         composable(
-            route = Screens.EDIT_POST_SCREEN + "/{postId}",
+            route = Screens.EDIT_POST_SCREEN,
         ){
-            EditPostScreen()
+            val post = navController.previousBackStackEntry?.savedStateHandle?.get<Post>(key ="post")
+            EditPostScreen(post = post)
         }
     }
 

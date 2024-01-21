@@ -18,22 +18,21 @@ package com.peterchege.blogger.presentation.alertDialogs
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.peterchege.blogger.core.api.responses.models.CommentWithUser
 import com.peterchege.blogger.core.api.responses.models.Post
 
 @Composable
 fun DeleteCommentDialog(
-    modifier: Modifier = Modifier,
-    post: Post,
+    comment: CommentWithUser,
     closeDeleteDialog: () -> Unit,
-    deletePost: () -> Unit,
-
-    ) {
+    deleteComment: () -> Unit,
+) {
     AlertDialog(
         onDismissRequest = {
-
+            closeDeleteDialog()
         },
         title = {
-            Text(text = "Delete '${post.postTitle}' ")
+            Text(text = "Delete '${comment.message}' ")
         },
         text = {
             Text(text = "Are you sure you want to delete this comment")
@@ -41,7 +40,7 @@ fun DeleteCommentDialog(
         confirmButton = {
             TextButton(
                 onClick = {
-                    deletePost()
+                    deleteComment()
                 }
             ) {
                 Text("Delete ")

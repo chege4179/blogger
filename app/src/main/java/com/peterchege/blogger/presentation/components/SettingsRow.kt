@@ -16,13 +16,19 @@
 package com.peterchege.blogger.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchColors
@@ -39,8 +45,7 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun SettingsRow(
     title: String,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    onClick: () -> Unit,
 ) {
     Card(
         modifier = Modifier
@@ -51,9 +56,12 @@ fun SettingsRow(
     ) {
         Row(
             modifier = Modifier
-                .fillMaxSize()
                 .background(color = MaterialTheme.colorScheme.onBackground)
-                .padding(10.dp),
+                .fillMaxWidth()
+                .padding(10.dp)
+                .clickable {
+                    onClick()
+                },
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -63,12 +71,19 @@ fun SettingsRow(
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
             )
-            Switch(
-                checked = checked,
-                onCheckedChange = {
-                    onCheckedChange(it)
-                },
-            )
+
+            IconButton(
+                onClick = {
+                    onClick()
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ChevronRight,
+                    contentDescription = "More",
+                    modifier = Modifier.size(40.dp)
+                )
+            }
+
 
         }
     }

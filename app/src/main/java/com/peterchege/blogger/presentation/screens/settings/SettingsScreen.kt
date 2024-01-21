@@ -19,8 +19,10 @@ import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,6 +40,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.peterchege.blogger.presentation.alertDialogs.SignOutDialog
+import com.peterchege.blogger.presentation.alertDialogs.ThemeDialog
 import com.peterchege.blogger.presentation.components.SettingsRow
 
 @Composable
@@ -50,9 +53,15 @@ fun SettingsScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val authUser by viewModel.authUser.collectAsStateWithLifecycle()
     val fcmToken by viewModel.fcmToken.collectAsStateWithLifecycle()
+    val theme by viewModel.theme.collectAsStateWithLifecycle()
+
     SettingsScreenContent(
         uiState = uiState,
+        theme = theme,
         openSignOutDialog = viewModel::toggleSignOutDialog,
+        openOSSMenu = startOSSActivity,
+        openThemeDialog = viewModel::toggleThemeDialog,
+        changeTheme = viewModel::changeTheme,
         signOutUser = {
             authUser?.let {
                 if (it.userId != "") {
@@ -64,15 +73,18 @@ fun SettingsScreen(
                 }
             }
         },
-        openOSSMenu = startOSSActivity
-    )
+
+        )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreenContent(
+    theme: String,
     uiState: SettingScreenUiState,
+    changeTheme: (String) -> Unit,
     openSignOutDialog: () -> Unit,
+    openThemeDialog: () -> Unit,
     signOutUser: () -> Unit,
     openOSSMenu: () -> Unit,
 ) {
@@ -87,6 +99,15 @@ fun SettingsScreenContent(
 
         }
     ) { paddingValues ->
+        if (uiState.isThemeDialogOpen) {
+            ThemeDialog(
+                changeTheme = {
+                    changeTheme(it)
+                },
+                toggleThemeDialog = openThemeDialog,
+                currentTheme = theme,
+            )
+        }
         if (uiState.isSignOutDialogOpen) {
             SignOutDialog(
                 signOut = signOutUser,
@@ -96,19 +117,28 @@ fun SettingsScreenContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
+                .padding(paddingValues)
+                .padding(10.dp)
+            ,
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
             ) {
-                Text(
-                    modifier = Modifier.clickable {
-                        openOSSMenu()
-                    },
-                    text = "Licenses"
+                SettingsRow(
+                    title = "Theme",
+                    onClick = {
+                        openThemeDialog()
+                    }
                 )
+                Spacer(modifier = Modifier.height(10.dp))
+                SettingsRow(
+                    title = "License",
+                    onClick = { openOSSMenu() }
+
+                )
+                Spacer(modifier = Modifier.height(10.dp))
             }
             Box(
                 modifier = Modifier
@@ -126,8 +156,6 @@ fun SettingsScreenContent(
                     Text(text = "Sign Out")
                 }
             }
-
-
         }
     }
 
