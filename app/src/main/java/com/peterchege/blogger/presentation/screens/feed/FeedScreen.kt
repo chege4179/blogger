@@ -49,6 +49,7 @@ import com.peterchege.blogger.domain.mappers.toPost
 import com.peterchege.blogger.domain.repository.NetworkStatus
 import com.peterchege.blogger.presentation.components.ArticleCard
 import com.peterchege.blogger.presentation.components.CategoryCard
+import com.peterchege.blogger.presentation.components.CustomIconButton
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.theme.defaultPadding
@@ -194,19 +195,13 @@ fun FeedScreenContent(
                     )
                 },
                 actions = {
-
-                    IconButton(
+                    CustomIconButton(
+                        imageVector = Icons.Filled.Search,
+                        contentDescription = "Search Posts",
                         onClick = {
                             navigateToSearchScreen()
                         }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Search,
-                            contentDescription = "Search Posts",
-                            modifier = Modifier.size(26.dp)
-
-                        )
-                    }
+                    )
                 },
                 scrollBehavior = scrollBehavior
 

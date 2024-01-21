@@ -17,6 +17,7 @@ package com.peterchege.blogger.data.remote.posts
 
 import com.peterchege.blogger.core.api.requests.FollowUser
 import com.peterchege.blogger.core.api.requests.LikePost
+import com.peterchege.blogger.core.api.requests.UpdatePost
 import com.peterchege.blogger.core.api.requests.Viewer
 import com.peterchege.blogger.core.api.responses.responses.AllPostsResponse
 import com.peterchege.blogger.core.api.responses.responses.DeleteResponse
@@ -25,6 +26,7 @@ import com.peterchege.blogger.core.api.responses.responses.LikeResponse
 import com.peterchege.blogger.core.api.responses.responses.PostResponse
 import com.peterchege.blogger.core.api.responses.responses.SearchPostResponse
 import com.peterchege.blogger.core.api.responses.responses.UnLikeResponse
+import com.peterchege.blogger.core.api.responses.responses.UpdatePostResponse
 import com.peterchege.blogger.core.api.responses.responses.UploadPostResponse
 import com.peterchege.blogger.core.api.responses.responses.ViewResponse
 import com.peterchege.blogger.core.util.NetworkResult
@@ -48,5 +50,7 @@ interface RemotePostsDataSource {
 
 
     suspend fun unlikePost(likePost: LikePost):NetworkResult<UnLikeResponse>
+
+    suspend fun updatePost(updatePost: UpdatePost):NetworkResult<UpdatePostResponse>
 
 }

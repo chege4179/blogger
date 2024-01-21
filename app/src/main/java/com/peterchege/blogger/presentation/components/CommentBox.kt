@@ -17,7 +17,6 @@ package com.peterchege.blogger.presentation.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,8 +30,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -60,11 +57,11 @@ import java.util.UUID
 @ExperimentalCoilApi
 @Composable
 fun CommentBox(
-    postAuthorId:String,
+    postAuthorId: String,
     comment: CommentWithUser,
     authUser: User?,
     openDeleteCommentDialog: () -> Unit,
-    setCommentToBeDeleted:(CommentWithUser) -> Unit,
+    setCommentToBeDeleted: (CommentWithUser) -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -78,9 +75,9 @@ fun CommentBox(
                     onClick = {
 
                     },
-                    onLongClick ={
-                        if (authUser != null && authUser.userId != ""){
-                            if (postAuthorId == authUser.userId){
+                    onLongClick = {
+                        if (authUser != null && authUser.userId != "") {
+                            if (postAuthorId == authUser.userId) {
                                 setCommentToBeDeleted(comment)
                                 openDeleteCommentDialog()
                             }
@@ -133,12 +130,13 @@ fun CommentBox(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(
-                        imageVector = Icons.Default.FavoriteBorder,
-                        contentDescription = "Like Coment"
-                    )
-                }
+                CustomIconButton(
+                    imageVector = Icons.Default.FavoriteBorder,
+                    onClick = {
+                        TODO("implement like comment")
+                    },
+                    contentDescription = "Like Comment"
+                )
                 Text(
                     text = comment._count.commentLikes.toString()
                 )

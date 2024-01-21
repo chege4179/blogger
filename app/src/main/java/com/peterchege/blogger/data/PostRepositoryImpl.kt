@@ -18,6 +18,7 @@ package com.peterchege.blogger.data
 
 import com.peterchege.blogger.core.api.requests.FollowUser
 import com.peterchege.blogger.core.api.requests.LikePost
+import com.peterchege.blogger.core.api.requests.UpdatePost
 import com.peterchege.blogger.core.api.requests.Viewer
 import com.peterchege.blogger.core.api.responses.responses.DeleteResponse
 import com.peterchege.blogger.core.api.responses.responses.FollowResponse
@@ -25,6 +26,7 @@ import com.peterchege.blogger.core.api.responses.responses.LikeResponse
 import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.api.responses.responses.SearchPostResponse
 import com.peterchege.blogger.core.api.responses.responses.UnLikeResponse
+import com.peterchege.blogger.core.api.responses.responses.UpdatePostResponse
 import com.peterchege.blogger.core.api.responses.responses.UploadPostResponse
 import com.peterchege.blogger.core.api.responses.responses.ViewResponse
 import com.peterchege.blogger.core.di.IoDispatcher
@@ -181,6 +183,10 @@ class PostRepositoryImpl @Inject constructor(
 
     override fun getAllSavedPosts(): Flow<List<Post>> {
         return savedPostsDataSource.getAllSavedPosts()
+    }
+
+    override suspend fun updatePost(updatePost: UpdatePost): NetworkResult<UpdatePostResponse> {
+        return remotePostsDataSource.updatePost(updatePost)
     }
 
 

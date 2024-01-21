@@ -39,6 +39,7 @@ import com.peterchege.blogger.core.api.responses.responses.SearchUserResponse
 import com.peterchege.blogger.core.api.responses.responses.SignUpResponse
 import com.peterchege.blogger.core.api.responses.responses.UnLikeResponse
 import com.peterchege.blogger.core.api.responses.responses.UnfollowResponse
+import com.peterchege.blogger.core.api.responses.responses.UpdatePostResponse
 import com.peterchege.blogger.core.api.responses.responses.UpdateTokenResponse
 import com.peterchege.blogger.core.api.responses.responses.UploadPostResponse
 import com.peterchege.blogger.core.api.responses.responses.ViewResponse
@@ -162,5 +163,10 @@ interface BloggerApi {
         @Query("page") page: Int = 1,
         @Query("limit") limit: Int = 20,
     ): Response<GetCommentsResponse>
+
+    @PUT("/post/update")
+    suspend fun updatePost(
+        @Body updatePost: UpdatePost,
+    ):Response<UpdatePostResponse>
 }
 

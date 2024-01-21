@@ -24,20 +24,27 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.peterchege.blogger.core.api.responses.models.Post
+import com.peterchege.blogger.core.util.UiEvent
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun EditPostScreen(
@@ -52,10 +59,11 @@ fun EditPostScreen(
 
     }
     EditPostScreenContent(
+        eventFlow = viewModel.eventFlow,
         post = editPost,
         onChangePostTitle = viewModel::onChangePostTitle,
         onChangePostBody = viewModel::onChangePostBody,
-        updatePost = { viewModel.updatePost() }
+        updatePost = viewModel::updatePost
     )
 }
 
@@ -63,12 +71,33 @@ fun EditPostScreen(
 @Composable
 fun EditPostScreenContent(
     post: Post?,
+    eventFlow:SharedFlow<UiEvent>,
     onChangePostTitle: (String) -> Unit,
     onChangePostBody: (String) -> Unit,
     updatePost: () -> Unit,
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    LaunchedEffect(key1 = true){
+        eventFlow.collectLatest { event ->
+            when (event) {
+                is UiEvent.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(
+                        message = event.message
+                    )
+                }
+
+                is UiEvent.Navigate -> {
+
+                }
+            }
+        }
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
         topBar = {
             TopAppBar(
                 title = {
@@ -121,6 +150,12 @@ fun EditPostScreenContent(
                         onChangePostBody(it)
                     }
                 )
+                Button(
+                    onClick = { updatePost() },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "Update Post")
+                }
             }
         }
     }

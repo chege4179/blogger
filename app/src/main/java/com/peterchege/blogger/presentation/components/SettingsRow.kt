@@ -71,18 +71,13 @@ fun SettingsRow(
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
             )
-
-            IconButton(
+            CustomIconButton(
+                imageVector = Icons.Default.ChevronRight,
+                contentDescription = "More",
                 onClick = {
                     onClick()
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ChevronRight,
-                    contentDescription = "More",
-                    modifier = Modifier.size(40.dp)
-                )
-            }
+                },
+            )
 
 
         }

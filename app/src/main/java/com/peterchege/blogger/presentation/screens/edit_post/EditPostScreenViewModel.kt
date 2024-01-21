@@ -18,11 +18,17 @@ package com.peterchege.blogger.presentation.screens.edit_post
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.peterchege.blogger.core.api.requests.UpdatePost
 import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.api.responses.models.PostAuthor
 import com.peterchege.blogger.core.api.responses.models.PostCount
+import com.peterchege.blogger.core.util.NetworkResult
+import com.peterchege.blogger.core.util.UiEvent
+import com.peterchege.blogger.domain.repository.PostRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -30,11 +36,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EditPostScreenViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle
+    private val postRepository: PostRepository,
 ) : ViewModel(){
 
     private val _editPost = MutableStateFlow<Post?>(null)
     val editPost = _editPost.asStateFlow()
+
+    private val _eventFlow= MutableSharedFlow<UiEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
 
 
     fun setEditPost(post: Post){
@@ -54,7 +63,28 @@ class EditPostScreenViewModel @Inject constructor(
 
     fun updatePost(){
         viewModelScope.launch {
+            val updatePost = UpdatePost(
+                postId = _editPost.value?.postId ?:return@launch,
+                postTitle = _editPost.value?.postTitle ?: return@launch,
+                postBody = _editPost.value?.postBody ?:return@launch
+            )
+            val response = postRepository.updatePost(updatePost)
+            when(response){
+                is NetworkResult.Success -> {
+                    if (response.data.success){
+                        _eventFlow.emit(UiEvent.ShowSnackbar(message = "Post updated successfully"))
+                    }else{
+                        _eventFlow.emit(UiEvent.ShowSnackbar(message = "Failed to update post"))
+                    }
 
+                }
+                is NetworkResult.Error -> {
+                    _eventFlow.emit(UiEvent.ShowSnackbar(message = "An error occurred"))
+                }
+                is NetworkResult.Exception -> {
+                    _eventFlow.emit(UiEvent.ShowSnackbar(message = "An exception occurred"))
+                }
+            }
         }
     }
 }

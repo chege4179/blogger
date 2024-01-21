@@ -51,6 +51,7 @@ import com.peterchege.blogger.domain.repository.NetworkStatus
 import com.peterchege.blogger.presentation.alertDialogs.DeletePostDialog
 import com.peterchege.blogger.presentation.components.ArticleCard
 import com.peterchege.blogger.presentation.components.BottomSheetItem
+import com.peterchege.blogger.presentation.components.CustomIconButton
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.components.NotLoggedInComponent
@@ -170,28 +171,16 @@ fun ProfileScreenContent(
                     Text(text = "Blogger ")
                 },
                 actions = {
-                    IconButton(
-                        onClick = {
-                            navigateToEditProfileScreen()
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Edit Profile",
-
-                            )
-                    }
-                    IconButton(
-                        onClick = {
-                            navigateToSettingsScreen()
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = "Settings",
-
-                            )
-                    }
+                    CustomIconButton(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Edit Profile",
+                        onClick = { navigateToEditProfileScreen() },
+                    )
+                    CustomIconButton(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Settings",
+                        onClick = { navigateToSettingsScreen() },
+                    )
                 }
             )
         }
