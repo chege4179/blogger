@@ -18,6 +18,31 @@ package com.peterchege.blogger.core.api
 
 import com.peterchege.blogger.core.api.requests.*
 import com.peterchege.blogger.core.api.responses.*
+import com.peterchege.blogger.core.api.responses.responses.AllPostsResponse
+import com.peterchege.blogger.core.api.responses.responses.AddCommentResponse
+import com.peterchege.blogger.core.api.responses.responses.DeleteCommentResponse
+import com.peterchege.blogger.core.api.responses.responses.DeleteResponse
+import com.peterchege.blogger.core.api.responses.responses.FollowResponse
+import com.peterchege.blogger.core.api.responses.responses.GetCommentsResponse
+import com.peterchege.blogger.core.api.responses.responses.GetFollowersResponse
+import com.peterchege.blogger.core.api.responses.responses.GetFollowingResponse
+import com.peterchege.blogger.core.api.responses.responses.GetPostLikesResponse
+import com.peterchege.blogger.core.api.responses.responses.GetPostsByUserIdResponse
+import com.peterchege.blogger.core.api.responses.responses.GetUserLikeResponse
+import com.peterchege.blogger.core.api.responses.responses.LikeResponse
+import com.peterchege.blogger.core.api.responses.responses.LoginResponse
+import com.peterchege.blogger.core.api.responses.responses.LogoutResponse
+import com.peterchege.blogger.core.api.responses.responses.PostResponse
+import com.peterchege.blogger.core.api.responses.responses.ProfileResponse
+import com.peterchege.blogger.core.api.responses.responses.SearchPostResponse
+import com.peterchege.blogger.core.api.responses.responses.SearchUserResponse
+import com.peterchege.blogger.core.api.responses.responses.SignUpResponse
+import com.peterchege.blogger.core.api.responses.responses.UnLikeResponse
+import com.peterchege.blogger.core.api.responses.responses.UnfollowResponse
+import com.peterchege.blogger.core.api.responses.responses.UpdatePostResponse
+import com.peterchege.blogger.core.api.responses.responses.UpdateTokenResponse
+import com.peterchege.blogger.core.api.responses.responses.UploadPostResponse
+import com.peterchege.blogger.core.api.responses.responses.ViewResponse
 import okhttp3.RequestBody
 import retrofit2.Response
 
@@ -26,60 +51,122 @@ import retrofit2.http.*
 
 interface BloggerApi {
 
-    @POST("/user/login")
+    @POST("/auth/login")
     suspend fun loginUser(@Body user: LoginUser): Response<LoginResponse>
 
-    @POST("/user/logout")
-    suspend fun logoutUser(@Body user: LogoutUser):Response<LogoutResponse>
+    @POST("/auth/logout")
+    suspend fun logoutUser(@Body user: LogoutUser): Response<LogoutResponse>
 
-    @POST("/user/signup")
-    suspend fun signUpUser(@Body user: SignUpUser):Response<SignUpResponse>
+    @POST("/auth/signup")
+    suspend fun signUpUser(@Body user: SignUpUser): Response<SignUpResponse>
 
     @GET("/post/all")
-    suspend fun getAllPosts():Response<AllPostsResponse>
+    suspend fun getAllPosts(): Response<AllPostsResponse>
 
-    @POST("/post/upload")
-    suspend fun uploadPost(@Body postBody: PostBody): Response<UploadPostResponse>
-
-    @POST("/post/add")
-    suspend fun postImage(
+    @POST("/post/create")
+    suspend fun createPost(
         @Body body: RequestBody
-    ):Response<UploadPostResponse>
+    ): Response<UploadPostResponse>
 
     @GET("/post/single/{postId}")
-    suspend fun getPostById(@Path("postId") postId: String):Response<PostResponse>
+    suspend fun getPostById(@Path("postId") postId: String): Response<PostResponse>
 
     @DELETE("/post/delete/{postId}")
-    suspend fun getDeletePostById(@Path("postId") postId: String):Response<DeleteResponse>
+    suspend fun getDeletePostById(@Path("postId") postId: String): Response<DeleteResponse>
 
-    @POST("/comment/add")
-    suspend fun postComment(@Body commentbody: CommentBody):Response<CommentResponse>
+    @POST("/like/like")
+    suspend fun likePost(@Body likePost: LikePost): Response<LikeResponse>
 
-    @POST("/like/add")
-    suspend fun likePost(@Body likePost: LikePost):Response<LikeResponse>
+    @POST("/like/unlike")
+    suspend fun unlikePost(
+        @Body likePost: LikePost
+    ): Response<UnLikeResponse>
 
-    @POST("/like/remove")
-    suspend fun unlikePost(@Body likePost: LikePost):Response<LikeResponse>
+    @POST("/follower/followUser")
+    suspend fun followUser(
+        @Body followUser: FollowUser
+    ): Response<FollowResponse>
 
-    @POST("/follower/follow")
-    suspend fun followUser(@Body followUser: FollowUser):Response<FollowResponse>
+    @POST("/follower/unfollowUser")
+    suspend fun unfollowUser(
+        @Body unFollowUser: UnFollowUser
+    ): Response<UnfollowResponse>
 
-    @POST("/follower/unfollow")
-    suspend fun unfollowUser(@Body followUser: FollowUser):Response<FollowResponse>
+    @GET("/user/single/{userId}")
+    suspend fun getUserProfile(@Path("userId") userId: String): Response<ProfileResponse>
 
-    @GET("/user/profile/{username}")
-    suspend fun getUserProfile(@Path("username") username: String): Response<ProfileResponse>
-
-    @POST("/user/updateToken")
-    suspend fun updateToken(@Body updateToken: UpdateToken):Response<UpdateTokenResponse>
+    @POST("/auth/updateDeviceToken")
+    suspend fun updateToken(@Body updateToken: UpdateToken): Response<UpdateTokenResponse>
 
     @GET("/post/search/{searchTerm}")
-    suspend fun searchPost(@Path("searchTerm") searchTerm: String):Response<SearchPostResponse>
+    suspend fun searchPost(@Path("searchTerm") searchTerm: String): Response<SearchPostResponse>
+
+    @GET("/user/search/{searchTerm}")
+    suspend fun searchUsers(@Path("searchTerm") searchTerm: String): Response<SearchUserResponse>
 
     @POST("/view/add")
-    suspend fun addView(@Body viewer: Viewer):Response<ViewResponse>
+    suspend fun addView(@Body viewer: Viewer): Response<ViewResponse>
+
+    @GET("/follower/getFollowers/{userId}")
+    suspend fun getUserFollowers(
+        @Path("userId") userId: String,
+        @Query("page") page: Int = 1,
+        @Query("limit") limit: Int = 1000,
+    ): Response<GetFollowersResponse>
+
+    @GET("/follower/getFollowing/{userId}")
+    suspend fun getUserFollowing(
+        @Path("userId") userId: String,
+        @Query("page") page: Int = 1,
+        @Query("limit") limit: Int = 1000,
+
+        ): Response<GetFollowingResponse>
+
+    @GET("/post/likes/{postId}")
+    suspend fun getPostLikes(
+        @Path("postId") postId: String,
+        @Query("page") page: Int = 1,
+        @Query("limit") limit: Int = 20,
+    ): Response<GetPostLikesResponse>
+
+    @GET("/user/likes/{userId}")
+    suspend fun getUserLikes(
+        @Path("userId") userId: String
+    ): Response<GetUserLikeResponse>
+
+    @GET("/post/user/{userId}")
+    suspend fun getPostByUserId(
+        @Path("userId") userId: String,
+        @Query("page") page: Int = 1,
+        @Query("limit") limit: Int = 20,
+    ): Response<GetPostsByUserIdResponse>
+
+    @POST("/comment/add")
+    suspend fun postComment(
+        @Body commentBody: CommentBody
+    ): Response<AddCommentResponse>
+
+    @POST("/comment/reply")
+    suspend fun replyToComment(
+        @Body commentBody: ReplyCommentBody
+    ): Response<AddCommentResponse>
+
+    @POST("/comment/remove")
+    suspend fun removeComment(
+        @Body commentBody: DeleteCommentBody
+    ): Response<DeleteCommentResponse>
 
 
+    @GET("/comment/all/{postId}")
+    suspend fun getAllComments(
+        @Path("postId") postId: String,
+        @Query("page") page: Int = 1,
+        @Query("limit") limit: Int = 20,
+    ): Response<GetCommentsResponse>
 
+    @PUT("/post/update")
+    suspend fun updatePost(
+        @Body updatePost: UpdatePost,
+    ):Response<UpdatePostResponse>
 }
 

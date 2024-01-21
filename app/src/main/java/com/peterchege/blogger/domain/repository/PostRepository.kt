@@ -17,9 +17,17 @@ package com.peterchege.blogger.domain.repository
 
 import com.peterchege.blogger.core.api.requests.FollowUser
 import com.peterchege.blogger.core.api.requests.LikePost
+import com.peterchege.blogger.core.api.requests.UpdatePost
 import com.peterchege.blogger.core.api.requests.Viewer
-import com.peterchege.blogger.core.api.responses.*
-import com.peterchege.blogger.core.room.entities.PostRecordWithCommentsLikesViews
+import com.peterchege.blogger.core.api.responses.responses.DeleteResponse
+import com.peterchege.blogger.core.api.responses.responses.FollowResponse
+import com.peterchege.blogger.core.api.responses.responses.LikeResponse
+import com.peterchege.blogger.core.api.responses.models.Post
+import com.peterchege.blogger.core.api.responses.responses.SearchPostResponse
+import com.peterchege.blogger.core.api.responses.responses.UnLikeResponse
+import com.peterchege.blogger.core.api.responses.responses.UpdatePostResponse
+import com.peterchege.blogger.core.api.responses.responses.UploadPostResponse
+import com.peterchege.blogger.core.api.responses.responses.ViewResponse
 import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.domain.models.PostUI
 import kotlinx.coroutines.flow.Flow
@@ -41,13 +49,7 @@ interface PostRepository {
 
     suspend fun likePost(likePost: LikePost):NetworkResult<LikeResponse>
 
-    suspend fun unlikePost(likePost: LikePost):NetworkResult<LikeResponse>
-
-    suspend fun followUser(followUser: FollowUser):NetworkResult<FollowResponse>
-
-    suspend fun unfollowUser(followUser: FollowUser):NetworkResult<FollowResponse>
-
-    suspend fun searchPosts(searchTerm:String):NetworkResult<SearchPostResponse>
+    suspend fun unlikePost(likePost: LikePost):NetworkResult<UnLikeResponse>
 
 
     suspend fun insertSavedPost(post: Post)
@@ -58,8 +60,10 @@ interface PostRepository {
 
     suspend fun getSavedPost(postId: String): Flow<Post?>
 
+    suspend fun updatePost(updatePost: UpdatePost):NetworkResult<UpdatePostResponse>
+
     fun getSavedPostIds():Flow<List<String>>
 
 
-    fun getAllSavedPosts(): Flow<List<PostRecordWithCommentsLikesViews>>
+    fun getAllSavedPosts(): Flow<List<Post>>
 }

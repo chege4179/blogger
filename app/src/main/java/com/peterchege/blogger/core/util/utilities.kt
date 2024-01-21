@@ -17,51 +17,51 @@ package com.peterchege.blogger.core.util
 
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
+import android.health.connect.datatypes.units.Length
 import android.os.Build
-import androidx.compose.ui.text.capitalize
-import java.io.ByteArrayOutputStream
-import java.util.*
+import android.widget.Toast
+import androidx.annotation.RequiresApi
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 
-//fun ByteArray.toBase64(): String = String(Base64.getEncoder().encode(this))
+@RequiresApi(Build.VERSION_CODES.O)
+fun formatDateTime(dateStr: String): String {
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    val dateTime = LocalDateTime.parse(dateStr, formatter)
 
-fun Bitmap.size(): Int{
-    val s = rowBytes * height
-    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT){
-        return try {
-            allocationByteCount
-        } catch (npe: NullPointerException) {
-            s
-        }
+    val formatted = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").format(dateTime)
+    return formatted
+}
+
+// date string by default in prisma are in UTC
+// we need to support different time zones
+@RequiresApi(Build.VERSION_CODES.O)
+fun addThreeHoursToDateString(dateString: String): String {
+    // Define the date format of the input string
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+
+    // Parse the input string to LocalDateTime
+    val dateTime = LocalDateTime.parse(dateString, formatter)
+
+    // Add 3 hours to the date
+    val updatedDateTime = dateTime.plusHours(3)
+
+    // Format the updated date to the same string format
+    val updatedDateString = updatedDateTime.format(formatter)
+
+    return updatedDateString
+}
+
+fun Context.toast(msg:String){
+    Toast.makeText(this,msg,Toast.LENGTH_LONG).show()
+}
+
+
+fun truncateString(str: String, n: Int): String {
+    return if ((str?.length ?: 0) > n) {
+        "${str.substring(0, n - 1)}...."
+    } else {
+        str
     }
-    return s
 }
-
-fun randomColorCode(): String {
-
-    // create random object - reuse this as often as possible
-    val random = Random()
-
-    // create a big random number - maximum is ffffff (hex) = 16777215 (dez)
-    val nextInt = random.nextInt(0xffffff + 1)
-
-    // format it as hexadecimal string (with hashtag and leading zeros)
-
-    return String.format("#%06x", nextInt).drop(1).capitalize(Locale.ROOT)
-}
-
-fun randomID(): String = List(6) {
-    (('a'..'z') + ('A'..'Z') + ('0'..'9')).random()
-}.joinToString("")
-fun generateAvatarURL(name:String):String{
-    var splitname = name.split(" ").joinToString("+")
-    var color = randomColorCode()
-    return "https://ui-avatars.com/api/?background=${color}&color=fff&name=${splitname}&bold=true&fontsize=0.6&rounded=true"
-
-}
-
-

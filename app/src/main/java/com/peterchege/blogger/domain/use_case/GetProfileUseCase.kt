@@ -15,36 +15,41 @@
  */
 package com.peterchege.blogger.domain.use_case
 
-import com.peterchege.blogger.core.api.responses.ProfileResponse
+import com.peterchege.blogger.core.api.responses.responses.ProfileResponse
 import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.core.util.Resource
 import com.peterchege.blogger.domain.repository.ProfileRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import retrofit2.HttpException
-import java.io.IOException
+import timber.log.Timber
 import javax.inject.Inject
 
 class GetProfileUseCase @Inject constructor(
     private val repository: ProfileRepository,
 
     ) {
+    val TAG = GetProfileUseCase::class.java.simpleName
 
-    operator fun invoke(username: String): Flow<Resource<ProfileResponse>> = flow {
+    operator fun invoke(userId: String): Flow<Resource<ProfileResponse>> = flow {
+        Timber.tag(TAG).i("Userid  passed >>> $userId")
         emit(Resource.Loading<ProfileResponse>())
-        val profileResponse = repository.getProfile(username)
+        val profileResponse = repository.getProfile(userId)
         when(profileResponse){
             is NetworkResult.Success -> {
                 if (profileResponse.data.success) {
+                    Timber.tag(TAG).i("Response success >>> ${profileResponse}")
                     emit(Resource.Success(profileResponse.data))
                 } else {
+                    Timber.tag(TAG).i("Response error else >>> ${profileResponse}")
                     emit(Resource.Error<ProfileResponse>("User could not be found"))
                 }
             }
             is NetworkResult.Error -> {
+                Timber.tag(TAG).i("Response error >>> ${profileResponse}")
                 emit(Resource.Error<ProfileResponse>(profileResponse.message ?: "Server error"))
             }
             is NetworkResult.Exception -> {
+                Timber.tag(TAG).i("Response exception >>> ${profileResponse}")
                 emit(Resource.Error<ProfileResponse>("Could not reach server"))
             }
         }

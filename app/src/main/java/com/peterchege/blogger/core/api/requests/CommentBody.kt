@@ -19,12 +19,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CommentBody(
-    val comment:String,
-    val username:String,
-    val postedAt:String,
-    val postedOn:String,
+    val commentBody:String,
+    val commentPostId:String,
     val userId:String,
-    val imageUrl:String,
-    val postId:String,
-    val postAuthor:String,
+
 )

@@ -16,7 +16,8 @@
 package com.peterchege.blogger.core.datastore.serializers
 
 import androidx.datastore.core.Serializer
-import com.peterchege.blogger.core.api.responses.User
+import com.peterchege.blogger.core.api.responses.models.User
+import com.peterchege.blogger.core.api.responses.models.UserCount
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import java.io.InputStream
@@ -45,17 +46,17 @@ object UserInfoSerializer : Serializer<User?> {
             Json.encodeToString(
                 serializer = User.serializer(),
                 value = t ?: User(
-                    _id = "",
-                    fullname = "",
+                    userId = "",
+                    fullName = "",
                     email = "",
                     password = "",
-                    followers = emptyList(),
-                    following = emptyList(),
-                    notifications = emptyList(),
                     username = "",
                     imageUrl = "",
-                    tokens = emptyList(),
-                    __v = 0
+                    deviceTokens = emptyList(),
+                    createdAt = "",
+                    updatedAt = "",
+                    _count = UserCount(0,0,0)
+
                 )
             ).encodeToByteArray()
         )

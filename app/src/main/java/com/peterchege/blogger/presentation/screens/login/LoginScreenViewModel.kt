@@ -21,6 +21,8 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.peterchege.blogger.core.analytics.analytics.AnalyticsHelper
 import com.peterchege.blogger.core.analytics.analytics.logLoginEvent
 import com.peterchege.blogger.core.api.requests.LoginUser
+import com.peterchege.blogger.core.datastore.preferences.DefaultAuthTokenProvider
+import com.peterchege.blogger.core.datastore.preferences.DefaultFCMTokenProvider
 import com.peterchege.blogger.core.util.*
 import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.NetworkInfoRepository
@@ -36,10 +38,11 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import timber.log.Timber
 import javax.inject.Inject
 
 data class LoginFormState(
-    val username: String = "",
+    val email: String = "",
     val password: String = "",
     val isPasswordVisible: Boolean = false,
     val isLoading: Boolean = false,
@@ -48,6 +51,8 @@ data class LoginFormState(
 @HiltViewModel
 class LoginScreenViewModel @Inject constructor(
     private val repository: AuthRepository,
+    private val defaultAuthTokenProvider: DefaultAuthTokenProvider,
+    private val defaultFCMTokenProvider: DefaultFCMTokenProvider,
     private val networkInfoRepository: NetworkInfoRepository,
     private val analyticsHelper: AnalyticsHelper,
 ) : ViewModel() {
@@ -71,8 +76,8 @@ class LoginScreenViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(isPasswordVisible = !initialState)
     }
 
-    fun onChangeUsername(text: String) {
-        _uiState.value = _uiState.value.copy(username = text)
+    fun onChangeEmail(text: String) {
+        _uiState.value = _uiState.value.copy(email = text)
     }
 
     fun onChangePassword(text: String) {
@@ -85,29 +90,38 @@ class LoginScreenViewModel @Inject constructor(
             try {
                 val token = FirebaseMessaging.getInstance().token.await()
                 _uiState.value = _uiState.value.copy(isLoading = true)
-                val username = _uiState.value.username
+                val email = _uiState.value.email
                 val password = _uiState.value.password
-                if (username.length < 5 || password.length < 5) {
+                if (email.length < 5 || password.length < 5) {
                     _uiState.value = _uiState.value.copy(isLoading = false)
                     _eventFlow.emit(UiEvent.ShowSnackbar(message = "Credentials should be at least 5 characters long"))
                 } else {
                     val loginUser = LoginUser(
-                        username = username.trim(),
+                        email = email.trim(),
                         password = password.trim(),
-                        token = token!!
+                        deviceToken = token!!
                     )
                     val response = repository.loginUser(loginUser)
+                    Timber.tag(TAG).i("Login Response --> ${response}")
                     when (response) {
                         is NetworkResult.Success -> {
                             _uiState.value = _uiState.value.copy(isLoading = false)
                             if (response.data.success) {
-                                analyticsHelper.logLoginEvent(username = _uiState.value.username)
+                                analyticsHelper.logLoginEvent(username = _uiState.value.email)
                                 response.data.user?.let {
+                                    Timber.tag(TAG).i("Logged In User : ${it}")
                                     repository.setLoggedInUser(user = it)
+                                }
+                                response.data.deviceToken?.let {
+                                    Timber.tag(TAG).i("Device Token : ${it}")
+                                    defaultFCMTokenProvider.setFcmToken(it)
+                                }
+                                response.data.jwtToken?.let {
+                                    Timber.tag(TAG).i("JWT Token : ${it}")
+                                    defaultAuthTokenProvider.setAuthToken(it)
                                 }
                                 navigateToDashBoard()
                             }else{
-                                println(response.data.msg)
                                 _eventFlow.emit(UiEvent.ShowSnackbar(message = response.data.msg))
                             }
                         }
@@ -138,5 +152,9 @@ class LoginScreenViewModel @Inject constructor(
                 _eventFlow.emit(UiEvent.ShowSnackbar(message = "Unexpected error "))
             }
         }
+    }
+    companion object {
+        val TAG = LoginScreenViewModel::class.java.simpleName
+
     }
 }

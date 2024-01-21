@@ -15,16 +15,17 @@
  */
 package com.peterchege.blogger.core.api.requests
 
+import com.peterchege.blogger.core.api.responses.models.User
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class Notification(
     val notificationType:String,
-    val notificationSender:String,
-    val notificationReceiver:String,
+    val notificationSender: User,
+    val notificationReceiver: User,
+    val senderId:String,
+    val receiverId:String,
     val notificationContent:String,
-    val notificationPostedAt:String? = null,
-    val notificationPostedOn:String? = null,
-    val notificationImageUrl:String? = null,
-    val postId:String? = null
+    val createdAt:String? = null,
+    val updatedAt:String? = null,
 )

@@ -21,23 +21,21 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
-import com.peterchege.blogger.core.api.responses.User
+import com.peterchege.blogger.core.api.responses.models.User
 
 
 @ExperimentalCoilApi
 @Composable
 fun ProfileCard(
-   navigateToAuthorProfileScreen:(String) -> Unit,
+    navigateToAuthorProfileScreen: (String) -> Unit,
     user: User,
 ) {
     Card(
@@ -46,7 +44,7 @@ fun ProfileCard(
             .padding(10.dp)
             .height(70.dp)
             .clickable {
-               navigateToAuthorProfileScreen(user.username)
+                navigateToAuthorProfileScreen(user.userId)
 
             },
         shape = RoundedCornerShape(15),
@@ -61,18 +59,10 @@ fun ProfileCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Spacer(modifier = Modifier.width(10.dp))
-            Image(
-                modifier = Modifier
-                    .width(48.dp)
-                    .height(48.dp),
-                painter = rememberImagePainter(
-                    data = user.imageUrl,
-                    builder = {
-                        crossfade(true)
-
-                    },
-                ),
-                contentDescription = ""
+            ProfileAvatar(
+                imageUrl = user.imageUrl,
+                modifier = Modifier,
+                size = 48
             )
             Spacer(modifier = Modifier.width(10.dp))
             Column(
@@ -87,7 +77,7 @@ fun ProfileCard(
                     fontWeight = FontWeight.Bold,
 
                     )
-                Text(text = user.fullname)
+                Text(text = user.fullName)
 
             }
 

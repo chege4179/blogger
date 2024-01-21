@@ -27,11 +27,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.peterchege.blogger.core.api.responses.Following
+import androidx.paging.compose.LazyPagingItems
+import com.peterchege.blogger.core.api.responses.models.FollowerUser
+import com.peterchege.blogger.core.api.responses.models.User
+import com.peterchege.blogger.domain.mappers.toUser
 
 @Composable
 fun FollowingList(
-    following:List<Following>,
+    followings: LazyPagingItems<FollowerUser>,
     navigateToAuthorProfileScreen:(String) -> Unit,
     paddingValues: PaddingValues,
 ){
@@ -41,7 +44,7 @@ fun FollowingList(
             .padding(paddingValues)
             .padding(10.dp)
     ){
-        if (following.isEmpty()){
+        if (followings.itemCount == 0){
             item {
                 Column(
                     modifier = Modifier.fillMaxSize(),
@@ -53,14 +56,17 @@ fun FollowingList(
                 }
             }
         }else{
-            items(items = following){ following ->
-                FollowingCard(
-                    navigateToFollowingPage = navigateToAuthorProfileScreen,
-                    following =following,
-                    unFollowUser ={
-                    },
-                    isYourProfile = false
-                )
+            items(count = followings.itemCount){ position ->
+                val following = followings[position]
+                if (following != null) {
+                    FollowingCard(
+                        navigateToFollowingPage = navigateToAuthorProfileScreen,
+                        following =following.toUser(),
+                        unFollowUser ={
+                        },
+                        isYourProfile = false
+                    )
+                }
             }
         }
     }

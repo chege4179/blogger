@@ -57,10 +57,8 @@ class UploadPostWorkManagerImpl @Inject constructor(
             "uri" to uri.toString(),
             "postBody" to postBody.postBody,
             "postTitle" to postBody.postTitle,
-            "postedBy" to postBody.postedBy,
-            "postedAt" to postBody.postedAt,
             "photo" to postBody.photo,
-            "postedOn" to postBody.postedOn
+            "userId" to postBody.userId
         )
         val postArticleRequest = OneTimeWorkRequestBuilder<UploadPostWorker>()
             .setInputData(postArticleParams)

@@ -53,9 +53,8 @@ class UploadPostWorker @AssistedInject constructor(
         val uri = inputData.getString("uri")
         val postTitle = inputData.getString("postTitle")
         val postBody = inputData.getString("postBody")
-        val postedBy = inputData.getString("postedBy")
-        val postedAt = inputData.getString("postedAt")
-        val postedOn = inputData.getString("postedOn")
+        val userId = inputData.getString("userId")
+
 
         startForegroundService(
             notificationTitle = "Uploading Post",
@@ -67,9 +66,7 @@ class UploadPostWorker @AssistedInject constructor(
         builder
             .addFormDataPart("postTitle", postTitle!!)
             .addFormDataPart("postBody", postBody!!)
-            .addFormDataPart("postedBy", postedBy!!)
-            .addFormDataPart("postedAt", postedAt!!)
-            .addFormDataPart("postedOn", postedOn!!)
+            .addFormDataPart("userId", userId!!)
             .addFormDataPart("photo", file.name, requestFile)
 
         val requestBody: RequestBody = builder.build()

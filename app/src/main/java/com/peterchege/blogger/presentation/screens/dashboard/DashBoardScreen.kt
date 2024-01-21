@@ -20,9 +20,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.NotificationsNone
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -33,6 +37,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -55,11 +60,12 @@ fun BottomNavBar(
             NavigationBarItem(
                 icon = {
                     Icon(
-                        imageVector = item.icon,
+                        imageVector = if (selected) item.selectedIcon else item.unselectedIcon,
                         contentDescription = item.name
                     )
                 },
                 label = { Text(text = item.name) },
+
                 selected = selected,
                 onClick = { onItemClick(item) }
             )
@@ -81,29 +87,38 @@ fun DashBoardScreen(
                     BottomNavItem(
                         name = "Home",
                         route = Screens.FEED_SCREEN,
-                        icon = Icons.Default.Home
+                        selectedIcon = Icons.Default.Home,
+                        unselectedIcon = Icons.Outlined.Home,
                     ),
                     BottomNavItem(
-                        name = "Saved Posts",
+                        name = "Saved",
                         route = Screens.SAVED_POST_SCREEN,
-                        icon = Icons.Default.Favorite
+                        selectedIcon = Icons.Default.Favorite,
+                        unselectedIcon = Icons.Default.FavoriteBorder
                     ),
 
                     BottomNavItem(
                         name = "Notifications",
                         route = Screens.NOTIFICATION_SCREEN,
-                        icon = Icons.Default.Notifications
+                        selectedIcon = Icons.Default.Notifications,
+                        unselectedIcon = Icons.Default.NotificationsNone
                     ),
                     BottomNavItem(
                         name = "Profile",
                         route = Screens.PROFILE_SCREEN,
-                        icon = Icons.Default.Person
+                        selectedIcon = Icons.Default.Person,
+                        unselectedIcon = Icons.Outlined.Person
                     )
 
                 ),
                 navController = bottomNavController,
                 onItemClick = {
-                    bottomNavController.navigate(it.route)
+                    bottomNavController.navigate(it.route) {
+                        launchSingleTop = true
+                        popUpTo(bottomNavController.graph.findStartDestination().id){
+                            saveState = true
+                        }
+                    }
                 }
             )
         }

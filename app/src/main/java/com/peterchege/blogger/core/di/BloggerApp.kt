@@ -33,36 +33,31 @@ import javax.inject.Inject
 
 
 @HiltAndroidApp
-class BloggerApp :Application(),Configuration.Provider {
-    @Inject
-    lateinit var workerFactory: HiltWorkerFactory
+class BloggerApp :Application(){
+
+//    @Inject
+//    lateinit var workerFactory: HiltWorkerFactory
+
+
     override fun onCreate() {
         super.onCreate()
         initTimber()
-        setUpWorkerManagerNotificationChannel()
-        WorkInitializer.initialize(context = this)
+        setUpNotificationChannel()
+
 
     }
-    override fun getWorkManagerConfiguration(): Configuration =
 
-        Configuration.Builder()
-            .setMinimumLoggingLevel(android.util.Log.DEBUG)
-            .setWorkerFactory(workerFactory)
-            .build()
+
     private fun initTimber() = when {
         BuildConfig.DEBUG -> {
-            Timber.plant(object : Timber.DebugTree() {
-                override fun createStackElementTag(element: StackTraceElement): String {
-                    return super.createStackElementTag(element) + ":" + element.lineNumber
-                }
-            })
+            Timber.plant(Timber.DebugTree())
         }
         else -> {
             Timber.plant(CrashlyticsTree())
         }
     }
 
-    private fun setUpWorkerManagerNotificationChannel(){
+    private fun setUpNotificationChannel(){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             val channel = NotificationChannel(
                 Constants.NOTIFICATION_CHANNEL,
@@ -72,7 +67,6 @@ class BloggerApp :Application(),Configuration.Provider {
             val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(channel)
         }
-        WorkManager.initialize(this, Configuration.Builder().setWorkerFactory(workerFactory).build())
     }
 
 }

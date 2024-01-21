@@ -17,26 +17,31 @@ package com.peterchege.blogger.core.room.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.peterchege.blogger.core.room.converters.PostAuthorConverter
+import com.peterchege.blogger.core.room.converters.PostCountConverter
+import com.peterchege.blogger.core.room.converters.UserCountConverter
 import com.peterchege.blogger.core.room.dao.CachedPostDao
-import com.peterchege.blogger.core.room.dao.DraftDao
+import com.peterchege.blogger.core.room.dao.DraftPostDao
+import com.peterchege.blogger.core.room.dao.FollowerDao
+import com.peterchege.blogger.core.room.dao.FollowingDao
+import com.peterchege.blogger.core.room.dao.LikeDao
 import com.peterchege.blogger.core.room.dao.SavedPostDao
 import com.peterchege.blogger.core.room.entities.*
 
+@TypeConverters(
+    PostAuthorConverter::class,
+    PostCountConverter::class,
+    UserCountConverter::class,
+)
 @Database(
     entities = [
-        DraftRecord::class,
-
-        PostRecord::class,
+        DraftPost::class,
+        SavePost::class,
+        CachePost::class,
+        FollowerUserEntity::class,
         LikeEntity::class,
-        ViewEntity::class,
-        CommentEntity::class,
-
-
-        PostCacheRecord::class,
-        LikeCacheEntity::class,
-        ViewCacheEntity::class,
-        CommentCacheEntity::class,
-
+        FollowingUserEntity::class,
     ],
     version = 1,
     exportSchema = true
@@ -44,8 +49,11 @@ import com.peterchege.blogger.core.room.entities.*
 abstract class BloggerDatabase : RoomDatabase() {
 
     abstract val savedPostDao: SavedPostDao
-    abstract val draftDao: DraftDao
-    abstract val cachedPostDao:CachedPostDao
+    abstract val draftPostDao: DraftPostDao
+    abstract val cachedPostDao: CachedPostDao
+    abstract val followerDao: FollowerDao
+    abstract val likeDao: LikeDao
+    abstract val followingDao:FollowingDao
 
 
 }

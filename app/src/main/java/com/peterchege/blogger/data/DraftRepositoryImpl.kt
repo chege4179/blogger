@@ -17,7 +17,7 @@ package com.peterchege.blogger.data
 
 import com.peterchege.blogger.core.di.IoDispatcher
 import com.peterchege.blogger.core.room.database.BloggerDatabase
-import com.peterchege.blogger.core.room.entities.DraftRecord
+import com.peterchege.blogger.core.room.entities.DraftPost
 import com.peterchege.blogger.domain.repository.DraftRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -31,31 +31,31 @@ class DraftRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ):DraftRepository {
 
-    override suspend fun insertDraft(draft: DraftRecord){
+    override suspend fun insertDraft(draft: DraftPost){
         withContext(ioDispatcher){
-            db.draftDao.insertDraft(draft)
+            db.draftPostDao.insertDraft(draft)
         }
 
     }
-    override fun getAllDrafts(): Flow<List<DraftRecord>> {
-        return db.draftDao.getAllDrafts().flowOn(ioDispatcher)
+    override fun getAllDrafts(): Flow<List<DraftPost>> {
+        return db.draftPostDao.getAllDrafts().flowOn(ioDispatcher)
     }
 
-    override suspend fun getDraftById(id:Int): DraftRecord? {
+    override suspend fun getDraftById(id:Int): DraftPost? {
         return withContext(ioDispatcher){
-            db.draftDao.getDraftById(id)
+            db.draftPostDao.getDraftById(id)
         }
     }
 
     override suspend fun deleteAllDrafts(){
         withContext(ioDispatcher){
-            db.draftDao.deleteAllDrafts()
+            db.draftPostDao.deleteAllDrafts()
         }
     }
 
     override suspend fun deleteDraftById(id: Int){
         withContext(ioDispatcher){
-            db.draftDao.deleteDraftById(id)
+            db.draftPostDao.deleteDraftById(id)
         }
     }
 
@@ -66,7 +66,7 @@ class DraftRepositoryImpl @Inject constructor(
         draftId: Int
     ) {
         withContext(ioDispatcher){
-            db.draftDao.updateDraft(postTitle, postBody, imageUri, draftId)
+            db.draftPostDao.updateDraft(postTitle, postBody, imageUri, draftId)
         }
     }
 

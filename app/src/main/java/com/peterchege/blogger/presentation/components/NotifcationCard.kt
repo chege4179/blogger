@@ -48,9 +48,9 @@ fun NotificationCard(
             .height(60.dp)
             .clickable {
                 if (notification.notificationType == "Like" || notification.notificationType == "Comment") {
-                    notification.postId?.let { navigateToPostScreen(it) }
+//                    notification.n?.let { navigateToPostScreen(it) }
                 } else {
-                    navigateToAuthorProfileScreen(notification.notificationSender)
+                    navigateToAuthorProfileScreen(notification.notificationSender.userId)
                 }
 
             },
@@ -64,22 +64,6 @@ fun NotificationCard(
                 .padding(5.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            notification.notificationImageUrl?.let {
-                Image(
-                    modifier = Modifier
-                        .fillMaxWidth(0.2f)
-                        .height(60.dp),
-                    painter = rememberImagePainter(
-                        data = notification.notificationImageUrl,
-                        builder = {
-                            crossfade(true)
-
-                        },
-                    ),
-
-                    contentDescription = ""
-                )
-            }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

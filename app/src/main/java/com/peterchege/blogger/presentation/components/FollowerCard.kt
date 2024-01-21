@@ -17,7 +17,15 @@ package com.peterchege.blogger.presentation.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -30,21 +38,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import coil.compose.SubcomposeAsyncImage
 import com.peterchege.blogger.R
-import com.peterchege.blogger.core.api.responses.Follower
-import com.peterchege.blogger.core.api.responses.Following
-import com.peterchege.blogger.core.util.Screens
-import com.peterchege.blogger.core.util.generateAvatarURL
+import com.peterchege.blogger.core.api.responses.models.User
 
 @Composable
 fun FollowerCard(
     navigateToFollowerPage:(String) ->Unit,
-    follower: Follower,
+    follower: User,
     isFollowing: Boolean,
-    removeFollower: (follower: Follower) -> Unit,
-    followFollower: (follower: Follower) -> Unit,
+    removeFollower: (follower: User) -> Unit,
+    followFollower: (follower: User) -> Unit,
     isYourProfile: Boolean,
 ) {
     Card(
@@ -53,7 +57,7 @@ fun FollowerCard(
             .padding(10.dp)
             .height(70.dp)
             .clickable {
-                navigateToFollowerPage(follower.followerUsername)
+                navigateToFollowerPage(follower.userId)
 
             },
         shape = RoundedCornerShape(15),
@@ -68,22 +72,10 @@ fun FollowerCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Spacer(modifier = Modifier.width(10.dp))
-            SubcomposeAsyncImage(
-                model = generateAvatarURL(follower.followerFullname),
-                loading = {
-                    Image(
-                        painter = painterResource(id = R.mipmap.default_profile),
-                        contentDescription = "Default Profile Picture",
-                        modifier = Modifier
-                            .width(48.dp)
-                            .height(48.dp)
-                    )
-                },
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .width(48.dp)
-                    .height(48.dp),
-                contentDescription = "Profile Photo URL"
+            ProfileAvatar(
+                imageUrl = follower.imageUrl,
+                modifier = Modifier,
+                size = 48
             )
             Spacer(modifier = Modifier.width(10.dp))
             Column(
@@ -94,11 +86,11 @@ fun FollowerCard(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = follower.followerUsername,
+                    text = follower.username,
                     fontWeight = FontWeight.Bold,
 
                     )
-                Text(text = follower.followerFullname)
+                Text(text = follower.fullName)
 
             }
             if (isYourProfile) {
@@ -127,86 +119,3 @@ fun FollowerCard(
     }
 }
 
-@Composable
-fun FollowingCard(
-    navigateToFollowingPage:(String) ->Unit,
-    following: Following,
-    unFollowUser: (following: Following) -> Unit,
-    isYourProfile: Boolean,
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp)
-            .height(70.dp)
-            .clickable {
-                navigateToFollowingPage(following.followedUsername)
-
-            },
-        shape = RoundedCornerShape(15),
-        elevation = CardDefaults.cardElevation()
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 10.dp)
-                .fillMaxWidth()
-                .fillMaxHeight(),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Spacer(modifier = Modifier.width(10.dp))
-            SubcomposeAsyncImage(
-                model = generateAvatarURL(following.followedFullname),
-                loading = {
-                    Image(
-                        painter = painterResource(id = R.mipmap.default_profile),
-                        contentDescription = "Default Profile Picture",
-                        modifier = Modifier
-                            .width(48.dp)
-                            .height(48.dp)
-                    )
-                },
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .width(48.dp)
-                    .height(48.dp),
-                contentDescription = "Profile Photo URL"
-            )
-            Spacer(modifier = Modifier.width(10.dp))
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth(if (isYourProfile) 0.5f else 0.9f)
-                    .fillMaxHeight(),
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = following.followedUsername,
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(text = following.followedFullname)
-
-            }
-            if (isYourProfile) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxHeight()
-                ) {
-                    Button(
-
-                        onClick = {
-                            unFollowUser(following)
-                        }) {
-                        Text(text = "Un Follow")
-                    }
-
-                }
-            }
-
-
-        }
-
-    }
-
-
-}

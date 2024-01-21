@@ -15,16 +15,16 @@
  */
 package com.peterchege.blogger.domain.repository
 
-import com.peterchege.blogger.core.room.entities.DraftRecord
+import com.peterchege.blogger.core.room.entities.DraftPost
 import kotlinx.coroutines.flow.Flow
 
 interface DraftRepository {
 
-    suspend fun insertDraft(draft: DraftRecord)
+    suspend fun insertDraft(draft: DraftPost)
 
-    fun getAllDrafts(): Flow<List<DraftRecord>>
+    fun getAllDrafts(): Flow<List<DraftPost>>
 
-    suspend fun getDraftById(id:Int): DraftRecord?
+    suspend fun getDraftById(id:Int): DraftPost?
 
     suspend fun deleteAllDrafts()
 

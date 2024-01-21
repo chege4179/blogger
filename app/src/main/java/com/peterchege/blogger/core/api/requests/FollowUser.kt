@@ -18,10 +18,7 @@ package com.peterchege.blogger.core.api.requests
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class FollowUser (
-    val followerUsername: String,
-    val followerFullname: String,
-    val followerId: String,
-    val followedUsername: String,
-
-    )
+data class FollowUser(
+    val followerUserId: String,
+    val followedUserId: String,
+)

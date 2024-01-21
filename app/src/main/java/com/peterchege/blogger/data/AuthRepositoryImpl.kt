@@ -19,15 +19,20 @@ import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.api.requests.LoginUser
 import com.peterchege.blogger.core.api.requests.LogoutUser
 import com.peterchege.blogger.core.api.requests.SignUpUser
-import com.peterchege.blogger.core.api.responses.Following
-import com.peterchege.blogger.core.api.responses.LoginResponse
-import com.peterchege.blogger.core.api.responses.LogoutResponse
-import com.peterchege.blogger.core.api.responses.SignUpResponse
-import com.peterchege.blogger.core.api.responses.User
+import com.peterchege.blogger.core.api.responses.models.FollowerUser
+
+import com.peterchege.blogger.core.api.responses.responses.LoginResponse
+import com.peterchege.blogger.core.api.responses.responses.LogoutResponse
+import com.peterchege.blogger.core.api.responses.responses.SignUpResponse
+import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.api.safeApiCall
+import com.peterchege.blogger.core.datastore.preferences.DefaultAuthTokenProvider
+import com.peterchege.blogger.core.datastore.preferences.DefaultFCMTokenProvider
 import com.peterchege.blogger.core.datastore.repository.UserDataStoreRepository
 import com.peterchege.blogger.core.di.IoDispatcher
 import com.peterchege.blogger.core.util.NetworkResult
+import com.peterchege.blogger.data.local.users.following.FollowingLocalDataSource
+import com.peterchege.blogger.domain.mappers.toFollowingEntity
 import com.peterchege.blogger.domain.repository.AuthRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -36,26 +41,38 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class AuthRepositoryImpl  @Inject constructor(
+class AuthRepositoryImpl @Inject constructor(
     private val api: BloggerApi,
     private val userDataStoreRepository: UserDataStoreRepository,
+    private val defaultAuthTokenProvider: DefaultAuthTokenProvider,
+    private val fcmTokenProvider: DefaultFCMTokenProvider,
+    private val followingLocalDataSource: FollowingLocalDataSource,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-): AuthRepository {
+) : AuthRepository {
 
     override val isUserLoggedIn: Flow<Boolean> =
         userDataStoreRepository.isUserLoggedIn.flowOn(ioDispatcher)
+
+    override val fcmToken: Flow<String> = fcmTokenProvider.fcmToken.flowOn(ioDispatcher)
+
+    override suspend fun setAuthToken(token: String) {
+        withContext(ioDispatcher) {
+            defaultAuthTokenProvider.setAuthToken(token)
+        }
+    }
 
     override suspend fun signUpUser(signUpUser: SignUpUser): NetworkResult<SignUpResponse> {
         return safeApiCall { api.signUpUser(signUpUser) }
     }
 
-    override suspend fun addUserFollowing(following: Following) {
-        return userDataStoreRepository.addUserFollowing(following)
+    override suspend fun addUserFollowing(following: FollowerUser) {
+        followingLocalDataSource.insertFollowing(followerUser = following)
     }
 
-    override suspend fun removeUserFollowing(following: Following) {
-        return userDataStoreRepository.removeUserFollowing(following)
+    override suspend fun removeUserFollowing(userId:String) {
+        followingLocalDataSource.deleteFollowingByUserId(userId = userId)
     }
+
     override suspend fun loginUser(loginUser: LoginUser): NetworkResult<LoginResponse> {
         return safeApiCall { api.loginUser(loginUser) }
     }
@@ -75,7 +92,6 @@ class AuthRepositoryImpl  @Inject constructor(
     override suspend fun unsetLoggedInUser() = withContext(context = ioDispatcher) {
         return@withContext userDataStoreRepository.unsetLoggedInUser()
     }
-
 
 
 }

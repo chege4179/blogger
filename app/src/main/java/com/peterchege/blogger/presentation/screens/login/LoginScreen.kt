@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -61,7 +62,7 @@ fun LoginScreen(
         uiState = uiState.value,
         networkStatus = networkStatus.value,
         eventFlow = viewModel.eventFlow,
-        onChangeUsername = { viewModel.onChangeUsername(it) },
+        onChangeEmail = { viewModel.onChangeEmail(it) },
         onChangePassword = { viewModel.onChangePassword(it) },
         onChangePasswordVisibility = { viewModel.onChangePasswordVisibility() },
         onSubmit = { viewModel.initiateLogin(navigateToDashBoard = navigateToDashBoard) } ,
@@ -79,26 +80,21 @@ fun LoginScreenContent(
     uiState: LoginFormState,
     networkStatus: NetworkStatus,
     navigateToSignUpScreen: () -> Unit,
-
     eventFlow: SharedFlow<UiEvent>,
-    onChangeUsername: (String) -> Unit,
+    onChangeEmail: (String) -> Unit,
     onChangePassword: (String) -> Unit,
     onChangePasswordVisibility: () -> Unit,
     onSubmit: () -> Unit,
 
 
     ) {
-    val snackbarHostState = SnackbarHostState()
+    val snackbarHostState = remember { SnackbarHostState() }
     val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(key1 = networkStatus) {
         when (networkStatus) {
             is NetworkStatus.Unknown -> {}
-            is NetworkStatus.Connected -> {
-                snackbarHostState.showSnackbar(
-                    message = "Connected"
-                )
-            }
+            is NetworkStatus.Connected -> {}
             is NetworkStatus.Disconnected -> {
                 snackbarHostState.showSnackbar(
                     message = "You are offline"
@@ -112,7 +108,7 @@ fun LoginScreenContent(
             when (event) {
                 is UiEvent.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
-                        message = "jjjj"
+                        message = event.message
                     )
                 }
                 is UiEvent.Navigate -> {}
@@ -159,12 +155,12 @@ fun LoginScreenContent(
                 Spacer(modifier = Modifier.height(15.dp))
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = uiState.username,
+                    value = uiState.email,
                     onValueChange = {
-                        onChangeUsername(it)
+                        onChangeEmail(it)
                         //state.username = it
                     },
-                    label = { Text("Username") }
+                    label = { Text("Email Address") }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
@@ -174,7 +170,6 @@ fun LoginScreenContent(
                         onChangePassword(it)
                     },
                     trailingIcon = {
-
                         Icon(
                             imageVector = if (!uiState.isPasswordVisible)
                                 Icons.Filled.VisibilityOff
@@ -215,8 +210,8 @@ fun LoginScreenContent(
                         .height(50.dp),
                     onClick = {
                         navigateToSignUpScreen()
-
-                    }) {
+                    }
+                ) {
                     Text(text = "Sign Up")
                 }
             }

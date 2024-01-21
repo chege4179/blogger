@@ -19,7 +19,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class LoginUser(
-    var username :String = "",
+    var email :String = "",
     var password:String = "",
-    var token:String = ""
+    var deviceToken:String = ""
 )

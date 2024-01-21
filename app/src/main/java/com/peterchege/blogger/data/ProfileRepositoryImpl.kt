@@ -15,20 +15,63 @@
  */
 package com.peterchege.blogger.data
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.peterchege.blogger.core.api.BloggerApi
-import com.peterchege.blogger.core.api.responses.ProfileResponse
+import com.peterchege.blogger.core.api.requests.FollowUser
+import com.peterchege.blogger.core.api.requests.UnFollowUser
+import com.peterchege.blogger.core.api.responses.models.Post
+import com.peterchege.blogger.core.api.responses.responses.FollowResponse
+import com.peterchege.blogger.core.api.responses.responses.GetFollowersResponse
+import com.peterchege.blogger.core.api.responses.responses.GetFollowingResponse
+import com.peterchege.blogger.core.api.responses.responses.GetPostsByUserIdResponse
+import com.peterchege.blogger.core.api.responses.responses.GetUserLikeResponse
+import com.peterchege.blogger.core.api.responses.responses.ProfileResponse
+import com.peterchege.blogger.core.api.responses.responses.UnfollowResponse
 import com.peterchege.blogger.core.api.safeApiCall
-import com.peterchege.blogger.core.di.IoDispatcher
 import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.domain.repository.ProfileRepository
-import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class ProfileRepositoryImpl @Inject constructor(
     private val api: BloggerApi,
     ):ProfileRepository {
-    override suspend fun getProfile(username: String): NetworkResult<ProfileResponse> {
-        return safeApiCall{ api.getUserProfile(username = username) }
+    override suspend fun getProfile(userId: String): NetworkResult<ProfileResponse> {
+        return safeApiCall{ api.getUserProfile(userId = userId) }
+    }
+
+    override suspend fun getPostsByUserId(userId: String,page:Int): NetworkResult<GetPostsByUserIdResponse> {
+        return safeApiCall { api.getPostByUserId(userId = userId,page = page) }
+    }
+
+    override suspend fun followUser(followUser: FollowUser): NetworkResult<FollowResponse> {
+        return safeApiCall{ api.followUser(followUser = followUser) }
+    }
+
+    override suspend fun unfollowUser(unfollowUser: UnFollowUser): NetworkResult<UnfollowResponse> {
+        return safeApiCall{ api.unfollowUser(unFollowUser = unfollowUser) }
+    }
+
+    override suspend fun getFollowers(
+        page: Int,
+        limit: Int,
+        userId: String
+    ): NetworkResult<GetFollowersResponse> {
+        return safeApiCall { api.getUserFollowers(page = page,userId = userId) }
+    }
+
+    override suspend fun getFollowing(
+        page: Int,
+        limit: Int,
+        userId: String
+    ): NetworkResult<GetFollowingResponse> {
+        return safeApiCall { api.getUserFollowing(page = page,userId = userId) }
+    }
+
+    override suspend fun getUserLikes(userId: String): NetworkResult<GetUserLikeResponse> {
+        return safeApiCall { api.getUserLikes(userId) }
     }
 
 }

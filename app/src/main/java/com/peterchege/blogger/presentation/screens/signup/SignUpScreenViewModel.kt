@@ -99,7 +99,7 @@ class SignUpScreenViewModel @Inject constructor(
             } else {
                 val signUpUser = SignUpUser(
                     username = _uiState.value.username.trim(),
-                    fullname = _uiState.value.fullName.trim(),
+                    fullName = _uiState.value.fullName.trim(),
                     password = _uiState.value.password.trim(),
                     email = _uiState.value.email.trim()
                 )

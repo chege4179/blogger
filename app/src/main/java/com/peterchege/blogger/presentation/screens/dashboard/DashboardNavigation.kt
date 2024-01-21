@@ -24,15 +24,18 @@ import com.peterchege.blogger.presentation.navigation.navigateToAddPostScreen
 import com.peterchege.blogger.presentation.navigation.navigateToAuthUserProfileScreen
 import com.peterchege.blogger.presentation.navigation.navigateToAuthorProfileScreen
 import com.peterchege.blogger.presentation.navigation.navigateToCategoryScreen
+import com.peterchege.blogger.presentation.navigation.navigateToEditPostScreen
+import com.peterchege.blogger.presentation.navigation.navigateToEditProfileScreen
 import com.peterchege.blogger.presentation.navigation.navigateToLoginScreen
 import com.peterchege.blogger.presentation.navigation.navigateToPostScreen
 import com.peterchege.blogger.presentation.navigation.navigateToProfileFollowerFollowingScreen
 import com.peterchege.blogger.presentation.navigation.navigateToSearchScreen
+import com.peterchege.blogger.presentation.navigation.navigateToSettingsScreen
 import com.peterchege.blogger.presentation.navigation.navigateToSignUpScreen
-import com.peterchege.blogger.presentation.screens.dashboard.feed_screen.FeedScreen
-import com.peterchege.blogger.presentation.screens.dashboard.notifcations_screen.NotificationScreen
-import com.peterchege.blogger.presentation.screens.dashboard.profile_screen.ProfileScreen
-import com.peterchege.blogger.presentation.screens.dashboard.savedposts_screen.SavedPostScreen
+import com.peterchege.blogger.presentation.screens.feed.FeedScreen
+import com.peterchege.blogger.presentation.screens.notifcations.NotificationScreen
+import com.peterchege.blogger.presentation.screens.profile.ProfileScreen
+import com.peterchege.blogger.presentation.screens.saved_posts.SavedPostScreen
 
 
 @Composable
@@ -40,7 +43,6 @@ fun DashboardNavigation(
     navHostController: NavHostController,
     bottomNavController:NavHostController
 ) {
-
 
     NavHost(
         navController = bottomNavController,
@@ -83,6 +85,9 @@ fun DashboardNavigation(
                 navigateToLoginScreen = navHostController::navigateToLoginScreen,
                 navigateToProfileFollowerFollowingScreen = navHostController::navigateToProfileFollowerFollowingScreen,
                 navigateToPostScreen = navHostController::navigateToPostScreen,
+                navigateToEditProfileScreen = navHostController::navigateToEditProfileScreen,
+                navigateToSettingsScreen = navHostController::navigateToSettingsScreen,
+                navigateToEditPostScreen = navHostController::navigateToEditPostScreen
             )
         }
     }
