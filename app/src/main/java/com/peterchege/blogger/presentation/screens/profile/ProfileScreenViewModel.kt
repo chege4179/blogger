@@ -50,6 +50,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.launchIn
@@ -115,6 +116,9 @@ class ProfileScreenViewModel @Inject constructor(
         )
 
     val authUser = authRepository.getLoggedInUser()
+        .filterNot {
+            it?.userId == ""
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000L),
@@ -127,7 +131,6 @@ class ProfileScreenViewModel @Inject constructor(
             when (response) {
                 is Resource.Success -> {
                     if (response.data?.user != null) {
-
                         ProfileScreenUiState.Success(
                             posts = getPaginatedPostsByUserId(userId = response.data.user.userId),
                             user = response.data.user,
