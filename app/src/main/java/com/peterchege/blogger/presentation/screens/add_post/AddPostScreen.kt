@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -40,6 +41,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.work.*
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.SubcomposeAsyncImage
+import com.peterchege.blogger.R
 import com.peterchege.blogger.core.services.UploadPostService
 import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.presentation.alertDialogs.DraftConfirmDialog
@@ -76,15 +78,15 @@ fun AddPostScreen(
         onSubmit = {
             authUser?.let { user ->
                 if (viewModel.formState.value.uri == null){
-                    viewModel.emitSnackBarEvent(msg = "Select a blogger image")
+                    viewModel.emitSnackBarEvent(msg = context.getString(R.string.post_image_uri_error))
                     return@let
                 }
                 if (viewModel.formState.value.postBody ==""){
-                    viewModel.emitSnackBarEvent(msg ="Post body can't be empty")
+                    viewModel.emitSnackBarEvent(msg = context.getString(R.string.post_body_error))
                     return@let
                 }
                 if (viewModel.formState.value.postTitle ==""){
-                    viewModel.emitSnackBarEvent(msg ="Post Title can't be empty")
+                    viewModel.emitSnackBarEvent(msg = context.getString(R.string.post_title_error))
                     return@let
                 }
                 Intent(context,UploadPostService::class.java).also {
@@ -141,7 +143,7 @@ fun AddPostScreenContent(
         }
 
     }
-    val snackbarHostState = remember{ SnackbarHostState() }
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(key1 = true) {
         eventFlow.collectLatest { event ->
@@ -204,7 +206,7 @@ fun AddPostScreenContent(
                                             .width(135.dp)
                                             .height(135.dp)
                                         ,
-                                        contentDescription = "Add Post Image",
+                                        contentDescription = stringResource(id = R.string.add_post_image_text),
                                         contentScale = ContentScale.FillBounds
                                     )
                                 }
@@ -221,7 +223,7 @@ fun AddPostScreenContent(
                                         onClick = {
                                             launcher.launch("image/*")
                                         }) {
-                                        Text("Select Image")
+                                        Text(text = stringResource(id = R.string.select_image_text))
                                     }
                                     Spacer(modifier = Modifier.height(10.dp))
                                     Button(
@@ -229,7 +231,7 @@ fun AddPostScreenContent(
                                         onClick = {
                                             onChangeImageUri(null)
                                         }) {
-                                        Text("Remove Image")
+                                        Text(text = stringResource(id = R.string.remove_image_text))
                                     }
                                 }
 
@@ -246,7 +248,7 @@ fun AddPostScreenContent(
                                     value = formState.postTitle,
                                     maxLines = 3,
                                     label = {
-                                        Text("Post Title")
+                                        Text(text = stringResource(id = R.string.post_title))
                                     },
                                     onValueChange = {
                                         onChangePostTitle(it)
@@ -259,7 +261,7 @@ fun AddPostScreenContent(
                                     value = formState.postBody,
                                     maxLines = 70,
                                     label = {
-                                        Text("Write your own story")
+                                        Text(text= stringResource(id = R.string.post_body))
                                     },
                                     onValueChange = {
                                         onChangePostBody(it)
@@ -275,7 +277,7 @@ fun AddPostScreenContent(
 
                                         }) {
                                         Text(
-                                            text = "Go To Drafts"
+                                            text = stringResource(id = R.string.view_draft)
                                         )
                                     }
                                     Button(
@@ -283,7 +285,7 @@ fun AddPostScreenContent(
                                             onSubmit()
                                         }) {
                                         Text(
-                                            text = "Post"
+                                            text =stringResource(id = R.string.post)
                                         )
                                     }
                                 }

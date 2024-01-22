@@ -28,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -40,13 +41,14 @@ import com.peterchege.blogger.presentation.components.ArticleCard
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.theme.defaultPadding
+import com.peterchege.blogger.R
 
 @Composable
 fun SavedPostScreen(
-    navigateToPostScreen:(String) -> Unit,
-    navigateToAuthorProfileScreen:(String) -> Unit,
+    navigateToPostScreen: (String) -> Unit,
+    navigateToAuthorProfileScreen: (String) -> Unit,
     viewModel: SavedPostScreenViewModel = hiltViewModel()
-){
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val authUser by viewModel.authUser.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -58,26 +60,26 @@ fun SavedPostScreen(
         bookmarkPost = viewModel::bookmarkPost,
         unBookmarkPost = viewModel::unBookmarkPost,
         likePost = { post ->
-            if (authUser == null){
-                context.toast(msg = "Login or create an account to like a post")
+            if (authUser == null) {
+                context.toast(msg = context.getString(R.string.login_like_message))
             }
             authUser?.let { user ->
                 if (user.userId != "") {
                     viewModel.likePost(post = post, user = user)
-                }else{
-                    context.toast(msg = "Login or create an account to like a post")
+                } else {
+                    context.toast(msg = context.getString(R.string.login_like_message))
                 }
             }
         },
         unLikePost = { post ->
-            if (authUser == null){
-                context.toast(msg = "Login or create an account to like a post")
+            if (authUser == null) {
+                context.toast(msg = context.getString(R.string.login_like_message))
             }
             authUser?.let { user ->
                 if (user.userId != "") {
                     viewModel.unLikePost(post = post, user = user)
-                }else{
-                    context.toast(msg = "Login or create an account to like a post")
+                } else {
+                    context.toast(msg = context.getString(R.string.login_like_message))
                 }
             }
         }
@@ -85,56 +87,56 @@ fun SavedPostScreen(
 }
 
 
-
 @OptIn(ExperimentalCoilApi::class, ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SavedPostScreenContent(
-    navigateToPostScreen:(String) -> Unit,
-    navigateToAuthorProfileScreen:(String) -> Unit,
+    navigateToPostScreen: (String) -> Unit,
+    navigateToAuthorProfileScreen: (String) -> Unit,
     uiState: SavedPostScreenUiState,
     bookmarkPost: (Post) -> Unit,
     unBookmarkPost: (Post) -> Unit,
     likePost: (Post) -> Unit,
     unLikePost: (Post) -> Unit,
-){
+) {
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text= "Your saved posts",
-                    )
+                    Text(text = stringResource(id = R.string.saved_post_header_name))
                 },
             )
         }
     ) { paddingValues ->
-        when(uiState){
+        when (uiState) {
             is SavedPostScreenUiState.Loading -> {
                 LoadingComponent()
             }
+
             is SavedPostScreenUiState.Empty -> {
 
             }
+
             is SavedPostScreenUiState.Error -> {
                 ErrorComponent(
                     retryCallback = { /*TODO*/ },
-                    errorMessage = uiState.message)
+                    errorMessage = uiState.message
+                )
             }
+
             is SavedPostScreenUiState.Success -> {
                 val posts = uiState.posts
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
-                        .padding(defaultPadding)
-                    ,
+                        .padding(defaultPadding),
 
-                ){
-                    if (posts.isEmpty()){
-                        item{
+                    ) {
+                    if (posts.isEmpty()) {
+                        item {
                             Column(
                                 modifier = Modifier
                                     .fillMaxSize(),
@@ -142,14 +144,14 @@ fun SavedPostScreenContent(
                                 verticalArrangement = Arrangement.Center,
                             ) {
                                 Text(
-                                    text = "You have no saved posts",
+                                    text = stringResource(id = R.string.no_saved_posts),
                                     fontWeight = FontWeight.Bold,
                                 )
                             }
                         }
 
                     }
-                    items(items = posts, key = { it.postId }){ post ->
+                    items(items = posts, key = { it.postId }) { post ->
                         ArticleCard(
                             post = post,
                             onItemClick = { post ->

@@ -26,7 +26,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import com.peterchege.blogger.R
 import com.peterchege.blogger.presentation.screens.post.CommentUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,7 +46,7 @@ fun CommentDialog(
             closeCommentDialog()
         },
         title = {
-            Text(text = "Post Comment")
+            Text(text = stringResource(id = R.string.post_comment))
         },
         text = {
             if (isUserLoggedIn) {
@@ -67,7 +69,7 @@ fun CommentDialog(
                     )
                 )
             } else {
-                Text(text = "Log In to be able to comment")
+                Text(text = stringResource(id = R.string.login_to_comment_text))
             }
 
         },
@@ -77,7 +79,7 @@ fun CommentDialog(
                     postComment()
                 }
             ) {
-                Text(text = "Comment")
+                Text(text = stringResource(id = R.string.comment))
             }
         },
         dismissButton = {
@@ -86,7 +88,7 @@ fun CommentDialog(
                     closeCommentDialog()
                 }
             ) {
-                Text(text = "Cancel")
+                Text(text = stringResource(id = R.string.cancel))
             }
         }
     )

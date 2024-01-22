@@ -36,11 +36,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.peterchege.blogger.R
 import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.presentation.components.BottomNavItem
 
@@ -85,26 +87,26 @@ fun DashBoardScreen(
             BottomNavBar(
                 items = listOf(
                     BottomNavItem(
-                        name = "Home",
+                        name = stringResource(id = R.string.home_navbar),
                         route = Screens.FEED_SCREEN,
                         selectedIcon = Icons.Default.Home,
                         unselectedIcon = Icons.Outlined.Home,
                     ),
                     BottomNavItem(
-                        name = "Saved",
+                        name = stringResource(id = R.string.saved_navbar),
                         route = Screens.SAVED_POST_SCREEN,
                         selectedIcon = Icons.Default.Favorite,
                         unselectedIcon = Icons.Default.FavoriteBorder
                     ),
 
                     BottomNavItem(
-                        name = "Notifications",
+                        name = stringResource(id = R.string.notifications_navbar),
                         route = Screens.NOTIFICATION_SCREEN,
                         selectedIcon = Icons.Default.Notifications,
                         unselectedIcon = Icons.Default.NotificationsNone
                     ),
                     BottomNavItem(
-                        name = "Profile",
+                        name = stringResource(id = R.string.profile_navbar),
                         route = Screens.PROFILE_SCREEN,
                         selectedIcon = Icons.Default.Person,
                         unselectedIcon = Icons.Outlined.Person
@@ -115,7 +117,7 @@ fun DashBoardScreen(
                 onItemClick = {
                     bottomNavController.navigate(it.route) {
                         launchSingleTop = true
-                        popUpTo(bottomNavController.graph.findStartDestination().id){
+                        popUpTo(bottomNavController.graph.findStartDestination().id) {
                             saveState = true
                         }
                     }

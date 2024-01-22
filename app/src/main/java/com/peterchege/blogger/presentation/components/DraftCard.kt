@@ -30,12 +30,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.peterchege.blogger.core.room.entities.DraftPost
 import com.peterchege.blogger.core.util.truncateString
+import com.peterchege.blogger.R
 
 @Preview
 @Composable
@@ -101,7 +103,7 @@ fun DraftCard(
                         onDeleteDraft(it)
                     }
                 },
-                contentDescription = "Delete Draft "
+                contentDescription = stringResource(id = R.string.delete_draft_description)
             )
 
 

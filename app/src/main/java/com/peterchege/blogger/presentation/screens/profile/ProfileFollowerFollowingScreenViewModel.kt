@@ -105,39 +105,6 @@ class ProfileFollowerFollowingScreenViewModel @Inject constructor(
         )
 
 
-    fun followUser(followedUsername: String) {
-//        viewModelScope.launch {
-//            val username = _user.value?.username ?: ""
-//            val fullname = _user.value?.fullname ?: ""
-//            val userId = _user.value?._id ?: ""
-//            val followResponse = repository.followUser(
-//                FollowUser(
-//                    followerUsername = username,
-//                    followerFullname = fullname,
-//                    followerId = userId,
-//                    followedUsername = followedUsername,
-//                )
-//            )
-//
-//        }
-    }
-
-    fun unfollowUser(followedUsername: String) {
-        viewModelScope.launch {
-//            val username = _user.value?.username ?: ""
-//            val fullname = _user.value?.fullname ?: ""
-//            val userId = _user.value?._id ?: ""
-//            val followResponse = repository.unfollowUser(
-//                FollowUser(
-//                    followerUsername = username,
-//                    followerFullname = fullname,
-//                    followerId = userId!!,
-//                    followedUsername = followedUsername,
-//                )
-//            )
-        }
-    }
-
     @OptIn(ExperimentalPagingApi::class)
     private fun getUserFollowersById(userId: String): Flow<PagingData<FollowerUser>> {
         return Pager(

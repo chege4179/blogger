@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,6 +42,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
+import com.peterchege.blogger.R
 import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.util.Constants
@@ -84,25 +86,25 @@ fun AuthorProfileScreen(
         eventFlow = viewModel.eventFlow,
         likePost = { post ->
             if (authUser == null){
-                context.toast(msg = "Login or create an account to like a post")
+                context.toast(msg = context.getString(R.string.login_like_message))
             }
             authUser?.let { user ->
                 if (user.userId != "") {
                     viewModel.likePost(post = post, user = user)
                 }else{
-                    context.toast(msg = "Login or create an account to like a post")
+                    context.toast(msg = context.getString(R.string.login_like_message))
                 }
             }
         },
         unLikePost = { post ->
             if (authUser == null){
-                context.toast(msg = "Login or create an account to like a post")
+                context.toast(msg = context.getString(R.string.login_like_message))
             }
             authUser?.let { user ->
                 if (user.userId != "") {
                     viewModel.unLikePost(post = post, user = user)
                 }else{
-                    context.toast(msg = "Login or create an account to like a post")
+                    context.toast(msg = context.getString(R.string.login_like_message))
                 }
             }
         },
@@ -247,7 +249,7 @@ fun AuthorProfileScreenContent(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             ProfileInfoCount(
-                                name = "Articles",
+                                name = stringResource(id = R.string.post_header_name),
                                 count = user._count.post,
                                 onClick = {
 
@@ -261,7 +263,7 @@ fun AuthorProfileScreenContent(
                                 color = Color.LightGray
                             )
                             ProfileInfoCount(
-                                name = "Followers",
+                                name = stringResource(id = R.string.followers_header_name),
                                 count = user._count.followers,
                                 onClick = {
                                     navigateToAuthorFollowerFollowingScreen(
@@ -278,7 +280,7 @@ fun AuthorProfileScreenContent(
                                 color = Color.LightGray
                             )
                             ProfileInfoCount(
-                                name = "Following",
+                                name = stringResource(id = R.string.following_header_name),
                                 count = user._count.following,
                                 onClick = {
                                     navigateToAuthorFollowerFollowingScreen(
@@ -305,7 +307,7 @@ fun AuthorProfileScreenContent(
                             Box(modifier = Modifier.fillMaxSize()) {
                                 Text(
                                     modifier = Modifier.align(Alignment.Center),
-                                    text = "This user does not have any posts yet"
+                                    text = stringResource(id = R.string.empty_posts_message)
                                 )
                             }
                         }

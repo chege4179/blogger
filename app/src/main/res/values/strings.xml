@@ -1,3 +1,130 @@
 <resources>
     <string name="app_name">Blogger</string>
+    <string name="offline_message">You are offline</string>
+
+    <string name="home_navbar">Home</string>
+    <string name="saved_navbar">Saved</string>
+    <string name="notifications_navbar">Notifications</string>
+    <string name="profile_navbar">Profile</string>
+
+    <!--  Icons Descriptions  -->
+    <string name="search_icon_description">Search Post</string>
+    <string name="create_post_icon_description">Create Post </string>
+    <string name="app_icon_description">App Icon</string>
+    <string name="visibility_on_description">Show password</string>
+    <string name="visibility_off_description">Hide password</string>
+    <string name="add_comment_description">Add a comment</string>
+    <string name="like_description">Like</string>
+    <string name="unlike_description">Un like </string>
+    <string name="save_description">Bookmark this Post</string>
+    <string name="un_save_description">Unbookmark this Post </string>
+    <string name="share_description">Share this Post </string>
+    <string name="edit_profile_description">Edit Profile</string>
+    <string name="settings_description">Settings</string>
+    <string name="edit_post_description">Edit Post</string>
+    <string name="delete_post_description">Delete Post</string>
+    <string name="like_comment_description">Like this comment</string>
+    <string name="delete_draft_description">Delete this draft</string>
+    <string name="more_description">More about this setting</string>
+
+    <!--  Image Content Description  -->
+    <string name="post_image">Image Header for the Post</string>
+    <string name="profile_image">Profile picture for this user</string>
+    <string name="default_profile_image">Default Profile Picture</string>
+
+    <!--    ADD POST STRINGS -->
+    <string name="add_post_image_text">Add Post Image</string>
+    <string name="select_image_text">Select Image</string>
+    <string name="remove_image_text">Remove Image</string>
+
+    <string name="post_title">Post Title</string>
+    <string name="post_body">Write your own story</string>
+    <string name="view_draft">View Drafts</string>
+    <string name="post">Post</string>
+
+    <string name="post_image_uri_error">Select an image</string>
+    <string name="post_body_error">Post body can\'t be empty</string>
+    <string name="post_title_error">Post title can\'t be empty</string>
+
+    <!--    PROFILE STRINGS -->
+
+    <string name="post_header_name">Posts</string>
+    <string name="followers_header_name">Followers</string>
+    <string name="following_header_name">Following</string>
+    <string name="empty_posts_message">This user does not have any posts yet</string>
+    <string name="login_like_message">Login or create an account to like a post</string>
+    <string name="user_not_found">User not found</string>
+
+    <!--  DRAFT SCREEN  -->
+
+    <string name="draft_screen_header">My Drafts</string>
+    <string name="empty_draft_message">You have no drafts</string>
+
+    <!--  Edit Post  -->
+    <string name="edit_post_screen_header">Edit Post</string>
+    <string name="edit_post_error">Post not found</string>
+    <string name="update_button_text">Update Post</string>
+
+    <!--  Feed  -->
+    <string name="no_posts_found">No posts were found</string>
+
+    <!--  Auth  -->
+    <string name="login_header">Blogger App</string>
+    <string name="login">Login</string>
+    <string name="email">Email Address</string>
+    <string name="password">Password</string>
+    <string name="signup">Sign Up</string>
+    <string name="confirm_password">Confirm Password</string>
+
+    <!--  Notifications  -->
+
+    <string name="notification_header">Notifications</string>
+    <string name="login_to_view_notifications">Login to view your notifications</string>
+    <string name="no_notifications_message">You have no notifications yet</string>
+
+    <string name="saved_post_header_name">Your saved posts</string>
+    <string name="no_saved_posts">You have no saved posts</string>
+
+    <!-- Search    -->
+    <string name="post_tab">Posts</string>
+    <string name="user_tab">User</string>
+
+    <!-- Settings   -->
+    <string name="settings_header_name">Settings</string>
+    <string name="theme">Theme</string>
+    <string name="license">Open Source Licenses</string>
+
+    <string name="sign_out_button_text">Sign Out</string>
+
+    <string name="retry">Retry</string>
+
+
+    <string name="following_button_text">Following</string>
+    <string name="follow_back_button_text">Follow Back</string>
+    <string name="follow_button_text">Follow</string>
+    <string name="unfollow_button_text">Un Follow</string>
+
+    <string name="no_followers">This user does not have any followers yet</string>
+    <string name="no_following">This user does not have any following yet</string>
+
+
+    <string name="post_comment">Post a comment</string>
+    <string name="login_to_comment_text">Login to be able to comment</string>
+    <string name="comment">Comment</string>
+    <string name="cancel">Cancel</string>
+    <string name="close">Close</string>
+    <string name="delete">Delete</string>
+    <string name="save">Save</string>
+    <string name="ok">ok</string>
+    <string name="delete_comment_description">Are you sure you want to delete this comment</string>
+    <string name="delete_post_description_text">Are you sure you want to delete this post</string>
+    <string name="save_draft_header_text">Save Draft</string>
+    <string name="save_draft_text">Do you want to save this draft ?</string>
+    <string name="sign_out_description">Are you sure you want to sign out ?</string>
+
+
+    <string name="system_default">System Default</string>
+    <string name="light">Light</string>
+    <string name="dark">Dark</string>
+
 </resources>

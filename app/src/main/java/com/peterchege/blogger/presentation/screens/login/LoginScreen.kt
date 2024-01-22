@@ -31,6 +31,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -50,7 +51,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun LoginScreen(
     navigateToSignUpScreen: () -> Unit,
-    navigateToDashBoard:() -> Unit,
+    navigateToDashBoard: () -> Unit,
     viewModel: LoginScreenViewModel = hiltViewModel()
 
 ) {
@@ -65,9 +66,9 @@ fun LoginScreen(
         onChangeEmail = { viewModel.onChangeEmail(it) },
         onChangePassword = { viewModel.onChangePassword(it) },
         onChangePasswordVisibility = { viewModel.onChangePasswordVisibility() },
-        onSubmit = { viewModel.initiateLogin(navigateToDashBoard = navigateToDashBoard) } ,
+        onSubmit = { viewModel.initiateLogin(navigateToDashBoard = navigateToDashBoard) },
         navigateToSignUpScreen = navigateToSignUpScreen,
-        )
+    )
 
 
 }
@@ -91,13 +92,15 @@ fun LoginScreenContent(
     val snackbarHostState = remember { SnackbarHostState() }
     val keyboardController = LocalSoftwareKeyboardController.current
 
+    val offlineMessage = stringResource(id = R.string.offline_message)
     LaunchedEffect(key1 = networkStatus) {
+
         when (networkStatus) {
             is NetworkStatus.Unknown -> {}
             is NetworkStatus.Connected -> {}
             is NetworkStatus.Disconnected -> {
                 snackbarHostState.showSnackbar(
-                    message = "You are offline"
+                    message = offlineMessage
                 )
             }
         }
@@ -111,6 +114,7 @@ fun LoginScreenContent(
                         message = event.message
                     )
                 }
+
                 is UiEvent.Navigate -> {}
             }
         }
@@ -127,7 +131,7 @@ fun LoginScreenContent(
                 .fillMaxSize()
                 .padding(defaultPadding),
 
-        ) {
+            ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
@@ -138,16 +142,16 @@ fun LoginScreenContent(
                     modifier = Modifier
                         .width(80.dp)
                         .height(80.dp),
-                    contentDescription = "App Icon"
+                    contentDescription = stringResource(id = R.string.app_name)
                 )
                 Text(
-                    text = "Blogger App",
+                    text = stringResource(id = R.string.login_header),
                     fontSize = 30.sp,
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
-                    text = "Login ",
+                    text = stringResource(id = R.string.login),
                     fontSize = 24.sp,
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold,
@@ -160,7 +164,9 @@ fun LoginScreenContent(
                         onChangeEmail(it)
                         //state.username = it
                     },
-                    label = { Text("Email Address") }
+                    label = {
+                        Text(text = stringResource(id = R.string.email))
+                    }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
@@ -175,7 +181,11 @@ fun LoginScreenContent(
                                 Icons.Filled.VisibilityOff
                             else
                                 Icons.Filled.Visibility,
-                            contentDescription = "Visibility on",
+                            contentDescription = if (!uiState.isPasswordVisible)
+                                stringResource(id = R.string.visibility_on_description)
+                            else
+                                stringResource(id = R.string.visibility_off_description)
+                                ,
                             modifier = Modifier
                                 .size(26.dp)
                                 .clickable {
@@ -188,7 +198,9 @@ fun LoginScreenContent(
                         VisualTransformation.None
                     else
                         PasswordVisualTransformation(),
-                    label = { Text("Password") }
+                    label = {
+                        Text(text = stringResource(id = R.string.password))
+                    }
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Button(
@@ -201,7 +213,7 @@ fun LoginScreenContent(
                     }
                 )
                 {
-                    Text("Login")
+                    Text(text = stringResource(id = R.string.login))
                 }
                 Spacer(modifier = Modifier.height(20.dp))
                 TextButton(
@@ -212,18 +224,14 @@ fun LoginScreenContent(
                         navigateToSignUpScreen()
                     }
                 ) {
-                    Text(text = "Sign Up")
+                    Text(text = stringResource(id = R.string.signup))
                 }
             }
             if (uiState.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
-
         }
-
     }
-
-
 }
 
 

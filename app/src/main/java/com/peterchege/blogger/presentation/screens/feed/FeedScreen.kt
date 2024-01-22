@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -56,6 +57,7 @@ import com.peterchege.blogger.presentation.theme.defaultPadding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
+import com.peterchege.blogger.R
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
@@ -97,26 +99,26 @@ fun FeedScreen(
         bookmarkPost = viewModel::bookmarkPost,
         unBookmarkPost = viewModel::unBookmarkPost,
         likePost = { post ->
-            if (authUser == null){
-                context.toast(msg = "Login or create an account to like a post")
+            if (authUser == null) {
+                context.toast(msg = context.getString(R.string.login_like_message))
             }
             authUser?.let { user ->
                 if (user.userId != "") {
                     viewModel.likePost(post = post, user = user)
-                }else{
-                    context.toast(msg = "Login or create an account to like a post")
+                } else {
+                    context.toast(msg = context.getString(R.string.login_like_message))
                 }
             }
         },
         unLikePost = { post ->
-            if (authUser == null){
-                context.toast(msg = "Login or create an account to like a post")
+            if (authUser == null) {
+                context.toast(msg = context.getString(R.string.login_like_message))
             }
             authUser?.let { user ->
                 if (user.userId != "") {
                     viewModel.unLikePost(post = post, user = user)
-                }else{
-                    context.toast(msg = "Login or create an account to like a post")
+                } else {
+                    context.toast(msg = context.getString(R.string.login_like_message))
                 }
             }
         }
@@ -147,6 +149,9 @@ fun FeedScreenContent(
 
     ) {
     val snackbarHostState = remember { SnackbarHostState() }
+
+    val offlineMessage = stringResource(id = R.string.offline_message)
+
     LaunchedEffect(key1 = networkStatus) {
         when (networkStatus) {
             is NetworkStatus.Unknown -> {}
@@ -155,7 +160,7 @@ fun FeedScreenContent(
 
             is NetworkStatus.Disconnected -> {
                 snackbarHostState.showSnackbar(
-                    message = "You are offline"
+                    message = offlineMessage
                 )
             }
         }
@@ -191,13 +196,13 @@ fun FeedScreenContent(
                 title = {
                     Text(
                         modifier = Modifier.fillMaxWidth(0.75f),
-                        text = "Blogger "
+                        text = stringResource(id = R.string.app_name)
                     )
                 },
                 actions = {
                     CustomIconButton(
                         imageVector = Icons.Filled.Search,
-                        contentDescription = "Search Posts",
+                        contentDescription = stringResource(id = R.string.search_icon_description),
                         onClick = {
                             navigateToSearchScreen()
                         }
@@ -217,7 +222,7 @@ fun FeedScreenContent(
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
-                    contentDescription = "Create Post"
+                    contentDescription = stringResource(id = R.string.create_post_icon_description)
                 )
 
             }
@@ -254,7 +259,7 @@ fun FeedScreenContent(
                     is FeedScreenUiState.Empty -> {
                         ErrorComponent(
                             retryCallback = { retryCallback() },
-                            errorMessage = "No posts were found"
+                            errorMessage = stringResource(id = R.string.no_posts_found)
                         )
                     }
 

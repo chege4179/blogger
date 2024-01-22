@@ -15,17 +15,12 @@
  */
 package com.peterchege.blogger.presentation.alertDialogs
 
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.stringResource
+import com.peterchege.blogger.R
 
 @Composable
 fun SignOutDialog(
@@ -37,10 +32,10 @@ fun SignOutDialog(
            closeSignOutDialog()
         },
         title = {
-            Text(text = "Sign Out ")
+            Text(text = stringResource(id = R.string.sign_out_button_text))
         },
         text = {
-            Text(text = "Are you sure you want to sign Out ")
+            Text(text = stringResource(id = R.string.sign_out_description))
 
         },
         confirmButton = {
@@ -49,7 +44,7 @@ fun SignOutDialog(
                     signOut()
                 }
             ) {
-                Text(text = "Sign Out")
+                Text(text = stringResource(id = R.string.sign_out_button_text))
             }
         },
         dismissButton = {
@@ -58,7 +53,7 @@ fun SignOutDialog(
                     closeSignOutDialog()
                 }
             ) {
-                Text(text = "Cancel")
+                Text(text = stringResource(id = R.string.cancel))
             }
         }
     )

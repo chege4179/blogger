@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,6 +44,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.rememberImagePainter
+import com.peterchege.blogger.R
 import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.util.Constants
@@ -168,17 +170,17 @@ fun ProfileScreenContent(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "Blogger ")
+                    Text(text = stringResource(id = R.string.app_name))
                 },
                 actions = {
                     CustomIconButton(
                         imageVector = Icons.Default.Edit,
-                        contentDescription = "Edit Profile",
+                        contentDescription = stringResource(id = R.string.edit_profile_description),
                         onClick = { navigateToEditProfileScreen() },
                     )
                     CustomIconButton(
                         imageVector = Icons.Default.Settings,
-                        contentDescription = "Settings",
+                        contentDescription = stringResource(id = R.string.settings_description),
                         onClick = { navigateToSettingsScreen() },
                     )
                 }
@@ -198,7 +200,7 @@ fun ProfileScreenContent(
             }
 
             is ProfileScreenUiState.Empty -> {
-                Text(text = "User Not found")
+                Text(text = stringResource(id = R.string.user_not_found))
 
             }
 
@@ -281,7 +283,7 @@ fun ProfileScreenContent(
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 ProfileInfoCount(
-                                    name = "Articles",
+                                    name = stringResource(id = R.string.post_header_name),
                                     count = user._count.post,
                                     onClick = {
 
@@ -295,7 +297,7 @@ fun ProfileScreenContent(
                                     color = Color.LightGray
                                 )
                                 ProfileInfoCount(
-                                    name = "Followers",
+                                    name = stringResource(id = R.string.followers_header_name),
                                     count = user._count.followers,
                                     onClick = {
                                         navigateToProfileFollowerFollowingScreen(Constants.FOLLOWER)
@@ -309,7 +311,7 @@ fun ProfileScreenContent(
                                     color = Color.LightGray
                                 )
                                 ProfileInfoCount(
-                                    name = "Following",
+                                    name = stringResource(id = R.string.following_header_name),
                                     count = user._count.following,
                                     onClick = {
                                         navigateToProfileFollowerFollowingScreen(Constants.FOLLOWING)

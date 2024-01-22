@@ -26,11 +26,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import com.peterchege.blogger.core.api.responses.models.FollowerUser
 import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.domain.mappers.toUser
+import com.peterchege.blogger.R
 
 @Composable
 fun FollowersList(
@@ -52,7 +54,7 @@ fun FollowersList(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = "This user not have any followers yet")
+                    Text(text = stringResource(id = R.string.no_followers))
 
                 }
             }

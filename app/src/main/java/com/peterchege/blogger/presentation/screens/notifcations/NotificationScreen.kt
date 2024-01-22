@@ -19,26 +19,25 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.peterchege.blogger.R
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.components.NotificationCard
 import com.peterchege.blogger.presentation.theme.defaultPadding
-
 
 @Composable
 fun NotificationScreen(
@@ -76,7 +75,7 @@ fun NotificationScreenContent(
             TopAppBar(
                 title = {
                     Text(
-                        text= "Notifications",
+                        text= stringResource(id = R.string.notification_header),
                     )
                 }
              )
@@ -88,7 +87,7 @@ fun NotificationScreenContent(
                     .fillMaxSize()
                     .padding(paddingValues) ){
                     Text(
-                        text = "Log In to view your notifications",
+                        text = stringResource(id = R.string.login_to_view_notifications),
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
@@ -117,7 +116,7 @@ fun NotificationScreenContent(
                                 horizontalAlignment = Alignment.CenterHorizontally,
 
                                 ){
-                                Text(text = "You have no notifications yet")
+                                Text(text = stringResource(id = R.string.no_notifications_message))
                             }
                         }
                     }else{

@@ -15,8 +15,6 @@
  */
 package com.peterchege.blogger.presentation.screens.settings
 
-import android.content.Intent
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -34,11 +32,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
+import com.peterchege.blogger.R
 import com.peterchege.blogger.presentation.alertDialogs.SignOutDialog
 import com.peterchege.blogger.presentation.alertDialogs.ThemeDialog
 import com.peterchege.blogger.presentation.components.SettingsRow
@@ -93,7 +91,7 @@ fun SettingsScreenContent(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "Settings")
+                    Text(text = stringResource(id = R.string.settings_header_name))
                 }
             )
 
@@ -118,8 +116,7 @@ fun SettingsScreenContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(10.dp)
-            ,
+                .padding(10.dp),
         ) {
             Column(
                 modifier = Modifier
@@ -127,14 +124,14 @@ fun SettingsScreenContent(
                     .weight(1f)
             ) {
                 SettingsRow(
-                    title = "Theme",
+                    title = stringResource(id = R.string.theme),
                     onClick = {
                         openThemeDialog()
                     }
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 SettingsRow(
-                    title = "License",
+                    title = stringResource(id = R.string.license),
                     onClick = { openOSSMenu() }
 
                 )
@@ -153,7 +150,7 @@ fun SettingsScreenContent(
                         openSignOutDialog()
                     }
                 ) {
-                    Text(text = "Sign Out")
+                    Text(text = stringResource(id = R.string.sign_out_button_text))
                 }
             }
         }

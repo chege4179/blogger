@@ -23,28 +23,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import com.peterchege.blogger.R
 
 @Composable
-fun ProfileAvatar(imageUrl:String,modifier: Modifier, size:Int) {
+fun ProfileAvatar(imageUrl: String, modifier: Modifier, size: Int) {
     SubcomposeAsyncImage(
         model = imageUrl,
         modifier = modifier
             .width(size.dp)
             .height(size.dp)
-            .clip(CircleShape)
-        ,
+            .clip(CircleShape),
         loading = {
             Image(
                 painter = painterResource(id = R.mipmap.default_profile),
-                contentDescription = "Default Profile Picture",
+                contentDescription = stringResource(id = R.string.default_profile_image),
                 modifier = Modifier
                     .width(size.dp)
                     .height(size.dp)
             )
         },
-        contentDescription = "Profile Image"
+        contentDescription = stringResource(id = R.string.profile_image)
     )
 }

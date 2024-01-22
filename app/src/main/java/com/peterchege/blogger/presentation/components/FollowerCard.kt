@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
@@ -103,13 +104,13 @@ fun FollowerCard(
                             removeFollower(follower)
 
                         }) {
-                            Text(text = "Un Follow")
+                            Text(text = stringResource(id = R.string.unfollow_button_text))
                         }
                     } else {
                         Button(onClick = {
                             followFollower(follower)
                         }) {
-                            Text(text = "Follow")
+                            Text(text = stringResource(id = R.string.follow_button_text))
                         }
                     }
 

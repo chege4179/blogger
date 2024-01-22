@@ -44,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -57,6 +58,7 @@ import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.api.responses.models.PostAuthor
 import com.peterchege.blogger.core.api.responses.models.PostCount
 import com.peterchege.blogger.presentation.theme.LightIconColor
+import com.peterchege.blogger.R
 
 @OptIn(ExperimentalCoilApi::class)
 @Preview
@@ -138,7 +140,7 @@ fun ArticleCard(
                     modifier = Modifier
                         .fillMaxSize()
                         .height(150.dp),
-                    contentDescription = "Post Image"
+                    contentDescription = stringResource(id = R.string.post_image)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(
@@ -193,19 +195,19 @@ fun ArticleCard(
                                 onClick = {
                                     navigateToEditPostScreen(post)
                                 },
-                                contentDescription = "Edit Post"
+                                contentDescription = stringResource(id = R.string.edit_post_description)
                             )
 
                             CustomIconButton(
                                 imageVector = Icons.Filled.Delete,
-                                contentDescription = "Delete Article",
+                                contentDescription = stringResource(id = R.string.delete_post_description),
                                 onClick = { openDeleteDialog(post) },
                             )
                             CustomIconButton(
                                 imageVector = Icons.Filled.Share,
-                                contentDescription = "Share",
+                                contentDescription = stringResource(id = R.string.share_description),
                                 onClick = {
-                                    TODO("implement share logic")
+
                                 }
                             )
                         } else {
@@ -218,7 +220,10 @@ fun ArticleCard(
                                         onLikePost(post)
                                     }
                                 },
-                                contentDescription = "Like",
+                                contentDescription = if (isLiked)
+                                    stringResource(id = R.string.unlike_description)
+                                else
+                                    stringResource(id = R.string.like_description),
                             )
                             CustomIconButton(
                                 imageVector = if (isSaved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
@@ -229,7 +234,10 @@ fun ArticleCard(
                                         onBookmarkPost(post)
                                     }
                                 },
-                                contentDescription = "Saved",
+                                contentDescription = if (isSaved)
+                                    stringResource(id = R.string.un_save_description)
+                                else
+                                    stringResource(id = R.string.save_description),
                             )
                         }
                     }

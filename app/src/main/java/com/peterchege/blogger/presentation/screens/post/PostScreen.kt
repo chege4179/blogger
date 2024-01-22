@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -63,6 +64,7 @@ import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.components.postCommentsSection
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
+import com.peterchege.blogger.R
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
@@ -81,14 +83,14 @@ fun PostScreen(
         uiState = uiState,
         commentUiState = commentUiState,
         onLikePost = { it1 ->
-            if (authUser == null){
-                context.toast(msg = "Login or create an account to like a post")
+            if (authUser == null) {
+                context.toast(msg = context.getString(R.string.login_like_message))
             }
             authUser?.let { user ->
                 if (user.userId != "") {
                     viewModel.likePost(post = it1, user = user)
-                }else{
-                    context.toast(msg = "Login or create an account to like a post")
+                } else {
+                    context.toast(msg = context.getString(R.string.login_like_message))
                 }
             }
         },
@@ -96,8 +98,8 @@ fun PostScreen(
             authUser?.let { user ->
                 if (user.userId != "") {
                     viewModel.unLikePost(post = it1, user = user)
-                }else{
-                    context.toast(msg = "Login or create an account to like a post")
+                } else {
+                    context.toast(msg = context.getString(R.string.login_like_message))
                 }
             }
         },
@@ -110,7 +112,7 @@ fun PostScreen(
         user = authUser,
         toggleDeleteCommentDialog = viewModel::toggleDeleteCommentDialog,
         postComment = {
-            viewModel.onCommentDialogConfirm(authUser!!,it)
+            viewModel.onCommentDialogConfirm(authUser!!, it)
         },
         deleteComment = viewModel::deleteComment,
         setCommentToBeDeleted = viewModel::setCommentToBeDeleted
@@ -125,7 +127,7 @@ fun PostScreen(
 fun PostScreenContent(
     uiState: PostScreenUiState,
     commentUiState: CommentUiState,
-    toggleDeleteCommentDialog:() -> Unit,
+    toggleDeleteCommentDialog: () -> Unit,
     onLikePost: (Post) -> Unit,
     onUnlikePost: (Post) -> Unit,
     onChangeNewComment: (String) -> Unit,
@@ -136,8 +138,8 @@ fun PostScreenContent(
     eventFlow: SharedFlow<UiEvent>,
     user: User?,
     postComment: (() -> Unit) -> Unit,
-    deleteComment:(() -> Unit) -> Unit,
-    setCommentToBeDeleted:(CommentWithUser) -> Unit,
+    deleteComment: (() -> Unit) -> Unit,
+    setCommentToBeDeleted: (CommentWithUser) -> Unit,
 ) {
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -171,7 +173,7 @@ fun PostScreenContent(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Outlined.Message,
-                    contentDescription = "Add a comment"
+                    contentDescription = stringResource(id = R.string.add_comment_description)
                 )
             }
         }
@@ -183,7 +185,7 @@ fun PostScreenContent(
 
             is PostScreenUiState.Error -> {
                 ErrorComponent(
-                    retryCallback = { /*TODO*/ },
+                    retryCallback = {  },
                     errorMessage = "An unexpected error occurred"
                 )
             }
@@ -191,7 +193,7 @@ fun PostScreenContent(
             is PostScreenUiState.PostNotFound -> {
                 ErrorComponent(
                     retryCallback = { /*TODO*/ },
-                    errorMessage = "Post not found"
+                    errorMessage = stringResource(id = R.string.no_posts_found)
                 )
             }
 
@@ -199,21 +201,21 @@ fun PostScreenContent(
                 val post = uiState.post
                 val comments = uiState.comments.collectAsLazyPagingItems()
 
-                if (commentUiState.isDeleteCommentDialogVisible &&(commentUiState.commentToBeDeleted != null)) {
+                if (commentUiState.isDeleteCommentDialogVisible && (commentUiState.commentToBeDeleted != null)) {
                     DeleteCommentDialog(
                         comment = commentUiState.commentToBeDeleted,
                         closeDeleteDialog = toggleDeleteCommentDialog,
                         deleteComment = {
-                            deleteComment{ comments.refresh() }
+                            deleteComment { comments.refresh() }
                         }
                     )
                 }
 
-                if (commentUiState.isCommentDialogVisible){
+                if (commentUiState.isCommentDialogVisible) {
                     CommentDialog(
                         closeCommentDialog = { closeCommentDialog() },
                         commentUiState = commentUiState,
-                        postComment = { postComment{ comments.refresh() } },
+                        postComment = { postComment { comments.refresh() } },
                         onChangeNewComment = { onChangeNewComment(it) },
                         isUserLoggedIn = uiState.isUserLoggedIn,
                     )
@@ -286,7 +288,7 @@ fun PostScreenContent(
                                                 pivotFractionY = 0f
                                             )
                                         },
-                                    contentDescription = "Post Image"
+                                    contentDescription = stringResource(id = R.string.post_image)
                                 )
 
                                 Spacer(
@@ -294,7 +296,7 @@ fun PostScreenContent(
                                         .height(8.dp)
                                         .padding(15.dp)
                                 )
-                                Divider(
+                                HorizontalDivider(
                                     color = Color.Blue,
                                     thickness = 1.dp,
                                     modifier = Modifier.padding(10.dp)
@@ -327,9 +329,9 @@ fun PostScreenContent(
                                             else
                                                 Icons.Default.FavoriteBorder,
                                             contentDescription = if (post.isLiked)
-                                                "Un Like"
+                                                stringResource(id = R.string.unlike_description)
                                             else
-                                                "Like",
+                                                stringResource(id = R.string.like_description),
                                             modifier = Modifier.clickable {
                                                 if (user != null) {
                                                     if (post.isLiked) {
@@ -346,7 +348,10 @@ fun PostScreenContent(
                                                 Icons.Default.Bookmark
                                             else
                                                 Icons.Default.BookmarkBorder,
-                                            contentDescription = if (post.isSaved) "Un Save" else "Save",
+                                            contentDescription = if (post.isSaved)
+                                                stringResource(id = R.string.un_save_description)
+                                            else
+                                                stringResource(id = R.string.save_description),
                                             modifier = Modifier.clickable {
                                                 if (post.isSaved) {
                                                     unSavePost(post.postId)
@@ -357,7 +362,7 @@ fun PostScreenContent(
                                         )
                                         Icon(
                                             imageVector = Icons.Default.Share,
-                                            contentDescription = "Share",
+                                            contentDescription = stringResource(id = R.string.share_description),
                                             modifier = Modifier.clickable {
 
                                             }

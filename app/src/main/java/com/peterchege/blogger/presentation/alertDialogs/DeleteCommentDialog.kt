@@ -15,11 +15,13 @@
  */
 package com.peterchege.blogger.presentation.alertDialogs
 
-import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.peterchege.blogger.R
 import com.peterchege.blogger.core.api.responses.models.CommentWithUser
-import com.peterchege.blogger.core.api.responses.models.Post
 
 @Composable
 fun DeleteCommentDialog(
@@ -32,10 +34,10 @@ fun DeleteCommentDialog(
             closeDeleteDialog()
         },
         title = {
-            Text(text = "Delete '${comment.message}' ")
+            Text(text = "${stringResource(id = R.string.delete)} '${comment.message}' ")
         },
         text = {
-            Text(text = "Are you sure you want to delete this comment")
+            Text(text = stringResource(id = R.string.delete_comment_description))
         },
         confirmButton = {
             TextButton(
@@ -43,7 +45,7 @@ fun DeleteCommentDialog(
                     deleteComment()
                 }
             ) {
-                Text("Delete ")
+                Text(text = stringResource(id = R.string.delete))
             }
         },
         dismissButton = {
@@ -52,7 +54,7 @@ fun DeleteCommentDialog(
                     closeDeleteDialog()
                 }
             ) {
-                Text("Cancel")
+                Text(stringResource(id = R.string.cancel))
             }
         }
     )

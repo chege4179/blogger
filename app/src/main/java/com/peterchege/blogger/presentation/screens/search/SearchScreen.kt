@@ -38,6 +38,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -53,6 +54,7 @@ import com.peterchege.blogger.presentation.screens.search.tabs.SearchPostsTab
 import com.peterchege.blogger.presentation.screens.search.tabs.SearchUsersTab
 import com.peterchege.blogger.presentation.theme.MainWhiteColor
 import kotlinx.coroutines.launch
+import com.peterchege.blogger.R
 
 @Composable
 fun SearchScreen(
@@ -74,7 +76,7 @@ fun SearchScreen(
         navigateToPostScreen = navigateToPostScreen,
         navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
         networkStatus = networkStatus,
-        )
+    )
 
 }
 
@@ -93,19 +95,21 @@ fun SearchScreenContent(
     navigateToPostScreen: (String) -> Unit,
     navigateToAuthorProfileScreen: (String) -> Unit,
     networkStatus: NetworkStatus,
-    ) {
+) {
 
 
     val snackbarHostState = SnackbarHostState()
 
-    LaunchedEffect(key1 = networkStatus){
-        when(networkStatus){
+    LaunchedEffect(key1 = networkStatus) {
+        when (networkStatus) {
             is NetworkStatus.Unknown -> {
 
             }
+
             is NetworkStatus.Disconnected -> {
                 snackbarHostState.showSnackbar(message = "Not connected")
             }
+
             is NetworkStatus.Connected -> {}
         }
 
@@ -179,9 +183,7 @@ fun SearchScreenContent(
             modifier = Modifier
                 .background(Color.White)
                 .padding(paddingValues)
-                .padding(vertical = 5.dp)
-
-            ,
+                .padding(vertical = 5.dp),
         ) {
             Tabs(pagerState = pagerState)
             TabsContent(
@@ -199,7 +201,10 @@ fun SearchScreenContent(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Tabs(pagerState: PagerState) {
-    val list = listOf(Constants.SEARCH_TYPE_POSTS, Constants.SEARCH_TYPE_USERS)
+    val list = listOf(
+        stringResource(id = R.string.post_tab),
+        stringResource(id = R.string.user_tab)
+    )
     val scope = rememberCoroutineScope()
 
     TabRow(
@@ -249,7 +254,7 @@ fun TabsContent(
             targetState = pagerState,
             label = "Horizontal Pager",
 
-        ) { pager ->
+            ) { pager ->
             when (pager.currentPage) {
                 0 -> SearchPostsTab(
                     uiState = uiState,

@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -51,6 +52,7 @@ import com.peterchege.blogger.core.api.responses.models.CommentUser
 import com.peterchege.blogger.core.api.responses.models.CommentWithUser
 import com.peterchege.blogger.core.api.responses.models.User
 import java.util.UUID
+import com.peterchege.blogger.R
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -135,7 +137,7 @@ fun CommentBox(
                     onClick = {
                         TODO("implement like comment")
                     },
-                    contentDescription = "Like Comment"
+                    contentDescription = stringResource(id = R.string.like_comment_description)
                 )
                 Text(
                     text = comment._count.commentLikes.toString()

@@ -23,18 +23,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.annotation.ExperimentalCoilApi
 import com.peterchege.blogger.presentation.components.ArticleCard
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.screens.search.SearchScreenUiState
+import com.peterchege.blogger.R
 
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
 fun SearchPostsTab(
-    navigateToPostScreen:(String) -> Unit,
+    navigateToPostScreen: (String) -> Unit,
     uiState: SearchScreenUiState,
 ) {
     Scaffold(
@@ -43,27 +45,33 @@ fun SearchPostsTab(
             .padding(6.dp)
 
     ) { paddingValues ->
-        when(uiState){
+        when (uiState) {
             is SearchScreenUiState.Idle -> {
-                
+
             }
+
             is SearchScreenUiState.Searching -> {
                 LoadingComponent()
             }
+
             is SearchScreenUiState.Error -> {
                 ErrorComponent(
                     retryCallback = { /*TODO*/ },
-                    errorMessage = uiState.message)
+                    errorMessage = uiState.message
+                )
             }
+
             is SearchScreenUiState.ResultsFound -> {
                 val searchPosts = uiState.posts
                 if (searchPosts.isEmpty()) {
                     Column(
-                        modifier = Modifier.fillMaxSize().padding(paddingValues),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = "No posts found")
+                        Text(text = stringResource(id = R.string.no_posts_found))
                     }
                 } else {
                     LazyColumn(
@@ -83,7 +91,7 @@ fun SearchPostsTab(
                                 isLiked = false,
                                 isSaved = false,
                                 isProfile = false,
-                                )
+                            )
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                     }

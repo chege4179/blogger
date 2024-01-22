@@ -60,13 +60,8 @@ class DraftScreenViewModel @Inject constructor(
 
     fun deleteDraft(id:Int){
         viewModelScope.launch {
-            try {
-                draftRepository.deleteDraftById(id)
-            }catch (e:IOException){
-
-            }
+            draftRepository.deleteDraftById(id)
         }
-
     }
 
 }

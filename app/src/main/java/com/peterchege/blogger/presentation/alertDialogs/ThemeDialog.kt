@@ -28,9 +28,6 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -43,9 +40,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import com.peterchege.blogger.R
 import com.peterchege.blogger.core.util.ThemeConfig
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun ThemeDialog(
     changeTheme: (String) -> Unit,
@@ -68,17 +66,17 @@ fun ThemeDialog(
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 Column(modifier = Modifier.selectableGroup()) {
                     SettingsDialogThemeChooserRow(
-                        text = "System Default",
+                        text = stringResource(id = R.string.system_default),
                         selected = currentTheme == ThemeConfig.FOLLOW_SYSTEM,
                         onClick = { changeTheme(ThemeConfig.FOLLOW_SYSTEM) },
                     )
                     SettingsDialogThemeChooserRow(
-                        text = "Light",
+                        text = stringResource(id = R.string.light),
                         selected = currentTheme == ThemeConfig.LIGHT,
                         onClick = { changeTheme(ThemeConfig.LIGHT) },
                     )
                     SettingsDialogThemeChooserRow(
-                        text = "Dark",
+                        text = stringResource(id = R.string.dark),
                         selected = currentTheme == ThemeConfig.DARK,
                         onClick = { changeTheme(ThemeConfig.DARK) },
                     )
@@ -88,7 +86,7 @@ fun ThemeDialog(
         },
         confirmButton = {
             Text(
-                text = "OK",
+                text = stringResource(id = R.string.ok).uppercase(),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier

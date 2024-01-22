@@ -38,9 +38,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.peterchege.blogger.R
 import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.util.UiEvent
 import kotlinx.coroutines.flow.SharedFlow
@@ -71,13 +73,13 @@ fun EditPostScreen(
 @Composable
 fun EditPostScreenContent(
     post: Post?,
-    eventFlow:SharedFlow<UiEvent>,
+    eventFlow: SharedFlow<UiEvent>,
     onChangePostTitle: (String) -> Unit,
     onChangePostBody: (String) -> Unit,
     updatePost: () -> Unit,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
-    LaunchedEffect(key1 = true){
+    LaunchedEffect(key1 = true) {
         eventFlow.collectLatest { event ->
             when (event) {
                 is UiEvent.ShowSnackbar -> {
@@ -101,7 +103,7 @@ fun EditPostScreenContent(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "Edit Post")
+                    Text(text = stringResource(id = R.string.edit_post_screen_header))
                 }
             )
         }
@@ -113,7 +115,7 @@ fun EditPostScreenContent(
                     .padding(paddingValues)
             ) {
                 Text(
-                    text = "Post not found",
+                    text = stringResource(id = R.string.edit_post_error),
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
@@ -131,7 +133,7 @@ fun EditPostScreenContent(
                     value = post.postTitle,
                     maxLines = 3,
                     label = {
-                        Text("Post Title")
+                        Text(text = stringResource(id = R.string.post_title))
                     },
                     onValueChange = {
                         onChangePostTitle(it)
@@ -144,7 +146,7 @@ fun EditPostScreenContent(
                     value = post.postBody,
                     maxLines = 70,
                     label = {
-                        Text("Write your own story")
+                        Text(text = stringResource(id = R.string.post_body))
                     },
                     onValueChange = {
                         onChangePostBody(it)
@@ -154,7 +156,7 @@ fun EditPostScreenContent(
                     onClick = { updatePost() },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "Update Post")
+                    Text(text = stringResource(id = R.string.update_button_text))
                 }
             }
         }

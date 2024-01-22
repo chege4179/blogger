@@ -29,8 +29,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.peterchege.blogger.R
 import com.peterchege.blogger.presentation.components.DraftCard
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
@@ -64,9 +66,7 @@ fun DraftScreenContent(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text= "My Drafts",
-                    )
+                    Text(text= stringResource(id = R.string.draft_screen_header))
                 }
                 )
         }
@@ -86,13 +86,14 @@ fun DraftScreenContent(
                 if (drafts.isEmpty()){
                     Box(modifier = Modifier.fillMaxSize()){
                         Text(
-                            text = "You have no drafts",
+                            text = stringResource(id = R.string.empty_draft_message),
                             modifier = Modifier.align(Alignment.Center)
                         )
                     }
                 }else{
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier
+                            .fillMaxSize()
                             .padding(paddingValues = paddingValues)
                             .padding(defaultPadding)
                     ){
