@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.ManagedVirtualDevice
+
 plugins {
     id("com.android.test")
     id("org.jetbrains.kotlin.android")
@@ -31,6 +33,14 @@ android {
             isDebuggable = true
             signingConfig = getByName("debug").signingConfig
             matchingFallbacks += listOf("release")
+        }
+    }
+
+    testOptions.managedDevices.devices {
+        create<ManagedVirtualDevice>(name = "pixel4api33").apply {
+            device = "Pixel 4"
+            apiLevel = 33
+            systemImageSource = "google"
         }
     }
 

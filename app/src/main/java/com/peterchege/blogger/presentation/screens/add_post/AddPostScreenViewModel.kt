@@ -110,7 +110,9 @@ class AddPostScreenViewModel @Inject constructor(
     }
 
     fun onCloseDialog(){
-        _formState.value = _formState.value.copy(isSaveDraftModalOpen = false)
+        _formState.update {
+            it.copy(isSaveDraftModalOpen = false)
+        }
     }
 
     fun onBackPress(navigateBack: () -> Unit) {
@@ -122,16 +124,22 @@ class AddPostScreenViewModel @Inject constructor(
     }
 
     fun onChangePostTitle(text: String) {
-        _formState.value = _formState.value.copy(postTitle = text)
-
+        _formState.update {
+            it.copy(postTitle = text)
+        }
     }
 
     fun onChangePostBody(text: String) {
-        _formState.value = _formState.value.copy(postBody = text)
+        _formState.update {
+            it.copy(postBody = text)
+        }
+
     }
 
     fun onChangePhotoUri(uri: Uri?) {
-        _formState.value = _formState.value.copy(uri = uri)
+        _formState.update {
+            it.copy(uri = uri)
+        }
     }
 
 
@@ -177,14 +185,9 @@ class AddPostScreenViewModel @Inject constructor(
         }
     }
 
-
-    fun postArticle(navigateToDashboardScreen: () -> Unit, user: User) {
+    fun emitSnackBarEvent(msg:String){
         viewModelScope.launch {
-
-            _formState.value.uri?.let { uri ->
-
-                navigateToDashboardScreen()
-            }
+            _eventFlow.emit(UiEvent.ShowSnackbar(msg))
         }
     }
 }

@@ -25,11 +25,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.annotation.ExperimentalCoilApi
+import com.peterchege.blogger.core.api.responses.models.Post
+import com.peterchege.blogger.core.util.toast
+import com.peterchege.blogger.domain.mappers.toPost
 import com.peterchege.blogger.presentation.components.ArticleCard
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
@@ -38,12 +44,43 @@ import com.peterchege.blogger.presentation.theme.defaultPadding
 @Composable
 fun SavedPostScreen(
     navigateToPostScreen:(String) -> Unit,
+    navigateToAuthorProfileScreen:(String) -> Unit,
     viewModel: SavedPostScreenViewModel = hiltViewModel()
 ){
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val authUser by viewModel.authUser.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
     SavedPostScreenContent(
         navigateToPostScreen = navigateToPostScreen,
-        uiState = uiState
+        navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
+        uiState = uiState,
+        bookmarkPost = viewModel::bookmarkPost,
+        unBookmarkPost = viewModel::unBookmarkPost,
+        likePost = { post ->
+            if (authUser == null){
+                context.toast(msg = "Login or create an account to like a post")
+            }
+            authUser?.let { user ->
+                if (user.userId != "") {
+                    viewModel.likePost(post = post, user = user)
+                }else{
+                    context.toast(msg = "Login or create an account to like a post")
+                }
+            }
+        },
+        unLikePost = { post ->
+            if (authUser == null){
+                context.toast(msg = "Login or create an account to like a post")
+            }
+            authUser?.let { user ->
+                if (user.userId != "") {
+                    viewModel.unLikePost(post = post, user = user)
+                }else{
+                    context.toast(msg = "Login or create an account to like a post")
+                }
+            }
+        }
     )
 }
 
@@ -54,7 +91,12 @@ fun SavedPostScreen(
 @Composable
 fun SavedPostScreenContent(
     navigateToPostScreen:(String) -> Unit,
+    navigateToAuthorProfileScreen:(String) -> Unit,
     uiState: SavedPostScreenUiState,
+    bookmarkPost: (Post) -> Unit,
+    unBookmarkPost: (Post) -> Unit,
+    likePost: (Post) -> Unit,
+    unLikePost: (Post) -> Unit,
 ){
     Scaffold(
         modifier = Modifier
@@ -95,7 +137,9 @@ fun SavedPostScreenContent(
                         item{
                             Column(
                                 modifier = Modifier
-                                    .fillMaxSize()
+                                    .fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
                             ) {
                                 Text(
                                     text = "You have no saved posts",
@@ -108,19 +152,31 @@ fun SavedPostScreenContent(
                     items(items = posts, key = { it.postId }){ post ->
                         ArticleCard(
                             post = post,
-                            onItemClick = {
-                                navigateToPostScreen(it.postId)
+                            onItemClick = { post ->
+                                navigateToPostScreen(post.postId)
                             },
-                            onProfileNavigate = {
-
+                            onProfileNavigate = { userId ->
+                                navigateToAuthorProfileScreen(userId)
                             },
-                            onDeletePost = {
-
-                            },
+                            onDeletePost = {},
                             isLiked = false,
-                            isSaved =true,
-                            isProfile = false
+                            isSaved = true,
+                            isProfile = false,
+                            onBookmarkPost = { post ->
+                                bookmarkPost(post)
+                            },
+                            onUnBookmarkPost = { post ->
+                                unBookmarkPost(post)
+                            },
+                            onLikePost = {
+                                likePost(it)
+                            },
+                            onUnlikePost = {
+                                unLikePost(it)
+
+                            }
                         )
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             }

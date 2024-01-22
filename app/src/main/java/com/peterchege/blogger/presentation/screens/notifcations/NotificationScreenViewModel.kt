@@ -17,9 +17,17 @@ package com.peterchege.blogger.presentation.screens.notifcations
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.peterchege.blogger.core.api.requests.Notification
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import com.peterchege.blogger.core.api.responses.models.Notification
 import com.peterchege.blogger.core.util.Resource
+import com.peterchege.blogger.domain.paging.NotificationsPagingSource
+import com.peterchege.blogger.domain.paging.ProfileScreenPostsPagingSource
 import com.peterchege.blogger.domain.repository.AuthRepository
+import com.peterchege.blogger.domain.repository.NotificationRepository
 
 import com.peterchege.blogger.domain.use_case.GetProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,7 +40,7 @@ sealed interface NotificationScreenUiState {
 
     object Loading : NotificationScreenUiState
 
-    data class Success(val notifications:List<Notification>) : NotificationScreenUiState
+    data class Success(val notifications:Flow<PagingData<Notification>>) : NotificationScreenUiState
 
     data class Error(val message: String) : NotificationScreenUiState
 
@@ -43,13 +51,9 @@ sealed interface NotificationScreenUiState {
 
 @HiltViewModel
 class NotificationScreenViewModel @Inject constructor(
-    private val getProfileUseCase: GetProfileUseCase,
+    private val notificationRepository: NotificationRepository,
     private val authRepository: AuthRepository,
 ) : ViewModel() {
-
-    private val _uiState =
-        MutableStateFlow<NotificationScreenUiState>(NotificationScreenUiState.Loading)
-    val uiState = _uiState.asStateFlow()
 
     val isUserLoggedIn  = authRepository.isUserLoggedIn
         .stateIn(
@@ -58,41 +62,45 @@ class NotificationScreenViewModel @Inject constructor(
             initialValue = false
         )
     val authUser = authRepository.getLoggedInUser()
+        .filterNot {
+            it?.userId == ""
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000L),
             initialValue = null
         )
 
-    fun getNotifications(username:String,isUserLoggedIn:Boolean) {
-        if (isUserLoggedIn){
-            getProfileUseCase(userId = username).onEach { result ->
-                when (result) {
-                    is Resource.Success -> {
-                        _uiState.value = NotificationScreenUiState.Success(
-                            // TODO : And notification
-                            notifications =  emptyList(),
-                        )
-                    }
-
-                    is Resource.Loading -> {
-                        _uiState.value = NotificationScreenUiState.Loading
-                    }
-
-                    is Resource.Error -> {
-                        _uiState.value = NotificationScreenUiState.Error(
-                            message = result.message ?: "An unexpected error occurred"
-                        )
-                    }
-                }
-
-            }.launchIn(viewModelScope)
+    val uiState = combine(isUserLoggedIn,authUser){ isLoggedIn,user ->
+        if (isLoggedIn){
+            val notificationsPagingData = getNotificationByUserId(userId = user?.userId ?:"")
+            NotificationScreenUiState.Success(notifications = notificationsPagingData)
         }else{
-            _uiState.value = NotificationScreenUiState.UserNotLoggedIn
+            NotificationScreenUiState.UserNotLoggedIn
         }
-
-
-
-
     }
+        .onStart { NotificationScreenUiState.Loading }
+        .catch { NotificationScreenUiState.Error(message = "An unexpected error occurred") }
+        .stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000L),
+        initialValue = NotificationScreenUiState.Loading
+    )
+
+    @OptIn(ExperimentalPagingApi::class)
+    fun getNotificationByUserId(userId:String): Flow<PagingData<Notification>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 20,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                NotificationsPagingSource(
+                    notificationRepository = notificationRepository,
+                    userId = userId
+                )
+            }
+        ).flow.cachedIn(viewModelScope)
+    }
+
 }

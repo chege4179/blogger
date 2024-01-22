@@ -209,4 +209,12 @@ object RepositoryModule {
         return NetworkInfoRepositoryImpl(context = context, ioDispatcher = ioDispatcher)
     }
 
+    @Provides
+    @Singleton
+    fun provideNotificationRepository(
+        api: BloggerApi
+    ): NotificationRepository {
+        return NotificationRepositoryImpl(api = api)
+    }
+
 }

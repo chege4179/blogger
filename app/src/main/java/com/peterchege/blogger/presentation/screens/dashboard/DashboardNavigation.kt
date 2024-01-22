@@ -65,6 +65,7 @@ fun DashboardNavigation(
         ) {
             SavedPostScreen(
                 navigateToPostScreen = navHostController::navigateToPostScreen,
+                navigateToAuthorProfileScreen = navHostController::navigateToAuthorProfileScreen
             )
         }
 

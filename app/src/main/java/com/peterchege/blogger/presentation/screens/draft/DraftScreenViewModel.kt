@@ -46,6 +46,8 @@ sealed interface DraftsScreenUiState {
 class DraftScreenViewModel @Inject constructor(
     private val draftRepository: DraftRepositoryImpl
 ):ViewModel() {
+
+
     val uiState = draftRepository.getAllDrafts()
         .map { DraftsScreenUiState.Success(it) }
         .onStart { DraftsScreenUiState.Loading }

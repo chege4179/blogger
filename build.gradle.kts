@@ -12,9 +12,7 @@ plugins {
     id("com.google.firebase.crashlytics") version "2.9.9" apply false
     id("com.google.firebase.firebase-perf") version "1.4.2" apply false
     id("com.android.test") version "8.2.0" apply false
-
-//    id("com.android.test") version "8.2.0" apply false
-//    id("androidx.baselineprofile") version "1.2.1" apply false
+    id("androidx.baselineprofile") version "1.2.1" apply false
 }
 
 

@@ -22,13 +22,16 @@ import android.net.Uri
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.peterchege.blogger.R
+import com.peterchege.blogger.core.room.entities.DraftPost
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.core.util.UriToFile
+import com.peterchege.blogger.domain.repository.DraftRepository
 import com.peterchege.blogger.domain.repository.PostRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -41,6 +44,10 @@ import javax.inject.Inject
 class UploadPostService : Service() {
     @Inject
     lateinit var postRepository: PostRepository
+
+    @Inject
+    lateinit var draftRepository: DraftRepository
+
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
@@ -105,6 +112,7 @@ class UploadPostService : Service() {
                             notificationContent = "Your post was uploaded successfully",
                         )
                     )
+                    delay(10000)
                     stopSelf()
                 } else {
                     startForeground(
@@ -114,6 +122,15 @@ class UploadPostService : Service() {
                             notificationContent = response.data.msg
                         )
                     )
+                    draftRepository.insertDraft(
+                        DraftPost(
+                            id = null,
+                            postTitle = postTitle,
+                            postBody = postBody,
+                            imageUri = uri
+                        )
+                    )
+                    delay(10000)
                     stopSelf()
                 }
             }
@@ -126,6 +143,14 @@ class UploadPostService : Service() {
                         notificationContent = "A network error occurred"
                     )
                 )
+                draftRepository.insertDraft(
+                    DraftPost(
+                        id = null,
+                        postTitle = postTitle,
+                        postBody = postBody,
+                        imageUri = uri
+                    )
+                )
             }
 
             is NetworkResult.Exception -> {
@@ -134,6 +159,14 @@ class UploadPostService : Service() {
                     createNotification(
                         notificationTitle = "A network exception occurred",
                         notificationContent = "A network exception occurred"
+                    )
+                )
+                draftRepository.insertDraft(
+                    DraftPost(
+                        id = null,
+                        postTitle = postTitle,
+                        postBody = postBody,
+                        imageUri = uri
                     )
                 )
             }

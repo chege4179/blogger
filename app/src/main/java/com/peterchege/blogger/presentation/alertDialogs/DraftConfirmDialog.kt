@@ -52,9 +52,8 @@ fun DraftConfirmDialog(
         },
         dismissButton = {
             TextButton(
-
                 onClick = {
-                    onCloseDialog()
+                    onSaveDraftDismiss()
                 },
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = MaterialTheme.colorScheme.onSurface

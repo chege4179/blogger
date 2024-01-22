@@ -17,7 +17,7 @@ package com.peterchege.blogger.core.util
 
 object Constants {
     const val LOCAL_URL="http://10.0.2.2:9000"
-    const val LOCAL_URL_2 = "http://192.168.1.10:9000"
+    const val LOCAL_URL_2 = "http://192.168.1.3:9000"
 
     const val REMOTE_URL = "https://bloggerserver-production.up.railway.app"
     const val REMOTE_URL_2 = "https://blogger-server-vfua.onrender.com"

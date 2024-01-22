@@ -15,7 +15,6 @@
  */
 package com.peterchege.blogger.presentation.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,20 +31,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
-import com.peterchege.blogger.core.api.requests.Notification
+import coil.compose.SubcomposeAsyncImage
+import com.peterchege.blogger.core.api.responses.models.Notification
+import com.peterchege.blogger.core.api.responses.models.PostAuthor
 
 @Composable
 fun NotificationCard(
-    navigateToPostScreen:(String) -> Unit,
-    navigateToAuthorProfileScreen:(String) -> Unit,
+    navigateToPostScreen: (String) -> Unit,
+    navigateToAuthorProfileScreen: (String) -> Unit,
     notification: Notification
 ) {
-    Card(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(60.dp)
+            .padding(5.dp)
             .clickable {
                 if (notification.notificationType == "Like" || notification.notificationType == "Comment") {
 //                    notification.n?.let { navigateToPostScreen(it) }
@@ -54,35 +56,69 @@ fun NotificationCard(
                 }
 
             },
-        elevation = CardDefaults.cardElevation(),
-
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(
+        ProfileAvatar(
+            imageUrl = notification.notificationSender.imageUrl,
+            modifier = Modifier.padding(horizontal = 5.dp),
+            size = 48
+        )
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight()
-                .padding(5.dp),
-            verticalAlignment = Alignment.CenterVertically,
+                .fillMaxHeight(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Start,
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(),
-                verticalArrangement = Arrangement.Center
-
-            ) {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = notification.notificationContent,
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold,
-
-                    )
-            }
-
-
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = notification.notificationContent,
+                textAlign = TextAlign.Start,
+                fontWeight = FontWeight.Bold,
+            )
         }
-
     }
+}
 
+
+@Preview
+@Composable
+fun NotificationCardPreview() {
+    NotificationCard(
+        navigateToPostScreen = {},
+        navigateToAuthorProfileScreen = {},
+        notification =
+        Notification(
+            notificationId = "",
+            notificationContent = "Peter Chege has liked your comment",
+            notificationPostId = "",
+            notificationType = "Like",
+            createdAt = "",
+            updatedAt = "",
+            senderId = "",
+            recieverId = "",
+            notificationCommentId = "",
+            notificationSender = PostAuthor(
+                userId = "",
+                email = "",
+                username = "",
+                password = "",
+                createdAt = "2023-12-02T18:55:36.935Z",
+                updatedAt = "2023-12-02T18:55:36.935Z",
+                imageUrl = "",
+                fullName = "Peter Chege"
+            ),
+            notificationReceiver = PostAuthor(
+                userId = "",
+                email = "",
+                username = "",
+                password = "",
+                createdAt = "2023-12-02T18:55:36.935Z",
+                updatedAt = "2023-12-02T18:55:36.935Z",
+                imageUrl = "",
+                fullName = "Peter Chege"
+            ),
+        )
+    )
 }

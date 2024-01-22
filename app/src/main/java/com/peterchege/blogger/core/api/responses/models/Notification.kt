@@ -13,19 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.core.api.requests
+package com.peterchege.blogger.core.api.responses.models
 
-import com.peterchege.blogger.core.api.responses.models.User
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class Notification(
+    val notificationId:String,
     val notificationType:String,
-    val notificationSender: User,
-    val notificationReceiver: User,
+
     val senderId:String,
-    val receiverId:String,
+    val recieverId:String,
+
     val notificationContent:String,
-    val createdAt:String? = null,
-    val updatedAt:String? = null,
+
+    val createdAt:String,
+    val updatedAt:String,
+
+    val notificationSender: PostAuthor,
+    val notificationReceiver: PostAuthor,
+
+    val notificationPostId:String?,
+    val notificationCommentId:String?
 )

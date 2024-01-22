@@ -29,6 +29,7 @@ import com.peterchege.blogger.core.api.responses.responses.GetFollowingResponse
 import com.peterchege.blogger.core.api.responses.responses.GetPostLikesResponse
 import com.peterchege.blogger.core.api.responses.responses.GetPostsByUserIdResponse
 import com.peterchege.blogger.core.api.responses.responses.GetUserLikeResponse
+import com.peterchege.blogger.core.api.responses.responses.GetUserNotificationsResponse
 import com.peterchege.blogger.core.api.responses.responses.LikeResponse
 import com.peterchege.blogger.core.api.responses.responses.LoginResponse
 import com.peterchege.blogger.core.api.responses.responses.LogoutResponse
@@ -168,5 +169,12 @@ interface BloggerApi {
     suspend fun updatePost(
         @Body updatePost: UpdatePost,
     ):Response<UpdatePostResponse>
+
+    @GET("/notification/all/{userId}")
+    suspend fun getUserNotifications(
+        @Path("userId") userId: String,
+        @Query("page") page: Int = 1,
+        @Query("limit") limit: Int = 20,
+    ):Response<GetUserNotificationsResponse>
 }
 

@@ -28,6 +28,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -74,6 +75,18 @@ fun AddPostScreen(
         onChangeImageUri = viewModel::onChangePhotoUri ,
         onSubmit = {
             authUser?.let { user ->
+                if (viewModel.formState.value.uri == null){
+                    viewModel.emitSnackBarEvent(msg = "Select a blogger image")
+                    return@let
+                }
+                if (viewModel.formState.value.postBody ==""){
+                    viewModel.emitSnackBarEvent(msg ="Post body can't be empty")
+                    return@let
+                }
+                if (viewModel.formState.value.postTitle ==""){
+                    viewModel.emitSnackBarEvent(msg ="Post Title can't be empty")
+                    return@let
+                }
                 Intent(context,UploadPostService::class.java).also {
                     it.action = UploadPostService.Actions.START.toString()
                     it.putExtra("postTitle",viewModel.formState.value.postTitle)
@@ -82,10 +95,8 @@ fun AddPostScreen(
                     it.putExtra("uri",viewModel.formState.value.uri.toString())
                     context.startService(it)
                 }
-                viewModel.postArticle(
-                    navigateToDashboardScreen = navigateToDashboardScreen,
-                    user = user
-                )
+                navigateToDashboardScreen()
+
             }
         },
         navigateToDraftScreen = navigateToDraftScreen,
@@ -130,7 +141,7 @@ fun AddPostScreenContent(
         }
 
     }
-    val snackbarHostState = SnackbarHostState()
+    val snackbarHostState = remember{ SnackbarHostState() }
 
     LaunchedEffect(key1 = true) {
         eventFlow.collectLatest { event ->
@@ -154,7 +165,7 @@ fun AddPostScreenContent(
         },
     ) {
 
-        BackHandler() {
+        BackHandler {
             onBackPress()
         }
         if (formState.isSaveDraftModalOpen) {
@@ -190,8 +201,9 @@ fun AddPostScreenContent(
                                     SubcomposeAsyncImage(
                                         model = it ,
                                         modifier = Modifier
-                                            .fillMaxWidth(0.7f)
-                                            .height(135.dp),
+                                            .width(135.dp)
+                                            .height(135.dp)
+                                        ,
                                         contentDescription = "Add Post Image",
                                         contentScale = ContentScale.FillBounds
                                     )

@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.components.NotificationCard
@@ -50,12 +51,6 @@ fun NotificationScreen(
     val authUser by viewModel.authUser.collectAsStateWithLifecycle()
     val isUserLoggedIn by viewModel.isUserLoggedIn.collectAsStateWithLifecycle()
 
-    LaunchedEffect(key1 = authUser, key2 = isUserLoggedIn){
-        authUser?.let {
-            viewModel.getNotifications(username = it.username,isUserLoggedIn = isUserLoggedIn)
-        }
-
-    }
     NotificationScreenContent(
         uiState = uiState,
         navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
@@ -89,8 +84,9 @@ fun NotificationScreenContent(
     ) { paddingValues ->
         when(uiState){
             is NotificationScreenUiState.UserNotLoggedIn -> {
-
-                Box( modifier = Modifier.fillMaxSize().padding(paddingValues) ){
+                Box( modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues) ){
                     Text(
                         text = "Log In to view your notifications",
                         modifier = Modifier.align(Alignment.Center)
@@ -107,13 +103,13 @@ fun NotificationScreenContent(
                 )
             }
             is NotificationScreenUiState.Success -> {
-                val notifications = uiState.notifications
+                val notifications = uiState.notifications.collectAsLazyPagingItems()
                 LazyColumn(modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
                     .padding(defaultPadding)
                 ){
-                    if (notifications.isEmpty()){
+                    if (notifications.itemCount == 0){
                         item{
                             Column(
                                 modifier = Modifier.fillMaxSize(),
@@ -125,13 +121,17 @@ fun NotificationScreenContent(
                             }
                         }
                     }else{
-                        items(items = notifications.reversed()){ notification ->
-                            NotificationCard(
-                                notification = notification,
-                                navigateToPostScreen = navigateToPostScreen,
-                                navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
-                            )
-                            Spacer(modifier = Modifier.padding(10.dp))
+                        items(count = notifications.itemCount){ position ->
+                            val notification = notifications[position]
+                            if (notification != null) {
+                                NotificationCard(
+                                    notification = notification,
+                                    navigateToPostScreen = navigateToPostScreen,
+                                    navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
+                                )
+                                Spacer(modifier = Modifier.padding(10.dp))
+                            }
+
                         }
                     }
 
