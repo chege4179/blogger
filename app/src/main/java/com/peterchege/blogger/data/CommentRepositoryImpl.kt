@@ -18,10 +18,12 @@ package com.peterchege.blogger.data
 import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.api.requests.CommentBody
 import com.peterchege.blogger.core.api.requests.DeleteCommentBody
+import com.peterchege.blogger.core.api.requests.LikeCommentBody
 import com.peterchege.blogger.core.api.requests.ReplyCommentBody
 import com.peterchege.blogger.core.api.responses.responses.AddCommentResponse
 import com.peterchege.blogger.core.api.responses.responses.DeleteCommentResponse
 import com.peterchege.blogger.core.api.responses.responses.GetCommentsResponse
+import com.peterchege.blogger.core.api.responses.responses.LikeCommentResponse
 import com.peterchege.blogger.core.api.safeApiCall
 import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.domain.repository.CommentRepository
@@ -48,6 +50,10 @@ class CommentRepositoryImpl @Inject constructor(
 
     override suspend fun deleteComment(deleteCommentBody: DeleteCommentBody): NetworkResult<DeleteCommentResponse> {
         return safeApiCall { api.removeComment(commentBody = deleteCommentBody) }
+    }
+
+    override suspend fun likeComment(likeCommentBody: LikeCommentBody): NetworkResult<LikeCommentResponse> {
+        return safeApiCall { api.likeComment(likeCommentBody) }
     }
 
 }

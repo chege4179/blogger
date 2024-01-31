@@ -170,7 +170,7 @@ fun AuthorProfileScreenContent(
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.LightGray),
+            .background(MaterialTheme.colorScheme.background),
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
@@ -194,7 +194,7 @@ fun AuthorProfileScreenContent(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.White)
+                        .background(MaterialTheme.colorScheme.background)
                         .padding(defaultPadding),
                 ) {
 
@@ -250,12 +250,12 @@ fun AuthorProfileScreenContent(
                         ) {
                             ProfileInfoCount(
                                 name = stringResource(id = R.string.post_header_name),
-                                count = user._count.post,
+                                count = user.count.post,
                                 onClick = {
 
                                 }
                             )
-                            HorizontalDivider(
+                            VerticalDivider(
                                 modifier = Modifier
                                     .fillMaxHeight(0.7f)
                                     .width(1.dp),
@@ -264,7 +264,7 @@ fun AuthorProfileScreenContent(
                             )
                             ProfileInfoCount(
                                 name = stringResource(id = R.string.followers_header_name),
-                                count = user._count.followers,
+                                count = user.count.followers,
                                 onClick = {
                                     navigateToAuthorFollowerFollowingScreen(
                                         user.userId,
@@ -272,7 +272,7 @@ fun AuthorProfileScreenContent(
                                     )
                                 }
                             )
-                            HorizontalDivider(
+                            VerticalDivider(
                                 modifier = Modifier
                                     .fillMaxHeight(0.7f)
                                     .width(1.dp),
@@ -281,7 +281,7 @@ fun AuthorProfileScreenContent(
                             )
                             ProfileInfoCount(
                                 name = stringResource(id = R.string.following_header_name),
-                                count = user._count.following,
+                                count = user.count.following,
                                 onClick = {
                                     navigateToAuthorFollowerFollowingScreen(
                                         user.userId,
@@ -323,9 +323,7 @@ fun AuthorProfileScreenContent(
                                     onItemClick = {
                                         navigateToPostScreen(post.postId)
                                     },
-                                    onProfileNavigate = {
-
-                                    },
+                                    onProfileNavigate = {},
                                     onDeletePost = {},
                                     onBookmarkPost = bookmarkPost,
                                     onUnBookmarkPost = unBookmarkPost,

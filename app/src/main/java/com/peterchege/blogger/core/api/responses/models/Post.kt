@@ -17,6 +17,7 @@ package com.peterchege.blogger.core.api.responses.models
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Parcelize
@@ -30,7 +31,9 @@ data class Post(
     val createdAt: String,
     val updatedAt: String,
     val postAuthor: PostAuthor,
-    val _count: PostCount
+
+    @SerialName(value = "_count")
+    val count: PostCount
     ):Parcelable
 
 @Parcelize

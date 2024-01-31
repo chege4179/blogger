@@ -31,11 +31,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -58,6 +62,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import com.peterchege.blogger.R
+import com.peterchege.blogger.core.util.setTagAndId
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
@@ -126,7 +131,7 @@ fun FeedScreen(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 @ExperimentalCoilApi
@@ -185,6 +190,9 @@ fun FeedScreenContent(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         modifier = Modifier
+            .semantics {
+                testTagsAsResourceId = true
+            }
             .fillMaxSize()
             .background(Color.DarkGray)
             .nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -227,11 +235,11 @@ fun FeedScreenContent(
 
             }
         }
-    ) {
+    ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues = it)
+                .padding(paddingValues = paddingValues)
                 .nestedScroll(pullRefreshState.nestedScrollConnection)
         ) {
             Column(
@@ -277,6 +285,7 @@ fun FeedScreenContent(
                     is FeedScreenUiState.Success -> {
                         LazyColumn(
                             modifier = Modifier
+                                .setTagAndId("feed")
                                 .fillMaxSize()
                                 .padding(defaultPadding)
                         ) {

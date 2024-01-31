@@ -25,6 +25,7 @@ import androidx.work.WorkManager
 import com.peterchege.blogger.BuildConfig
 import com.peterchege.blogger.core.analytics.crashlytics.CrashlyticsTree
 import com.peterchege.blogger.core.util.Constants
+import com.peterchege.blogger.core.util.ProfileVerifierLogger
 import com.peterchege.blogger.core.work.WorkConstants
 import com.peterchege.blogger.core.work.WorkInitializer
 import dagger.hilt.android.HiltAndroidApp
@@ -38,11 +39,14 @@ class BloggerApp :Application(){
 //    @Inject
 //    lateinit var workerFactory: HiltWorkerFactory
 
+    @Inject
+    lateinit var profileVerifierLogger: ProfileVerifierLogger
 
     override fun onCreate() {
         super.onCreate()
         initTimber()
         setUpNotificationChannel()
+        profileVerifierLogger()
 
 
     }

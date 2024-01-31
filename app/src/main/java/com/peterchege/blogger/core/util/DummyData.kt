@@ -17,6 +17,7 @@ package com.peterchege.blogger.core.util
 
 import com.peterchege.blogger.core.api.requests.CommentBody
 import com.peterchege.blogger.core.api.requests.DeleteCommentBody
+import com.peterchege.blogger.core.api.requests.LikeCommentBody
 import com.peterchege.blogger.core.api.requests.ReplyCommentBody
 import com.peterchege.blogger.core.api.responses.models.CommentCount
 import com.peterchege.blogger.core.api.responses.models.CommentUser
@@ -24,11 +25,16 @@ import com.peterchege.blogger.core.api.responses.models.CommentWithUser
 import com.peterchege.blogger.core.api.responses.responses.AddCommentResponse
 import com.peterchege.blogger.core.api.responses.responses.DeleteCommentResponse
 import com.peterchege.blogger.core.api.responses.responses.GetCommentsResponse
+import com.peterchege.blogger.core.api.responses.responses.LikeCommentResponse
 import com.peterchege.blogger.domain.repository.CommentRepository
 import java.util.UUID
 
 class DummyCommentsRepository : CommentRepository {
     override suspend fun postComment(commentBody: CommentBody): NetworkResult<AddCommentResponse> {
+        return NetworkResult.Error(code = 200,message = null)
+    }
+
+    override suspend fun likeComment(likeCommentBody: LikeCommentBody): NetworkResult<LikeCommentResponse> {
         return NetworkResult.Error(code = 200,message = null)
     }
 
@@ -65,7 +71,7 @@ class DummyCommentsRepository : CommentRepository {
             parentId = null,
             createdAt = "2023-12-02T18:55:36.935Z",
             updatedAt = "2023-12-02T18:55:36.935Z",
-            _count = CommentCount(commentLikes = 23),
+            count = CommentCount(commentLikes = 23),
             user = CommentUser(
                 userId = UUID.randomUUID().toString(),
                 email = "peter@gmail.com",
@@ -75,7 +81,8 @@ class DummyCommentsRepository : CommentRepository {
                 createdAt = "2023-12-02T18:55:36.935Z",
                 updatedAt = "2023-12-02T18:55:36.935Z",
                 password = "2023-12-02T18:55:36.935Z",
-            )
+            ),
+            children = emptyList()
         )
     }
 

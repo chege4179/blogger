@@ -52,7 +52,7 @@ fun SettingsRow(
     ) {
         Row(
             modifier = Modifier
-                .background(color = MaterialTheme.colorScheme.onBackground)
+                .background(color = MaterialTheme.colorScheme.onPrimary)
                 .fillMaxWidth()
                 .padding(10.dp)
                 .clickable {

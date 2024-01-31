@@ -23,5 +23,8 @@ data class ReplyCommentBody(
     val replyCommentId: String,
     val replyCommentBody: String,
     val postId: String,
-    val userId: String
+    val userId: String,
+    val participants:List<String> = emptyList(),
+
+    val postAuthorId:String,
 )

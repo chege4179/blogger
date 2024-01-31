@@ -50,12 +50,14 @@ android {
             initWith(buildTypes.getByName("release"))
             matchingFallbacks += listOf("release")
             isDebuggable = false
+            //dependencies.add("implementation","com.github.chuckerteam.chucker:library-no-op:4.0.0")
         }
     }
     ksp {
         arg("room.schemaLocation", "$projectDir/schemas")
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -91,25 +93,25 @@ dependencies {
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.compose.ui:ui:1.6.0-rc01")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.6.0-rc01")
+    implementation("androidx.compose.ui:ui:1.6.0")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.6.0")
     implementation("androidx.activity:activity-compose:1.8.2")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.0-rc01")
-    debugImplementation("androidx.compose.ui:ui-tooling:1.6.0-rc01")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.0")
+    debugImplementation("androidx.compose.ui:ui-tooling:1.6.0")
 
-    implementation("androidx.compose.material:material-icons-extended:1.6.0-rc01")
-    implementation("androidx.compose.material3:material3:1.2.0-beta02")
-    implementation("androidx.compose.material3:material3-window-size-class:1.2.0-beta02")
+    implementation("androidx.compose.material:material-icons-extended:1.6.0")
+    implementation("androidx.compose.material3:material3:1.2.0-rc01")
+    implementation("androidx.compose.material3:material3-window-size-class:1.2.0-rc01")
 
     implementation("androidx.metrics:metrics-performance:1.0.0-beta01")
     // retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
-    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.11")
-    implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.11")
+    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.12")
+    implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.12")
     implementation("com.squareup.retrofit2:retrofit-mock:2.9.0")
     implementation("com.squareup.okhttp3:mockwebserver:4.12.0")
 
@@ -162,15 +164,19 @@ dependencies {
     implementation("com.google.android.gms:play-services-oss-licenses:17.0.1")
 
 
+    implementation("androidx.profileinstaller:profileinstaller:1.3.1")
+
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-messaging-ktx")
     implementation("com.google.firebase:firebase-perf")
 
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
     implementation("com.jakewharton.timber:timber:5.0.1")
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.12")
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.13")
 
 
     debugImplementation("com.github.chuckerteam.chucker:library:4.0.0")

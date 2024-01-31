@@ -24,7 +24,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -36,6 +39,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import com.peterchege.blogger.core.api.responses.models.Notification
 import com.peterchege.blogger.core.api.responses.models.PostAuthor
+import com.peterchege.blogger.core.util.convertUtcDateStringToReadable
+import kotlinx.datetime.toInstant
 
 @Composable
 fun NotificationCard(
@@ -43,42 +48,62 @@ fun NotificationCard(
     navigateToAuthorProfileScreen: (String) -> Unit,
     notification: Notification
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp)
-            .padding(5.dp)
-            .clickable {
-                if (notification.notificationType == "Like" || notification.notificationType == "Comment") {
-//                    notification.n?.let { navigateToPostScreen(it) }
-                } else {
-                    navigateToAuthorProfileScreen(notification.notificationSender.userId)
-                }
-
-            },
-        horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        ProfileAvatar(
-            imageUrl = notification.notificationSender.imageUrl,
-            modifier = Modifier.padding(horizontal = 5.dp),
-            size = 48
+    Card (
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardColors(
+            containerColor = MaterialTheme.colorScheme.onPrimary,
+            contentColor = MaterialTheme.colorScheme.onBackground,
+            disabledContentColor = MaterialTheme.colorScheme.background,
+            disabledContainerColor = MaterialTheme.colorScheme.onBackground
         )
-        Column(
+    ){
+        Row (
+            modifier = Modifier.fillMaxWidth().padding(5.dp),
+            horizontalArrangement = Arrangement.End,
+        ){
+            Text(
+                text = convertUtcDateStringToReadable(notification.createdAt),
+                textAlign = TextAlign.Start,
+            )
+
+        }
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.Start,
+                .height(60.dp)
+                .padding(5.dp)
+                .clickable {
+                    if (notification.notificationType == "Like" || notification.notificationType == "Comment") {
+//                    notification.n?.let { navigateToPostScreen(it) }
+                    } else {
+                        navigateToAuthorProfileScreen(notification.notificationSender.userId)
+                    }
+
+                },
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = notification.notificationContent,
-                textAlign = TextAlign.Start,
-                fontWeight = FontWeight.Bold,
+            ProfileAvatar(
+                imageUrl = notification.notificationSender.imageUrl,
+                modifier = Modifier.padding(horizontal = 5.dp),
+                size = 48
             )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.Start,
+            ) {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = notification.notificationContent,
+                    textAlign = TextAlign.Start,
+                )
+            }
         }
     }
+
 }
 
 

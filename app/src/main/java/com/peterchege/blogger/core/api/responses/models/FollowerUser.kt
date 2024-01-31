@@ -15,6 +15,7 @@
  */
 package com.peterchege.blogger.core.api.responses.models
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 
@@ -28,5 +29,6 @@ data class FollowerUser(
     val username: String,
     val createdAt:String,
     val updatedAt:String,
-    val _count: UserCount,
+    @SerialName(value = "_count")
+    val count: UserCount,
 )

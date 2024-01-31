@@ -15,6 +15,7 @@
  */
 package com.peterchege.blogger.core.api.responses.models
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -26,7 +27,8 @@ data class Comment (
     val parentId:String?,
     val createdAt:String,
     val updatedAt:String,
-    val _count:CommentCount
+    @SerialName(value = "_count")
+    val count:CommentCount
 )
 
 @Serializable

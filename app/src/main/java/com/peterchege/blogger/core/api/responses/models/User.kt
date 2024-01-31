@@ -15,6 +15,7 @@
  */
 package com.peterchege.blogger.core.api.responses.models
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -28,7 +29,9 @@ data class User(
     val createdAt:String,
     val updatedAt:String,
     val deviceTokens:List<DeviceToken>,
-    val _count: UserCount,
+
+    @SerialName(value = "_count")
+    val count: UserCount,
 )
 
 

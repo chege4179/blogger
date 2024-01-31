@@ -45,6 +45,10 @@ fun LazyListScope.postCommentsSection(
     authUser: User?,
     toggleDeleteCommentDialog: () -> Unit,
     setCommentToBeDeleted:(CommentWithUser) -> Unit,
+    setCommentToBeRepliedTo:(CommentWithUser?) -> Unit,
+    toggleReplyCommentDialog:() -> Unit,
+    addParticipants:(List<String>) -> Unit,
+    likeComment:(String,String) -> Unit,
 
 ) {
     item {
@@ -82,7 +86,11 @@ fun LazyListScope.postCommentsSection(
                     authUser = authUser,
                     postAuthorId = postAuthorId,
                     openDeleteCommentDialog = toggleDeleteCommentDialog,
-                    setCommentToBeDeleted = setCommentToBeDeleted
+                    setCommentToBeDeleted = setCommentToBeDeleted,
+                    setCommentToBeReplied = setCommentToBeRepliedTo,
+                    toggleReplyCommentDialog = toggleReplyCommentDialog,
+                    addParticipants = addParticipants,
+                    likeComment = likeComment,
                 )
             }
             Spacer(modifier = Modifier.height(10.dp))

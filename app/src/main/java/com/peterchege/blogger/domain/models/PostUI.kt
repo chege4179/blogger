@@ -27,7 +27,7 @@ data class PostUI(
     val createdAt: String,
     val updatedAt: String,
     val postAuthor: PostAuthor,
-    val _count: PostCount,
+    val count: PostCount,
     val isSaved:Boolean = false,
     val isLiked:Boolean = false,
     val isProfile:Boolean = false,

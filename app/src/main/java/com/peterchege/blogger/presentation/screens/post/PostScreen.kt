@@ -47,24 +47,24 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.SubcomposeAsyncImage
+import com.peterchege.blogger.R
 import com.peterchege.blogger.core.api.responses.models.CommentWithUser
 import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.util.UiEvent
-import com.peterchege.blogger.core.util.addThreeHoursToDateString
 import com.peterchege.blogger.core.util.calculateDoubleTapOffset
 import com.peterchege.blogger.core.util.calculateNewOffset
-import com.peterchege.blogger.core.util.formatDateTime
+import com.peterchege.blogger.core.util.convertUtcDateStringToReadable
 import com.peterchege.blogger.core.util.toast
 import com.peterchege.blogger.domain.mappers.toPost
 import com.peterchege.blogger.presentation.alertDialogs.CommentDialog
 import com.peterchege.blogger.presentation.alertDialogs.DeleteCommentDialog
+import com.peterchege.blogger.presentation.alertDialogs.ReplyCommentDialog
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.components.postCommentsSection
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
-import com.peterchege.blogger.R
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
@@ -115,7 +115,28 @@ fun PostScreen(
             viewModel.onCommentDialogConfirm(authUser!!, it)
         },
         deleteComment = viewModel::deleteComment,
-        setCommentToBeDeleted = viewModel::setCommentToBeDeleted
+        setCommentToBeDeleted = viewModel::setCommentToBeDeleted,
+        setCommentToRepliedTo = viewModel::setCommentToBeRepliedTo,
+        toggleReplyCommentDialog = viewModel::toggleReplyCommentDialog,
+        addCommentParticipants = viewModel::addCommentParticipants,
+        onChangeReplyComment = viewModel::onChangeReplyComment,
+        replyToComment = { refresh ->
+            authUser?.let { user ->
+
+                if (user.userId != "") {
+                    if (uiState is PostScreenUiState.Success) {
+                        viewModel.replyToComment(
+                            postAuthorId = (uiState as PostScreenUiState.Success).post.postAuthorId,
+                            userId = user.userId,
+                            refresh = refresh
+                        )
+                    }
+                } else {
+                    context.toast(msg = context.getString(R.string.login_like_message))
+                }
+            }
+        },
+        likeComment = viewModel::likeComment
     )
 }
 
@@ -140,6 +161,12 @@ fun PostScreenContent(
     postComment: (() -> Unit) -> Unit,
     deleteComment: (() -> Unit) -> Unit,
     setCommentToBeDeleted: (CommentWithUser) -> Unit,
+    onChangeReplyComment: (String) -> Unit,
+    toggleReplyCommentDialog: () -> Unit,
+    setCommentToRepliedTo: (CommentWithUser?) -> Unit,
+    addCommentParticipants: (List<String>) -> Unit,
+    replyToComment: (() -> Unit) -> Unit,
+    likeComment:(String,String,() -> Unit) -> Unit,
 ) {
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -185,7 +212,7 @@ fun PostScreenContent(
 
             is PostScreenUiState.Error -> {
                 ErrorComponent(
-                    retryCallback = {  },
+                    retryCallback = { },
                     errorMessage = "An unexpected error occurred"
                 )
             }
@@ -200,6 +227,18 @@ fun PostScreenContent(
             is PostScreenUiState.Success -> {
                 val post = uiState.post
                 val comments = uiState.comments.collectAsLazyPagingItems()
+
+                if (commentUiState.isReplyCommentDialogVisible && (commentUiState.commentToBeRepliedTo != null)) {
+                    ReplyCommentDialog(
+                        isUserLoggedIn = uiState.isUserLoggedIn,
+                        commentUiState = commentUiState,
+                        onChangeNewComment = onChangeReplyComment,
+                        replyToComment = {
+                            replyToComment { comments.refresh() }
+                        },
+                        closeCommentDialog = toggleReplyCommentDialog
+                    )
+                }
 
                 if (commentUiState.isDeleteCommentDialogVisible && (commentUiState.commentToBeDeleted != null)) {
                     DeleteCommentDialog(
@@ -381,10 +420,10 @@ fun PostScreenContent(
                                         Alignment.CenterVertically
 
                                     ) {
-                                        Text(text = formatDateTime(addThreeHoursToDateString(post.createdAt)))
+                                        Text(text = convertUtcDateStringToReadable(post.createdAt))
 
-                                        Text(text = "${post._count.likes} like(s)")
-                                        Text(text = "${post._count.views} view(s)")
+                                        Text(text = "${post.count.likes} like(s)")
+                                        Text(text = "${post.count.views} view(s)")
 
                                     }
                                     Spacer(
@@ -418,10 +457,18 @@ fun PostScreenContent(
                         postAuthorId = post.postAuthorId,
                         authUser = user,
                         toggleDeleteCommentDialog = toggleDeleteCommentDialog,
-                        setCommentToBeDeleted = setCommentToBeDeleted
+                        setCommentToBeDeleted = setCommentToBeDeleted,
+                        setCommentToBeRepliedTo = setCommentToRepliedTo,
+                        toggleReplyCommentDialog = toggleReplyCommentDialog,
+                        addParticipants = addCommentParticipants,
+                        likeComment = { commentId,userId ->
+                            likeComment(commentId,userId, { comments.refresh() })
+                        }
                     )
                 }
             }
+
+            else -> {}
         }
     }
 }

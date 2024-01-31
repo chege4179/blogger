@@ -22,7 +22,7 @@ object Constants {
     const val REMOTE_URL = "https://bloggerserver-production.up.railway.app"
     const val REMOTE_URL_2 = "https://blogger-server-vfua.onrender.com"
 
-    const val BASE_URL = LOCAL_URL_2
+    const val BASE_URL = LOCAL_URL
 
     const val FCM_TOKEN ="FCM_TOKEN"
 

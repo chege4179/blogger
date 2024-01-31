@@ -42,8 +42,6 @@ fun SearchPostsTab(
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .padding(6.dp)
-
     ) { paddingValues ->
         when (uiState) {
             is SearchScreenUiState.Idle -> {

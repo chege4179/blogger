@@ -30,6 +30,7 @@ import com.peterchege.blogger.core.api.responses.responses.GetPostLikesResponse
 import com.peterchege.blogger.core.api.responses.responses.GetPostsByUserIdResponse
 import com.peterchege.blogger.core.api.responses.responses.GetUserLikeResponse
 import com.peterchege.blogger.core.api.responses.responses.GetUserNotificationsResponse
+import com.peterchege.blogger.core.api.responses.responses.LikeCommentResponse
 import com.peterchege.blogger.core.api.responses.responses.LikeResponse
 import com.peterchege.blogger.core.api.responses.responses.LoginResponse
 import com.peterchege.blogger.core.api.responses.responses.LogoutResponse
@@ -176,5 +177,12 @@ interface BloggerApi {
         @Query("page") page: Int = 1,
         @Query("limit") limit: Int = 20,
     ):Response<GetUserNotificationsResponse>
+
+    @POST("/comment/like")
+    suspend fun likeComment(
+        @Body likeCommentBody: LikeCommentBody,
+    ):Response<LikeCommentResponse>
+
+
 }
 

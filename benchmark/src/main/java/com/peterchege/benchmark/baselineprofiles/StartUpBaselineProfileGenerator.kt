@@ -15,8 +15,10 @@
  */
 package com.peterchege.benchmark.baselineprofiles
 
+import androidx.benchmark.macro.MacrobenchmarkScope
 import androidx.benchmark.macro.junit4.BaselineProfileRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.peterchege.benchmark.util.allowNotifications
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,9 +36,12 @@ class StartUpBaselineProfileGenerator {
             packageName = "com.peterchege.blogger",
             includeInStartupProfile = true,
         ) {
-            startActivityAndWait()
-            pressHome()
-
+            startActivityAndAllowNotifications()
         }
     }
+}
+
+fun MacrobenchmarkScope.startActivityAndAllowNotifications() {
+    startActivityAndWait()
+    allowNotifications()
 }

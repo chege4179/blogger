@@ -25,7 +25,9 @@ import androidx.paging.PagingData
 import com.peterchege.blogger.core.api.requests.CommentBody
 import com.peterchege.blogger.core.api.requests.DeleteCommentBody
 import com.peterchege.blogger.core.api.requests.FollowUser
+import com.peterchege.blogger.core.api.requests.LikeCommentBody
 import com.peterchege.blogger.core.api.requests.LikePost
+import com.peterchege.blogger.core.api.requests.ReplyCommentBody
 import com.peterchege.blogger.core.api.requests.Viewer
 import com.peterchege.blogger.core.api.responses.models.Comment
 import com.peterchege.blogger.core.api.responses.models.CommentWithUser
@@ -67,8 +69,16 @@ sealed interface PostScreenUiState {
 data class CommentUiState(
     val newComment: String = "",
     val isCommentDialogVisible: Boolean = false,
+
     val isDeleteCommentDialogVisible: Boolean = false,
     val commentToBeDeleted: CommentWithUser? = null,
+
+    val commentToBeRepliedTo: CommentWithUser? = null,
+    val isReplyCommentDialogVisible: Boolean = false,
+    val replyCommentMessage: String = "",
+    val commentParticipants: List<String> = emptyList()
+
+
 )
 
 
@@ -193,6 +203,31 @@ class PostScreenViewModel @Inject constructor(
 
     }
 
+    fun addCommentParticipants(commentParticipants: List<String>) {
+        _commentUiState.update {
+            it.copy(commentParticipants = commentParticipants)
+        }
+    }
+
+    fun toggleReplyCommentDialog() {
+        val initialState = _commentUiState.value.isReplyCommentDialogVisible
+        _commentUiState.update {
+            it.copy(isReplyCommentDialogVisible = !initialState)
+        }
+    }
+
+    fun setCommentToBeRepliedTo(commentToBeRepliedTo: CommentWithUser?) {
+        _commentUiState.update {
+            it.copy(commentToBeRepliedTo = commentToBeRepliedTo)
+        }
+    }
+
+    fun onChangeReplyComment(commentMessage: String) {
+        _commentUiState.update {
+            it.copy(replyCommentMessage = commentMessage)
+        }
+    }
+
     fun toggleDeleteCommentDialog() {
         val initialState = _commentUiState.value.isDeleteCommentDialogVisible
         _commentUiState.update {
@@ -222,13 +257,15 @@ class PostScreenViewModel @Inject constructor(
                     if (response.data.success) {
                         _eventFlow.emit(
                             UiEvent.ShowSnackbar(
-                                message = "Comment deleted successfully")
+                                message = "Comment deleted successfully"
+                            )
                         )
                         refresh()
                     } else {
                         _eventFlow.emit(
                             UiEvent.ShowSnackbar(
-                                message = "An unexpected error occurred")
+                                message = "An unexpected error occurred"
+                            )
                         )
                     }
                 }
@@ -253,6 +290,7 @@ class PostScreenViewModel @Inject constructor(
         }
 
     }
+
 
     fun savePostToRoom(post: Post) {
         viewModelScope.launch {
@@ -342,6 +380,82 @@ class PostScreenViewModel @Inject constructor(
                     _eventFlow.emit(
                         UiEvent.ShowSnackbar(
                             message = commentResponse.e.message ?: "Your Comment was not sent"
+                        )
+                    )
+
+                }
+
+                is NetworkResult.Error -> {
+                    _eventFlow.emit(UiEvent.ShowSnackbar(message = "Could not reach server... Please check your internet connection"))
+                }
+            }
+        }
+    }
+
+    fun replyToComment(userId: String, postAuthorId: String, refresh: () -> Unit) {
+        viewModelScope.launch {
+            val response = commentRepository.replyToComment(
+                commentBody = ReplyCommentBody(
+                    replyCommentId = _commentUiState.value.commentToBeRepliedTo?.commentId
+                        ?: return@launch,
+                    postId = postId.value,
+                    userId = userId,
+                    postAuthorId = postAuthorId,
+                    participants = _commentUiState.value.commentParticipants,
+                    replyCommentBody = _commentUiState.value.replyCommentMessage
+                )
+            )
+            when (response) {
+                is NetworkResult.Success -> {
+                    toggleReplyCommentDialog()
+                    setCommentToBeRepliedTo(null)
+                    onChangeReplyComment("")
+
+                    if (response.data.success) {
+                        _eventFlow.emit(UiEvent.ShowSnackbar(message = response.data.msg))
+                        refresh()
+
+                    }
+                }
+
+                is NetworkResult.Exception -> {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            message = response.e.message ?: "Your Comment was not sent"
+                        )
+                    )
+
+                }
+
+                is NetworkResult.Error -> {
+                    _eventFlow.emit(UiEvent.ShowSnackbar(message = "Could not reach server... Please check your internet connection"))
+                }
+            }
+        }
+    }
+
+    fun likeComment(commentId: String, userId: String, refresh: () -> Unit) {
+        viewModelScope.launch {
+            val response = commentRepository.likeComment(
+                likeCommentBody = LikeCommentBody(
+                    commentId = commentId,
+                    userId = userId
+                )
+            )
+            when (response) {
+                is NetworkResult.Success -> {
+
+                    if (response.data.success) {
+                        _eventFlow.emit(UiEvent.ShowSnackbar(message = response.data.msg))
+                        refresh()
+
+                    }
+                }
+
+                is NetworkResult.Exception -> {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            message = response.e.message ?: "Could not like comment"
                         )
                     )
 

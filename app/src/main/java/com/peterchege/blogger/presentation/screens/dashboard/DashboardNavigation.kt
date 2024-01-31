@@ -15,6 +15,7 @@
  */
 package com.peterchege.blogger.presentation.screens.dashboard
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -32,12 +33,17 @@ import com.peterchege.blogger.presentation.navigation.navigateToProfileFollowerF
 import com.peterchege.blogger.presentation.navigation.navigateToSearchScreen
 import com.peterchege.blogger.presentation.navigation.navigateToSettingsScreen
 import com.peterchege.blogger.presentation.navigation.navigateToSignUpScreen
+import com.peterchege.blogger.presentation.navigation.scaleInEnterTransition
+import com.peterchege.blogger.presentation.navigation.scaleInPopEnterTransition
+import com.peterchege.blogger.presentation.navigation.scaleOutExitTransition
+import com.peterchege.blogger.presentation.navigation.scaleOutPopExitTransition
 import com.peterchege.blogger.presentation.screens.feed.FeedScreen
 import com.peterchege.blogger.presentation.screens.notifcations.NotificationScreen
 import com.peterchege.blogger.presentation.screens.profile.ProfileScreen
 import com.peterchege.blogger.presentation.screens.saved_posts.SavedPostScreen
 
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun DashboardNavigation(
     navHostController: NavHostController,
@@ -49,7 +55,11 @@ fun DashboardNavigation(
         startDestination = Screens.FEED_SCREEN
     ){
         composable(
-            route = Screens.FEED_SCREEN
+            route = Screens.FEED_SCREEN,
+            enterTransition = { scaleInEnterTransition() },
+            exitTransition = { scaleOutExitTransition() },
+            popEnterTransition = { scaleInPopEnterTransition() },
+            popExitTransition = { scaleOutPopExitTransition() },
         ) {
             FeedScreen(
                 navigateToAddPostScreen = navHostController::navigateToAddPostScreen,
@@ -61,7 +71,11 @@ fun DashboardNavigation(
             )
         }
         composable(
-            route = Screens.SAVED_POST_SCREEN
+            route = Screens.SAVED_POST_SCREEN,
+            enterTransition = { scaleInEnterTransition() },
+            exitTransition = { scaleOutExitTransition() },
+            popEnterTransition = { scaleInPopEnterTransition() },
+            popExitTransition = { scaleOutPopExitTransition() },
         ) {
             SavedPostScreen(
                 navigateToPostScreen = navHostController::navigateToPostScreen,
@@ -70,7 +84,11 @@ fun DashboardNavigation(
         }
 
         composable(
-            route = Screens.NOTIFICATION_SCREEN
+            route = Screens.NOTIFICATION_SCREEN,
+            enterTransition = { scaleInEnterTransition() },
+            exitTransition = { scaleOutExitTransition() },
+            popEnterTransition = { scaleInPopEnterTransition() },
+            popExitTransition = { scaleOutPopExitTransition() },
         ) {
             NotificationScreen(
                 navigateToPostScreen = navHostController::navigateToPostScreen,
@@ -79,7 +97,11 @@ fun DashboardNavigation(
 
         }
         composable(
-            route = Screens.PROFILE_SCREEN
+            route = Screens.PROFILE_SCREEN,
+            enterTransition = { scaleInEnterTransition() },
+            exitTransition = { scaleOutExitTransition() },
+            popEnterTransition = { scaleInPopEnterTransition() },
+            popExitTransition = { scaleOutPopExitTransition() },
         ) {
             ProfileScreen(
                 navigateToSignUpScreen = navHostController::navigateToSignUpScreen,

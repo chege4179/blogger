@@ -15,6 +15,7 @@
  */
 package com.peterchege.blogger.core.api.responses.models
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 
@@ -27,9 +28,27 @@ data class CommentWithUser(
     val parentId:String?,
     val createdAt:String,
     val updatedAt:String,
-    val _count:CommentCount,
+    @SerialName(value = "_count")
+    val count:CommentCount,
+    val user:CommentUser,
+    val children:List<ReplyCommentWithUser>
+)
+
+@Serializable
+data class ReplyCommentWithUser(
+    val commentId:String,
+    val message:String,
+    val commentUserId:String,
+    val commentPostId:String,
+    val parentId:String?,
+    val createdAt:String,
+    val updatedAt:String,
+    @SerialName(value = "_count")
+    val count:CommentCount,
     val user:CommentUser,
 )
+
+
 
 
 @Serializable

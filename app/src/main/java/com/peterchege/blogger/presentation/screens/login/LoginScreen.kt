@@ -138,7 +138,7 @@ fun LoginScreenContent(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
-                    painter = painterResource(id = R.mipmap.blogger_app_icon_foreground),
+                    painter = painterResource(id = R.mipmap.app_icon_foreground),
                     modifier = Modifier
                         .width(80.dp)
                         .height(80.dp),

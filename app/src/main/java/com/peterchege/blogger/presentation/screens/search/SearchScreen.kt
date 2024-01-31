@@ -120,12 +120,15 @@ fun SearchScreenContent(
             SnackbarHost(hostState = snackbarHostState)
         },
         modifier = Modifier
-            .fillMaxSize()
-            .padding(10.dp),
+            .fillMaxSize(),
         topBar = {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(horizontal = 10.dp)
+                    .padding(top = 10.dp)
+                ,
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = CenterVertically
             ) {
@@ -137,6 +140,7 @@ fun SearchScreenContent(
                     placeholder = {
                         Text(
                             text = "Search",
+                            color = MaterialTheme.colorScheme.onBackground,
                         )
                     },
                     modifier = Modifier
@@ -183,7 +187,7 @@ fun SearchScreenContent(
             modifier = Modifier
                 .background(Color.White)
                 .padding(paddingValues)
-                .padding(vertical = 5.dp),
+                ,
         ) {
             Tabs(pagerState = pagerState)
             TabsContent(
@@ -209,8 +213,8 @@ fun Tabs(pagerState: PagerState) {
 
     TabRow(
         selectedTabIndex = pagerState.currentPage,
-        containerColor = Color.Transparent,
-        contentColor = Color.Transparent,
+        containerColor = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.background,
         indicator = { tabPositions ->
             SecondaryIndicator(
                 modifier = Modifier
@@ -227,7 +231,9 @@ fun Tabs(pagerState: PagerState) {
                         fontWeight = FontWeight.Bold,
                         fontSize = 17.sp,
                         color = if (pagerState.currentPage == index)
-                            MaterialTheme.colorScheme.primary else Color.LightGray
+                            MaterialTheme.colorScheme.onBackground
+                        else
+                            MaterialTheme.colorScheme.primary
                     )
                 },
                 selected = pagerState.currentPage == index,

@@ -38,6 +38,7 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -83,7 +84,7 @@ fun ArticleCardPreview() {
                 imageUrl = "",
                 fullName = "Peter Chege"
             ),
-            _count = PostCount(
+            count = PostCount(
                 likes = 0,
                 views = 0,
                 comments = 0
@@ -126,7 +127,7 @@ fun ArticleCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(color = LightIconColor)
+                .background(color = MaterialTheme.colorScheme.onPrimary)
         ) {
             post.let {
                 SubcomposeAsyncImage(

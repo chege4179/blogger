@@ -30,7 +30,7 @@ fun Post.toSavedEntity(): SavePost {
         createdAt = createdAt,
         updatedAt = updatedAt,
         postAuthor = postAuthor,
-        _count = _count
+        _count = count
     )
 
 }
@@ -46,7 +46,7 @@ fun Post.toCacheEntity(): CachePost {
         createdAt = createdAt,
         updatedAt = updatedAt,
         postAuthor = postAuthor,
-        _count = _count
+        _count = count
     )
 }
 
@@ -60,7 +60,7 @@ fun CachePost.toExternalModel(): Post {
         createdAt = createdAt,
         updatedAt = updatedAt,
         postAuthor = postAuthor,
-        _count = _count
+        count = _count
     )
 }
 
@@ -74,7 +74,7 @@ fun SavePost.toExternalModel(): Post {
         createdAt = createdAt,
         updatedAt = updatedAt,
         postAuthor = postAuthor,
-        _count = _count
+        count = _count
     )
 }
 
@@ -92,7 +92,7 @@ fun Post.toDomain(
         updatedAt = updatedAt,
         postAuthor = postAuthor,
         postAuthorId = postAuthorId,
-        _count = _count,
+        count = count,
         isLiked = isLiked,
         isProfile = isProfile,
         isSaved = isSaved
@@ -109,6 +109,6 @@ fun PostUI.toPost(): Post {
         updatedAt = updatedAt,
         postAuthor = postAuthor,
         postAuthorId = postAuthorId,
-        _count = _count,
+        count = count,
     )
 }

@@ -30,7 +30,7 @@ fun FollowerUser.toUser(): User {
         username = username,
         createdAt = createdAt,
         updatedAt= updatedAt,
-        _count = _count,
+        count = count,
         deviceTokens = emptyList()
     )
 }
@@ -45,7 +45,7 @@ fun User.toFollower(): FollowerUser {
         username = username,
         createdAt = createdAt,
         updatedAt= updatedAt,
-        _count = _count,
+        count = count,
     )
 }
 
@@ -59,7 +59,7 @@ fun User.toFollowerEntity(): FollowerUserEntity {
         username = username,
         createdAt = createdAt,
         updatedAt= updatedAt,
-        _count = _count
+        _count = count
     )
 }
 
@@ -73,7 +73,7 @@ fun FollowerUser.toFollowerEntity(): FollowerUserEntity {
         username = username,
         createdAt = createdAt,
         updatedAt= updatedAt,
-        _count = _count
+        _count = count
     )
 }
 fun FollowerUserEntity.toFollower(): FollowerUser {
@@ -86,7 +86,7 @@ fun FollowerUserEntity.toFollower(): FollowerUser {
         username = username,
         createdAt = createdAt,
         updatedAt= updatedAt,
-        _count = _count
+        count = _count
     )
 }
 
@@ -100,7 +100,7 @@ fun FollowerUserEntity.toUser(): User {
         username = username,
         createdAt = createdAt,
         updatedAt= updatedAt,
-        _count = _count,
+        count = _count,
         deviceTokens = emptyList()
     )
 }

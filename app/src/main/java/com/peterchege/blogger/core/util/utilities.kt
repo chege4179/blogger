@@ -17,41 +17,18 @@ package com.peterchege.blogger.core.util
 
 
 import android.content.Context
-import android.health.connect.datatypes.units.Length
-import android.os.Build
+import android.text.format.DateFormat
 import android.widget.Toast
-import androidx.annotation.RequiresApi
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-
-
-@RequiresApi(Build.VERSION_CODES.O)
-fun formatDateTime(dateStr: String): String {
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-    val dateTime = LocalDateTime.parse(dateStr, formatter)
-
-    val formatted = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").format(dateTime)
-    return formatted
-}
-
-// date string by default in prisma are in UTC
-// we need to support different time zones
-@RequiresApi(Build.VERSION_CODES.O)
-fun addThreeHoursToDateString(dateString: String): String {
-    // Define the date format of the input string
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-
-    // Parse the input string to LocalDateTime
-    val dateTime = LocalDateTime.parse(dateString, formatter)
-
-    // Add 3 hours to the date
-    val updatedDateTime = dateTime.plusHours(3)
-
-    // Format the updated date to the same string format
-    val updatedDateString = updatedDateTime.format(formatter)
-
-    return updatedDateString
-}
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 fun Context.toast(msg:String){
     Toast.makeText(this,msg,Toast.LENGTH_LONG).show()
@@ -59,9 +36,35 @@ fun Context.toast(msg:String){
 
 
 fun truncateString(str: String, n: Int): String {
-    return if ((str?.length ?: 0) > n) {
+    return if (str.length > n) {
         "${str.substring(0, n - 1)}...."
     } else {
         str
     }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+fun Modifier.setTagAndId(tag: String): Modifier {
+    return this
+        .semantics { testTagsAsResourceId = true }
+        .testTag(tag)
+}
+
+fun convertUtcDateStringToReadable(dateString: String): String {
+    val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+    val outputFormat = DateFormat.getBestDateTimePattern(Locale.getDefault(), "yyyy-MM-dd h:mm:ss a ")
+
+    val utcDate: Date
+    try {
+        inputFormat.timeZone = TimeZone.getTimeZone("UTC")
+        utcDate = inputFormat.parse(dateString)!!
+    } catch (e: ParseException) {
+        e.printStackTrace()
+        return "Error parsing date"
+    }
+
+    val outputFormatter = SimpleDateFormat(outputFormat, Locale.getDefault())
+    outputFormatter.timeZone = TimeZone.getDefault()
+
+    return outputFormatter.format(utcDate)
 }

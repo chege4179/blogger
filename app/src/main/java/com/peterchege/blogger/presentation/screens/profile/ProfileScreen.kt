@@ -225,12 +225,12 @@ fun ProfileScreenContent(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
-                        .background(Color.White)
+                        .background(MaterialTheme.colorScheme.background)
                 ) {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Color.White)
+                            .background(MaterialTheme.colorScheme.background)
                             .padding(defaultPadding),
                     ) {
                         item {
@@ -284,35 +284,35 @@ fun ProfileScreenContent(
                             ) {
                                 ProfileInfoCount(
                                     name = stringResource(id = R.string.post_header_name),
-                                    count = user._count.post,
+                                    count = user.count.post,
                                     onClick = {
 
                                     }
                                 )
-                                HorizontalDivider(
+                                VerticalDivider(
                                     modifier = Modifier
                                         .fillMaxHeight(0.7f)
                                         .width(1.dp),
                                     thickness = 2.dp,
-                                    color = Color.LightGray
+                                    color = MaterialTheme.colorScheme.onBackground
                                 )
                                 ProfileInfoCount(
                                     name = stringResource(id = R.string.followers_header_name),
-                                    count = user._count.followers,
+                                    count = user.count.followers,
                                     onClick = {
                                         navigateToProfileFollowerFollowingScreen(Constants.FOLLOWER)
                                     }
                                 )
-                                HorizontalDivider(
+                                VerticalDivider(
                                     modifier = Modifier
                                         .fillMaxHeight(0.7f)
                                         .width(1.dp),
                                     thickness = 2.dp,
-                                    color = Color.LightGray
+                                    color = MaterialTheme.colorScheme.onBackground
                                 )
                                 ProfileInfoCount(
                                     name = stringResource(id = R.string.following_header_name),
-                                    count = user._count.following,
+                                    count = user.count.following,
                                     onClick = {
                                         navigateToProfileFollowerFollowingScreen(Constants.FOLLOWING)
                                     }

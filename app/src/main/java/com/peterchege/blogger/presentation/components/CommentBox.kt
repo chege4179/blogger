@@ -15,13 +15,16 @@
  */
 package com.peterchege.blogger.presentation.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,12 +33,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -64,90 +72,164 @@ fun CommentBox(
     authUser: User?,
     openDeleteCommentDialog: () -> Unit,
     setCommentToBeDeleted: (CommentWithUser) -> Unit,
+    setCommentToBeReplied:(CommentWithUser?) -> Unit,
+    toggleReplyCommentDialog:() -> Unit,
+    addParticipants:(List<String>) -> Unit,
+    likeComment:(String,String) -> Unit,
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(),
-    ) {
-        Row(
+    var isRepliesOpen by remember { mutableStateOf(false) }
+    Column {
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .combinedClickable(
-                    onClick = {
+                .fillMaxHeight(),
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .combinedClickable(
+                        onClick = {
 
-                    },
-                    onLongClick = {
-                        if (authUser != null && authUser.userId != "") {
-                            if (postAuthorId == authUser.userId) {
-                                setCommentToBeDeleted(comment)
-                                openDeleteCommentDialog()
+                        },
+                        onLongClick = {
+                            if (authUser != null && authUser.userId != "") {
+                                if (postAuthorId == authUser.userId) {
+                                    setCommentToBeDeleted(comment)
+                                    openDeleteCommentDialog()
+                                }
                             }
                         }
-                    }
-                ),
-        ) {
-            Image(
-                modifier = Modifier
-                    .padding(5.dp)
-                    .width(40.dp)
-                    .height(40.dp)
-                    .clip(CircleShape),
-                painter = rememberImagePainter(
-                    data = comment.user.imageUrl,
-                    builder = {
-                        crossfade(true)
-                    },
-                ),
-                contentDescription = "Image of ${comment.user.fullName}"
-            )
-            Column(
-                modifier = Modifier.weight(1f)
+                    ),
             ) {
-                val annotatedText = buildAnnotatedString {
-                    pushStyle(SpanStyle(fontWeight = FontWeight.ExtraBold, fontSize = 16.sp))
-                    append(comment.user.username + " ")
-                    pop()
-                    append(comment.message)
-                }
-                Box(
+                Image(
                     modifier = Modifier
-                        .fillMaxWidth()
-
                         .padding(5.dp)
-
-
+                        .width(40.dp)
+                        .height(40.dp)
+                        .clip(CircleShape),
+                    painter = rememberImagePainter(
+                        data = comment.user.imageUrl,
+                        builder = {
+                            crossfade(true)
+                        },
+                    ),
+                    contentDescription = "Image of ${comment.user.fullName}"
+                )
+                Column(
+                    modifier = Modifier.weight(1f)
                 ) {
+                    val annotatedText = buildAnnotatedString {
+                        pushStyle(SpanStyle(fontWeight = FontWeight.ExtraBold, fontSize = 16.sp))
+                        append(comment.user.username + " ")
+                        pop()
+                        append(comment.message )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp)
+                    ) {
+                        Text(
+                            text = annotatedText,
+                            textAlign = TextAlign.Start,
+                            textDecoration = TextDecoration.None,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                    }
                     Text(
-                        text = annotatedText,
+                        text = "Reply",
+                        fontSize = 14.sp,
                         textAlign = TextAlign.Start,
                         textDecoration = TextDecoration.None,
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.clickable {
+                            setCommentToBeReplied(comment)
+                            toggleReplyCommentDialog()
+                            if (authUser != null){
+                                addParticipants(listOf(authUser.userId,comment.commentUserId))
+                            }
+
+                        }
                     )
 
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        HorizontalDivider(
+                            thickness = 2.dp,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier
+                                .width(50.dp)
+                                .padding(horizontal = 5.dp)
+                        )
+                        Text(
+                            text = if (isRepliesOpen)
+                                "Hide Replies"
+                            else
+                                "Show ${comment.children.size ?: 0} replies",
+                            fontSize = 14.sp,
+                            textAlign = TextAlign.Start,
+                            textDecoration = TextDecoration.None,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.clickable {
+                                if(comment.children.isNotEmpty()){
+                                    isRepliesOpen = !isRepliesOpen
+                                }
+                            }
+                        )
+                    }
                 }
+                Column(
+                    modifier = Modifier.fillMaxHeight(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    CustomIconButton(
+                        imageVector = Icons.Default.FavoriteBorder,
+                        onClick = {
+                            authUser?.let {
+                                if (it.userId != ""){
+                                    likeComment(comment.commentId,it.userId)
+                                }
+                            }
+
+                        },
+                        contentDescription = stringResource(id = R.string.like_comment_description)
+                    )
+                    Text(
+                        text = comment.count.commentLikes.toString()
+                    )
+                }
+
+
             }
-            Column(
-                modifier = Modifier.fillMaxHeight(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                CustomIconButton(
-                    imageVector = Icons.Default.FavoriteBorder,
-                    onClick = {
-                        TODO("implement like comment")
-                    },
-                    contentDescription = stringResource(id = R.string.like_comment_description)
-                )
-                Text(
-                    text = comment._count.commentLikes.toString()
-                )
+
+        }
+        AnimatedVisibility(visible = isRepliesOpen) {
+            Row {
+                Spacer(modifier = Modifier.width(50.dp))
+                Column (
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.End,
+                    modifier = Modifier.fillMaxWidth()
+                ){
+                    comment.children?.forEach {
+                        ReplyCommentBox(
+                            postAuthorId = postAuthorId,
+                            comment = it,
+                            authUser = authUser,
+                            openDeleteCommentDialog = { /*TODO*/ },
+                            setCommentToBeDeleted = { }
+                        )
+                    }
+                }
             }
 
 
         }
-
     }
+
 
 }
 
@@ -164,7 +246,7 @@ fun CommentBoxPreview() {
             parentId = null,
             createdAt = "2023-12-02T18:55:36.935Z",
             updatedAt = "2023-12-02T18:55:36.935Z",
-            _count = CommentCount(commentLikes = 23),
+            count = CommentCount(commentLikes = 23),
             user = CommentUser(
                 userId = UUID.randomUUID().toString(),
                 email = "peter@gmail.com",
@@ -174,12 +256,17 @@ fun CommentBoxPreview() {
                 createdAt = "2023-12-02T18:55:36.935Z",
                 updatedAt = "2023-12-02T18:55:36.935Z",
                 password = "2023-12-02T18:55:36.935Z",
-            )
+            ),
+            children = emptyList()
         ),
         authUser = null,
         postAuthorId = "",
         openDeleteCommentDialog = { },
-        setCommentToBeDeleted = { }
+        setCommentToBeDeleted = { },
+        setCommentToBeReplied = { },
+        addParticipants = {},
+        toggleReplyCommentDialog = {  },
+        likeComment = { _,_ ->  }
     )
 
 }

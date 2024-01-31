@@ -17,10 +17,12 @@ package com.peterchege.blogger.domain.repository
 
 import com.peterchege.blogger.core.api.requests.CommentBody
 import com.peterchege.blogger.core.api.requests.DeleteCommentBody
+import com.peterchege.blogger.core.api.requests.LikeCommentBody
 import com.peterchege.blogger.core.api.requests.ReplyCommentBody
 import com.peterchege.blogger.core.api.responses.responses.AddCommentResponse
 import com.peterchege.blogger.core.api.responses.responses.DeleteCommentResponse
 import com.peterchege.blogger.core.api.responses.responses.GetCommentsResponse
+import com.peterchege.blogger.core.api.responses.responses.LikeCommentResponse
 import com.peterchege.blogger.core.util.NetworkResult
 
 interface CommentRepository {
@@ -32,4 +34,8 @@ interface CommentRepository {
     suspend fun replyToComment(commentBody: ReplyCommentBody):NetworkResult<AddCommentResponse>
 
     suspend fun deleteComment(deleteCommentBody:DeleteCommentBody):NetworkResult<DeleteCommentResponse>
+
+
+    suspend fun likeComment(likeCommentBody: LikeCommentBody):NetworkResult<LikeCommentResponse>
+
 }

@@ -21,6 +21,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import com.peterchege.blogger.core.util.setTagAndId
 
 @Composable
 fun LoadingComponent() {
@@ -28,7 +30,9 @@ fun LoadingComponent() {
         modifier = Modifier.fillMaxSize()
     ) {
         CircularProgressIndicator(
-            modifier = Modifier.align(Alignment.Center)
+            modifier = Modifier
+                .align(Alignment.Center)
+                .setTagAndId("loadingIndicator")
         )
     }
 }

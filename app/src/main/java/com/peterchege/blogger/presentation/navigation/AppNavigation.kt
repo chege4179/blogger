@@ -18,10 +18,14 @@ package com.peterchege.blogger.presentation.navigation
 import android.app.Activity
 import android.view.Window
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -47,7 +51,7 @@ import com.peterchege.blogger.presentation.screens.settings.SettingsScreen
 import com.peterchege.blogger.presentation.screens.signup.SignUpScreen
 
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalCoilApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalCoilApi::class, ExperimentalAnimationApi::class)
 @ExperimentalMaterial3Api
 @Composable
 fun AppNavigation(
@@ -56,12 +60,20 @@ fun AppNavigation(
 ) {
     val activity = (LocalContext.current as? Activity)
 
-
     NavHost(
+        modifier = Modifier.semantics {
+            testTagsAsResourceId = true
+        },
         navController = navController,
         startDestination = Screens.DASHBOARD_SCREEN
     ) {
-        composable(route = Screens.LOGIN_SCREEN) {
+        composable(
+            route = Screens.LOGIN_SCREEN,
+            enterTransition = { scaleInEnterTransition() },
+            exitTransition = { scaleOutExitTransition() },
+            popEnterTransition = { scaleInPopEnterTransition() },
+            popExitTransition = { scaleOutPopExitTransition() },
+        ) {
             LoginScreen(
                 navigateToDashBoard = navController::navigateToDashBoard,
                 navigateToSignUpScreen = navController::navigateToSignUpScreen,
@@ -70,27 +82,57 @@ fun AppNavigation(
                 activity?.finish()
             }
         }
-        composable(route = Screens.SIGNUP_SCREEN) {
+        composable(
+            route = Screens.SIGNUP_SCREEN,
+            enterTransition = { scaleInEnterTransition() },
+            exitTransition = { scaleOutExitTransition() },
+            popEnterTransition = { scaleInPopEnterTransition() },
+            popExitTransition = { scaleOutPopExitTransition() },
+        ) {
             SignUpScreen(
                 navigateToLoginScreen = navController::navigateToLoginScreen,
             )
         }
-        composable(route = Screens.SEARCH_SCREEN) {
+        composable(
+            route = Screens.SEARCH_SCREEN,
+            enterTransition = { scaleInEnterTransition() },
+            exitTransition = { scaleOutExitTransition() },
+            popEnterTransition = { scaleInPopEnterTransition() },
+            popExitTransition = { scaleOutPopExitTransition() },
+        ) {
             SearchScreen(
                 navigateToPostScreen = navController::navigateToPostScreen,
                 navigateToAuthorProfileScreen = navController::navigateToAuthorProfileScreen,
             )
         }
-        composable(route = Screens.POST_SCREEN + "/{postId}") {
+        composable(
+            route = Screens.POST_SCREEN + "/{postId}",
+            enterTransition = { scaleInEnterTransition() },
+            exitTransition = { scaleOutExitTransition() },
+            popEnterTransition = { scaleInPopEnterTransition() },
+            popExitTransition = { scaleOutPopExitTransition() },
+        ) {
             PostScreen()
         }
-        composable(route = Screens.AUTHOR_PROFILE_SCREEN + "/{userId}") {
+        composable(
+            route = Screens.AUTHOR_PROFILE_SCREEN + "/{userId}",
+            enterTransition = { scaleInEnterTransition() },
+            exitTransition = { scaleOutExitTransition() },
+            popEnterTransition = { scaleInPopEnterTransition() },
+            popExitTransition = { scaleOutPopExitTransition() },
+        ) {
             AuthorProfileScreen(
                 navigateToPostScreen = navController::navigateToPostScreen,
                 navigateToAuthorFollowerFollowingScreen = navController::navigateToAuthorProfileFollowingScreen
             )
         }
-        composable(route = Screens.AUTHOR_FOLLOWER_FOLLOWING_SCREEN + "/{userId}" + "/{type}") {
+        composable(
+            route = Screens.AUTHOR_FOLLOWER_FOLLOWING_SCREEN + "/{userId}" + "/{type}",
+            enterTransition = { scaleInEnterTransition() },
+            exitTransition = { scaleOutExitTransition() },
+            popEnterTransition = { scaleInPopEnterTransition() },
+            popExitTransition = { scaleOutPopExitTransition() },
+        ) {
             val type = it.arguments?.getString("type")
                 ?: throw IllegalStateException("Type data missing.")
             val userId = it.arguments?.getString("type")
@@ -101,10 +143,22 @@ fun AppNavigation(
                 userId = userId,
             )
         }
-        composable(route = Screens.CATEGORY_SCREEN + "/{category}") {
+        composable(
+            route = Screens.CATEGORY_SCREEN + "/{category}",
+            enterTransition = { scaleInEnterTransition() },
+            exitTransition = { scaleOutExitTransition() },
+            popEnterTransition = { scaleInPopEnterTransition() },
+            popExitTransition = { scaleOutPopExitTransition() },
+        ) {
             CategoryScreen()
         }
-        composable(route = Screens.PROFILE_FOLLOWER_FOLLOWING_SCREEN + "/{type}"){
+        composable(
+            route = Screens.PROFILE_FOLLOWER_FOLLOWING_SCREEN + "/{type}",
+            enterTransition = { scaleInEnterTransition() },
+            exitTransition = { scaleOutExitTransition() },
+            popEnterTransition = { scaleInPopEnterTransition() },
+            popExitTransition = { scaleOutPopExitTransition() },
+        ){
             val type = it.arguments?.getString("type")
                 ?: throw IllegalStateException("Type data missing.")
             ProfileFollowerFollowingScreen(
@@ -115,6 +169,10 @@ fun AppNavigation(
 
         composable(
             route = Screens.ADD_NEW_POST_SCREEN + "?draftId={draftId}",
+            enterTransition = { scaleInEnterTransition() },
+            exitTransition = { scaleOutExitTransition() },
+            popEnterTransition = { scaleInPopEnterTransition() },
+            popExitTransition = { scaleOutPopExitTransition() },
             arguments = listOf(
                 navArgument(name = "draftId") {
                     type = NavType.IntType
@@ -133,7 +191,11 @@ fun AppNavigation(
 
         }
         composable(
-            route = Screens.DRAFT_SCREEN
+            route = Screens.DRAFT_SCREEN,
+            enterTransition = { scaleInEnterTransition() },
+            exitTransition = { scaleOutExitTransition() },
+            popEnterTransition = { scaleInPopEnterTransition() },
+            popExitTransition = { scaleOutPopExitTransition() },
         ) {
             DraftScreen(
                 navigateToAddPostScreen = navController::navigateToAddPostScreen,
@@ -150,7 +212,11 @@ fun AppNavigation(
 
         }
         composable(
-            route = Screens.SETTINGS_SCREEN
+            route = Screens.SETTINGS_SCREEN,
+            enterTransition = { scaleInEnterTransition() },
+            exitTransition = { scaleOutExitTransition() },
+            popEnterTransition = { scaleInPopEnterTransition() },
+            popExitTransition = { scaleOutPopExitTransition() },
         ) {
             SettingsScreen(
                 navigateHome = navController::navigateToDashBoard,
@@ -159,18 +225,30 @@ fun AppNavigation(
 
         }
         composable(
-            route = Screens.ABOUT_SCREEN
+            route = Screens.ABOUT_SCREEN,
+            enterTransition = { scaleInEnterTransition() },
+            exitTransition = { scaleOutExitTransition() },
+            popEnterTransition = { scaleInPopEnterTransition() },
+            popExitTransition = { scaleOutPopExitTransition() },
         ) {
             AboutScreen()
         }
         composable(
-            route = Screens.EDIT_PROFILE_SCREEN
+            route = Screens.EDIT_PROFILE_SCREEN,
+            enterTransition = { scaleInEnterTransition() },
+            exitTransition = { scaleOutExitTransition() },
+            popEnterTransition = { scaleInPopEnterTransition() },
+            popExitTransition = { scaleOutPopExitTransition() },
         ){
             EditProfileScreen()
         }
 
         composable(
             route = Screens.EDIT_POST_SCREEN,
+            enterTransition = { scaleInEnterTransition() },
+            exitTransition = { scaleOutExitTransition() },
+            popEnterTransition = { scaleInPopEnterTransition() },
+            popExitTransition = { scaleOutPopExitTransition() },
         ){
             val post = navController.previousBackStackEntry?.savedStateHandle?.get<Post>(key ="post")
             EditPostScreen(post = post)

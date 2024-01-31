@@ -30,7 +30,7 @@ fun User.toFollowingEntity(): FollowingUserEntity {
         username = username,
         createdAt = createdAt,
         updatedAt= updatedAt,
-        _count = _count
+        _count = count
     )
 }
 
@@ -44,7 +44,7 @@ fun FollowerUser.toFollowingEntity(): FollowingUserEntity {
         username = username,
         createdAt = createdAt,
         updatedAt= updatedAt,
-        _count = _count
+        _count = count
     )
 }
 fun FollowingUserEntity.toFollower(): FollowerUser {
@@ -57,7 +57,7 @@ fun FollowingUserEntity.toFollower(): FollowerUser {
         username = username,
         createdAt = createdAt,
         updatedAt= updatedAt,
-        _count = _count
+        count = _count
     )
 }
 
@@ -71,7 +71,7 @@ fun FollowingUserEntity.toUser(): User {
         username = username,
         createdAt = createdAt,
         updatedAt= updatedAt,
-        _count = _count,
+        count = _count,
         deviceTokens = emptyList()
     )
 }
