@@ -125,13 +125,13 @@ fun SignUpScreenContent(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Blogger App",
+                    text = stringResource(id = R.string.app_name),
                     fontSize = 30.sp,
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
-                    text = "Sign Up",
+                    text = stringResource(id = R.string.signup),
                     fontSize = 24.sp,
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold,
@@ -143,7 +143,9 @@ fun SignUpScreenContent(
                         onChangeUsername(it)
 
                     },
-                    label = { Text("Username") }
+                    label = {
+                        Text(text = stringResource(id = R.string.username))
+                    }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
@@ -152,7 +154,9 @@ fun SignUpScreenContent(
                     onValueChange = {
                         onChangeFullName(it)
                     },
-                    label = { Text("Full Name") }
+                    label = {
+                        Text(text = stringResource(id = R.string.fullName))
+                    }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
@@ -162,7 +166,7 @@ fun SignUpScreenContent(
                         onChangeEmail(it)
 
                     },
-                    label = { Text("Email Address") }
+                    label = { Text(text = stringResource(id = R.string.email)) }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(

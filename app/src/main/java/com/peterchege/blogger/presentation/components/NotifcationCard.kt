@@ -23,10 +23,17 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Message
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,6 +57,7 @@ fun NotificationCard(
 ) {
     Card (
         modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.elevatedCardElevation(),
         colors = CardColors(
             containerColor = MaterialTheme.colorScheme.onPrimary,
             contentColor = MaterialTheme.colorScheme.onBackground,
@@ -57,10 +65,23 @@ fun NotificationCard(
             disabledContainerColor = MaterialTheme.colorScheme.onBackground
         )
     ){
+        val imageVector = if (notification.notificationType == "Like")
+            Icons.Default.Favorite
+        else if (notification.notificationType =="Comment")
+            Icons.Default.Message
+        else
+            Icons.Default.Info
         Row (
-            modifier = Modifier.fillMaxWidth().padding(5.dp),
-            horizontalArrangement = Arrangement.End,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 15.dp, vertical = 5.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
         ){
+            Icon(
+                modifier = Modifier.size(26.dp),
+                imageVector = imageVector,
+                contentDescription = null
+            )
             Text(
                 text = convertUtcDateStringToReadable(notification.createdAt),
                 textAlign = TextAlign.Start,

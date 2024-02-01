@@ -55,6 +55,10 @@ class NotificationScreenViewModel @Inject constructor(
     private val authRepository: AuthRepository,
 ) : ViewModel() {
 
+    private val _activeNotificationFilter = MutableStateFlow("All")
+    val activeNotificationFilter = _activeNotificationFilter.asStateFlow()
+
+
     val isUserLoggedIn  = authRepository.isUserLoggedIn
         .stateIn(
             scope = viewModelScope,
@@ -103,4 +107,7 @@ class NotificationScreenViewModel @Inject constructor(
         ).flow.cachedIn(viewModelScope)
     }
 
+    fun setNotificationFilter(notificationFilter:String){
+        _activeNotificationFilter.update { notificationFilter }
+    }
 }

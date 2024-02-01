@@ -178,6 +178,7 @@ dependencies {
     implementation("com.jakewharton.timber:timber:5.0.1")
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.13")
 
+    implementation ("com.airbnb.android:lottie-compose:6.3.0")
 
     debugImplementation("com.github.chuckerteam.chucker:library:4.0.0")
     releaseImplementation("com.github.chuckerteam.chucker:library-no-op:4.0.0")

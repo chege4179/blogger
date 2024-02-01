@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -59,31 +60,41 @@ class SignUpScreenViewModel @Inject constructor(
 
     fun onChangePasswordVisibility() {
         val initialState = _uiState.value.isPasswordVisible
-        _uiState.value = _uiState.value.copy(isPasswordVisible = !initialState)
+        _uiState.update {
+            it.copy(isPasswordVisible = !initialState)
+        }
     }
 
     fun onChangeUsername(text: String) {
-        _uiState.value = _uiState.value.copy(username = text)
+        _uiState.update {
+            it.copy(username = text)
+        }
     }
 
     fun onChangePassword(text: String) {
-        _uiState.value = _uiState.value.copy(password = text)
-
+        _uiState.update {
+            it.copy(password = text)
+        }
     }
 
     fun onChangePasswordConfirm(text: String) {
-        _uiState.value = _uiState.value.copy(confirmPassword = text)
+        _uiState.update {
+            it.copy(confirmPassword = text)
+        }
 
     }
 
     fun onChangeEmail(text: String) {
-        _uiState.value = _uiState.value.copy(email = text)
+        _uiState.update {
+            it.copy(email = text)
+        }
 
     }
 
     fun onChangeFullName(text: String) {
-        _uiState.value = _uiState.value.copy(fullName = text)
-
+        _uiState.update {
+            it.copy(fullName = text)
+        }
     }
 
     fun signUpUser(navigateToLoginScreen:() -> Unit,) {

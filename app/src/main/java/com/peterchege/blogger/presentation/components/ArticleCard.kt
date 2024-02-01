@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -165,8 +166,7 @@ fun ArticleCard(
                             val annotatedText = buildAnnotatedString {
                                 append("By: ")
                                 pushStyle(SpanStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp))
-                                append(post.postAuthor.fullName)
-                                pop()
+                                append(post.postAuthor.username)
                             }
                             Text(
                                 text = annotatedText,
@@ -175,8 +175,7 @@ fun ArticleCard(
                                     .clickable {
                                         onProfileNavigate(post.postAuthor.userId)
                                     },
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp
+                                fontSize = 16.sp
 
                             )
                         }
@@ -190,6 +189,16 @@ fun ArticleCard(
                             .fillMaxHeight()
 
                     ) {
+                        Text(
+                            text = post.count.views.toString(),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        CustomIconButton(
+                            imageVector = Icons.Default.RemoveRedEye,
+                            contentDescription = stringResource(id = R.string.views),
+                            onClick = { }
+                        )
                         if (isProfile) {
                             CustomIconButton(
                                 imageVector = Icons.Default.Edit,
@@ -198,7 +207,6 @@ fun ArticleCard(
                                 },
                                 contentDescription = stringResource(id = R.string.edit_post_description)
                             )
-
                             CustomIconButton(
                                 imageVector = Icons.Filled.Delete,
                                 contentDescription = stringResource(id = R.string.delete_post_description),
@@ -212,6 +220,11 @@ fun ArticleCard(
                                 }
                             )
                         } else {
+                            Text(
+                                text = post.count.likes.toString(),
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                            )
                             CustomIconButton(
                                 imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                                 onClick = {

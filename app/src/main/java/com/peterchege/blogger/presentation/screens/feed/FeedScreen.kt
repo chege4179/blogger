@@ -247,22 +247,22 @@ fun FeedScreenContent(
                     .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(5.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    items(items = categories) { category ->
-                        CategoryCard(
-                            modifier = Modifier.height(30.dp),
-                            navigateToCategoryScreen = navigateToCategoryScreen,
-                            categoryItem = category
-                        )
-                        Spacer(modifier = Modifier.width(10.dp))
-
-                    }
-                }
+//                LazyRow(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(5.dp),
+//                    verticalAlignment = Alignment.CenterVertically,
+//                ) {
+//                    items(items = categories) { category ->
+//                        CategoryCard(
+//                            modifier = Modifier.height(30.dp),
+//                            navigateToCategoryScreen = navigateToCategoryScreen,
+//                            categoryItem = category
+//                        )
+//                        Spacer(modifier = Modifier.width(10.dp))
+//
+//                    }
+//                }
                 when (uiState) {
                     is FeedScreenUiState.Empty -> {
                         ErrorComponent(

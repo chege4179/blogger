@@ -17,6 +17,8 @@ package com.peterchege.blogger.presentation.screens.post
 
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -63,6 +65,8 @@ import com.peterchege.blogger.presentation.alertDialogs.ReplyCommentDialog
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.components.postCommentsSection
+import com.peterchege.blogger.presentation.navigation.scaleInEnterTransition
+import com.peterchege.blogger.presentation.navigation.scaleOutExitTransition
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
@@ -141,7 +145,7 @@ fun PostScreen(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @ExperimentalCoilApi
 @Composable
@@ -250,7 +254,11 @@ fun PostScreenContent(
                     )
                 }
 
-                if (commentUiState.isCommentDialogVisible) {
+                AnimatedVisibility(
+                    visible = commentUiState.isCommentDialogVisible,
+                    enter = scaleInEnterTransition() ,
+                    exit =  scaleOutExitTransition()
+                ) {
                     CommentDialog(
                         closeCommentDialog = { closeCommentDialog() },
                         commentUiState = commentUiState,
@@ -259,7 +267,6 @@ fun PostScreenContent(
                         isUserLoggedIn = uiState.isUserLoggedIn,
                     )
                 }
-
                 LazyColumn(
                     modifier = Modifier.padding(paddingValues)
                 ) {

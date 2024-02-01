@@ -26,6 +26,7 @@
     <string name="like_comment_description">Like this comment</string>
     <string name="delete_draft_description">Delete this draft</string>
     <string name="more_description">More about this setting</string>
+    <string name="views">Views</string>
 
     <!--  Image Content Description  -->
     <string name="post_image">Image Header for the Post</string>
@@ -75,6 +76,9 @@
     <string name="password">Password</string>
     <string name="signup">Sign Up</string>
     <string name="confirm_password">Confirm Password</string>
+    <string name="username">Username</string>
+    <string name="fullName">Full Name</string>
+
 
     <!--  Notifications  -->
 
@@ -97,6 +101,7 @@
     <string name="sign_out_button_text">Sign Out</string>
 
     <string name="retry">Retry</string>
+
 
 
     <string name="following_button_text">Following</string>
@@ -126,5 +131,6 @@
     <string name="system_default">System Default</string>
     <string name="light">Light</string>
     <string name="dark">Dark</string>
+
 
 </resources>

@@ -117,8 +117,10 @@ fun DashBoardScreen(
                 onItemClick = {
                     bottomNavController.navigate(it.route) {
                         launchSingleTop = true
+                        restoreState = true
                         popUpTo(bottomNavController.graph.findStartDestination().id) {
                             saveState = true
+
                         }
                     }
                 }
