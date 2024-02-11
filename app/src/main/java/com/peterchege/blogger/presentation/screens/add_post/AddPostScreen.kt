@@ -21,6 +21,7 @@ import android.content.*
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -135,14 +136,14 @@ fun AddPostScreenContent(
 
 
     ) {
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        if (uri != null) {
-            onChangeImageUri(uri)
+    val photoPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) {
+        if (it != null) {
+            onChangeImageUri(it)
         }
-
     }
+
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(key1 = true) {
@@ -221,7 +222,7 @@ fun AddPostScreenContent(
                                     Button(
                                         modifier = Modifier.fillMaxWidth(0.95f),
                                         onClick = {
-                                            launcher.launch("image/*")
+                                            photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                                         }) {
                                         Text(text = stringResource(id = R.string.select_image_text))
                                     }
