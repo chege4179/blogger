@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 class NetworkInfoRepositoryImpl @Inject constructor(
@@ -81,7 +82,6 @@ class NetworkInfoRepositoryImpl @Inject constructor(
 
 
     override val isOnline: Flow<Boolean> = callbackFlow {
-
         if (connectivityManager == null) {
             channel.trySend(false)
             channel.close()

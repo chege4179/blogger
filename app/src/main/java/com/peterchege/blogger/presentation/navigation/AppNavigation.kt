@@ -199,6 +199,7 @@ fun AppNavigation(
         ) {
             DraftScreen(
                 navigateToAddPostScreen = navController::navigateToAddPostScreen,
+                navigateBack = navController::popBackStack
             )
         }
 

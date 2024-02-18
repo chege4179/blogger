@@ -74,12 +74,14 @@ fun CommentDialog(
 
         },
         confirmButton = {
-            TextButton(
-                onClick = {
-                    postComment()
+            if (isUserLoggedIn){
+                TextButton(
+                    onClick = {
+                        postComment()
+                    }
+                ) {
+                    Text(text = stringResource(id = R.string.comment))
                 }
-            ) {
-                Text(text = stringResource(id = R.string.comment))
             }
         },
         dismissButton = {

@@ -63,7 +63,10 @@ import com.peterchege.blogger.presentation.theme.LightIconColor
 import com.peterchege.blogger.R
 
 @OptIn(ExperimentalCoilApi::class)
-@Preview
+@Preview(
+    showSystemUi = true,
+
+)
 @Composable
 fun ArticleCardPreview() {
     ArticleCard(
@@ -189,16 +192,6 @@ fun ArticleCard(
                             .fillMaxHeight()
 
                     ) {
-                        Text(
-                            text = post.count.views.toString(),
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
-                        CustomIconButton(
-                            imageVector = Icons.Default.RemoveRedEye,
-                            contentDescription = stringResource(id = R.string.views),
-                            onClick = { }
-                        )
                         if (isProfile) {
                             CustomIconButton(
                                 imageVector = Icons.Default.Edit,
@@ -220,11 +213,6 @@ fun ArticleCard(
                                 }
                             )
                         } else {
-                            Text(
-                                text = post.count.likes.toString(),
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold,
-                            )
                             CustomIconButton(
                                 imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                                 onClick = {

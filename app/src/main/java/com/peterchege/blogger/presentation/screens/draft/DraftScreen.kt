@@ -21,6 +21,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -33,6 +36,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.peterchege.blogger.R
+import com.peterchege.blogger.core.room.entities.DraftPost
+import com.peterchege.blogger.presentation.alertDialogs.DeleteDraftDialog
+import com.peterchege.blogger.presentation.components.CustomIconButton
 import com.peterchege.blogger.presentation.components.DraftCard
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
@@ -41,14 +47,19 @@ import com.peterchege.blogger.presentation.theme.defaultPadding
 
 @Composable
 fun DraftScreen(
-    navigateToAddPostScreen:(Int) -> Unit,
+    navigateToAddPostScreen: (Int) -> Unit,
+    navigateBack: () -> Unit,
     viewModel: DraftScreenViewModel = hiltViewModel()
-){
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val deleteDraftState by viewModel.deleteDraftUiState.collectAsStateWithLifecycle()
     DraftScreenContent(
         navigateToAddPostScreen = navigateToAddPostScreen,
-        deleteDraft = { viewModel.deleteDraft(it) },
-        uiState = uiState
+        uiState = uiState,
+        deleteDraftState = deleteDraftState,
+        deleteDraft = viewModel::deleteDraft,
+        toggleDeleteDraftDialog = viewModel::toggleDeleteDraftVisibility,
+        navigateBack = navigateBack
     )
 
 }
@@ -57,52 +68,74 @@ fun DraftScreen(
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun DraftScreenContent(
-    navigateToAddPostScreen:(Int) -> Unit,
-    deleteDraft:(Int) -> Unit,
+    navigateToAddPostScreen: (Int) -> Unit,
+    deleteDraft: (Int) -> Unit,
+    deleteDraftState: DeleteDraftState,
     uiState: DraftsScreenUiState,
-){
+    toggleDeleteDraftDialog: (DraftPost?) -> Unit,
+    navigateBack:() -> Unit,
+) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
+                navigationIcon = {
+                    CustomIconButton(imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(id = R.string.go_back),
+                        onClick = navigateBack
+                    )
+                },
                 title = {
-                    Text(text= stringResource(id = R.string.draft_screen_header))
+                    Text(text = stringResource(id = R.string.draft_screen_header))
                 }
-                )
+            )
         }
     ) { paddingValues ->
-        when(uiState){
+        when (uiState) {
             is DraftsScreenUiState.Loading -> {
                 LoadingComponent()
             }
+
             is DraftsScreenUiState.Error -> {
                 ErrorComponent(
                     retryCallback = { /*TODO*/ },
                     errorMessage = uiState.message
                 )
             }
+
             is DraftsScreenUiState.Success -> {
+                if (deleteDraftState.selectedDraftToBeDeleted != null) {
+                    DeleteDraftDialog(
+                        draftPost = deleteDraftState.selectedDraftToBeDeleted,
+                        onDeleteDraftConfirm = {
+                            deleteDraftState.selectedDraftToBeDeleted.id?.let {
+                                deleteDraft(it)
+                            }
+                        },
+                        onDismiss = { toggleDeleteDraftDialog(null) }
+                    )
+                }
                 val drafts = uiState.drafts
-                if (drafts.isEmpty()){
-                    Box(modifier = Modifier.fillMaxSize()){
+                if (drafts.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxSize()) {
                         Text(
                             text = stringResource(id = R.string.empty_draft_message),
                             modifier = Modifier.align(Alignment.Center)
                         )
                     }
-                }else{
+                } else {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(paddingValues = paddingValues)
                             .padding(defaultPadding)
-                    ){
-                        items(items = drafts){ draft ->
+                    ) {
+                        items(items = drafts) { draft ->
                             DraftCard(
                                 draftRecord = draft,
                                 navigateToAddPostScreen = navigateToAddPostScreen,
                                 onDeleteDraft = {
-                                    deleteDraft(it)
+                                    toggleDeleteDraftDialog(draft)
                                 }
                             )
                         }
