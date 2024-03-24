@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.peterchege.blogger.core.analytics.analytics
-
-import com.peterchege.blogger.core.analytics.analytics.AnalyticsEvent
+package com.peterchege.blogger.core.firebase.analytics
 
 /**
  * Interface for logging analytics events. See `FirebaseAnalyticsHelper` and

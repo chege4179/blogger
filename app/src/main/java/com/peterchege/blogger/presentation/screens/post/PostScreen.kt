@@ -42,6 +42,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -53,6 +54,7 @@ import com.peterchege.blogger.R
 import com.peterchege.blogger.core.api.responses.models.CommentWithUser
 import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.api.responses.models.User
+import com.peterchege.blogger.core.fake.dummyPostList
 import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.core.util.calculateDoubleTapOffset
 import com.peterchege.blogger.core.util.calculateNewOffset
@@ -62,13 +64,16 @@ import com.peterchege.blogger.domain.mappers.toPost
 import com.peterchege.blogger.presentation.alertDialogs.CommentDialog
 import com.peterchege.blogger.presentation.alertDialogs.DeleteCommentDialog
 import com.peterchege.blogger.presentation.alertDialogs.ReplyCommentDialog
+import com.peterchege.blogger.presentation.components.AppBackgroundImage
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.components.postCommentsSection
 import com.peterchege.blogger.presentation.navigation.scaleInEnterTransition
 import com.peterchege.blogger.presentation.navigation.scaleOutExitTransition
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flowOf
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
@@ -170,7 +175,7 @@ fun PostScreenContent(
     setCommentToRepliedTo: (CommentWithUser?) -> Unit,
     addCommentParticipants: (List<String>) -> Unit,
     replyToComment: (() -> Unit) -> Unit,
-    likeComment:(String,String,() -> Unit) -> Unit,
+    likeComment: (String, String, () -> Unit) -> Unit,
 ) {
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -192,6 +197,7 @@ fun PostScreenContent(
         }
     }
     Scaffold(
+        containerColor = Color.Transparent,
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
@@ -256,8 +262,8 @@ fun PostScreenContent(
 
                 AnimatedVisibility(
                     visible = commentUiState.isCommentDialogVisible,
-                    enter = scaleInEnterTransition() ,
-                    exit =  scaleOutExitTransition()
+                    enter = scaleInEnterTransition(),
+                    exit = scaleOutExitTransition()
                 ) {
                     CommentDialog(
                         closeCommentDialog = { closeCommentDialog() },
@@ -468,8 +474,8 @@ fun PostScreenContent(
                         setCommentToBeRepliedTo = setCommentToRepliedTo,
                         toggleReplyCommentDialog = toggleReplyCommentDialog,
                         addParticipants = addCommentParticipants,
-                        likeComment = { commentId,userId ->
-                            likeComment(commentId,userId, { comments.refresh() })
+                        likeComment = { commentId, userId ->
+                            likeComment(commentId, userId, { comments.refresh() })
                         }
                     )
                 }
@@ -478,4 +484,37 @@ fun PostScreenContent(
             else -> {}
         }
     }
+}
+
+@Preview
+@Composable
+fun PostScreenContentPreview() {
+
+    PostScreenContent(
+        uiState = PostScreenUiState.Success(
+            post = dummyPostList[0],
+            isUserLoggedIn = false,
+            comments = flowOf()
+        ),
+        commentUiState = CommentUiState(),
+        toggleDeleteCommentDialog = { /*TODO*/ },
+        onLikePost = {},
+        onUnlikePost = {},
+        onChangeNewComment = {},
+        savePost = {},
+        unSavePost = {},
+        openCommentDialog = { /*TODO*/ },
+        closeCommentDialog = { /*TODO*/ },
+        eventFlow = MutableSharedFlow(),
+        user = null,
+        postComment = {},
+        deleteComment = {},
+        setCommentToBeDeleted = {},
+        onChangeReplyComment = {},
+        toggleReplyCommentDialog = { /*TODO*/ },
+        setCommentToRepliedTo = {},
+        addCommentParticipants = {},
+        replyToComment = {},
+        likeComment = {_,_,_ ->}
+    )
 }

@@ -19,15 +19,12 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
-import androidx.hilt.work.HiltWorkerFactory
-import androidx.work.Configuration
-import androidx.work.WorkManager
 import com.peterchege.blogger.BuildConfig
-import com.peterchege.blogger.core.analytics.crashlytics.CrashlyticsTree
+import com.peterchege.blogger.core.firebase.config.RemoteFeatureToggle
+import com.peterchege.blogger.core.firebase.crashlytics.CrashlyticsTree
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.ProfileVerifierLogger
 import com.peterchege.blogger.core.work.WorkConstants
-import com.peterchege.blogger.core.work.WorkInitializer
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 import javax.inject.Inject
@@ -35,15 +32,17 @@ import javax.inject.Inject
 
 @HiltAndroidApp
 class BloggerApp :Application(){
+    @Inject
+    lateinit var remoteFeatureToggle: RemoteFeatureToggle
 
-//    @Inject
-//    lateinit var workerFactory: HiltWorkerFactory
 
     @Inject
     lateinit var profileVerifierLogger: ProfileVerifierLogger
 
     override fun onCreate() {
         super.onCreate()
+        remoteFeatureToggle.sync()
+        remoteFeatureToggle.checkForUpdates()
         initTimber()
         setUpNotificationChannel()
         profileVerifierLogger()

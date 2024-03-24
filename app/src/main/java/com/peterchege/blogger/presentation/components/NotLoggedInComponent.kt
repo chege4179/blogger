@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,14 +34,13 @@ import com.peterchege.blogger.R
 
 @Composable
 fun NotLoggedInComponent(
-    navigateToLoginScreen:() -> Unit,
-    navigateToSignUpScreen:() -> Unit,
+    navigateToLoginScreen: () -> Unit,
+    navigateToSignUpScreen: () -> Unit,
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(10.dp)
-        ,
+            .padding(10.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
 
@@ -49,9 +49,8 @@ fun NotLoggedInComponent(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
-            onClick = {
-                navigateToLoginScreen()
-            }
+            shape = RoundedCornerShape(8.dp),
+            onClick = navigateToLoginScreen
         ) {
             Text(text = stringResource(id = R.string.login))
         }
@@ -60,10 +59,8 @@ fun NotLoggedInComponent(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
-            onClick = {
-
-                navigateToSignUpScreen()
-            }
+            shape = RoundedCornerShape(8.dp),
+            onClick = navigateToSignUpScreen
         ) {
             Text(text = stringResource(id = R.string.signup))
         }

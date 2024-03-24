@@ -40,6 +40,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -62,7 +63,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import com.peterchege.blogger.R
+import com.peterchege.blogger.core.fake.dummyPostList
 import com.peterchege.blogger.core.util.setTagAndId
+import com.peterchege.blogger.domain.models.PostUI
+import com.peterchege.blogger.presentation.components.AppBackgroundImage
+import com.peterchege.blogger.presentation.theme.BloggerTheme
+import kotlinx.coroutines.flow.MutableSharedFlow
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
@@ -190,12 +196,11 @@ fun FeedScreenContent(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         modifier = Modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
             .semantics {
                 testTagsAsResourceId = true
-            }
-            .fillMaxSize()
-            .background(Color.DarkGray)
-            .nestedScroll(scrollBehavior.nestedScrollConnection),
+            },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
@@ -211,9 +216,7 @@ fun FeedScreenContent(
                     CustomIconButton(
                         imageVector = Icons.Filled.Search,
                         contentDescription = stringResource(id = R.string.search_icon_description),
-                        onClick = {
-                            navigateToSearchScreen()
-                        }
+                        onClick = navigateToSearchScreen
                     )
                 },
                 scrollBehavior = scrollBehavior
@@ -239,12 +242,14 @@ fun FeedScreenContent(
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color.Transparent)
                 .padding(paddingValues = paddingValues)
                 .nestedScroll(pullRefreshState.nestedScrollConnection)
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .background(Color.Transparent),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
 //                LazyRow(
@@ -285,6 +290,7 @@ fun FeedScreenContent(
                     is FeedScreenUiState.Success -> {
                         LazyColumn(
                             modifier = Modifier
+
                                 .setTagAndId("feed")
                                 .fillMaxSize()
                                 .padding(defaultPadding)
@@ -329,7 +335,84 @@ fun FeedScreenContent(
                 modifier = Modifier.align(Alignment.TopCenter),
             )
         }
-
-
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Composable
+fun FeedScreenPreviewLightTheme() {
+    BloggerTheme {
+        AppBackgroundImage()
+        FeedScreenContent(
+            navigateToPostScreen = {},
+            navigateToAuthUserProfileScreen = { /*TODO*/ },
+            navigateToAuthorProfileScreen = {},
+            navigateToAddPostScreen = { /*TODO*/ },
+            navigateToSearchScreen = { /*TODO*/ },
+            navigateToCategoryScreen = {},
+            uiState = FeedScreenUiState.Success(posts = dummyPostList),
+            eventFlow = MutableSharedFlow(),
+            networkStatus = NetworkStatus.Connected,
+            pullRefreshState = rememberPullToRefreshState(),
+            retryCallback = { /*TODO*/ },
+            bookmarkPost = {},
+            unBookmarkPost = {},
+            likePost = {},
+            unLikePost = {}
+        )
+    }
+
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalCoilApi::class)
+@Preview
+@Composable
+fun FeedScreenPreviewDarkTheme() {
+    BloggerTheme(darkTheme = true) {
+        FeedScreenContent(
+            navigateToPostScreen = {},
+            navigateToAuthUserProfileScreen = { /*TODO*/ },
+            navigateToAuthorProfileScreen = {},
+            navigateToAddPostScreen = { /*TODO*/ },
+            navigateToSearchScreen = { /*TODO*/ },
+            navigateToCategoryScreen = {},
+            uiState = FeedScreenUiState.Success(posts = dummyPostList),
+            eventFlow = MutableSharedFlow(),
+            networkStatus = NetworkStatus.Connected,
+            pullRefreshState = rememberPullToRefreshState(),
+            retryCallback = { /*TODO*/ },
+            bookmarkPost = {},
+            unBookmarkPost = {},
+            likePost = {},
+            unLikePost = {}
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(device = "spec:id=reference_tablet,shape=Normal,width=1280,height=800,unit=dp,dpi=240")
+@Composable
+fun FeedScreenPreviewTablet() {
+    BloggerTheme {
+        FeedScreenContent(
+            navigateToPostScreen = {},
+            navigateToAuthUserProfileScreen = { /*TODO*/ },
+            navigateToAuthorProfileScreen = {},
+            navigateToAddPostScreen = { /*TODO*/ },
+            navigateToSearchScreen = { /*TODO*/ },
+            navigateToCategoryScreen = {},
+            uiState = FeedScreenUiState.Success(posts = dummyPostList),
+            eventFlow = MutableSharedFlow(),
+            networkStatus = NetworkStatus.Connected,
+            pullRefreshState = rememberPullToRefreshState(),
+            retryCallback = { /*TODO*/ },
+            bookmarkPost = {},
+            unBookmarkPost = {},
+            likePost = {},
+            unLikePost = {}
+        )
+    }
+
 }

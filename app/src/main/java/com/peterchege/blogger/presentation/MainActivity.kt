@@ -21,10 +21,19 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -34,8 +43,10 @@ import androidx.metrics.performance.JankStats
 import androidx.navigation.compose.rememberNavController
 import coil.annotation.ExperimentalCoilApi
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
+import com.peterchege.blogger.R
 import com.peterchege.blogger.core.services.UploadPostService
 import com.peterchege.blogger.core.util.ThemeConfig
+import com.peterchege.blogger.presentation.components.AppBackgroundImage
 import com.peterchege.blogger.presentation.navigation.AppNavigation
 import com.peterchege.blogger.presentation.theme.BloggerTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -62,11 +73,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             val viewModel: MainActivityViewModel = hiltViewModel()
             val theme by viewModel.theme.collectAsStateWithLifecycle()
+            val navController = rememberNavController()
             BloggerTheme(
                 darkTheme = shouldUseDarkTheme(theme = theme)
             ) {
-                val navController = rememberNavController()
-
+                AppBackgroundImage()
                 AppNavigation(
                     navController = navController,
                     startOSSActivity = {
@@ -74,6 +85,7 @@ class MainActivity : ComponentActivity() {
                     }
                 )
             }
+
         }
 
     }

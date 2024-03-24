@@ -15,13 +15,24 @@
  */
 package com.peterchege.blogger.presentation.components
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import com.peterchege.blogger.R
+import com.peterchege.blogger.core.util.Screens
 
 data class BottomNavItem(
-    val name:String,
-    val route:String,
-    val selectedIcon:ImageVector,
-    val unselectedIcon:ImageVector,
-    val badgeCount:Int = 0,
+    val name: String,
+    val route: String,
+    val selectedIcon: ImageVector,
+    val unselectedIcon: ImageVector,
+    val badgeCount: Int = 0,
 
-)
+    )
+
+

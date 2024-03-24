@@ -17,11 +17,17 @@ package com.peterchege.blogger.domain.repository
 
 import com.peterchege.blogger.core.api.requests.LoginUser
 import com.peterchege.blogger.core.api.requests.LogoutUser
+import com.peterchege.blogger.core.api.requests.OtpTriggerBody
+import com.peterchege.blogger.core.api.requests.ResetPasswordBody
 import com.peterchege.blogger.core.api.requests.SignUpUser
+import com.peterchege.blogger.core.api.requests.ValidateOtpBody
 import com.peterchege.blogger.core.api.responses.models.FollowerUser
 import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.api.responses.responses.LoginResponse
 import com.peterchege.blogger.core.api.responses.responses.LogoutResponse
+import com.peterchege.blogger.core.api.responses.responses.OtpTriggerResponse
+import com.peterchege.blogger.core.api.responses.responses.OtpValidateResponse
+import com.peterchege.blogger.core.api.responses.responses.ResetPasswordResponse
 import com.peterchege.blogger.core.api.responses.responses.SignUpResponse
 import com.peterchege.blogger.core.util.NetworkResult
 import kotlinx.coroutines.flow.Flow
@@ -48,5 +54,16 @@ interface AuthRepository {
 
 
     suspend fun unsetLoggedInUser()
+
+    suspend fun resetPassword(body: ResetPasswordBody):NetworkResult<ResetPasswordResponse>
+
+    suspend fun triggerVerifyEmailOtp(body: OtpTriggerBody):NetworkResult<OtpTriggerResponse>
+
+    suspend fun triggerPasswordResetOtp(body :OtpTriggerBody):NetworkResult<OtpTriggerResponse>
+
+    suspend fun validateVerifyEmailOtp(body: ValidateOtpBody):NetworkResult<OtpValidateResponse>
+
+    suspend fun validatePasswordResetOtp(body:ValidateOtpBody):NetworkResult<OtpValidateResponse>
+
 
 }

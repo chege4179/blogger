@@ -22,6 +22,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.api.interceptor.AuthInterceptor
 import com.peterchege.blogger.core.datastore.preferences.DefaultAuthTokenProvider
+import com.peterchege.blogger.core.firebase.config.RemoteFeatureToggle
 import com.peterchege.blogger.core.util.Constants
 import dagger.Module
 import dagger.Provides
@@ -29,10 +30,12 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -40,6 +43,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
+    val TAG = NetworkModule::class.java.simpleName
 
     @Provides
     @Singleton
@@ -79,7 +83,10 @@ object NetworkModule {
     fun provideUserApi(
         client: OkHttpClient,
         networkJson: Json,
+        remoteFeatureToggle: RemoteFeatureToggle,
     ): BloggerApi {
+        val URL = runBlocking { remoteFeatureToggle.getString("BASE_URL") }
+        Timber.tag(TAG).w("Remote feature config BASE URL ${URL}")
         return Retrofit.Builder()
             .baseUrl(Constants.BASE_URL)
             .client(client)

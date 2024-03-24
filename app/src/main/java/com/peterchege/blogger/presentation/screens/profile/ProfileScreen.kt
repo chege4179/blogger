@@ -35,11 +35,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.SubcomposeAsyncImage
@@ -47,8 +49,11 @@ import coil.compose.rememberImagePainter
 import com.peterchege.blogger.R
 import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.api.responses.models.User
+import com.peterchege.blogger.core.api.responses.models.UserCount
+import com.peterchege.blogger.core.fake.dummyPostList
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.UiEvent
+import com.peterchege.blogger.domain.mappers.toPost
 import com.peterchege.blogger.domain.repository.NetworkStatus
 import com.peterchege.blogger.presentation.alertDialogs.DeletePostDialog
 import com.peterchege.blogger.presentation.components.ArticleCard
@@ -61,8 +66,11 @@ import com.peterchege.blogger.presentation.components.PagingLoader
 import com.peterchege.blogger.presentation.components.ProfileAvatar
 import com.peterchege.blogger.presentation.components.ProfileInfoCount
 import com.peterchege.blogger.presentation.theme.defaultPadding
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoilApi::class)
@@ -126,10 +134,10 @@ fun ProfileScreenContent(
     navigateToSignUpScreen: () -> Unit,
     navigateToSettingsScreen: () -> Unit,
     navigateToEditProfileScreen: () -> Unit,
-    navigateToEditPostScreen:(Post) -> Unit,
-    deletePost:(() -> Unit) -> Unit,
-    eventFlow:SharedFlow<UiEvent>
-    ) {
+    navigateToEditPostScreen: (Post) -> Unit,
+    deletePost: (() -> Unit) -> Unit,
+    eventFlow: SharedFlow<UiEvent>
+) {
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -218,7 +226,7 @@ fun ProfileScreenContent(
                     DeletePostDialog(
                         post = deletePostUiState.post,
                         closeDeleteDialog = toggleDeletePostDialog,
-                        deletePost = { deletePost{ posts.refresh() } }
+                        deletePost = { deletePost { posts.refresh() } }
                     )
                 }
                 Box(
@@ -324,7 +332,7 @@ fun ProfileScreenContent(
                             val post = posts[position]
                             if (post != null) {
                                 ArticleCard(
-                                    post = post,
+                                    post = post!!,
                                     onItemClick = {
                                         navigateToPostScreen(post.postId)
                                     },
@@ -343,8 +351,9 @@ fun ProfileScreenContent(
                                     isSaved = false,
                                     isProfile = true
                                 )
+                                Spacer(modifier = Modifier.padding(5.dp))
                             }
-                            Spacer(modifier = Modifier.padding(5.dp))
+
                         }
                         if (posts.loadState.append is LoadState.Loading) {
                             item {
@@ -356,4 +365,114 @@ fun ProfileScreenContent(
             }
         }
     }
+}
+
+
+@Preview
+@Composable
+fun ProfileScreenPreview() {
+    ProfileScreenContent(
+        deletePostUiState = DeletePostUiState(),
+        toggleDeletePostDialog = { /*TODO*/ },
+        setDeletePost = {},
+        networkStatus = NetworkStatus.Connected,
+        uiState = ProfileScreenUiState.UserNotLoggedIn,
+        navigateToProfileFollowerFollowingScreen = {},
+        navigateToPostScreen = {},
+        navigateToLoginScreen = { /*TODO*/ },
+        navigateToSignUpScreen = { /*TODO*/ },
+        navigateToSettingsScreen = { /*TODO*/ },
+        navigateToEditProfileScreen = { /*TODO*/ },
+        navigateToEditPostScreen = {},
+        deletePost = {},
+        eventFlow = MutableSharedFlow()
+    )
+
+}
+
+@Preview
+@Composable
+fun ProfileScreenPreview1() {
+    ProfileScreenContent(
+        deletePostUiState = DeletePostUiState(),
+        toggleDeletePostDialog = { /*TODO*/ },
+        setDeletePost = {},
+        networkStatus = NetworkStatus.Connected,
+        uiState = ProfileScreenUiState.Success(
+            user = User(
+                userId = "1234567",
+                email = "peter@gmail.com",
+                fullName = "peter",
+                username = "peter",
+                imageUrl = "https://ui-avatars.com/api/?background=719974&color=fff&name=Peter+Chege&bold=true&fontsize=0.6",
+                createdAt = "2023-12-02T18:55:36.935Z",
+                updatedAt = "2023-12-02T18:55:36.935Z",
+                password = "2023-12-02T18:55:36.935Z",
+                count = UserCount(
+                    followers = 10,
+                    post = dummyPostList.size,
+                    following = 10
+                ),
+                isEmailVerified = true,
+                deviceTokens = emptyList()
+            ),
+            posts = flow { PagingData.from(dummyPostList.map { it.toPost() }) }
+        ),
+        navigateToProfileFollowerFollowingScreen = {},
+        navigateToPostScreen = {},
+        navigateToLoginScreen = { /*TODO*/ },
+        navigateToSignUpScreen = { /*TODO*/ },
+        navigateToSettingsScreen = { /*TODO*/ },
+        navigateToEditProfileScreen = { /*TODO*/ },
+        navigateToEditPostScreen = {},
+        deletePost = {},
+        eventFlow = MutableSharedFlow()
+    )
+
+}
+
+
+@Preview
+@Composable
+fun ProfileScreenPreview2() {
+    ProfileScreenContent(
+        deletePostUiState = DeletePostUiState(
+            isDeletePostDialogOpen = true,
+            post = dummyPostList[0].toPost()
+            
+        ),
+        toggleDeletePostDialog = { /*TODO*/ },
+        setDeletePost = {},
+        networkStatus = NetworkStatus.Connected,
+        uiState = ProfileScreenUiState.Success(
+            user = User(
+                userId = "1234567",
+                email = "peter@gmail.com",
+                fullName = "peter",
+                username = "peter",
+                imageUrl = "https://ui-avatars.com/api/?background=719974&color=fff&name=Peter+Chege&bold=true&fontsize=0.6",
+                createdAt = "2023-12-02T18:55:36.935Z",
+                updatedAt = "2023-12-02T18:55:36.935Z",
+                password = "2023-12-02T18:55:36.935Z",
+                count = UserCount(
+                    followers = 10,
+                    post = dummyPostList.size,
+                    following = 10
+                ),
+                isEmailVerified = true,
+                deviceTokens = emptyList()
+            ),
+            posts = flow { PagingData.from(dummyPostList.map { it.toPost() }) }
+        ),
+        navigateToProfileFollowerFollowingScreen = {},
+        navigateToPostScreen = {},
+        navigateToLoginScreen = { /*TODO*/ },
+        navigateToSignUpScreen = { /*TODO*/ },
+        navigateToSettingsScreen = { /*TODO*/ },
+        navigateToEditProfileScreen = { /*TODO*/ },
+        navigateToEditPostScreen = {},
+        deletePost = {},
+        eventFlow = MutableSharedFlow()
+    )
+
 }

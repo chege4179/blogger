@@ -34,8 +34,11 @@ import com.peterchege.blogger.core.api.responses.responses.LikeCommentResponse
 import com.peterchege.blogger.core.api.responses.responses.LikeResponse
 import com.peterchege.blogger.core.api.responses.responses.LoginResponse
 import com.peterchege.blogger.core.api.responses.responses.LogoutResponse
+import com.peterchege.blogger.core.api.responses.responses.OtpTriggerResponse
+import com.peterchege.blogger.core.api.responses.responses.OtpValidateResponse
 import com.peterchege.blogger.core.api.responses.responses.PostResponse
 import com.peterchege.blogger.core.api.responses.responses.ProfileResponse
+import com.peterchege.blogger.core.api.responses.responses.ResetPasswordResponse
 import com.peterchege.blogger.core.api.responses.responses.SearchPostResponse
 import com.peterchege.blogger.core.api.responses.responses.SearchUserResponse
 import com.peterchege.blogger.core.api.responses.responses.SignUpResponse
@@ -182,6 +185,36 @@ interface BloggerApi {
     suspend fun likeComment(
         @Body likeCommentBody: LikeCommentBody,
     ):Response<LikeCommentResponse>
+
+
+    @POST("/auth/triggerVerifyEmailOtp")
+    suspend fun triggerVerifyEmailOtp(
+        @Body body: OtpTriggerBody
+    ):Response<OtpTriggerResponse>
+
+
+    @POST("/auth/triggerPasswordResetOtp")
+    suspend fun triggerPasswordResetOtp(
+        @Body body: OtpTriggerBody
+    ):Response<OtpTriggerResponse>
+
+
+    @POST("/auth/validatePasswordResetOtp")
+    suspend fun validatePasswordResetOtp(
+        @Body body: ValidateOtpBody
+    ):Response<OtpValidateResponse>
+
+
+    @POST("/auth/validateVerifyEmailOtp")
+    suspend fun validateVerifyEmailOtp(
+        @Body body: ValidateOtpBody
+    ):Response<OtpValidateResponse>
+
+
+    @POST("/auth/resetPassword")
+    suspend fun resetPassword(
+        @Body body: ResetPasswordBody
+    ):Response<ResetPasswordResponse>
 
 
 }

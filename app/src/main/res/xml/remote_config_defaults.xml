@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<defaults>
+  <entry>
+    <key>BASE_URL</key>
+    <value>http://localhost:8081</value>
+  </entry>
+</defaults>

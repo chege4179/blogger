@@ -18,6 +18,8 @@ package com.peterchege.blogger.presentation.screens.signup
 import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -30,10 +32,15 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -41,7 +48,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.peterchege.blogger.R
 import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.presentation.components.CustomIconButton
+import com.peterchege.blogger.presentation.components.OtpComponent
 import com.peterchege.blogger.presentation.theme.defaultPadding
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
@@ -65,12 +74,16 @@ fun SignUpScreen(
         onChangePassword = viewModel::onChangePassword,
         onChangeConfirmPassword = viewModel::onChangePasswordConfirm,
         onChangePasswordVisibility = viewModel::onChangePasswordVisibility,
-        onSubmit = { viewModel.signUpUser(navigateToLoginScreen = navigateToLoginScreen) }
+        onSubmit =viewModel::signUpUser,
+        onChangeOTPInput = viewModel::onChangeOTPInput,
+        onDismissOTP = viewModel::toggleOTPInputVisibility,
+        onSubmitOTP = { viewModel.submitOTPInput(navigateToLoginScreen) }
     )
 
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @ExperimentalComposeUiApi
 @Composable
@@ -85,11 +98,36 @@ fun SignUpScreenContent(
     onChangeConfirmPassword: (String) -> Unit,
     onChangePasswordVisibility: () -> Unit,
     onSubmit: () -> Unit,
+    onSubmitOTP:() -> Unit,
+    onChangeOTPInput:(String) -> Unit,
+    onDismissOTP:() -> Unit,
 
     ) {
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val snackbarHostState = remember { SnackbarHostState() }
+
+    val annotatedString = buildAnnotatedString {
+        withStyle(
+            style = SpanStyle(
+                fontWeight = FontWeight.Normal,
+                fontSize = 17.sp
+            )
+        ) {
+            append("Already have an account ? ")
+        }
+        withStyle(
+            style = SpanStyle(
+                fontWeight = FontWeight.Bold,
+                fontSize = 17.sp,
+                textDecoration = TextDecoration.Underline
+            )
+        ) {
+            pushStringAnnotation(tag = "login", annotation = "login")
+            append("Login")
+        }
+
+    }
 
     LaunchedEffect(key1 = true) {
         eventFlow.collectLatest { event ->
@@ -234,6 +272,7 @@ fun SignUpScreenContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
+                    shape = RoundedCornerShape(8.dp),
                     onClick = {
                         keyboardController?.hide()
                         onSubmit()
@@ -243,15 +282,20 @@ fun SignUpScreenContent(
                     Text(text = stringResource(id = R.string.signup))
                 }
                 Spacer(modifier = Modifier.height(30.dp))
-                TextButton(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    onClick = {
-                        navigateToLoginScreen()
-                    }) {
-                    Text(text = stringResource(id = R.string.login))
-                }
+                ClickableText(
+                    text = annotatedString,
+                    onClick = { offset ->
+                        annotatedString.getStringAnnotations(start = offset, end = offset)
+                            .firstOrNull()
+                            ?.let { span ->
+                                when (span.tag) {
+                                    "login" -> {
+                                        navigateToLoginScreen()
+                                    }
+                                }
+                            }
+                    }
+                )
             }
             if (uiState.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -259,4 +303,39 @@ fun SignUpScreenContent(
 
         }
     }
+    if (uiState.isOtpBottomSheetVisible){
+        ModalBottomSheet(
+            onDismissRequest = onDismissOTP
+        ) {
+            OtpComponent(
+                onSubmitClicked = onSubmitOTP,
+                onCancelClicked = onDismissOTP,
+                otpInputState = uiState.otpInput,
+                otpEmailSentTo = uiState.email,
+                onOtpInputStateChange = onChangeOTPInput
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Preview
+@Composable
+fun SignUpScreenPreview() {
+    SignUpScreenContent(
+        navigateToLoginScreen = { /*TODO*/ },
+        uiState = SignUpFormState(),
+        eventFlow = MutableSharedFlow(),
+        onChangeUsername = {},
+        onChangeEmail = {},
+        onChangeFullName = {},
+        onChangePassword = {},
+        onChangeConfirmPassword = {},
+        onChangePasswordVisibility = { /*TODO*/ },
+        onSubmit = { /*TODO*/ },
+        onSubmitOTP = { /*TODO*/ },
+        onChangeOTPInput = {},
+        onDismissOTP = {}
+    )
+    
 }

@@ -55,7 +55,8 @@ object UserInfoSerializer : Serializer<User?> {
                     deviceTokens = emptyList(),
                     createdAt = "",
                     updatedAt = "",
-                    count = UserCount(0,0,0)
+                    count = UserCount(0,0,0),
+                    isEmailVerified = false
 
                 )
             ).encodeToByteArray()

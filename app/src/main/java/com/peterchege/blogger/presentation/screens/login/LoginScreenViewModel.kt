@@ -18,8 +18,8 @@ package com.peterchege.blogger.presentation.screens.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.messaging.FirebaseMessaging
-import com.peterchege.blogger.core.analytics.analytics.AnalyticsHelper
-import com.peterchege.blogger.core.analytics.analytics.logLoginEvent
+import com.peterchege.blogger.core.firebase.analytics.AnalyticsHelper
+import com.peterchege.blogger.core.firebase.analytics.logLoginEvent
 import com.peterchege.blogger.core.api.requests.LoginUser
 import com.peterchege.blogger.core.datastore.preferences.DefaultAuthTokenProvider
 import com.peterchege.blogger.core.datastore.preferences.DefaultFCMTokenProvider
@@ -28,13 +28,11 @@ import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.NetworkInfoRepository
 import com.peterchege.blogger.domain.repository.NetworkStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await

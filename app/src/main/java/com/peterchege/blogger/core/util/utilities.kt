@@ -16,7 +16,9 @@
 package com.peterchege.blogger.core.util
 
 
+import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.text.format.DateFormat
 import android.widget.Toast
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -32,6 +34,15 @@ import java.util.TimeZone
 
 fun Context.toast(msg:String){
     Toast.makeText(this,msg,Toast.LENGTH_LONG).show()
+}
+
+fun Context.findActivity(): Activity {
+    var context = this
+    while (context is ContextWrapper) {
+        if (context is Activity) return context
+        context = context.baseContext
+    }
+    throw IllegalStateException("no activity")
 }
 
 

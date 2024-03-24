@@ -36,6 +36,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -48,6 +49,7 @@ import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.presentation.alertDialogs.DraftConfirmDialog
 import com.peterchege.blogger.presentation.components.NotLoggedInComponent
 import com.peterchege.blogger.presentation.theme.defaultPadding
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
@@ -303,4 +305,51 @@ fun AddPostScreenContent(
 
     }
 }
+
+@Preview
+@Composable
+fun AddPostScreenPreview1() {
+    AddPostScreenContent(
+        uiState = AddPostScreenUiState.LoggedIn,
+        navigateToDraftScreen = { /*TODO*/ },
+        formState = AddPostFormState(),
+        isUploading = false,
+        eventFlow = MutableSharedFlow(),
+        onChangePostTitle = {},
+        onChangePostBody = {},
+        onChangeImageUri = {},
+        onSubmit = { /*TODO*/ },
+        onBackPress = { /*TODO*/ },
+        onSaveDraftConfirm = { /*TODO*/ },
+        onSaveDraftDismiss = { /*TODO*/ },
+        onCloseDialog = { /*TODO*/ },
+        navigateToLoginScreen = { /*TODO*/ },
+        navigateToSignUpScreen = {}
+    )
+}
+
+@Preview
+@Composable
+fun AddPostScreenPreview2() {
+    AddPostScreenContent(
+        uiState = AddPostScreenUiState.LoggedIn,
+        navigateToDraftScreen = { /*TODO*/ },
+        formState = AddPostFormState(isSaveDraftModalOpen = true),
+        isUploading = false,
+        eventFlow = MutableSharedFlow(),
+        onChangePostTitle = {},
+        onChangePostBody = {},
+        onChangeImageUri = {},
+        onSubmit = { /*TODO*/ },
+        onBackPress = { /*TODO*/ },
+        onSaveDraftConfirm = { /*TODO*/ },
+        onSaveDraftDismiss = { /*TODO*/ },
+        onCloseDialog = { /*TODO*/ },
+        navigateToLoginScreen = { /*TODO*/ },
+        navigateToSignUpScreen = {}
+    )
+
+}
+
+
 

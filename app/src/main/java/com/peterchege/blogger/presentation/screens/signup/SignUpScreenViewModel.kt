@@ -17,11 +17,12 @@ package com.peterchege.blogger.presentation.screens.signup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.peterchege.blogger.core.analytics.analytics.AnalyticsHelper
-import com.peterchege.blogger.core.analytics.analytics.logSignUpEvent
+import com.peterchege.blogger.core.firebase.analytics.AnalyticsHelper
+import com.peterchege.blogger.core.firebase.analytics.logSignUpEvent
+import com.peterchege.blogger.core.api.requests.OtpTriggerBody
 import com.peterchege.blogger.core.api.requests.SignUpUser
+import com.peterchege.blogger.core.api.requests.ValidateOtpBody
 import com.peterchege.blogger.core.util.NetworkResult
-import com.peterchege.blogger.core.util.Screens
 import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.domain.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,8 +32,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 import javax.inject.Inject
 
 data class SignUpFormState(
@@ -43,6 +42,10 @@ data class SignUpFormState(
     val confirmPassword: String = "",
     val isPasswordVisible: Boolean = false,
     val isLoading: Boolean = false,
+
+    val isOtpBottomSheetVisible: Boolean = false,
+    val otpInput: String = "",
+
 
     )
 
@@ -97,7 +100,17 @@ class SignUpScreenViewModel @Inject constructor(
         }
     }
 
-    fun signUpUser(navigateToLoginScreen:() -> Unit,) {
+    fun onChangeOTPInput(text: String) {
+        _uiState.update {
+            it.copy(otpInput = text)
+        }
+    }
+
+    fun toggleOTPInputVisibility() {
+        _uiState.update { it.copy(isOtpBottomSheetVisible = !_uiState.value.isOtpBottomSheetVisible) }
+    }
+
+    fun signUpUser() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
             val confirmPassword = _uiState.value.confirmPassword
@@ -115,24 +128,75 @@ class SignUpScreenViewModel @Inject constructor(
                     email = _uiState.value.email.trim()
                 )
                 val signUpResponse = signUpRepository.signUpUser(signUpUser = signUpUser)
-                when(signUpResponse){
+                when (signUpResponse) {
                     is NetworkResult.Success -> {
                         _uiState.value = _uiState.value.copy(isLoading = false)
                         _eventFlow.emit(UiEvent.ShowSnackbar(message = signUpResponse.data.msg))
                         if (signUpResponse.data.success) {
                             analyticsHelper.logSignUpEvent(email = _uiState.value.email)
-                            navigateToLoginScreen()
+
+                            val response =
+                                signUpRepository.triggerVerifyEmailOtp(OtpTriggerBody(email = _uiState.value.email))
+                            when (response) {
+                                is NetworkResult.Success -> {
+                                    toggleOTPInputVisibility()
+
+                                }
+
+                                is NetworkResult.Error -> {
+
+                                }
+
+                                is NetworkResult.Exception -> {
+
+                                }
+                            }
+
 
                         }
                     }
+
                     is NetworkResult.Error -> {
                         _uiState.value = _uiState.value.copy(isLoading = false)
                         _eventFlow.emit(UiEvent.ShowSnackbar(message = "Server error...Please try again later"))
                     }
+
                     is NetworkResult.Exception -> {
                         _uiState.value = _uiState.value.copy(isLoading = false)
                         _eventFlow.emit(UiEvent.ShowSnackbar(message = "Could not connect to the server...Please try again later"))
                     }
+                }
+            }
+        }
+    }
+
+    fun submitOTPInput(navigateToLoginScreen: () -> Unit) {
+
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true)
+            val response = signUpRepository.validateVerifyEmailOtp(
+                ValidateOtpBody(
+                    email = _uiState.value.email,
+                    otpPassword = _uiState.value.otpInput
+                )
+            )
+            when(response){
+                is NetworkResult.Success -> {
+                    _uiState.value = _uiState.value.copy(isLoading = false)
+                    if (response.data.success){
+                        _eventFlow.emit(UiEvent.ShowSnackbar(message = "OTP Validated"))
+                        navigateToLoginScreen()
+                    }else{
+                        _eventFlow.emit(UiEvent.ShowSnackbar(message = "Invalid OTP"))
+                    }
+                }
+                is NetworkResult.Error -> {
+                    _uiState.value = _uiState.value.copy(isLoading = false)
+                    _eventFlow.emit(UiEvent.ShowSnackbar(message = "An unexpected error occurred"))
+                }
+                is NetworkResult.Exception -> {
+                    _uiState.value = _uiState.value.copy(isLoading = false)
+                    _eventFlow.emit(UiEvent.ShowSnackbar(message = "An unexpected exception occurred"))
                 }
             }
         }

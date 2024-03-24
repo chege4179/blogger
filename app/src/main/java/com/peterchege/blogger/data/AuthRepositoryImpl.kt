@@ -18,13 +18,19 @@ package com.peterchege.blogger.data
 import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.api.requests.LoginUser
 import com.peterchege.blogger.core.api.requests.LogoutUser
+import com.peterchege.blogger.core.api.requests.OtpTriggerBody
+import com.peterchege.blogger.core.api.requests.ResetPasswordBody
 import com.peterchege.blogger.core.api.requests.SignUpUser
+import com.peterchege.blogger.core.api.requests.ValidateOtpBody
 import com.peterchege.blogger.core.api.responses.models.FollowerUser
 
 import com.peterchege.blogger.core.api.responses.responses.LoginResponse
 import com.peterchege.blogger.core.api.responses.responses.LogoutResponse
 import com.peterchege.blogger.core.api.responses.responses.SignUpResponse
 import com.peterchege.blogger.core.api.responses.models.User
+import com.peterchege.blogger.core.api.responses.responses.OtpTriggerResponse
+import com.peterchege.blogger.core.api.responses.responses.OtpValidateResponse
+import com.peterchege.blogger.core.api.responses.responses.ResetPasswordResponse
 import com.peterchege.blogger.core.api.safeApiCall
 import com.peterchege.blogger.core.datastore.preferences.DefaultAuthTokenProvider
 import com.peterchege.blogger.core.datastore.preferences.DefaultFCMTokenProvider
@@ -69,7 +75,7 @@ class AuthRepositoryImpl @Inject constructor(
         followingLocalDataSource.insertFollowing(followerUser = following)
     }
 
-    override suspend fun removeUserFollowing(userId:String) {
+    override suspend fun removeUserFollowing(userId: String) {
         followingLocalDataSource.deleteFollowingByUserId(userId = userId)
     }
 
@@ -91,6 +97,26 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun unsetLoggedInUser() = withContext(context = ioDispatcher) {
         return@withContext userDataStoreRepository.unsetLoggedInUser()
+    }
+
+    override suspend fun resetPassword(body: ResetPasswordBody): NetworkResult<ResetPasswordResponse> {
+        return safeApiCall { api.resetPassword(body) }
+    }
+
+    override suspend fun triggerVerifyEmailOtp(body: OtpTriggerBody): NetworkResult<OtpTriggerResponse> {
+        return safeApiCall { api.triggerVerifyEmailOtp(body) }
+    }
+
+    override suspend fun triggerPasswordResetOtp(body: OtpTriggerBody): NetworkResult<OtpTriggerResponse> {
+        return safeApiCall { api.triggerPasswordResetOtp(body) }
+    }
+
+    override suspend fun validateVerifyEmailOtp(body: ValidateOtpBody): NetworkResult<OtpValidateResponse> {
+        return safeApiCall { api.validateVerifyEmailOtp(body) }
+    }
+
+    override suspend fun validatePasswordResetOtp(body: ValidateOtpBody): NetworkResult<OtpValidateResponse> {
+        return safeApiCall { api.validatePasswordResetOtp(body) }
     }
 
 

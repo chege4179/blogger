@@ -15,6 +15,8 @@
  */
 package com.peterchege.blogger.core.util
 
+import com.peterchege.blogger.BuildConfig
+
 object Constants {
     const val LOCAL_URL="http://10.0.2.2:9000"
     const val LOCAL_URL_2 = "http://192.168.1.3:9000"

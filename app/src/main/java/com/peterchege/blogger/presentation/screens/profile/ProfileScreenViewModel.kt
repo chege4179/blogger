@@ -22,9 +22,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.peterchege.blogger.core.analytics.analytics.AnalyticsHelper
-import com.peterchege.blogger.core.analytics.analytics.logLogOutEvent
-import com.peterchege.blogger.core.api.requests.LogoutUser
+import com.peterchege.blogger.core.firebase.analytics.AnalyticsHelper
 import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.util.NetworkResult
@@ -53,8 +51,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.last
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update

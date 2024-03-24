@@ -29,6 +29,7 @@ data class User(
     val createdAt:String,
     val updatedAt:String,
     val deviceTokens:List<DeviceToken>,
+    val isEmailVerified:Boolean,
 
     @SerialName(value = "_count")
     val count: UserCount,

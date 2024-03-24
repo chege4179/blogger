@@ -17,8 +17,11 @@ package com.peterchege.blogger.presentation.screens.login
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -29,13 +32,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -43,7 +53,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.peterchege.blogger.R
 import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.domain.repository.NetworkStatus
+import com.peterchege.blogger.presentation.components.AppBackgroundImage
 import com.peterchege.blogger.presentation.theme.defaultPadding
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
@@ -106,6 +118,28 @@ fun LoginScreenContent(
         }
     }
 
+    val annotatedString = buildAnnotatedString {
+        withStyle(
+            style = SpanStyle(
+                fontWeight = FontWeight.Normal,
+                fontSize = 17.sp
+            )
+        ) {
+            append("Don't have an account yet ? ")
+        }
+        withStyle(
+            style = SpanStyle(
+                fontWeight = FontWeight.Bold,
+                fontSize = 17.sp,
+                textDecoration = TextDecoration.Underline
+            )
+        ) {
+            pushStringAnnotation(tag = "signup", annotation = "signup")
+            append("Sign Up")
+        }
+
+    }
+
     LaunchedEffect(key1 = Unit) {
         eventFlow.collectLatest { event ->
             when (event) {
@@ -141,7 +175,9 @@ fun LoginScreenContent(
                     painter = painterResource(id = R.mipmap.app_icon_foreground),
                     modifier = Modifier
                         .width(80.dp)
-                        .height(80.dp),
+                        .height(80.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                    ,
                     contentDescription = stringResource(id = R.string.app_name)
                 )
                 Text(
@@ -184,8 +220,7 @@ fun LoginScreenContent(
                             contentDescription = if (!uiState.isPasswordVisible)
                                 stringResource(id = R.string.visibility_on_description)
                             else
-                                stringResource(id = R.string.visibility_off_description)
-                                ,
+                                stringResource(id = R.string.visibility_off_description),
                             modifier = Modifier
                                 .size(26.dp)
                                 .clickable {
@@ -207,6 +242,7 @@ fun LoginScreenContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
+                    shape = RoundedCornerShape(8.dp),
                     onClick = {
                         keyboardController?.hide()
                         onSubmit()
@@ -216,16 +252,20 @@ fun LoginScreenContent(
                     Text(text = stringResource(id = R.string.login))
                 }
                 Spacer(modifier = Modifier.height(20.dp))
-                TextButton(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    onClick = {
-                        navigateToSignUpScreen()
+                ClickableText(
+                    text = annotatedString,
+                    onClick = { offset ->
+                        annotatedString.getStringAnnotations(start = offset, end = offset)
+                            .firstOrNull()
+                            ?.let { span ->
+                                when (span.tag) {
+                                    "signup" -> {
+                                        navigateToSignUpScreen()
+                                    }
+                                }
+                            }
                     }
-                ) {
-                    Text(text = stringResource(id = R.string.signup))
-                }
+                )
             }
             if (uiState.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -235,3 +275,19 @@ fun LoginScreenContent(
 }
 
 
+@OptIn(ExperimentalComposeUiApi::class)
+@Preview
+@Composable
+fun LoginScreenPreview() {
+
+    LoginScreenContent(
+        uiState = LoginFormState(),
+        networkStatus = NetworkStatus.Connected,
+        navigateToSignUpScreen = { /*TODO*/ },
+        eventFlow = MutableSharedFlow<UiEvent>(),
+        onChangeEmail = {},
+        onChangePassword = {},
+        onChangePasswordVisibility = { /*TODO*/ },
+        onSubmit = {}
+    )
+}

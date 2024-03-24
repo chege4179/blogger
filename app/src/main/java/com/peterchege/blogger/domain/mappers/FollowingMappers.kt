@@ -72,6 +72,7 @@ fun FollowingUserEntity.toUser(): User {
         createdAt = createdAt,
         updatedAt= updatedAt,
         count = _count,
-        deviceTokens = emptyList()
+        deviceTokens = emptyList(),
+        isEmailVerified = true
     )
 }

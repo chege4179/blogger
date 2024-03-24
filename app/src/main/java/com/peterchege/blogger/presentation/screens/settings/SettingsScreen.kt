@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -33,10 +34,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.peterchege.blogger.R
+import com.peterchege.blogger.core.util.Constants
+import com.peterchege.blogger.core.util.ThemeConfig
 import com.peterchege.blogger.presentation.alertDialogs.SignOutDialog
 import com.peterchege.blogger.presentation.alertDialogs.ThemeDialog
 import com.peterchege.blogger.presentation.components.SettingsRow
@@ -146,14 +150,52 @@ fun SettingsScreenContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .align(Alignment.Center),
-                    onClick = {
-                        openSignOutDialog()
-                    }
+                    shape = RoundedCornerShape(8.dp),
+                    onClick = openSignOutDialog
                 ) {
                     Text(text = stringResource(id = R.string.sign_out_button_text))
                 }
             }
         }
     }
+}
+@Preview
+@Composable
+fun SettingsScreenPreview1() {
+    SettingsScreenContent(
+        theme =ThemeConfig.DARK,
+        uiState = SettingScreenUiState(),
+        changeTheme = {},
+        openSignOutDialog = { /*TODO*/ },
+        openThemeDialog = { /*TODO*/ },
+        signOutUser = { /*TODO*/ },
+        openOSSMenu = {}
+    )
+}
 
+@Preview
+@Composable
+fun SettingsScreenPreview2() {
+    SettingsScreenContent(
+        theme =ThemeConfig.DARK,
+        uiState = SettingScreenUiState(isSignOutDialogOpen = true),
+        changeTheme = {},
+        openSignOutDialog = { /*TODO*/ },
+        openThemeDialog = { /*TODO*/ },
+        signOutUser = { /*TODO*/ },
+        openOSSMenu = {}
+    )
+}
+@Preview
+@Composable
+fun SettingsScreenPreview3() {
+    SettingsScreenContent(
+        theme =ThemeConfig.DARK,
+        uiState = SettingScreenUiState(isThemeDialogOpen = true),
+        changeTheme = {},
+        openSignOutDialog = { /*TODO*/ },
+        openThemeDialog = { /*TODO*/ },
+        signOutUser = { /*TODO*/ },
+        openOSSMenu = {}
+    )
 }

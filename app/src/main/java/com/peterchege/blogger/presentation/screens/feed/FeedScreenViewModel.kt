@@ -20,6 +20,7 @@ import androidx.lifecycle.viewModelScope
 import com.peterchege.blogger.core.api.requests.LikePost
 import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.api.responses.models.User
+import com.peterchege.blogger.core.firebase.config.RemoteFeatureToggle
 import com.peterchege.blogger.core.util.NetworkResult
 import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.data.local.posts.likes.LikesLocalDataSource
@@ -40,6 +41,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 sealed interface FeedScreenUiState {
@@ -60,9 +62,16 @@ class FeedScreenViewModel @Inject constructor(
     private val likesLocalDataSource: LikesLocalDataSource,
     authRepository: AuthRepository,
     networkInfoRepository: NetworkInfoRepository,
+    private val remoteFeatureToggle: RemoteFeatureToggle,
 
 
 ) : ViewModel() {
+    val tag = FeedScreenViewModel::class.java.simpleName
+
+    init {
+        val BASE_URL = remoteFeatureToggle.getString("BASE_URL")
+        Timber.tag(tag).i("Base URL $BASE_URL")
+    }
 
     private val _isSyncing = MutableStateFlow(false)
     val isSyncing = _isSyncing.asStateFlow()
