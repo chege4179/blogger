@@ -55,6 +55,7 @@ import com.peterchege.blogger.presentation.screens.search.tabs.SearchUsersTab
 import com.peterchege.blogger.presentation.theme.MainWhiteColor
 import kotlinx.coroutines.launch
 import com.peterchege.blogger.R
+import com.peterchege.blogger.presentation.components.CustomIconButton
 
 @Composable
 fun SearchScreen(
@@ -134,9 +135,7 @@ fun SearchScreenContent(
             ) {
                 TextField(
                     value = searchQuery,
-                    onValueChange = {
-                        onChangeSearchQuery(it)
-                    },
+                    onValueChange = onChangeSearchQuery,
                     placeholder = {
                         Text(
                             text = "Search",
@@ -163,15 +162,12 @@ fun SearchScreenContent(
                     textStyle = TextStyle(color = Color.Black),
                     maxLines = 1,
                     singleLine = true,
-                    leadingIcon = {
-                        Icon(
+                    trailingIcon = {
+                        CustomIconButton(
                             imageVector = Icons.Default.Search,
                             contentDescription = "Search",
-                            modifier = Modifier
-                                .size(24.dp)
-                                .clickable {
-
-                                }
+                            modifier = Modifier,
+                            onClick = {}
                         )
                     }
                 )
@@ -195,6 +191,7 @@ fun SearchScreenContent(
                 uiState = uiState,
                 navigateToPostScreen = navigateToPostScreen,
                 navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
+                onRetry = { onChangeSearchQuery(searchQuery) }
             )
         }
     }
@@ -254,6 +251,7 @@ fun TabsContent(
     uiState: SearchScreenUiState,
     navigateToAuthorProfileScreen: (String) -> Unit,
     navigateToPostScreen: (String) -> Unit,
+    onRetry:() -> Unit,
 ) {
     HorizontalPager(state = pagerState) {
         AnimatedContent(
@@ -264,12 +262,14 @@ fun TabsContent(
             when (pager.currentPage) {
                 0 -> SearchPostsTab(
                     uiState = uiState,
-                    navigateToPostScreen = navigateToPostScreen
+                    navigateToPostScreen = navigateToPostScreen,
+                    onRetry = onRetry
                 )
 
                 1 -> SearchUsersTab(
                     uiState = uiState,
-                    navigateToAuthorProfileScreen = navigateToAuthorProfileScreen
+                    navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
+                    onRetry = onRetry
                 )
 
             }

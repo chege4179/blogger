@@ -17,6 +17,7 @@ package com.peterchege.blogger.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -47,17 +49,15 @@ fun SettingsRow(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 0.dp)
-            .clip(shape = RoundedCornerShape(13.dp)),
+            .clip(shape = RoundedCornerShape(13.dp))
+            .clickable(onClick = onClick),
         shape = MaterialTheme.shapes.large,
     ) {
         Row(
             modifier = Modifier
                 .background(color = MaterialTheme.colorScheme.onPrimary)
                 .fillMaxWidth()
-                .padding(10.dp)
-                .clickable {
-                    onClick()
-                },
+                .padding(10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -70,9 +70,7 @@ fun SettingsRow(
             CustomIconButton(
                 imageVector = Icons.Default.ChevronRight,
                 contentDescription = stringResource(id = R.string.more_description),
-                onClick = {
-                    onClick()
-                },
+                onClick = onClick,
             )
 
 

@@ -6,6 +6,7 @@
     <string name="saved_navbar">Saved</string>
     <string name="notifications_navbar">Notifications</string>
     <string name="profile_navbar">Profile</string>
+    <string name="rate_us">Rate us on Playstore</string>
 
     <!--  Icons Descriptions  -->
     <string name="search_icon_description">Search Post</string>

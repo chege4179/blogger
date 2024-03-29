@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.peterchege.blogger.R
@@ -122,4 +123,15 @@ fun SettingsDialogThemeChooserRow(
         Spacer(modifier = Modifier.width(8.dp))
         Text(text = text)
     }
+}
+
+@Preview
+@Composable
+fun ThemeDialogPreview() {
+    ThemeDialog(
+        changeTheme = {},
+        toggleThemeDialog = { /*TODO*/ },
+        currentTheme = ThemeConfig.DARK
+    )
+
 }

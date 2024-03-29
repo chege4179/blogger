@@ -47,6 +47,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.peterchege.blogger.R
 import com.peterchege.blogger.core.util.UiEvent
+import com.peterchege.blogger.presentation.components.AppLoader
 import com.peterchege.blogger.presentation.components.CustomIconButton
 import com.peterchege.blogger.presentation.components.OtpComponent
 import com.peterchege.blogger.presentation.theme.defaultPadding
@@ -74,7 +75,7 @@ fun SignUpScreen(
         onChangePassword = viewModel::onChangePassword,
         onChangeConfirmPassword = viewModel::onChangePasswordConfirm,
         onChangePasswordVisibility = viewModel::onChangePasswordVisibility,
-        onSubmit =viewModel::signUpUser,
+        onSubmit = viewModel::signUpUser,
         onChangeOTPInput = viewModel::onChangeOTPInput,
         onDismissOTP = viewModel::toggleOTPInputVisibility,
         onSubmitOTP = { viewModel.submitOTPInput(navigateToLoginScreen) }
@@ -98,9 +99,9 @@ fun SignUpScreenContent(
     onChangeConfirmPassword: (String) -> Unit,
     onChangePasswordVisibility: () -> Unit,
     onSubmit: () -> Unit,
-    onSubmitOTP:() -> Unit,
-    onChangeOTPInput:(String) -> Unit,
-    onDismissOTP:() -> Unit,
+    onSubmitOTP: () -> Unit,
+    onChangeOTPInput: (String) -> Unit,
+    onDismissOTP: () -> Unit,
 
     ) {
 
@@ -150,160 +151,153 @@ fun SignUpScreenContent(
         },
         modifier = Modifier
             .fillMaxSize()
-    ) {
-        Box(
+    ) { paddingValues ->
+        AppLoader(isLoading = uiState.isLoading)
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(defaultPadding),
+                .padding(paddingValues)
+                .padding(10.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Text(
+                text = stringResource(id = R.string.app_name),
+                fontSize = 30.sp,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                text = stringResource(id = R.string.signup),
+                fontSize = 24.sp,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold,
+            )
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = uiState.username,
+                onValueChange = {
+                    onChangeUsername(it)
 
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = stringResource(id = R.string.app_name),
-                    fontSize = 30.sp,
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
-                    text = stringResource(id = R.string.signup),
-                    fontSize = 24.sp,
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold,
-                )
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = uiState.username,
-                    onValueChange = {
-                        onChangeUsername(it)
-
-                    },
-                    label = {
-                        Text(text = stringResource(id = R.string.username))
-                    }
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = uiState.fullName,
-                    onValueChange = {
-                        onChangeFullName(it)
-                    },
-                    label = {
-                        Text(text = stringResource(id = R.string.fullName))
-                    }
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = uiState.email,
-                    onValueChange = {
-                        onChangeEmail(it)
-
-                    },
-                    label = { Text(text = stringResource(id = R.string.email)) }
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = uiState.password,
-                    onValueChange = {
-                        onChangePassword(it)
-                    },
-                    trailingIcon = {
-                        CustomIconButton(
-                            imageVector = if (!uiState.isPasswordVisible)
-                                Icons.Filled.Visibility
-                            else
-                                Icons.Filled.VisibilityOff,
-                            onClick = {
-                                onChangePasswordVisibility()
-                            },
-                            contentDescription = if (!uiState.isPasswordVisible)
-                                stringResource(id = R.string.visibility_on_description)
-                            else
-                                stringResource(id = R.string.visibility_off_description)
-                        )
-                    },
-                    visualTransformation = if (!uiState.isPasswordVisible)
-                        VisualTransformation.None
-                    else
-                        PasswordVisualTransformation(),
-                    label = {
-                        Text(text = stringResource(id = R.string.password))
-                    }
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = uiState.confirmPassword,
-                    onValueChange = {
-                        onChangeConfirmPassword(it)
-
-                    },
-                    trailingIcon = {
-                        CustomIconButton(
-                            imageVector = if (!uiState.isPasswordVisible)
-                                Icons.Filled.Visibility
-                            else
-                                Icons.Filled.VisibilityOff,
-                            onClick = { onChangePasswordVisibility() },
-                            contentDescription = if (!uiState.isPasswordVisible)
-                                stringResource(id = R.string.visibility_on_description)
-                            else
-                                stringResource(id = R.string.visibility_off_description),
-
-                            )
-                    },
-                    visualTransformation = if (!uiState.isPasswordVisible)
-                        VisualTransformation.None
-                    else
-                        PasswordVisualTransformation(),
-
-                    label = {
-                        Text(text = stringResource(id = R.string.confirm_password))
-                    }
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    shape = RoundedCornerShape(8.dp),
-                    onClick = {
-                        keyboardController?.hide()
-                        onSubmit()
-
-                    }
-                ) {
-                    Text(text = stringResource(id = R.string.signup))
+                },
+                label = {
+                    Text(text = stringResource(id = R.string.username))
                 }
-                Spacer(modifier = Modifier.height(30.dp))
-                ClickableText(
-                    text = annotatedString,
-                    onClick = { offset ->
-                        annotatedString.getStringAnnotations(start = offset, end = offset)
-                            .firstOrNull()
-                            ?.let { span ->
-                                when (span.tag) {
-                                    "login" -> {
-                                        navigateToLoginScreen()
-                                    }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = uiState.fullName,
+                onValueChange = {
+                    onChangeFullName(it)
+                },
+                label = {
+                    Text(text = stringResource(id = R.string.fullName))
+                }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = uiState.email,
+                onValueChange = {
+                    onChangeEmail(it)
+
+                },
+                label = { Text(text = stringResource(id = R.string.email)) }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = uiState.password,
+                onValueChange = {
+                    onChangePassword(it)
+                },
+                trailingIcon = {
+                    CustomIconButton(
+                        imageVector = if (!uiState.isPasswordVisible)
+                            Icons.Filled.Visibility
+                        else
+                            Icons.Filled.VisibilityOff,
+                        onClick = {
+                            onChangePasswordVisibility()
+                        },
+                        contentDescription = if (!uiState.isPasswordVisible)
+                            stringResource(id = R.string.visibility_on_description)
+                        else
+                            stringResource(id = R.string.visibility_off_description)
+                    )
+                },
+                visualTransformation = if (!uiState.isPasswordVisible)
+                    VisualTransformation.None
+                else
+                    PasswordVisualTransformation(),
+                label = {
+                    Text(text = stringResource(id = R.string.password))
+                }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = uiState.confirmPassword,
+                onValueChange = {
+                    onChangeConfirmPassword(it)
+
+                },
+                trailingIcon = {
+                    CustomIconButton(
+                        imageVector = if (!uiState.isPasswordVisible)
+                            Icons.Filled.Visibility
+                        else
+                            Icons.Filled.VisibilityOff,
+                        onClick = { onChangePasswordVisibility() },
+                        contentDescription = if (!uiState.isPasswordVisible)
+                            stringResource(id = R.string.visibility_on_description)
+                        else
+                            stringResource(id = R.string.visibility_off_description),
+
+                        )
+                },
+                visualTransformation = if (!uiState.isPasswordVisible)
+                    VisualTransformation.None
+                else
+                    PasswordVisualTransformation(),
+
+                label = {
+                    Text(text = stringResource(id = R.string.confirm_password))
+                }
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RoundedCornerShape(8.dp),
+                onClick = {
+                    keyboardController?.hide()
+                    onSubmit()
+
+                }
+            ) {
+                Text(text = stringResource(id = R.string.signup))
+            }
+            Spacer(modifier = Modifier.height(30.dp))
+            ClickableText(
+                text = annotatedString,
+                onClick = { offset ->
+                    annotatedString.getStringAnnotations(start = offset, end = offset)
+                        .firstOrNull()
+                        ?.let { span ->
+                            when (span.tag) {
+                                "login" -> {
+                                    navigateToLoginScreen()
                                 }
                             }
-                    }
-                )
-            }
-            if (uiState.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            }
-
+                        }
+                }
+            )
         }
     }
-    if (uiState.isOtpBottomSheetVisible){
+    if (uiState.isOtpBottomSheetVisible) {
         ModalBottomSheet(
             onDismissRequest = onDismissOTP
         ) {
@@ -324,7 +318,7 @@ fun SignUpScreenContent(
 fun SignUpScreenPreview() {
     SignUpScreenContent(
         navigateToLoginScreen = { /*TODO*/ },
-        uiState = SignUpFormState(),
+        uiState = SignUpFormState(isLoading = true),
         eventFlow = MutableSharedFlow(),
         onChangeUsername = {},
         onChangeEmail = {},
@@ -337,5 +331,5 @@ fun SignUpScreenPreview() {
         onChangeOTPInput = {},
         onDismissOTP = {}
     )
-    
+
 }

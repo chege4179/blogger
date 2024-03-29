@@ -306,7 +306,9 @@ fun AddPostScreenContent(
     }
 }
 
-@Preview
+@Preview(
+    showSystemUi = true,
+)
 @Composable
 fun AddPostScreenPreview1() {
     AddPostScreenContent(
@@ -328,7 +330,9 @@ fun AddPostScreenPreview1() {
     )
 }
 
-@Preview
+@Preview(
+    showSystemUi = true,
+)
 @Composable
 fun AddPostScreenPreview2() {
     AddPostScreenContent(

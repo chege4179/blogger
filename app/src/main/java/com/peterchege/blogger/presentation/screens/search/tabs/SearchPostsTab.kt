@@ -37,6 +37,7 @@ import com.peterchege.blogger.R
 @Composable
 fun SearchPostsTab(
     navigateToPostScreen: (String) -> Unit,
+    onRetry:() -> Unit,
     uiState: SearchScreenUiState,
 ) {
     Scaffold(
@@ -54,7 +55,7 @@ fun SearchPostsTab(
 
             is SearchScreenUiState.Error -> {
                 ErrorComponent(
-                    retryCallback = { /*TODO*/ },
+                    retryCallback = onRetry,
                     errorMessage = uiState.message
                 )
             }

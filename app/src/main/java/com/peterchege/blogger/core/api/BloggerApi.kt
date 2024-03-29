@@ -18,6 +18,7 @@ package com.peterchege.blogger.core.api
 
 import com.peterchege.blogger.core.api.requests.*
 import com.peterchege.blogger.core.api.responses.*
+import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.api.responses.responses.AllPostsResponse
 import com.peterchege.blogger.core.api.responses.responses.AddCommentResponse
 import com.peterchege.blogger.core.api.responses.responses.DeleteCommentResponse
@@ -46,6 +47,7 @@ import com.peterchege.blogger.core.api.responses.responses.UnLikeResponse
 import com.peterchege.blogger.core.api.responses.responses.UnfollowResponse
 import com.peterchege.blogger.core.api.responses.responses.UpdatePostResponse
 import com.peterchege.blogger.core.api.responses.responses.UpdateTokenResponse
+import com.peterchege.blogger.core.api.responses.responses.UpdateUserResponse
 import com.peterchege.blogger.core.api.responses.responses.UploadPostResponse
 import com.peterchege.blogger.core.api.responses.responses.ViewResponse
 import okhttp3.RequestBody
@@ -72,6 +74,8 @@ interface BloggerApi {
     suspend fun createPost(
         @Body body: RequestBody
     ): Response<UploadPostResponse>
+
+
 
     @GET("/post/single/{postId}")
     suspend fun getPostById(@Path("postId") postId: String): Response<PostResponse>
@@ -100,7 +104,7 @@ interface BloggerApi {
     @GET("/user/single/{userId}")
     suspend fun getUserProfile(@Path("userId") userId: String): Response<ProfileResponse>
 
-    @POST("/auth/updateDeviceToken")
+    @PUT("/auth/updateDeviceToken")
     suspend fun updateToken(@Body updateToken: UpdateToken): Response<UpdateTokenResponse>
 
     @GET("/post/search/{searchTerm}")
@@ -215,6 +219,14 @@ interface BloggerApi {
     suspend fun resetPassword(
         @Body body: ResetPasswordBody
     ):Response<ResetPasswordResponse>
+
+
+    @PUT("/user/update")
+    suspend fun updateUserInfo(
+        @Body body: RequestBody
+    ): Response<UpdateUserResponse>
+
+
 
 
 }

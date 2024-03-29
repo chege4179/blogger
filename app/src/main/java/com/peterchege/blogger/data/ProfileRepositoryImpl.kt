@@ -15,6 +15,8 @@
  */
 package com.peterchege.blogger.data
 
+import android.content.Context
+import android.net.Uri
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -29,14 +31,23 @@ import com.peterchege.blogger.core.api.responses.responses.GetPostsByUserIdRespo
 import com.peterchege.blogger.core.api.responses.responses.GetUserLikeResponse
 import com.peterchege.blogger.core.api.responses.responses.ProfileResponse
 import com.peterchege.blogger.core.api.responses.responses.UnfollowResponse
+import com.peterchege.blogger.core.api.responses.responses.UpdateUserResponse
 import com.peterchege.blogger.core.api.safeApiCall
 import com.peterchege.blogger.core.util.NetworkResult
+import com.peterchege.blogger.core.util.UriToFile
 import com.peterchege.blogger.domain.repository.ProfileRepository
+import com.peterchege.blogger.presentation.screens.edit_profile.EditProfileFormState
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import javax.inject.Inject
 
 class ProfileRepositoryImpl @Inject constructor(
     private val api: BloggerApi,
+    @ApplicationContext private val appContext: Context,
     ):ProfileRepository {
     override suspend fun getProfile(userId: String): NetworkResult<ProfileResponse> {
         return safeApiCall{ api.getUserProfile(userId = userId) }
@@ -72,6 +83,27 @@ class ProfileRepositoryImpl @Inject constructor(
 
     override suspend fun getUserLikes(userId: String): NetworkResult<GetUserLikeResponse> {
         return safeApiCall { api.getUserLikes(userId) }
+    }
+
+    override suspend fun updateUserInfo(updateUser: EditProfileFormState): NetworkResult<UpdateUserResponse> {
+        val builder: MultipartBody.Builder = MultipartBody.Builder().setType(MultipartBody.FORM)
+        if (updateUser.imageUrl != null){
+            val file = UriToFile(context = appContext).getImageBody(Uri.parse(updateUser.imageUrl.toString()))
+            val requestFile: RequestBody = file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
+            builder
+                .addFormDataPart("userId", updateUser.userId)
+                .addFormDataPart("username", updateUser.username)
+                .addFormDataPart("fullName", updateUser.fullName)
+                .addFormDataPart("photo", file.name, requestFile)
+        }else{
+            builder
+                .addFormDataPart("userId", updateUser.userId)
+                .addFormDataPart("username", updateUser.username)
+                .addFormDataPart("fullName", updateUser.fullName)
+        }
+        val requestBody: RequestBody = builder.build()
+
+        return safeApiCall { api.updateUserInfo(requestBody) }
     }
 
 }

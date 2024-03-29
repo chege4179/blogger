@@ -34,54 +34,65 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+data class EditPostFormState(
+    val post: Post? = null,
+    val isLoading: Boolean = false
+)
+
 @HiltViewModel
 class EditPostScreenViewModel @Inject constructor(
     private val postRepository: PostRepository,
-) : ViewModel(){
+) : ViewModel() {
 
-    private val _editPost = MutableStateFlow<Post?>(null)
-    val editPost = _editPost.asStateFlow()
+    private val _formState = MutableStateFlow<EditPostFormState>(EditPostFormState())
+    val formState = _formState.asStateFlow()
 
-    private val _eventFlow= MutableSharedFlow<UiEvent>()
+    private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
 
-    fun setEditPost(post: Post){
-        _editPost.update { post }
+    fun setEditPost(post: Post) {
+        _formState.update { it.copy(post = post) }
     }
 
-    fun onChangePostBody(text:String){
-        _editPost.update {
-            it?.copy(postBody = text)
-        }
-    }
-    fun onChangePostTitle(text:String){
-        _editPost.update {
-            it?.copy(postTitle = text)
+    fun onChangePostBody(text: String) {
+        _formState.update {
+            it.copy(post = _formState.value.post?.copy(postBody = text))
         }
     }
 
-    fun updatePost(){
+    fun onChangePostTitle(text: String) {
+        _formState.update {
+            it.copy(post = _formState.value.post?.copy(postTitle = text))
+        }
+    }
+
+    fun updatePost() {
         viewModelScope.launch {
+            _formState.update { it.copy(isLoading = true) }
             val updatePost = UpdatePost(
-                postId = _editPost.value?.postId ?:return@launch,
-                postTitle = _editPost.value?.postTitle ?: return@launch,
-                postBody = _editPost.value?.postBody ?:return@launch
+                postId = _formState.value.post?.postId ?: return@launch,
+                postTitle = _formState.value.post?.postTitle ?: return@launch,
+                postBody = _formState.value.post?.postBody ?: return@launch
             )
             val response = postRepository.updatePost(updatePost)
-            when(response){
+            when (response) {
                 is NetworkResult.Success -> {
-                    if (response.data.success){
+                    _formState.update { it.copy(isLoading = false) }
+                    if (response.data.success) {
                         _eventFlow.emit(UiEvent.ShowSnackbar(message = "Post updated successfully"))
-                    }else{
+                    } else {
                         _eventFlow.emit(UiEvent.ShowSnackbar(message = "Failed to update post"))
                     }
-
                 }
+
                 is NetworkResult.Error -> {
+                    _formState.update { it.copy(isLoading = false) }
                     _eventFlow.emit(UiEvent.ShowSnackbar(message = "An error occurred"))
                 }
+
                 is NetworkResult.Exception -> {
+                    _formState.update { it.copy(isLoading = false) }
                     _eventFlow.emit(UiEvent.ShowSnackbar(message = "An exception occurred"))
                 }
             }

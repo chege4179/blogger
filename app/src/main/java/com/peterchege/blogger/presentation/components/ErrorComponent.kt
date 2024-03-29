@@ -45,9 +45,7 @@ fun ErrorComponent(
             text = errorMessage,
         )
         Spacer(modifier = Modifier.height(10.dp))
-        Button(
-            onClick = { retryCallback() }
-        ){
+        Button(onClick = retryCallback){
             Text(text = stringResource(id = R.string.retry))
         }
 

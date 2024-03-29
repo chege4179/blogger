@@ -125,9 +125,11 @@ object RepositoryModule {
     fun provideProfileRepository(
         api: BloggerApi,
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
+        @ApplicationContext appContext: Context,
     ): ProfileRepository {
         return ProfileRepositoryImpl(
             api = api,
+            appContext = appContext
         )
     }
 

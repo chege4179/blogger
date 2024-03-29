@@ -26,7 +26,9 @@ import com.peterchege.blogger.core.api.responses.responses.GetPostsByUserIdRespo
 import com.peterchege.blogger.core.api.responses.responses.GetUserLikeResponse
 import com.peterchege.blogger.core.api.responses.responses.ProfileResponse
 import com.peterchege.blogger.core.api.responses.responses.UnfollowResponse
+import com.peterchege.blogger.core.api.responses.responses.UpdateUserResponse
 import com.peterchege.blogger.core.util.NetworkResult
+import com.peterchege.blogger.presentation.screens.edit_profile.EditProfileFormState
 import kotlinx.coroutines.flow.Flow
 
 interface ProfileRepository {
@@ -45,4 +47,6 @@ interface ProfileRepository {
     suspend fun unfollowUser(unfollowUser: UnFollowUser): NetworkResult<UnfollowResponse>
 
     suspend fun followUser(followUser: FollowUser): NetworkResult<FollowResponse>
+
+    suspend fun updateUserInfo(updateUser:EditProfileFormState):NetworkResult<UpdateUserResponse>
 }

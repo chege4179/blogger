@@ -54,6 +54,7 @@ import com.peterchege.blogger.R
 import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.domain.repository.NetworkStatus
 import com.peterchege.blogger.presentation.components.AppBackgroundImage
+import com.peterchege.blogger.presentation.components.AppLoader
 import com.peterchege.blogger.presentation.theme.defaultPadding
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -160,116 +161,109 @@ fun LoginScreenContent(
             SnackbarHost(hostState = snackbarHostState)
         }
     ) {
-        Box(
+        AppLoader(isLoading = uiState.isLoading)
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(defaultPadding),
-
-            ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Image(
-                    painter = painterResource(id = R.mipmap.app_icon_foreground),
-                    modifier = Modifier
-                        .width(80.dp)
-                        .height(80.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                    ,
-                    contentDescription = stringResource(id = R.string.app_name)
-                )
-                Text(
-                    text = stringResource(id = R.string.login_header),
-                    fontSize = 30.sp,
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
-                    text = stringResource(id = R.string.login),
-                    fontSize = 24.sp,
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold,
-                )
-                Spacer(modifier = Modifier.height(15.dp))
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = uiState.email,
-                    onValueChange = {
-                        onChangeEmail(it)
-                        //state.username = it
-                    },
-                    label = {
-                        Text(text = stringResource(id = R.string.email))
-                    }
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = uiState.password,
-                    onValueChange = {
-                        onChangePassword(it)
-                    },
-                    trailingIcon = {
-                        Icon(
-                            imageVector = if (!uiState.isPasswordVisible)
-                                Icons.Filled.VisibilityOff
-                            else
-                                Icons.Filled.Visibility,
-                            contentDescription = if (!uiState.isPasswordVisible)
-                                stringResource(id = R.string.visibility_on_description)
-                            else
-                                stringResource(id = R.string.visibility_off_description),
-                            modifier = Modifier
-                                .size(26.dp)
-                                .clickable {
-                                    onChangePasswordVisibility()
-                                }
-                        )
-
-                    },
-                    visualTransformation = if (uiState.isPasswordVisible)
-                        VisualTransformation.None
-                    else
-                        PasswordVisualTransformation(),
-                    label = {
-                        Text(text = stringResource(id = R.string.password))
-                    }
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    shape = RoundedCornerShape(8.dp),
-                    onClick = {
-                        keyboardController?.hide()
-                        onSubmit()
-                    }
-                )
-                {
-                    Text(text = stringResource(id = R.string.login))
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = R.mipmap.app_icon_foreground),
+                modifier = Modifier
+                    .width(80.dp)
+                    .height(80.dp)
+                    .clip(RoundedCornerShape(20.dp))
+                ,
+                contentDescription = stringResource(id = R.string.app_name)
+            )
+            Text(
+                text = stringResource(id = R.string.login_header),
+                fontSize = 30.sp,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                text = stringResource(id = R.string.login),
+                fontSize = 24.sp,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold,
+            )
+            Spacer(modifier = Modifier.height(15.dp))
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = uiState.email,
+                onValueChange = {
+                    onChangeEmail(it)
+                    //state.username = it
+                },
+                label = {
+                    Text(text = stringResource(id = R.string.email))
                 }
-                Spacer(modifier = Modifier.height(20.dp))
-                ClickableText(
-                    text = annotatedString,
-                    onClick = { offset ->
-                        annotatedString.getStringAnnotations(start = offset, end = offset)
-                            .firstOrNull()
-                            ?.let { span ->
-                                when (span.tag) {
-                                    "signup" -> {
-                                        navigateToSignUpScreen()
-                                    }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = uiState.password,
+                onValueChange = {
+                    onChangePassword(it)
+                },
+                trailingIcon = {
+                    Icon(
+                        imageVector = if (!uiState.isPasswordVisible)
+                            Icons.Filled.VisibilityOff
+                        else
+                            Icons.Filled.Visibility,
+                        contentDescription = if (!uiState.isPasswordVisible)
+                            stringResource(id = R.string.visibility_on_description)
+                        else
+                            stringResource(id = R.string.visibility_off_description),
+                        modifier = Modifier
+                            .size(26.dp)
+                            .clickable {
+                                onChangePasswordVisibility()
+                            }
+                    )
+
+                },
+                visualTransformation = if (uiState.isPasswordVisible)
+                    VisualTransformation.None
+                else
+                    PasswordVisualTransformation(),
+                label = {
+                    Text(text = stringResource(id = R.string.password))
+                }
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RoundedCornerShape(8.dp),
+                onClick = {
+                    keyboardController?.hide()
+                    onSubmit()
+                }
+            )
+            {
+                Text(text = stringResource(id = R.string.login))
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+            ClickableText(
+                text = annotatedString,
+                onClick = { offset ->
+                    annotatedString.getStringAnnotations(start = offset, end = offset)
+                        .firstOrNull()
+                        ?.let { span ->
+                            when (span.tag) {
+                                "signup" -> {
+                                    navigateToSignUpScreen()
                                 }
                             }
-                    }
-                )
-            }
-            if (uiState.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            }
+                        }
+                }
+            )
         }
     }
 }
@@ -281,7 +275,7 @@ fun LoginScreenContent(
 fun LoginScreenPreview() {
 
     LoginScreenContent(
-        uiState = LoginFormState(),
+        uiState = LoginFormState(isLoading = true),
         networkStatus = NetworkStatus.Connected,
         navigateToSignUpScreen = { /*TODO*/ },
         eventFlow = MutableSharedFlow<UiEvent>(),

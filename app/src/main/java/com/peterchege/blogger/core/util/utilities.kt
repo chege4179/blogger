@@ -26,14 +26,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import com.google.android.play.core.review.ReviewManagerFactory
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
-fun Context.toast(msg:String){
-    Toast.makeText(this,msg,Toast.LENGTH_LONG).show()
+fun Context.toast(msg: String) {
+    Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
 }
 
 fun Context.findActivity(): Activity {
@@ -54,6 +55,29 @@ fun truncateString(str: String, n: Int): String {
     }
 }
 
+fun showReviewDialog(activity: Activity, onComplete: () -> Unit, onFailure: () -> Unit) {
+    val reviewManager = ReviewManagerFactory.create(activity.applicationContext)
+    reviewManager.requestReviewFlow()
+        .addOnCompleteListener {
+            if (it.isSuccessful) {
+                reviewManager.launchReviewFlow(activity, it.result)
+                    .addOnSuccessListener {
+                        onComplete()
+                    }
+                    .addOnFailureListener {
+                        onFailure()
+                    }
+            }else{
+                onFailure()
+            }
+        }
+        .addOnFailureListener {
+            it.printStackTrace()
+            onFailure()
+
+        }
+}
+
 @OptIn(ExperimentalComposeUiApi::class)
 fun Modifier.setTagAndId(tag: String): Modifier {
     return this
@@ -63,7 +87,8 @@ fun Modifier.setTagAndId(tag: String): Modifier {
 
 fun convertUtcDateStringToReadable(dateString: String): String {
     val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
-    val outputFormat = DateFormat.getBestDateTimePattern(Locale.getDefault(), "yyyy-MM-dd h:mm:ss a ")
+    val outputFormat =
+        DateFormat.getBestDateTimePattern(Locale.getDefault(), "yyyy-MM-dd h:mm:ss a ")
 
     val utcDate: Date
     try {

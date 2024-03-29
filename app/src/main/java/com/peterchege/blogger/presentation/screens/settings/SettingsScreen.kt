@@ -41,6 +41,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.peterchege.blogger.R
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.core.util.ThemeConfig
+import com.peterchege.blogger.core.util.findActivity
+import com.peterchege.blogger.core.util.showReviewDialog
+import com.peterchege.blogger.core.util.toast
 import com.peterchege.blogger.presentation.alertDialogs.SignOutDialog
 import com.peterchege.blogger.presentation.alertDialogs.ThemeDialog
 import com.peterchege.blogger.presentation.components.SettingsRow
@@ -52,6 +55,7 @@ fun SettingsScreen(
     startOSSActivity: () -> Unit,
 ) {
     val context = LocalContext.current
+    val activity = context.findActivity()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val authUser by viewModel.authUser.collectAsStateWithLifecycle()
     val fcmToken by viewModel.fcmToken.collectAsStateWithLifecycle()
@@ -64,6 +68,17 @@ fun SettingsScreen(
         openOSSMenu = startOSSActivity,
         openThemeDialog = viewModel::toggleThemeDialog,
         changeTheme = viewModel::changeTheme,
+        reviewApp = {
+            showReviewDialog(
+                activity = activity,
+                onComplete = {
+                    context.toast(msg = "Review submitted successfully. Thank you")
+                },
+                onFailure = {
+                    context.toast(msg = "Failed to add review")
+                }
+            )
+        },
         signOutUser = {
             authUser?.let {
                 if (it.userId != "") {
@@ -89,6 +104,7 @@ fun SettingsScreenContent(
     openThemeDialog: () -> Unit,
     signOutUser: () -> Unit,
     openOSSMenu: () -> Unit,
+    reviewApp: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -129,14 +145,18 @@ fun SettingsScreenContent(
             ) {
                 SettingsRow(
                     title = stringResource(id = R.string.theme),
-                    onClick = {
-                        openThemeDialog()
-                    }
+                    onClick = openThemeDialog
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 SettingsRow(
                     title = stringResource(id = R.string.license),
-                    onClick = { openOSSMenu() }
+                    onClick = openOSSMenu
+
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                SettingsRow(
+                    title = stringResource(id = R.string.rate_us),
+                    onClick = reviewApp
 
                 )
                 Spacer(modifier = Modifier.height(10.dp))
@@ -159,17 +179,19 @@ fun SettingsScreenContent(
         }
     }
 }
+
 @Preview
 @Composable
 fun SettingsScreenPreview1() {
     SettingsScreenContent(
-        theme =ThemeConfig.DARK,
+        theme = ThemeConfig.DARK,
         uiState = SettingScreenUiState(),
         changeTheme = {},
         openSignOutDialog = { /*TODO*/ },
         openThemeDialog = { /*TODO*/ },
         signOutUser = { /*TODO*/ },
-        openOSSMenu = {}
+        openOSSMenu = {},
+        reviewApp = {}
     )
 }
 
@@ -177,25 +199,28 @@ fun SettingsScreenPreview1() {
 @Composable
 fun SettingsScreenPreview2() {
     SettingsScreenContent(
-        theme =ThemeConfig.DARK,
+        theme = ThemeConfig.DARK,
         uiState = SettingScreenUiState(isSignOutDialogOpen = true),
         changeTheme = {},
         openSignOutDialog = { /*TODO*/ },
         openThemeDialog = { /*TODO*/ },
         signOutUser = { /*TODO*/ },
-        openOSSMenu = {}
+        openOSSMenu = {},
+        reviewApp = {}
     )
 }
+
 @Preview
 @Composable
 fun SettingsScreenPreview3() {
     SettingsScreenContent(
-        theme =ThemeConfig.DARK,
+        theme = ThemeConfig.DARK,
         uiState = SettingScreenUiState(isThemeDialogOpen = true),
         changeTheme = {},
         openSignOutDialog = { /*TODO*/ },
         openThemeDialog = { /*TODO*/ },
         signOutUser = { /*TODO*/ },
-        openOSSMenu = {}
+        openOSSMenu = {},
+        reviewApp = {}
     )
 }

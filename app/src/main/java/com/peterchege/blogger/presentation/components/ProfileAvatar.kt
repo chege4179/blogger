@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -36,6 +37,7 @@ fun ProfileAvatar(imageUrl: String, modifier: Modifier, size: Int) {
             .width(size.dp)
             .height(size.dp)
             .clip(CircleShape),
+        contentScale = ContentScale.Crop,
         loading = {
             Image(
                 painter = painterResource(id = R.mipmap.default_profile),

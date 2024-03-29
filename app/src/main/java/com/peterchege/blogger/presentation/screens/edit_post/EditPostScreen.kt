@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,12 +40,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.peterchege.blogger.R
 import com.peterchege.blogger.core.api.responses.models.Post
+import com.peterchege.blogger.core.fake.dummyPostList
 import com.peterchege.blogger.core.util.UiEvent
+import com.peterchege.blogger.domain.mappers.toPost
+import com.peterchege.blogger.presentation.components.AppLoader
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
@@ -53,7 +59,7 @@ fun EditPostScreen(
     viewModel: EditPostScreenViewModel = hiltViewModel(),
     post: Post?,
 ) {
-    val editPost by viewModel.editPost.collectAsStateWithLifecycle()
+    val formState by viewModel.formState.collectAsStateWithLifecycle()
     LaunchedEffect(key1 = post) {
         post?.let {
             viewModel.setEditPost(it)
@@ -62,7 +68,7 @@ fun EditPostScreen(
     }
     EditPostScreenContent(
         eventFlow = viewModel.eventFlow,
-        post = editPost,
+        formState = formState,
         onChangePostTitle = viewModel::onChangePostTitle,
         onChangePostBody = viewModel::onChangePostBody,
         updatePost = viewModel::updatePost
@@ -72,7 +78,7 @@ fun EditPostScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditPostScreenContent(
-    post: Post?,
+    formState: EditPostFormState,
     eventFlow: SharedFlow<UiEvent>,
     onChangePostTitle: (String) -> Unit,
     onChangePostBody: (String) -> Unit,
@@ -108,7 +114,8 @@ fun EditPostScreenContent(
             )
         }
     ) { paddingValues ->
-        if (post == null) {
+        AppLoader(isLoading = formState.isLoading)
+        if (formState.post == null) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -130,7 +137,7 @@ fun EditPostScreenContent(
                 OutlinedTextField(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    value = post.postTitle,
+                    value = formState.post.postTitle,
                     maxLines = 3,
                     label = {
                         Text(text = stringResource(id = R.string.post_title))
@@ -143,7 +150,7 @@ fun EditPostScreenContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(400.dp),
-                    value = post.postBody,
+                    value = formState.post.postBody,
                     maxLines = 70,
                     label = {
                         Text(text = stringResource(id = R.string.post_body))
@@ -152,15 +159,27 @@ fun EditPostScreenContent(
                         onChangePostBody(it)
                     }
                 )
+                Spacer(modifier = Modifier.weight(1f))
                 Button(
                     onClick = { updatePost() },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(text = stringResource(id = R.string.update_button_text))
                 }
             }
         }
     }
+}
 
-
+@Preview
+@Composable
+fun EditPostScreenPreview() {
+    EditPostScreenContent(
+        formState = EditPostFormState(post = dummyPostList[0].toPost(),isLoading = true),
+        eventFlow = MutableSharedFlow(),
+        onChangePostTitle = {},
+        onChangePostBody = {},
+        updatePost = {}
+    )
 }

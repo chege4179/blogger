@@ -34,6 +34,7 @@ import com.peterchege.blogger.presentation.screens.search.SearchScreenUiState
 @Composable
 fun SearchUsersTab(
     navigateToAuthorProfileScreen:(String) -> Unit,
+    onRetry:() -> Unit,
     uiState: SearchScreenUiState,
 ) {
 
@@ -52,7 +53,7 @@ fun SearchUsersTab(
 
             is SearchScreenUiState.Error -> {
                 ErrorComponent(
-                    retryCallback = { /*TODO*/ },
+                    retryCallback = onRetry,
                     errorMessage = uiState.message
                 )
             }
