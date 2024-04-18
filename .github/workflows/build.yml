@@ -23,6 +23,9 @@ jobs:
       - name: Build Release Apk with Gradle
         run: ./gradlew assembleRelease
 
+      - name: Build Release bundle with Gradle
+        run: ./gradlew bundleRelease
+
       - name: Upload a Build Artifact (APK)
         uses: actions/upload-artifact@v2.2.4
         with:
@@ -36,3 +39,14 @@ jobs:
           serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
           groups: trusted-testers
           file: app/build/outputs/apk/release/app-release.apk
+
+      - name: Upload to playstore internal release
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: ${{ PLAY_CONSOLE_SERVICE_ACCOUNT }}
+          packageName: com.peterchege.nlogger
+          releaseFiles: app/build/outputs/bundle/release/app-release.aab
+          track: internal
+          userFraction: 1.00
+          whatsNewDirectory: /distribution/whatsnew
+          mappingFile: /app/build/outputs/mapping/release/mapping.txt

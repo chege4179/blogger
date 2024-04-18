@@ -13,6 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
-
+playconsole.json
 /fastlane/firebase_distribution_key.json
 
