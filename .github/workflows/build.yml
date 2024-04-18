@@ -43,7 +43,7 @@ jobs:
       - name: Upload to playstore internal release
         uses: r0adkll/upload-google-play@v1
         with:
-          serviceAccountJson: ${{ PLAY_CONSOLE_SERVICE_ACCOUNT }}
+          serviceAccountJson: ${{ secrets.PLAY_CONSOLE_SERVICE_ACCOUNT }}
           packageName: com.peterchege.nlogger
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
           track: internal
