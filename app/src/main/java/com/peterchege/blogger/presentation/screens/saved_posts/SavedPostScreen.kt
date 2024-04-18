@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -42,6 +43,7 @@ import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.theme.defaultPadding
 import com.peterchege.blogger.R
+import com.peterchege.blogger.core.fake.dummyPostList
 
 @Composable
 fun SavedPostScreen(
@@ -185,6 +187,22 @@ fun SavedPostScreenContent(
         }
 
     }
+}
 
+
+@Preview
+@Composable
+fun SavedPostScreen() {
+    SavedPostScreenContent(
+        navigateToPostScreen = {},
+        navigateToAuthorProfileScreen = {},
+        uiState = SavedPostScreenUiState.Success(
+            posts = dummyPostList.map { it.toPost() }
+        ),
+        bookmarkPost ={} ,
+        unBookmarkPost ={} ,
+        likePost = {},
+        unLikePost = {}
+    )
 
 }

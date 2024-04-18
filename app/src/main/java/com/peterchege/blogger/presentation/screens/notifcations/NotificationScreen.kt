@@ -28,20 +28,26 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.peterchege.blogger.R
+import com.peterchege.blogger.core.fake.dummyNotifications
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.components.NotificationCard
 import com.peterchege.blogger.presentation.components.NotificationFilterCard
 import com.peterchege.blogger.presentation.theme.defaultPadding
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun NotificationScreen(
@@ -157,18 +163,21 @@ fun NotificationScreenContent(
                             val notification = notifications[position]
                             if (notification != null) {
                                 val shouldShowNotification =
+                                    remember(key1 = notificationFilter,key2 = notification) {
                                     if (notificationFilter == "All")
                                         true
                                     else (notification.notificationType == notificationFilter)
+                                }
                                 if (shouldShowNotification) {
                                     NotificationCard(
                                         notification = notification,
                                         navigateToPostScreen = navigateToPostScreen,
                                         navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
                                     )
+                                    Spacer(modifier = Modifier.padding(10.dp))
                                 }
 
-                                Spacer(modifier = Modifier.padding(10.dp))
+
                             }
 
                         }
@@ -179,4 +188,32 @@ fun NotificationScreenContent(
         }
 
     }
+}
+
+@Preview
+@Composable
+fun NotificationScreenPreview1(){
+    NotificationScreenContent(
+        uiState = NotificationScreenUiState.Success(
+            notifications = flowOf(PagingData.from(dummyNotifications))
+        ),
+        navigateToPostScreen = {},
+        navigateToAuthorProfileScreen = {},
+        notificationFilter = "All",
+        setNotificationFilter = {}
+    )
+}
+
+@Preview
+@Composable
+fun NotificationScreenPreview2(){
+    NotificationScreenContent(
+        uiState = NotificationScreenUiState.Success(
+            notifications = flowOf(PagingData.from(dummyNotifications))
+        ),
+        navigateToPostScreen = {},
+        navigateToAuthorProfileScreen = {},
+        notificationFilter = "Comment",
+        setNotificationFilter = {}
+    )
 }

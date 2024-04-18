@@ -15,6 +15,7 @@
  */
 package com.peterchege.blogger.presentation.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -79,6 +80,7 @@ fun LazyListScope.postCommentsSection(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 15.dp)
+                .background(Color.Transparent)
         ) {
             comments[position]?.let {
                 CommentBox(

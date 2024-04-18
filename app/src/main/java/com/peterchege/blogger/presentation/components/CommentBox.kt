@@ -54,6 +54,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.annotation.ExperimentalCoilApi
+import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
 import com.peterchege.blogger.core.api.responses.models.CommentCount
 import com.peterchege.blogger.core.api.responses.models.CommentUser
@@ -82,7 +83,8 @@ fun CommentBox(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(),
+                .fillMaxHeight()
+            ,
         ) {
             Row(
                 modifier = Modifier
@@ -101,18 +103,13 @@ fun CommentBox(
                         }
                     ),
             ) {
-                Image(
+                AsyncImage(
                     modifier = Modifier
                         .padding(5.dp)
                         .width(40.dp)
                         .height(40.dp)
                         .clip(CircleShape),
-                    painter = rememberImagePainter(
-                        data = comment.user.imageUrl,
-                        builder = {
-                            crossfade(true)
-                        },
-                    ),
+                    model = comment.user.imageUrl,
                     contentDescription = "Image of ${comment.user.fullName}"
                 )
                 Column(
