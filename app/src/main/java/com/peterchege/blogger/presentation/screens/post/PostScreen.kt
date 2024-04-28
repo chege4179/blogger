@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.SubcomposeAsyncImage
@@ -54,6 +55,7 @@ import com.peterchege.blogger.R
 import com.peterchege.blogger.core.api.responses.models.CommentWithUser
 import com.peterchege.blogger.core.api.responses.models.Post
 import com.peterchege.blogger.core.api.responses.models.User
+import com.peterchege.blogger.core.fake.dummyComments
 import com.peterchege.blogger.core.fake.dummyPostList
 import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.core.util.calculateDoubleTapOffset
@@ -70,6 +72,7 @@ import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.components.postCommentsSection
 import com.peterchege.blogger.presentation.navigation.scaleInEnterTransition
 import com.peterchege.blogger.presentation.navigation.scaleOutExitTransition
+import com.peterchege.blogger.presentation.theme.BloggerTheme
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -197,7 +200,6 @@ fun PostScreenContent(
         }
     }
     Scaffold(
-        containerColor = Color.Transparent,
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
@@ -488,33 +490,71 @@ fun PostScreenContent(
 
 @Preview
 @Composable
-fun PostScreenContentPreview() {
+fun PostScreenContentPreview1() {
+    BloggerTheme(darkTheme = false) {
+        PostScreenContent(
+            uiState = PostScreenUiState.Success(
+                post = dummyPostList[0],
+                isUserLoggedIn = false,
+                comments = flowOf(PagingData.from(dummyComments))
+            ),
+            commentUiState = CommentUiState(),
+            toggleDeleteCommentDialog = { /*TODO*/ },
+            onLikePost = {},
+            onUnlikePost = {},
+            onChangeNewComment = {},
+            savePost = {},
+            unSavePost = {},
+            openCommentDialog = { /*TODO*/ },
+            closeCommentDialog = { /*TODO*/ },
+            eventFlow = MutableSharedFlow(),
+            user = null,
+            postComment = {},
+            deleteComment = {},
+            setCommentToBeDeleted = {},
+            onChangeReplyComment = {},
+            toggleReplyCommentDialog = { /*TODO*/ },
+            setCommentToRepliedTo = {},
+            addCommentParticipants = {},
+            replyToComment = {},
+            likeComment = {_,_,_ ->}
+        )
+    }
 
-    PostScreenContent(
-        uiState = PostScreenUiState.Success(
-            post = dummyPostList[0],
-            isUserLoggedIn = false,
-            comments = flowOf()
-        ),
-        commentUiState = CommentUiState(),
-        toggleDeleteCommentDialog = { /*TODO*/ },
-        onLikePost = {},
-        onUnlikePost = {},
-        onChangeNewComment = {},
-        savePost = {},
-        unSavePost = {},
-        openCommentDialog = { /*TODO*/ },
-        closeCommentDialog = { /*TODO*/ },
-        eventFlow = MutableSharedFlow(),
-        user = null,
-        postComment = {},
-        deleteComment = {},
-        setCommentToBeDeleted = {},
-        onChangeReplyComment = {},
-        toggleReplyCommentDialog = { /*TODO*/ },
-        setCommentToRepliedTo = {},
-        addCommentParticipants = {},
-        replyToComment = {},
-        likeComment = {_,_,_ ->}
-    )
+}
+
+
+@Preview
+@Composable
+fun PostScreenContentPreview2() {
+    BloggerTheme(darkTheme = true) {
+        PostScreenContent(
+            uiState = PostScreenUiState.Success(
+                post = dummyPostList[0],
+                isUserLoggedIn = false,
+                comments = flowOf(PagingData.from(dummyComments))
+            ),
+            commentUiState = CommentUiState(),
+            toggleDeleteCommentDialog = { /*TODO*/ },
+            onLikePost = {},
+            onUnlikePost = {},
+            onChangeNewComment = {},
+            savePost = {},
+            unSavePost = {},
+            openCommentDialog = { /*TODO*/ },
+            closeCommentDialog = { /*TODO*/ },
+            eventFlow = MutableSharedFlow(),
+            user = null,
+            postComment = {},
+            deleteComment = {},
+            setCommentToBeDeleted = {},
+            onChangeReplyComment = {},
+            toggleReplyCommentDialog = { /*TODO*/ },
+            setCommentToRepliedTo = {},
+            addCommentParticipants = {},
+            replyToComment = {},
+            likeComment = {_,_,_ ->}
+        )
+    }
+
 }

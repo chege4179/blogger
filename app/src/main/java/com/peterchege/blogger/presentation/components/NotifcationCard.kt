@@ -25,10 +25,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Message
+import androidx.compose.material.icons.filled.PersonAddAlt1
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
@@ -55,8 +57,20 @@ fun NotificationCard(
     navigateToAuthorProfileScreen: (String) -> Unit,
     notification: Notification
 ) {
-    Card (
-        modifier = Modifier.fillMaxWidth(),
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = {
+                when (notification.notificationType) {
+                    "Like", "Comment" -> {
+                        notification.notificationPostId?.let { navigateToPostScreen(it) }
+                    }
+
+                    "Follower" -> {
+                        navigateToAuthorProfileScreen(notification.notificationSender.userId)
+                    }
+                }
+            }),
         elevation = CardDefaults.elevatedCardElevation(),
         colors = CardColors(
             containerColor = MaterialTheme.colorScheme.onPrimary,
@@ -64,19 +78,21 @@ fun NotificationCard(
             disabledContentColor = MaterialTheme.colorScheme.background,
             disabledContainerColor = MaterialTheme.colorScheme.onBackground
         )
-    ){
+    ) {
         val imageVector = if (notification.notificationType == "Like")
             Icons.Default.Favorite
-        else if (notification.notificationType =="Comment")
-            Icons.Default.Message
+        else if (notification.notificationType == "Comment")
+            Icons.AutoMirrored.Filled.Message
+        else if (notification.notificationType == "Follower")
+            Icons.Default.PersonAddAlt1
         else
             Icons.Default.Info
-        Row (
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 15.dp, vertical = 5.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-        ){
+        ) {
             Icon(
                 modifier = Modifier.size(26.dp),
                 imageVector = imageVector,
@@ -92,15 +108,7 @@ fun NotificationCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(60.dp)
-                .padding(5.dp)
-                .clickable {
-                    if (notification.notificationType == "Like" || notification.notificationType == "Comment") {
-//                    notification.n?.let { navigateToPostScreen(it) }
-                    } else {
-                        navigateToAuthorProfileScreen(notification.notificationSender.userId)
-                    }
-
-                },
+                .padding(5.dp),
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically,
         ) {

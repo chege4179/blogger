@@ -33,7 +33,7 @@ class FollowersPagingSource (
         val response = profileRepository.getFollowers(limit = 30, page = pageNumber, userId = userId)
         when (response) {
             is NetworkResult.Success -> {
-                val prevKey = if (pageNumber > 0) pageNumber - 1 else null
+                val prevKey = if (pageNumber == 1) null else pageNumber
                 val nextKey = response.data.nextPage
                 val pageData = response.data.followers ?: emptyList()
                 if (pageData.isNotEmpty()){

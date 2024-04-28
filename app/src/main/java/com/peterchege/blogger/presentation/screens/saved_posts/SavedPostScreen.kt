@@ -159,26 +159,15 @@ fun SavedPostScreenContent(
                             onItemClick = { post ->
                                 navigateToPostScreen(post.postId)
                             },
-                            onProfileNavigate = { userId ->
-                                navigateToAuthorProfileScreen(userId)
-                            },
+                            onProfileNavigate = navigateToAuthorProfileScreen,
                             onDeletePost = {},
                             isLiked = false,
                             isSaved = true,
                             isProfile = false,
-                            onBookmarkPost = { post ->
-                                bookmarkPost(post)
-                            },
-                            onUnBookmarkPost = { post ->
-                                unBookmarkPost(post)
-                            },
-                            onLikePost = {
-                                likePost(it)
-                            },
-                            onUnlikePost = {
-                                unLikePost(it)
-
-                            }
+                            onBookmarkPost = bookmarkPost,
+                            onUnBookmarkPost = unBookmarkPost,
+                            onLikePost = likePost,
+                            onUnlikePost = unLikePost
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                     }

@@ -75,7 +75,7 @@ class NotificationScreenViewModel @Inject constructor(
             initialValue = null
         )
 
-    val uiState = combine(isUserLoggedIn,authUser){ isLoggedIn,user ->
+    val uiState = combine(flow = isUserLoggedIn,flow2 = authUser){ isLoggedIn,user ->
         if (isLoggedIn){
             val notificationsPagingData = getNotificationByUserId(userId = user?.userId ?:"")
             NotificationScreenUiState.Success(notifications = notificationsPagingData)

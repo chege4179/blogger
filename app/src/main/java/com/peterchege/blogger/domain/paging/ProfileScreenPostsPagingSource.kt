@@ -33,7 +33,7 @@ class ProfileScreenPostsPagingSource(
         val response = profileRepository.getPostsByUserId(userId = userId, page = pageNumber)
         when (response) {
             is NetworkResult.Success -> {
-                val prevKey = if (pageNumber > 0) pageNumber - 1 else null
+                val prevKey = if (pageNumber == 1) null else pageNumber
                 val nextKey = response.data.nextPage
                 val pageData = response.data.posts ?: emptyList()
                 if (pageData.isNotEmpty()) {

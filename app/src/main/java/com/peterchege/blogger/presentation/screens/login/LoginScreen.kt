@@ -55,6 +55,7 @@ import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.domain.repository.NetworkStatus
 import com.peterchege.blogger.presentation.components.AppBackgroundImage
 import com.peterchege.blogger.presentation.components.AppLoader
+import com.peterchege.blogger.presentation.theme.BloggerTheme
 import com.peterchege.blogger.presentation.theme.defaultPadding
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -123,7 +124,8 @@ fun LoginScreenContent(
         withStyle(
             style = SpanStyle(
                 fontWeight = FontWeight.Normal,
-                fontSize = 17.sp
+                fontSize = 17.sp,
+                color = MaterialTheme.colorScheme.onBackground
             )
         ) {
             append("Don't have an account yet ? ")
@@ -132,7 +134,8 @@ fun LoginScreenContent(
             style = SpanStyle(
                 fontWeight = FontWeight.Bold,
                 fontSize = 17.sp,
-                textDecoration = TextDecoration.Underline
+                textDecoration = TextDecoration.Underline,
+                color = MaterialTheme.colorScheme.onBackground
             )
         ) {
             pushStringAnnotation(tag = "signup", annotation = "signup")
@@ -252,6 +255,7 @@ fun LoginScreenContent(
             Spacer(modifier = Modifier.height(20.dp))
             ClickableText(
                 text = annotatedString,
+
                 onClick = { offset ->
                     annotatedString.getStringAnnotations(start = offset, end = offset)
                         .firstOrNull()
@@ -272,16 +276,38 @@ fun LoginScreenContent(
 @OptIn(ExperimentalComposeUiApi::class)
 @Preview
 @Composable
-fun LoginScreenPreview() {
+fun LoginScreenPreview1() {
+    BloggerTheme(darkTheme = true){
+        LoginScreenContent(
+            uiState = LoginFormState(isLoading = true),
+            networkStatus = NetworkStatus.Connected,
+            navigateToSignUpScreen = { /*TODO*/ },
+            eventFlow = MutableSharedFlow<UiEvent>(),
+            onChangeEmail = {},
+            onChangePassword = {},
+            onChangePasswordVisibility = { /*TODO*/ },
+            onSubmit = {}
+        )
+    }
 
-    LoginScreenContent(
-        uiState = LoginFormState(isLoading = true),
-        networkStatus = NetworkStatus.Connected,
-        navigateToSignUpScreen = { /*TODO*/ },
-        eventFlow = MutableSharedFlow<UiEvent>(),
-        onChangeEmail = {},
-        onChangePassword = {},
-        onChangePasswordVisibility = { /*TODO*/ },
-        onSubmit = {}
-    )
+}
+
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Preview
+@Composable
+fun LoginScreenPreview2() {
+    BloggerTheme(darkTheme = false){
+        LoginScreenContent(
+            uiState = LoginFormState(isLoading = true),
+            networkStatus = NetworkStatus.Connected,
+            navigateToSignUpScreen = { /*TODO*/ },
+            eventFlow = MutableSharedFlow<UiEvent>(),
+            onChangeEmail = {},
+            onChangePassword = {},
+            onChangePasswordVisibility = { /*TODO*/ },
+            onSubmit = {}
+        )
+    }
+
 }

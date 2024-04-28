@@ -112,7 +112,8 @@ fun SignUpScreenContent(
         withStyle(
             style = SpanStyle(
                 fontWeight = FontWeight.Normal,
-                fontSize = 17.sp
+                fontSize = 17.sp,
+                color = MaterialTheme.colorScheme.onBackground
             )
         ) {
             append("Already have an account ? ")
@@ -121,7 +122,8 @@ fun SignUpScreenContent(
             style = SpanStyle(
                 fontWeight = FontWeight.Bold,
                 fontSize = 17.sp,
-                textDecoration = TextDecoration.Underline
+                textDecoration = TextDecoration.Underline,
+                color = MaterialTheme.colorScheme.onBackground
             )
         ) {
             pushStringAnnotation(tag = "login", annotation = "login")

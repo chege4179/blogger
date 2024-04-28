@@ -17,6 +17,7 @@ package com.peterchege.blogger.presentation.screens.notifcations
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -37,6 +38,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.CombinedLoadStates
+import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.peterchege.blogger.R
@@ -71,7 +74,7 @@ fun NotificationScreen(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun NotificationScreenContent(
@@ -84,7 +87,7 @@ fun NotificationScreenContent(
     val notificationFilters = listOf(
         "All",
         "Like",
-        "Follow",
+        "Follower",
         "Comment",
     )
     Scaffold(
@@ -138,7 +141,7 @@ fun NotificationScreenContent(
                         LazyRow(
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            items(items = notificationFilters) {
+                            items(items = notificationFilters, key = { it }) {
                                 NotificationFilterCard(
                                     filterType = it,
                                     isActive = notificationFilter == it,
@@ -147,6 +150,7 @@ fun NotificationScreenContent(
                             }
                         }
                     }
+                   
                     if (notifications.itemCount == 0) {
                         item {
                             Column(
@@ -179,6 +183,33 @@ fun NotificationScreenContent(
 
 
                             }
+
+                        }
+                    }
+                    when(notifications.loadState.append){
+                        is LoadState.Loading -> {
+                            item {
+                                LoadingComponent()
+                            }
+
+                        }
+                        is LoadState.Error -> {
+
+                        }
+                        is LoadState.NotLoading -> {
+
+                        }
+                    }
+                    when (notifications.loadState.prepend){
+                        is LoadState.Loading -> {
+                            item {
+                                LoadingComponent()
+                            }
+                        }
+                        is LoadState.NotLoading -> {
+                            
+                        }
+                        is LoadState.Error ->  {
 
                         }
                     }
