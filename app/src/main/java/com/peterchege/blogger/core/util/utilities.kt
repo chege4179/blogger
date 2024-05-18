@@ -37,6 +37,14 @@ fun Context.toast(msg: String) {
     Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
 }
 
+fun Any?.isNull(): Boolean {
+    return this == null
+}
+
+fun Any?.isNotNull(): Boolean {
+    return this != null
+}
+
 fun Context.findActivity(): Activity {
     var context = this
     while (context is ContextWrapper) {

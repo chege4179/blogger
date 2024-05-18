@@ -17,6 +17,7 @@ package com.peterchege.blogger.presentation.screens.search
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,6 +29,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
@@ -43,6 +45,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -55,7 +58,10 @@ import com.peterchege.blogger.presentation.screens.search.tabs.SearchUsersTab
 import com.peterchege.blogger.presentation.theme.MainWhiteColor
 import kotlinx.coroutines.launch
 import com.peterchege.blogger.R
+import com.peterchege.blogger.core.fake.dummyPostList
+import com.peterchege.blogger.domain.mappers.toPost
 import com.peterchege.blogger.presentation.components.CustomIconButton
+import com.peterchege.blogger.presentation.theme.BloggerTheme
 
 @Composable
 fun SearchScreen(
@@ -128,48 +134,30 @@ fun SearchScreenContent(
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.background)
                     .padding(horizontal = 10.dp)
-                    .padding(top = 10.dp)
-                ,
+                    .padding(top = 10.dp),
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = CenterVertically
             ) {
-                TextField(
-                    value = searchQuery,
-                    onValueChange = onChangeSearchQuery,
-                    placeholder = {
-                        Text(
-                            text = "Search",
-                            color = MaterialTheme.colorScheme.onBackground,
-                        )
-                    },
+                SearchBar(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color.LightGray, shape = RoundedCornerShape(8.dp))
-                        .clickable {
-                        },
-                    shape = RoundedCornerShape(size = 8.dp),
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.Words,
-                        autoCorrect = true,
-                        keyboardType = KeyboardType.Text,
-                    ),
-                    colors = TextFieldDefaults.textFieldColors(
-                        disabledTextColor = MainWhiteColor,
-                        focusedIndicatorColor = MainWhiteColor,
-                        unfocusedIndicatorColor = MainWhiteColor,
-                        disabledIndicatorColor = MainWhiteColor
-                    ),
-                    textStyle = TextStyle(color = Color.Black),
-                    maxLines = 1,
-                    singleLine = true,
+                        .padding(horizontal = 5.dp),
+                    query = searchQuery,
+                    onQueryChange = onChangeSearchQuery,
+                    placeholder = {
+                        Text(text = "Search")
+                    },
                     trailingIcon = {
                         CustomIconButton(
+                            onClick = {},
                             imageVector = Icons.Default.Search,
                             contentDescription = "Search",
-                            modifier = Modifier,
-                            onClick = {}
                         )
-                    }
+                    },
+                    onSearch = {},
+                    active = false,
+                    onActiveChange = { },
+                    content = {}
                 )
             }
         },
@@ -181,9 +169,9 @@ fun SearchScreenContent(
         )
         Column(
             modifier = Modifier
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
-                ,
+                .padding(10.dp),
         ) {
             Tabs(pagerState = pagerState)
             TabsContent(
@@ -209,6 +197,7 @@ fun Tabs(pagerState: PagerState) {
     val scope = rememberCoroutineScope()
 
     TabRow(
+
         selectedTabIndex = pagerState.currentPage,
         containerColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.background,
@@ -221,16 +210,20 @@ fun Tabs(pagerState: PagerState) {
         }
     ) {
         list.forEachIndexed { index, _ ->
+            val color by animateColorAsState(
+                label = "Color Animation",
+                targetValue = if (pagerState.currentPage == index)
+                    MaterialTheme.colorScheme.onBackground
+                else
+                    MaterialTheme.colorScheme.primary
+            )
             Tab(
                 text = {
                     Text(
                         text = list[index],
                         fontWeight = FontWeight.Bold,
                         fontSize = 17.sp,
-                        color = if (pagerState.currentPage == index)
-                            MaterialTheme.colorScheme.onBackground
-                        else
-                            MaterialTheme.colorScheme.primary
+                        color = color
                     )
                 },
                 selected = pagerState.currentPage == index,
@@ -251,9 +244,12 @@ fun TabsContent(
     uiState: SearchScreenUiState,
     navigateToAuthorProfileScreen: (String) -> Unit,
     navigateToPostScreen: (String) -> Unit,
-    onRetry:() -> Unit,
+    onRetry: () -> Unit,
 ) {
-    HorizontalPager(state = pagerState) {
+    HorizontalPager(
+
+        state = pagerState
+    ) {
         AnimatedContent(
             targetState = pagerState,
             label = "Horizontal Pager",
@@ -276,4 +272,43 @@ fun TabsContent(
         }
 
     }
+}
+
+@Preview
+@Composable
+fun SearchScreenContentPreviewLight() {
+    BloggerTheme {
+        SearchScreenContent(
+            uiState = SearchScreenUiState.ResultsFound(
+                posts = dummyPostList.map { it.toPost() },
+                users = emptyList()
+            ),
+            searchQuery = "",
+            onChangeSearchQuery = {},
+            navigateToPostScreen = {},
+            navigateToAuthorProfileScreen = {},
+            networkStatus = NetworkStatus.Connected
+        )
+    }
+
+}
+
+
+@Preview
+@Composable
+fun SearchScreenContentPreviewDark() {
+    BloggerTheme(darkTheme = true) {
+        SearchScreenContent(
+            uiState = SearchScreenUiState.ResultsFound(
+                posts = dummyPostList.map { it.toPost() },
+                users = emptyList()
+            ),
+            searchQuery = "",
+            onChangeSearchQuery = {},
+            navigateToPostScreen = {},
+            navigateToAuthorProfileScreen = {},
+            networkStatus = NetworkStatus.Connected
+        )
+    }
+
 }

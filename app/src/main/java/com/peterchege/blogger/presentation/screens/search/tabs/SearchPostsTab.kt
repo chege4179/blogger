@@ -77,6 +77,7 @@ fun SearchPostsTab(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(top = 10.dp)
+                        ,
                     ) {
                         items(items = searchPosts) { post ->
                             ArticleCard(

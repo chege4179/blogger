@@ -23,8 +23,14 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -46,8 +53,12 @@ import coil.compose.SubcomposeAsyncImage
 import com.peterchege.blogger.R
 import com.peterchege.blogger.core.services.UploadPostService
 import com.peterchege.blogger.core.util.UiEvent
+import com.peterchege.blogger.core.util.isNotNull
+import com.peterchege.blogger.core.util.isNull
 import com.peterchege.blogger.presentation.alertDialogs.DraftConfirmDialog
+import com.peterchege.blogger.presentation.components.CustomIconButton
 import com.peterchege.blogger.presentation.components.NotLoggedInComponent
+import com.peterchege.blogger.presentation.theme.BloggerTheme
 import com.peterchege.blogger.presentation.theme.defaultPadding
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -59,8 +70,8 @@ fun AddPostScreen(
     navigateBack: () -> Unit,
     navigateToDraftScreen: () -> Unit,
     navigateToDashboardScreen: () -> Unit,
-    navigateToLoginScreen:() -> Unit,
-    navigateToSignUpScreen:() -> Unit,
+    navigateToLoginScreen: () -> Unit,
+    navigateToSignUpScreen: () -> Unit,
     viewModel: AddPostScreenViewModel = hiltViewModel(),
 
     ) {
@@ -77,27 +88,27 @@ fun AddPostScreen(
         eventFlow = viewModel.eventFlow,
         onChangePostTitle = viewModel::onChangePostTitle,
         onChangePostBody = viewModel::onChangePostBody,
-        onChangeImageUri = viewModel::onChangePhotoUri ,
+        onChangeImageUri = viewModel::onChangePhotoUri,
         onSubmit = {
             authUser?.let { user ->
-                if (viewModel.formState.value.uri == null){
+                if (viewModel.formState.value.uri == null) {
                     viewModel.emitSnackBarEvent(msg = context.getString(R.string.post_image_uri_error))
                     return@let
                 }
-                if (viewModel.formState.value.postBody ==""){
+                if (viewModel.formState.value.postBody == "") {
                     viewModel.emitSnackBarEvent(msg = context.getString(R.string.post_body_error))
                     return@let
                 }
-                if (viewModel.formState.value.postTitle ==""){
+                if (viewModel.formState.value.postTitle == "") {
                     viewModel.emitSnackBarEvent(msg = context.getString(R.string.post_title_error))
                     return@let
                 }
-                Intent(context,UploadPostService::class.java).also {
+                Intent(context, UploadPostService::class.java).also {
                     it.action = UploadPostService.Actions.START.toString()
-                    it.putExtra("postTitle",viewModel.formState.value.postTitle)
-                    it.putExtra("postBody",viewModel.formState.value.postBody)
-                    it.putExtra("userId",user.userId)
-                    it.putExtra("uri",viewModel.formState.value.uri.toString())
+                    it.putExtra("postTitle", viewModel.formState.value.postTitle)
+                    it.putExtra("postBody", viewModel.formState.value.postBody)
+                    it.putExtra("userId", user.userId)
+                    it.putExtra("uri", viewModel.formState.value.uri.toString())
                     context.startService(it)
                 }
                 navigateToDashboardScreen()
@@ -116,6 +127,7 @@ fun AddPostScreen(
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @ExperimentalCoilApi
 @Composable
@@ -133,8 +145,8 @@ fun AddPostScreenContent(
     onSaveDraftConfirm: () -> Unit,
     onSaveDraftDismiss: () -> Unit,
     onCloseDialog: () -> Unit,
-    navigateToLoginScreen:() -> Unit,
-    navigateToSignUpScreen:() -> Unit,
+    navigateToLoginScreen: () -> Unit,
+    navigateToSignUpScreen: () -> Unit,
 
 
     ) {
@@ -168,7 +180,16 @@ fun AddPostScreenContent(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
-    ) {
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.create_post_icon_description),
+                        textAlign = TextAlign.Center,)
+                }
+            )
+        }
+    ) { paddingValues ->
 
         BackHandler {
             onBackPress()
@@ -180,19 +201,20 @@ fun AddPostScreenContent(
                 onCloseDialog = onCloseDialog,
             )
         }
-        when(uiState){
+        when (uiState) {
             is AddPostScreenUiState.NotLoggedIn -> {
                 NotLoggedInComponent(
                     navigateToLoginScreen = navigateToLoginScreen,
-                    navigateToSignUpScreen =navigateToSignUpScreen
+                    navigateToSignUpScreen = navigateToSignUpScreen
                 )
             }
+
             is AddPostScreenUiState.LoggedIn -> {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(defaultPadding)
-                    ,
+                        .padding(paddingValues)
+                        .padding(defaultPadding),
                 ) {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
 
@@ -202,38 +224,75 @@ fun AddPostScreenContent(
                                 horizontalArrangement = Arrangement.SpaceEvenly
 
                             ) {
-                                formState.uri?.let {
-                                    SubcomposeAsyncImage(
-                                        model = it ,
-                                        modifier = Modifier
-                                            .width(135.dp)
-                                            .height(135.dp)
-                                        ,
-                                        contentDescription = stringResource(id = R.string.add_post_image_text),
-                                        contentScale = ContentScale.FillBounds
-                                    )
+                                Box(
+                                    modifier = Modifier
+                                        .width(120.dp)
+                                        .height(120.dp)
+                                        .border(BorderStroke(1.dp, Color.Gray))
+                                        .background(MaterialTheme.colorScheme.background.copy(alpha = 0.7f)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    AnimatedContent(
+                                        targetState = formState.uri.isNotNull(),
+                                        label = "Post Image"
+                                    ) { isUriNull ->
+                                        if (isUriNull) {
+                                            SubcomposeAsyncImage(
+                                                model = formState.uri,
+                                                modifier = Modifier
+                                                    .width(135.dp)
+                                                    .height(135.dp),
+                                                contentDescription = stringResource(id = R.string.add_post_image_text),
+                                                contentScale = ContentScale.FillBounds
+                                            )
+                                        } else {
+                                            CustomIconButton(
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                                    .align(Alignment.Center),
+                                                imageVector = Icons.Default.Add,
+                                                contentDescription = stringResource(id = R.string.add_post_image_text),
+                                                onClick = {
+                                                    photoPicker.launch(
+                                                        PickVisualMediaRequest(
+                                                            ActivityResultContracts.PickVisualMedia.ImageOnly
+                                                        )
+                                                    )
+                                                }
+                                            )
+                                        }
+                                    }
+
                                 }
+
                                 Column(
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .fillMaxHeight(0.2f),
+                                        .height(120.dp)
+                                        .padding(5.dp),
                                     verticalArrangement = Arrangement.SpaceEvenly,
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-
                                     Button(
                                         modifier = Modifier.fillMaxWidth(0.95f),
+                                        shape = MaterialTheme.shapes.small,
                                         onClick = {
-                                            photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                                        }) {
+                                            photoPicker.launch(
+                                                PickVisualMediaRequest(
+                                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                                )
+                                            )
+                                        }
+                                    ) {
                                         Text(text = stringResource(id = R.string.select_image_text))
                                     }
                                     Spacer(modifier = Modifier.height(10.dp))
                                     Button(
                                         modifier = Modifier.fillMaxWidth(0.95f),
+                                        shape = MaterialTheme.shapes.small,
                                         onClick = {
                                             onChangeImageUri(null)
-                                        }) {
+                                        }
+                                    ) {
                                         Text(text = stringResource(id = R.string.remove_image_text))
                                     }
                                 }
@@ -253,9 +312,8 @@ fun AddPostScreenContent(
                                     label = {
                                         Text(text = stringResource(id = R.string.post_title))
                                     },
-                                    onValueChange = {
-                                        onChangePostTitle(it)
-                                    })
+                                    onValueChange = onChangePostTitle
+                                )
                                 Spacer(modifier = Modifier.height(10.dp))
                                 OutlinedTextField(
                                     modifier = Modifier
@@ -264,31 +322,29 @@ fun AddPostScreenContent(
                                     value = formState.postBody,
                                     maxLines = 70,
                                     label = {
-                                        Text(text= stringResource(id = R.string.post_body))
+                                        Text(text = stringResource(id = R.string.post_body))
                                     },
-                                    onValueChange = {
-                                        onChangePostBody(it)
-                                    })
+                                    onValueChange = onChangePostBody
+                                )
                                 Spacer(modifier = Modifier.height(10.dp))
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                 ) {
                                     Button(
-                                        onClick = {
-                                            navigateToDraftScreen()
-
-                                        }) {
+                                        shape = MaterialTheme.shapes.small,
+                                        onClick = navigateToDraftScreen
+                                    ) {
                                         Text(
                                             text = stringResource(id = R.string.view_draft)
                                         )
                                     }
                                     Button(
-                                        onClick = {
-                                            onSubmit()
-                                        }) {
+                                        shape = MaterialTheme.shapes.small,
+                                        onClick = onSubmit
+                                    ) {
                                         Text(
-                                            text =stringResource(id = R.string.post)
+                                            text = stringResource(id = R.string.post)
                                         )
                                     }
                                 }
@@ -355,5 +411,28 @@ fun AddPostScreenPreview2() {
 
 }
 
+@Preview
+@Composable
+fun AddPostScreenPreview3() {
+    BloggerTheme(darkTheme = true) {
+        AddPostScreenContent(
+            uiState = AddPostScreenUiState.LoggedIn,
+            navigateToDraftScreen = { /*TODO*/ },
+            formState = AddPostFormState(),
+            isUploading = false,
+            eventFlow = MutableSharedFlow(),
+            onChangePostTitle = {},
+            onChangePostBody = {},
+            onChangeImageUri = {},
+            onSubmit = { /*TODO*/ },
+            onBackPress = { /*TODO*/ },
+            onSaveDraftConfirm = { /*TODO*/ },
+            onSaveDraftDismiss = { /*TODO*/ },
+            onCloseDialog = { /*TODO*/ },
+            navigateToLoginScreen = { /*TODO*/ },
+            navigateToSignUpScreen = {}
+        )
+    }
 
+}
 

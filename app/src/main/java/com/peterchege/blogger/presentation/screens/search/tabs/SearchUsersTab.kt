@@ -64,6 +64,8 @@ fun SearchUsersTab(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
+                        .padding(top = 10.dp)
+
                 ) {
                     items(items = searchUsers, key = { it.userId }) { user ->
                         ProfileCard(
