@@ -150,7 +150,7 @@ fun NotificationScreenContent(
                             }
                         }
                     }
-                   
+
                     if (notifications.itemCount == 0) {
                         item {
                             Column(
@@ -172,7 +172,7 @@ fun NotificationScreenContent(
                                         true
                                     else (notification.notificationType == notificationFilter)
                                 }
-                                if (shouldShowNotification) {
+                                AnimatedVisibility(visible = shouldShowNotification) {
                                     NotificationCard(
                                         notification = notification,
                                         navigateToPostScreen = navigateToPostScreen,
@@ -180,8 +180,6 @@ fun NotificationScreenContent(
                                     )
                                     Spacer(modifier = Modifier.padding(10.dp))
                                 }
-
-
                             }
 
                         }

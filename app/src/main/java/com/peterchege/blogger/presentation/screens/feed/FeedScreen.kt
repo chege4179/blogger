@@ -16,6 +16,7 @@
 package com.peterchege.blogger.presentation.screens.feed
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -268,67 +269,70 @@ fun FeedScreenContent(
 //
 //                    }
 //                }
-                when (uiState) {
-                    is FeedScreenUiState.Empty -> {
-                        ErrorComponent(
-                            retryCallback = { retryCallback() },
-                            errorMessage = stringResource(id = R.string.no_posts_found)
-                        )
-                    }
+                AnimatedContent(targetState = uiState, label = "Feed Screen" ) { uiState ->
+                    when (uiState) {
+                        is FeedScreenUiState.Empty -> {
+                            ErrorComponent(
+                                retryCallback = { retryCallback() },
+                                errorMessage = stringResource(id = R.string.no_posts_found)
+                            )
+                        }
 
-                    is FeedScreenUiState.Loading -> {
-                        LoadingComponent()
-                    }
+                        is FeedScreenUiState.Loading -> {
+                            LoadingComponent()
+                        }
 
-                    is FeedScreenUiState.Error -> {
-                        ErrorComponent(
-                            retryCallback = { retryCallback() },
-                            errorMessage = uiState.message
-                        )
-                    }
+                        is FeedScreenUiState.Error -> {
+                            ErrorComponent(
+                                retryCallback = { retryCallback() },
+                                errorMessage = uiState.message
+                            )
+                        }
 
-                    is FeedScreenUiState.Success -> {
-                        LazyColumn(
-                            modifier = Modifier
+                        is FeedScreenUiState.Success -> {
+                            LazyColumn(
+                                modifier = Modifier
 
-                                .setTagAndId("feed")
-                                .fillMaxSize()
-                                .padding(defaultPadding)
-                        ) {
+                                    .setTagAndId("feed")
+                                    .fillMaxSize()
+                                    .padding(defaultPadding)
+                            ) {
 
-                            items(items = uiState.posts, key = { it.postId }) { post ->
-                                ArticleCard(
-                                    post = post.toPost(),
-                                    onItemClick = { post ->
-                                        navigateToPostScreen(post.postId)
-                                    },
-                                    onProfileNavigate = { userId ->
-                                        navigateToAuthorProfileScreen(userId)
-                                    },
-                                    onDeletePost = {},
-                                    isLiked = post.isLiked,
-                                    isSaved = post.isSaved,
-                                    isProfile = false,
-                                    onBookmarkPost = { post ->
-                                        bookmarkPost(post)
-                                    },
-                                    onUnBookmarkPost = { post ->
-                                        unBookmarkPost(post)
-                                    },
-                                    onLikePost = {
-                                        likePost(it)
-                                    },
-                                    onUnlikePost = {
-                                        unLikePost(it)
+                                items(items = uiState.posts, key = { it.postId }) { post ->
+                                    ArticleCard(
+                                        post = post.toPost(),
+                                        onItemClick = { post ->
+                                            navigateToPostScreen(post.postId)
+                                        },
+                                        onProfileNavigate = { userId ->
+                                            navigateToAuthorProfileScreen(userId)
+                                        },
+                                        onDeletePost = {},
+                                        isLiked = post.isLiked,
+                                        isSaved = post.isSaved,
+                                        isProfile = false,
+                                        onBookmarkPost = { post ->
+                                            bookmarkPost(post)
+                                        },
+                                        onUnBookmarkPost = { post ->
+                                            unBookmarkPost(post)
+                                        },
+                                        onLikePost = {
+                                            likePost(it)
+                                        },
+                                        onUnlikePost = {
+                                            unLikePost(it)
 
-                                    }
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
+                                        }
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                }
+
                             }
-
                         }
                     }
                 }
+
             }
             PullToRefreshContainer(
                 state = pullRefreshState,

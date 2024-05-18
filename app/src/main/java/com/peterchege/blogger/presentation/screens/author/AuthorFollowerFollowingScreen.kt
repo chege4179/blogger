@@ -15,6 +15,7 @@
  */
 package com.peterchege.blogger.presentation.screens.author
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -36,11 +37,11 @@ import java.util.*
 
 @Composable
 fun AuthorFollowerFollowingScreen(
-    navigateToAuthorProfileScreen:(String) -> Unit,
-    type:String,
-    userId:String,
+    navigateToAuthorProfileScreen: (String) -> Unit,
+    type: String,
+    userId: String,
     viewModel: AuthorFollowerFollowingScreenViewModel = hiltViewModel()
-){
+) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -57,51 +58,62 @@ fun AuthorFollowerFollowingScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuthorFollowerFollowingScreenContent(
-    uiState:AuthorProfileFollowerFollowingScreenUiState,
+    uiState: AuthorProfileFollowerFollowingScreenUiState,
     navigateToAuthorProfileScreen: (String) -> Unit,
-    type:String,
-    userId:String,
-){
+    type: String,
+    userId: String,
+) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text= "User's " + type.toLowerCase(Locale.ROOT).capitalize(
-                            Locale.ROOT) + "s",
+                        text = "User's " + type.toLowerCase(Locale.ROOT).capitalize(
+                            Locale.ROOT
+                        ) + "s",
                     )
                 }
             )
         }
-    ){ paddingValues ->
-        when(uiState){
-            is AuthorProfileFollowerFollowingScreenUiState.Loading ->{
-                LoadingComponent()
-            }
-            is AuthorProfileFollowerFollowingScreenUiState.Error -> {
-                ErrorComponent(
-                    retryCallback = { /*TODO*/ },
-                    errorMessage = uiState.message)
-            }
-            is AuthorProfileFollowerFollowingScreenUiState.Followers -> {
-                val followers = uiState.followers.collectAsLazyPagingItems()
-                FollowersList(
-                    followers =followers,
-                    paddingValues = paddingValues,
-                    navigateToAuthorProfileScreen = navigateToAuthorProfileScreen
-                )
+    ) { paddingValues ->
+        AnimatedContent(
+            targetState = uiState,
+            label = "AuthorProfileFollowerFollowingScreenContent"
+        ) { uiState ->
+            when (uiState) {
+                is AuthorProfileFollowerFollowingScreenUiState.Loading -> {
+                    LoadingComponent()
+                }
 
-            }
-            is AuthorProfileFollowerFollowingScreenUiState.Following -> {
-                val following = uiState.following.collectAsLazyPagingItems()
-                FollowingList(
-                    followings = following,
-                    paddingValues = paddingValues,
-                    navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
-                )
+                is AuthorProfileFollowerFollowingScreenUiState.Error -> {
+                    ErrorComponent(
+                        retryCallback = { /*TODO*/ },
+                        errorMessage = uiState.message
+                    )
+                }
+
+                is AuthorProfileFollowerFollowingScreenUiState.Followers -> {
+                    val followers = uiState.followers.collectAsLazyPagingItems()
+                    FollowersList(
+                        followers = followers,
+                        paddingValues = paddingValues,
+                        navigateToAuthorProfileScreen = navigateToAuthorProfileScreen
+                    )
+
+                }
+
+                is AuthorProfileFollowerFollowingScreenUiState.Following -> {
+                    val following = uiState.following.collectAsLazyPagingItems()
+                    FollowingList(
+                        followings = following,
+                        paddingValues = paddingValues,
+                        navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
+                    )
+                }
             }
         }
+
 
     }
 }

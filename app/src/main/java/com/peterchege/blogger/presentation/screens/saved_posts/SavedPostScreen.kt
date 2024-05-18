@@ -16,6 +16,7 @@
 package com.peterchege.blogger.presentation.screens.saved_posts
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -112,68 +113,71 @@ fun SavedPostScreenContent(
             )
         }
     ) { paddingValues ->
-        when (uiState) {
-            is SavedPostScreenUiState.Loading -> {
-                LoadingComponent()
-            }
+        AnimatedContent(targetState = uiState, label = "Saved Post") { uiState ->
+            when (uiState) {
+                is SavedPostScreenUiState.Loading -> {
+                    LoadingComponent()
+                }
 
-            is SavedPostScreenUiState.Empty -> {
+                is SavedPostScreenUiState.Empty -> {
 
-            }
+                }
 
-            is SavedPostScreenUiState.Error -> {
-                ErrorComponent(
-                    retryCallback = { /*TODO*/ },
-                    errorMessage = uiState.message
-                )
-            }
+                is SavedPostScreenUiState.Error -> {
+                    ErrorComponent(
+                        retryCallback = { /*TODO*/ },
+                        errorMessage = uiState.message
+                    )
+                }
 
-            is SavedPostScreenUiState.Success -> {
-                val posts = uiState.posts
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                        .padding(defaultPadding),
+                is SavedPostScreenUiState.Success -> {
+                    val posts = uiState.posts
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
+                            .padding(defaultPadding),
 
-                    ) {
-                    if (posts.isEmpty()) {
-                        item {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxSize(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center,
-                            ) {
-                                Text(
-                                    text = stringResource(id = R.string.no_saved_posts),
-                                    fontWeight = FontWeight.Bold,
-                                )
+                        ) {
+                        if (posts.isEmpty()) {
+                            item {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxSize(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center,
+                                ) {
+                                    Text(
+                                        text = stringResource(id = R.string.no_saved_posts),
+                                        fontWeight = FontWeight.Bold,
+                                    )
+                                }
                             }
-                        }
 
-                    }
-                    items(items = posts, key = { it.postId }) { post ->
-                        ArticleCard(
-                            post = post,
-                            onItemClick = { post ->
-                                navigateToPostScreen(post.postId)
-                            },
-                            onProfileNavigate = navigateToAuthorProfileScreen,
-                            onDeletePost = {},
-                            isLiked = false,
-                            isSaved = true,
-                            isProfile = false,
-                            onBookmarkPost = bookmarkPost,
-                            onUnBookmarkPost = unBookmarkPost,
-                            onLikePost = likePost,
-                            onUnlikePost = unLikePost
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        }
+                        items(items = posts, key = { it.postId }) { post ->
+                            ArticleCard(
+                                post = post,
+                                onItemClick = { post ->
+                                    navigateToPostScreen(post.postId)
+                                },
+                                onProfileNavigate = navigateToAuthorProfileScreen,
+                                onDeletePost = {},
+                                isLiked = false,
+                                isSaved = true,
+                                isProfile = false,
+                                onBookmarkPost = bookmarkPost,
+                                onUnBookmarkPost = unBookmarkPost,
+                                onLikePost = likePost,
+                                onUnlikePost = unLikePost
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
                     }
                 }
             }
         }
+
 
     }
 }

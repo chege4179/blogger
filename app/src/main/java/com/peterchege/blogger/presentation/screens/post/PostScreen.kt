@@ -17,6 +17,7 @@ package com.peterchege.blogger.presentation.screens.post
 
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
@@ -217,274 +218,277 @@ fun PostScreenContent(
             }
         }
     ) { paddingValues ->
-        when (uiState) {
-            is PostScreenUiState.Loading -> {
-                LoadingComponent()
-            }
+        AnimatedContent(targetState = uiState,label = "Post Screen"){ uiState ->
+            when (uiState) {
+                is PostScreenUiState.Loading -> {
+                    LoadingComponent()
+                }
 
-            is PostScreenUiState.Error -> {
-                ErrorComponent(
-                    retryCallback = { },
-                    errorMessage = "An unexpected error occurred"
-                )
-            }
-
-            is PostScreenUiState.PostNotFound -> {
-                ErrorComponent(
-                    retryCallback = { /*TODO*/ },
-                    errorMessage = stringResource(id = R.string.no_posts_found)
-                )
-            }
-
-            is PostScreenUiState.Success -> {
-                val post = uiState.post
-                val comments = uiState.comments.collectAsLazyPagingItems()
-
-                if (commentUiState.isReplyCommentDialogVisible && (commentUiState.commentToBeRepliedTo != null)) {
-                    ReplyCommentDialog(
-                        isUserLoggedIn = uiState.isUserLoggedIn,
-                        commentUiState = commentUiState,
-                        onChangeNewComment = onChangeReplyComment,
-                        replyToComment = {
-                            replyToComment { comments.refresh() }
-                        },
-                        closeCommentDialog = toggleReplyCommentDialog
+                is PostScreenUiState.Error -> {
+                    ErrorComponent(
+                        retryCallback = { },
+                        errorMessage = "An unexpected error occurred"
                     )
                 }
 
-                if (commentUiState.isDeleteCommentDialogVisible && (commentUiState.commentToBeDeleted != null)) {
-                    DeleteCommentDialog(
-                        comment = commentUiState.commentToBeDeleted,
-                        closeDeleteDialog = toggleDeleteCommentDialog,
-                        deleteComment = {
-                            deleteComment { comments.refresh() }
-                        }
+                is PostScreenUiState.PostNotFound -> {
+                    ErrorComponent(
+                        retryCallback = { /*TODO*/ },
+                        errorMessage = stringResource(id = R.string.no_posts_found)
                     )
                 }
 
-                AnimatedVisibility(
-                    visible = commentUiState.isCommentDialogVisible,
-                    enter = scaleInEnterTransition(),
-                    exit = scaleOutExitTransition()
-                ) {
-                    CommentDialog(
-                        closeCommentDialog = { closeCommentDialog() },
-                        commentUiState = commentUiState,
-                        postComment = { postComment { comments.refresh() } },
-                        onChangeNewComment = { onChangeNewComment(it) },
-                        isUserLoggedIn = uiState.isUserLoggedIn,
-                    )
-                }
-                LazyColumn(
-                    modifier = Modifier.padding(paddingValues)
-                ) {
-                    item {
-                        Box(
-                            modifier = Modifier.fillMaxSize()
+                is PostScreenUiState.Success -> {
+                    val post = uiState.post
+                    val comments = uiState.comments.collectAsLazyPagingItems()
+
+                    if (commentUiState.isReplyCommentDialogVisible && (commentUiState.commentToBeRepliedTo != null)) {
+                        ReplyCommentDialog(
+                            isUserLoggedIn = uiState.isUserLoggedIn,
+                            commentUiState = commentUiState,
+                            onChangeNewComment = onChangeReplyComment,
+                            replyToComment = {
+                                replyToComment { comments.refresh() }
+                            },
+                            closeCommentDialog = toggleReplyCommentDialog
                         )
-                        {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                            ) {
-                                var offset by remember { mutableStateOf(Offset.Zero) }
-                                var zoom by remember { mutableStateOf(1f) }
-                                SubcomposeAsyncImage(
-                                    model = post.imageUrl,
-                                    loading = {
-                                        Box(modifier = Modifier.fillMaxSize()) {
-                                            CircularProgressIndicator(
-                                                modifier = Modifier.align(
-                                                    Alignment.Center
-                                                )
-                                            )
-                                        }
-                                    },
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .height(300.dp)
-                                        .clipToBounds()
-                                        .pointerInput(Unit) {
-                                            detectTapGestures(
-                                                onDoubleTap = { tapOffset ->
-                                                    zoom = if (zoom > 1f) 1f else 2f
-                                                    offset = calculateDoubleTapOffset(
-                                                        zoom = zoom,
-                                                        size = size,
-                                                        tapOffset = tapOffset
-                                                    )
+                    }
 
-                                                }
-                                            )
-                                        }
-                                        .pointerInput(Unit) {
-                                            detectTransformGestures(
-                                                onGesture = { centroid, pan, gestureZoom, _ ->
-                                                    offset = offset.calculateNewOffset(
-                                                        centroid = centroid,
-                                                        pan = pan,
-                                                        zoom = zoom,
-                                                        gestureZoom = gestureZoom,
-                                                        size = size
-                                                    )
-                                                    zoom = maxOf(a = 1f, b = zoom * gestureZoom)
-                                                }
-                                            )
-                                        }
-                                        .graphicsLayer {
-                                            translationX = -offset.x * zoom
-                                            translationY = -offset.y * zoom
-                                            scaleX = zoom
-                                            scaleY = zoom
-                                            transformOrigin = TransformOrigin(
-                                                pivotFractionX = 0f,
-                                                pivotFractionY = 0f
-                                            )
-                                        },
-                                    contentDescription = stringResource(id = R.string.post_image)
-                                )
+                    if (commentUiState.isDeleteCommentDialogVisible && (commentUiState.commentToBeDeleted != null)) {
+                        DeleteCommentDialog(
+                            comment = commentUiState.commentToBeDeleted,
+                            closeDeleteDialog = toggleDeleteCommentDialog,
+                            deleteComment = {
+                                deleteComment { comments.refresh() }
+                            }
+                        )
+                    }
 
-                                Spacer(
-                                    modifier = Modifier
-                                        .height(8.dp)
-                                        .padding(15.dp)
-                                )
-                                HorizontalDivider(
-                                    color = Color.Blue,
-                                    thickness = 1.dp,
-                                    modifier = Modifier.padding(10.dp)
-                                )
+                    AnimatedVisibility(
+                        visible = commentUiState.isCommentDialogVisible,
+                        enter = scaleInEnterTransition(),
+                        exit = scaleOutExitTransition()
+                    ) {
+                        CommentDialog(
+                            closeCommentDialog = { closeCommentDialog() },
+                            commentUiState = commentUiState,
+                            postComment = { postComment { comments.refresh() } },
+                            onChangeNewComment = { onChangeNewComment(it) },
+                            isUserLoggedIn = uiState.isUserLoggedIn,
+                        )
+                    }
+                    LazyColumn(
+                        modifier = Modifier.padding(paddingValues)
+                    ) {
+                        item {
+                            Box(
+                                modifier = Modifier.fillMaxSize()
+                            )
+                            {
                                 Column(
-                                    modifier = Modifier.padding(10.dp)
-
+                                    modifier = Modifier
+                                        .fillMaxWidth()
                                 ) {
-                                    Text(
-                                        text = post.postTitle,
-                                        textAlign = TextAlign.Center,
-                                        fontWeight = FontWeight.ExtraBold,
-                                        fontSize = 30.sp
-                                    )
-                                    Row(
+                                    var offset by remember { mutableStateOf(Offset.Zero) }
+                                    var zoom by remember { mutableStateOf(1f) }
+                                    SubcomposeAsyncImage(
+                                        model = post.imageUrl,
+                                        loading = {
+                                            Box(modifier = Modifier.fillMaxSize()) {
+                                                CircularProgressIndicator(
+                                                    modifier = Modifier.align(
+                                                        Alignment.Center
+                                                    )
+                                                )
+                                            }
+                                        },
+                                        contentScale = ContentScale.Crop,
                                         modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 10.dp),
-                                        Arrangement.SpaceEvenly
-                                    ) {
-                                        Text(text = "By: ")
-                                        Text(
-                                            text = post.postAuthor.fullName,
-                                            fontWeight = FontWeight.Bold,
-                                            modifier = Modifier.clickable {}
-                                        )
-                                        Icon(
-                                            imageVector = if (post.isLiked)
-                                                Icons.Default.Favorite
-                                            else
-                                                Icons.Default.FavoriteBorder,
-                                            contentDescription = if (post.isLiked)
-                                                stringResource(id = R.string.unlike_description)
-                                            else
-                                                stringResource(id = R.string.like_description),
-                                            modifier = Modifier.clickable {
-                                                if (user != null) {
-                                                    if (post.isLiked) {
-                                                        onUnlikePost(post.toPost())
-                                                    } else {
-                                                        onLikePost(post.toPost())
+                                            .fillMaxSize()
+                                            .height(300.dp)
+                                            .clipToBounds()
+                                            .pointerInput(Unit) {
+                                                detectTapGestures(
+                                                    onDoubleTap = { tapOffset ->
+                                                        zoom = if (zoom > 1f) 1f else 2f
+                                                        offset = calculateDoubleTapOffset(
+                                                            zoom = zoom,
+                                                            size = size,
+                                                            tapOffset = tapOffset
+                                                        )
+
                                                     }
+                                                )
+                                            }
+                                            .pointerInput(Unit) {
+                                                detectTransformGestures(
+                                                    onGesture = { centroid, pan, gestureZoom, _ ->
+                                                        offset = offset.calculateNewOffset(
+                                                            centroid = centroid,
+                                                            pan = pan,
+                                                            zoom = zoom,
+                                                            gestureZoom = gestureZoom,
+                                                            size = size
+                                                        )
+                                                        zoom = maxOf(a = 1f, b = zoom * gestureZoom)
+                                                    }
+                                                )
+                                            }
+                                            .graphicsLayer {
+                                                translationX = -offset.x * zoom
+                                                translationY = -offset.y * zoom
+                                                scaleX = zoom
+                                                scaleY = zoom
+                                                transformOrigin = TransformOrigin(
+                                                    pivotFractionX = 0f,
+                                                    pivotFractionY = 0f
+                                                )
+                                            },
+                                        contentDescription = stringResource(id = R.string.post_image)
+                                    )
 
-                                                }
-                                            }
-                                        )
-                                        Icon(
-                                            imageVector = if (post.isSaved)
-                                                Icons.Default.Bookmark
-                                            else
-                                                Icons.Default.BookmarkBorder,
-                                            contentDescription = if (post.isSaved)
-                                                stringResource(id = R.string.un_save_description)
-                                            else
-                                                stringResource(id = R.string.save_description),
-                                            modifier = Modifier.clickable {
-                                                if (post.isSaved) {
-                                                    unSavePost(post.postId)
-                                                } else {
-                                                    savePost(post.toPost())
-                                                }
-                                            }
-                                        )
-                                        Icon(
-                                            imageVector = Icons.Default.Share,
-                                            contentDescription = stringResource(id = R.string.share_description),
-                                            modifier = Modifier.clickable {
-
-                                            }
-                                        )
-                                    }
                                     Spacer(
                                         modifier = Modifier
                                             .height(8.dp)
                                             .padding(15.dp)
                                     )
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 10.dp),
-                                        Arrangement.SpaceEvenly,
-                                        Alignment.CenterVertically
+                                    HorizontalDivider(
+                                        color = Color.Blue,
+                                        thickness = 1.dp,
+                                        modifier = Modifier.padding(10.dp)
+                                    )
+                                    Column(
+                                        modifier = Modifier.padding(10.dp)
 
                                     ) {
-                                        Text(text = convertUtcDateStringToReadable(post.createdAt))
+                                        Text(
+                                            text = post.postTitle,
+                                            textAlign = TextAlign.Center,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            fontSize = 30.sp
+                                        )
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 10.dp),
+                                            Arrangement.SpaceEvenly
+                                        ) {
+                                            Text(text = "By: ")
+                                            Text(
+                                                text = post.postAuthor.fullName,
+                                                fontWeight = FontWeight.Bold,
+                                                modifier = Modifier.clickable {}
+                                            )
+                                            Icon(
+                                                imageVector = if (post.isLiked)
+                                                    Icons.Default.Favorite
+                                                else
+                                                    Icons.Default.FavoriteBorder,
+                                                contentDescription = if (post.isLiked)
+                                                    stringResource(id = R.string.unlike_description)
+                                                else
+                                                    stringResource(id = R.string.like_description),
+                                                modifier = Modifier.clickable {
+                                                    if (user != null) {
+                                                        if (post.isLiked) {
+                                                            onUnlikePost(post.toPost())
+                                                        } else {
+                                                            onLikePost(post.toPost())
+                                                        }
 
-                                        Text(text = "${post.count.likes} like(s)")
-                                        Text(text = "${post.count.views} view(s)")
+                                                    }
+                                                }
+                                            )
+                                            Icon(
+                                                imageVector = if (post.isSaved)
+                                                    Icons.Default.Bookmark
+                                                else
+                                                    Icons.Default.BookmarkBorder,
+                                                contentDescription = if (post.isSaved)
+                                                    stringResource(id = R.string.un_save_description)
+                                                else
+                                                    stringResource(id = R.string.save_description),
+                                                modifier = Modifier.clickable {
+                                                    if (post.isSaved) {
+                                                        unSavePost(post.postId)
+                                                    } else {
+                                                        savePost(post.toPost())
+                                                    }
+                                                }
+                                            )
+                                            Icon(
+                                                imageVector = Icons.Default.Share,
+                                                contentDescription = stringResource(id = R.string.share_description),
+                                                modifier = Modifier.clickable {
 
+                                                }
+                                            )
+                                        }
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(8.dp)
+                                                .padding(15.dp)
+                                        )
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 10.dp),
+                                            Arrangement.SpaceEvenly,
+                                            Alignment.CenterVertically
+
+                                        ) {
+                                            Text(text = convertUtcDateStringToReadable(post.createdAt))
+
+                                            Text(text = "${post.count.likes} like(s)")
+                                            Text(text = "${post.count.views} view(s)")
+
+                                        }
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(8.dp)
+                                                .padding(15.dp)
+                                        )
                                     }
+                                    HorizontalDivider(
+                                        modifier = Modifier.padding(10.dp),
+                                        thickness = 1.dp,
+                                        color = Color.Blue
+                                    )
+                                    Text(
+                                        text = post.postBody,
+                                        textAlign = TextAlign.Left,
+                                        modifier = Modifier
+                                            .padding(10.dp)
+
+                                    )
                                     Spacer(
                                         modifier = Modifier
                                             .height(8.dp)
                                             .padding(15.dp)
                                     )
                                 }
-                                HorizontalDivider(
-                                    modifier = Modifier.padding(10.dp),
-                                    thickness = 1.dp,
-                                    color = Color.Blue
-                                )
-                                Text(
-                                    text = post.postBody,
-                                    textAlign = TextAlign.Left,
-                                    modifier = Modifier
-                                        .padding(10.dp)
-
-                                )
-                                Spacer(
-                                    modifier = Modifier
-                                        .height(8.dp)
-                                        .padding(15.dp)
-                                )
                             }
                         }
+                        postCommentsSection(
+                            comments = comments,
+                            postAuthorId = post.postAuthorId,
+                            authUser = user,
+                            toggleDeleteCommentDialog = toggleDeleteCommentDialog,
+                            setCommentToBeDeleted = setCommentToBeDeleted,
+                            setCommentToBeRepliedTo = setCommentToRepliedTo,
+                            toggleReplyCommentDialog = toggleReplyCommentDialog,
+                            addParticipants = addCommentParticipants,
+                            likeComment = { commentId, userId ->
+                                likeComment(commentId, userId, { comments.refresh() })
+                            }
+                        )
                     }
-                    postCommentsSection(
-                        comments = comments,
-                        postAuthorId = post.postAuthorId,
-                        authUser = user,
-                        toggleDeleteCommentDialog = toggleDeleteCommentDialog,
-                        setCommentToBeDeleted = setCommentToBeDeleted,
-                        setCommentToBeRepliedTo = setCommentToRepliedTo,
-                        toggleReplyCommentDialog = toggleReplyCommentDialog,
-                        addParticipants = addCommentParticipants,
-                        likeComment = { commentId, userId ->
-                            likeComment(commentId, userId, { comments.refresh() })
-                        }
-                    )
                 }
-            }
 
-            else -> {}
+                else -> {}
+            }
         }
+
     }
 }
 
