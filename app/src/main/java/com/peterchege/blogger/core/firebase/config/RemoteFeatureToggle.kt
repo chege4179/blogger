@@ -36,7 +36,7 @@ class RemoteFeatureToggle(
             }
 
             override fun onError(error: FirebaseRemoteConfigException) {
-                Timber.tag(TAG).w("Config update error with code: " + error.code, error)
+                Timber.tag(TAG).w(error, "Config update error with code: %s", error.code)
             }
         })
     }

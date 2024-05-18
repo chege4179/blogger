@@ -18,7 +18,7 @@ object FirebaseModule {
     @Provides
     @Singleton
     fun provideRemoteFeatureToggle(): RemoteFeatureToggle =
-        RemoteFeatureToggle(Firebase.remoteConfig)
+        RemoteFeatureToggle(remoteConfig = Firebase.remoteConfig)
 
     @Provides
     @Singleton
