@@ -43,39 +43,37 @@ fun SearchUsersTab(
         modifier = Modifier
             .fillMaxSize()
     ) { paddingValues ->
-        AnimatedContent(targetState = uiState,label = "Search Users") { uiState ->
-            when (uiState) {
-                is SearchScreenUiState.Idle -> {
+        when (uiState) {
+            is SearchScreenUiState.Idle -> {
 
-                }
+            }
 
-                is SearchScreenUiState.Searching -> {
-                    LoadingComponent()
-                }
+            is SearchScreenUiState.Searching -> {
+                LoadingComponent()
+            }
 
-                is SearchScreenUiState.Error -> {
-                    ErrorComponent(
-                        retryCallback = onRetry,
-                        errorMessage = uiState.message
-                    )
-                }
+            is SearchScreenUiState.Error -> {
+                ErrorComponent(
+                    retryCallback = onRetry,
+                    errorMessage = uiState.message
+                )
+            }
 
-                is SearchScreenUiState.ResultsFound -> {
-                    val searchUsers = uiState.users
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(paddingValues)
-                            .padding(top = 10.dp)
+            is SearchScreenUiState.ResultsFound -> {
+                val searchUsers = uiState.users
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .padding(top = 10.dp)
 
-                    ) {
-                        items(items = searchUsers, key = { it.userId }) { user ->
-                            ProfileCard(
-                                navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
-                                user = user,
+                ) {
+                    items(items = searchUsers, key = { it.userId }) { user ->
+                        ProfileCard(
+                            navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
+                            user = user,
 
-                                )
-                        }
+                            )
                     }
                 }
             }

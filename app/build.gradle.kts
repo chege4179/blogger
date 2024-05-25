@@ -10,6 +10,7 @@ plugins {
     id("com.google.firebase.firebase-perf")
     id("com.google.android.gms.oss-licenses-plugin")
     id("androidx.baselineprofile")
+    id("org.jetbrains.kotlin.plugin.compose")
 }
 
 android {
@@ -20,8 +21,8 @@ android {
         applicationId = "com.peterchege.blogger"
         minSdk = 21
         targetSdk = 34
-        versionCode = 7
-        versionName = "1.0.7"
+        versionCode = 8
+        versionName = "1.0.8"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -73,10 +74,7 @@ android {
         abortOnError = false
         checkReleaseBuilds = false
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.13"
 
-    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -86,6 +84,10 @@ android {
 baselineProfile {
     saveInSrc = true
     automaticGenerationDuringBuild = false
+}
+composeCompiler {
+    enableStrongSkippingMode = true
+    reportsDestination = layout.buildDirectory.dir("compose_compiler")
 }
 dependencies {
 

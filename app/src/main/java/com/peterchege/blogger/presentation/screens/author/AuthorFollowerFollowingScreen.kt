@@ -77,40 +77,35 @@ fun AuthorFollowerFollowingScreenContent(
             )
         }
     ) { paddingValues ->
-        AnimatedContent(
-            targetState = uiState,
-            label = "AuthorProfileFollowerFollowingScreenContent"
-        ) { uiState ->
-            when (uiState) {
-                is AuthorProfileFollowerFollowingScreenUiState.Loading -> {
-                    LoadingComponent()
-                }
+        when (uiState) {
+            is AuthorProfileFollowerFollowingScreenUiState.Loading -> {
+                LoadingComponent()
+            }
 
-                is AuthorProfileFollowerFollowingScreenUiState.Error -> {
-                    ErrorComponent(
-                        retryCallback = { /*TODO*/ },
-                        errorMessage = uiState.message
-                    )
-                }
+            is AuthorProfileFollowerFollowingScreenUiState.Error -> {
+                ErrorComponent(
+                    retryCallback = { /*TODO*/ },
+                    errorMessage = uiState.message
+                )
+            }
 
-                is AuthorProfileFollowerFollowingScreenUiState.Followers -> {
-                    val followers = uiState.followers.collectAsLazyPagingItems()
-                    FollowersList(
-                        followers = followers,
-                        paddingValues = paddingValues,
-                        navigateToAuthorProfileScreen = navigateToAuthorProfileScreen
-                    )
+            is AuthorProfileFollowerFollowingScreenUiState.Followers -> {
+                val followers = uiState.followers.collectAsLazyPagingItems()
+                FollowersList(
+                    followers = followers,
+                    paddingValues = paddingValues,
+                    navigateToAuthorProfileScreen = navigateToAuthorProfileScreen
+                )
 
-                }
+            }
 
-                is AuthorProfileFollowerFollowingScreenUiState.Following -> {
-                    val following = uiState.following.collectAsLazyPagingItems()
-                    FollowingList(
-                        followings = following,
-                        paddingValues = paddingValues,
-                        navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
-                    )
-                }
+            is AuthorProfileFollowerFollowingScreenUiState.Following -> {
+                val following = uiState.following.collectAsLazyPagingItems()
+                FollowingList(
+                    followings = following,
+                    paddingValues = paddingValues,
+                    navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
+                )
             }
         }
 

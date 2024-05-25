@@ -92,55 +92,53 @@ fun DraftScreenContent(
             )
         }
     ) { paddingValues ->
-        AnimatedContent(targetState = uiState,label = "DraftsScreen") { uiState ->
-            when (uiState) {
-                is DraftsScreenUiState.Loading -> {
-                    LoadingComponent()
-                }
+        when (uiState) {
+            is DraftsScreenUiState.Loading -> {
+                LoadingComponent()
+            }
 
-                is DraftsScreenUiState.Error -> {
-                    ErrorComponent(
-                        retryCallback = { /*TODO*/ },
-                        errorMessage = uiState.message
+            is DraftsScreenUiState.Error -> {
+                ErrorComponent(
+                    retryCallback = { /*TODO*/ },
+                    errorMessage = uiState.message
+                )
+            }
+
+            is DraftsScreenUiState.Success -> {
+                if (deleteDraftState.selectedDraftToBeDeleted != null) {
+                    DeleteDraftDialog(
+                        draftPost = deleteDraftState.selectedDraftToBeDeleted,
+                        onDeleteDraftConfirm = {
+                            deleteDraftState.selectedDraftToBeDeleted.id?.let {
+                                deleteDraft(it)
+                            }
+                        },
+                        onDismiss = { toggleDeleteDraftDialog(null) }
                     )
                 }
-
-                is DraftsScreenUiState.Success -> {
-                    if (deleteDraftState.selectedDraftToBeDeleted != null) {
-                        DeleteDraftDialog(
-                            draftPost = deleteDraftState.selectedDraftToBeDeleted,
-                            onDeleteDraftConfirm = {
-                                deleteDraftState.selectedDraftToBeDeleted.id?.let {
-                                    deleteDraft(it)
-                                }
-                            },
-                            onDismiss = { toggleDeleteDraftDialog(null) }
+                val drafts = uiState.drafts
+                if (drafts.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Text(
+                            text = stringResource(id = R.string.empty_draft_message),
+                            modifier = Modifier.align(Alignment.Center)
                         )
                     }
-                    val drafts = uiState.drafts
-                    if (drafts.isEmpty()) {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            Text(
-                                text = stringResource(id = R.string.empty_draft_message),
-                                modifier = Modifier.align(Alignment.Center)
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues = paddingValues)
+                            .padding(defaultPadding)
+                    ) {
+                        items(items = drafts) { draft ->
+                            DraftCard(
+                                draftRecord = draft,
+                                navigateToAddPostScreen = navigateToAddPostScreen,
+                                onDeleteDraft = {
+                                    toggleDeleteDraftDialog(draft)
+                                }
                             )
-                        }
-                    } else {
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(paddingValues = paddingValues)
-                                .padding(defaultPadding)
-                        ) {
-                            items(items = drafts) { draft ->
-                                DraftCard(
-                                    draftRecord = draft,
-                                    navigateToAddPostScreen = navigateToAddPostScreen,
-                                    onDeleteDraft = {
-                                        toggleDeleteDraftDialog(draft)
-                                    }
-                                )
-                            }
                         }
                     }
                 }

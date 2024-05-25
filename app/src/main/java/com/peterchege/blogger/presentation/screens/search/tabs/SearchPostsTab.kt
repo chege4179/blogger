@@ -46,57 +46,55 @@ fun SearchPostsTab(
         modifier = Modifier
             .fillMaxSize()
     ) { paddingValues ->
-        AnimatedContent(targetState = uiState,label = "Search Posts") { uiState ->
-            when (uiState) {
-                is SearchScreenUiState.Idle -> {
+        when (uiState) {
+            is SearchScreenUiState.Idle -> {
 
-                }
+            }
 
-                is SearchScreenUiState.Searching -> {
-                    LoadingComponent()
-                }
+            is SearchScreenUiState.Searching -> {
+                LoadingComponent()
+            }
 
-                is SearchScreenUiState.Error -> {
-                    ErrorComponent(
-                        retryCallback = onRetry,
-                        errorMessage = uiState.message
-                    )
-                }
+            is SearchScreenUiState.Error -> {
+                ErrorComponent(
+                    retryCallback = onRetry,
+                    errorMessage = uiState.message
+                )
+            }
 
-                is SearchScreenUiState.ResultsFound -> {
-                    val searchPosts = uiState.posts
-                    if (searchPosts.isEmpty()) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(paddingValues),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(text = stringResource(id = R.string.no_posts_found))
-                        }
-                    } else {
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(top = 10.dp)
-                            ,
-                        ) {
-                            items(items = searchPosts) { post ->
-                                ArticleCard(
-                                    post = post,
-                                    onItemClick = {
-                                        navigateToPostScreen(post.postId)
+            is SearchScreenUiState.ResultsFound -> {
+                val searchPosts = uiState.posts
+                if (searchPosts.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(text = stringResource(id = R.string.no_posts_found))
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 10.dp)
+                        ,
+                    ) {
+                        items(items = searchPosts) { post ->
+                            ArticleCard(
+                                post = post,
+                                onItemClick = {
+                                    navigateToPostScreen(post.postId)
 
-                                    },
-                                    onProfileNavigate = {},
-                                    onDeletePost = {},
-                                    isLiked = false,
-                                    isSaved = false,
-                                    isProfile = false,
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                            }
+                                },
+                                onProfileNavigate = {},
+                                onDeletePost = {},
+                                isLiked = false,
+                                isSaved = false,
+                                isProfile = false,
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
                 }

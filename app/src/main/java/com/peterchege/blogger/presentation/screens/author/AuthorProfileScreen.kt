@@ -177,175 +177,173 @@ fun AuthorProfileScreenContent(
             SnackbarHost(hostState = snackbarHostState)
         },
     ) { paddingValues ->
-        AnimatedContent(targetState = uiState,label = "AuthorProfileScreen") { uiState ->
-            when (uiState) {
-                is AuthorProfileScreenUiState.Loading -> {
-                    LoadingComponent()
-                }
+        when (uiState) {
+            is AuthorProfileScreenUiState.Loading -> {
+                LoadingComponent()
+            }
 
-                is AuthorProfileScreenUiState.Error -> {
-                    ErrorComponent(
-                        errorMessage = uiState.message,
-                        retryCallback = { },
-                    )
+            is AuthorProfileScreenUiState.Error -> {
+                ErrorComponent(
+                    errorMessage = uiState.message,
+                    retryCallback = { },
+                )
 
-                }
+            }
 
-                is AuthorProfileScreenUiState.Success -> {
-                    val user = uiState.user
-                    val posts = uiState.posts.collectAsLazyPagingItems()
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.background)
-                            .padding(defaultPadding),
-                    ) {
+            is AuthorProfileScreenUiState.Success -> {
+                val user = uiState.user
+                val posts = uiState.posts.collectAsLazyPagingItems()
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background)
+                        .padding(defaultPadding),
+                ) {
 
-                        item {
-                            Column(
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(160.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            Box(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(160.dp),
+                                    .fillMaxWidth(0.3f)
+                            ) {
+                                ProfileAvatar(
+                                    size = 80,
+                                    imageUrl = user.imageUrl,
+                                    modifier = Modifier.align(Alignment.Center)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(5.dp))
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
                                 verticalArrangement = Arrangement.Center,
                                 horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth(0.3f)
-                                ) {
-                                    ProfileAvatar(
-                                        size = 80,
-                                        imageUrl = user.imageUrl,
-                                        modifier = Modifier.align(Alignment.Center)
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(5.dp))
-                                Column(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalArrangement = Arrangement.Center,
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                ) {
-                                    Text(
-                                        text = user.fullName,
-                                        fontWeight = FontWeight.ExtraBold,
-                                        fontSize = 20.sp
-                                    )
-                                    Spacer(modifier = Modifier.padding(3.dp))
-                                    Text(
-                                        text = "@" + (user?.username?.toLowerCase(Locale.ROOT)
-                                            ?: ""),
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 18.sp
-                                    )
-                                    Spacer(modifier = Modifier.height(3.dp))
+                                Text(
+                                    text = user.fullName,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    fontSize = 20.sp
+                                )
+                                Spacer(modifier = Modifier.padding(3.dp))
+                                Text(
+                                    text = "@" + (user?.username?.toLowerCase(Locale.ROOT)
+                                        ?: ""),
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 18.sp
+                                )
+                                Spacer(modifier = Modifier.height(3.dp))
 
 
-                                }
-                            }
-                        }
-                        item {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(70.dp),
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                ProfileInfoCount(
-                                    name = stringResource(id = R.string.post_header_name),
-                                    count = user.count.post,
-                                    onClick = {
-
-                                    }
-                                )
-                                VerticalDivider(
-                                    modifier = Modifier
-                                        .fillMaxHeight(0.7f)
-                                        .width(1.dp),
-                                    thickness = 2.dp,
-                                    color = Color.LightGray
-                                )
-                                ProfileInfoCount(
-                                    name = stringResource(id = R.string.followers_header_name),
-                                    count = user.count.followers,
-                                    onClick = {
-                                        navigateToAuthorFollowerFollowingScreen(
-                                            user.userId,
-                                            Constants.FOLLOWER
-                                        )
-                                    }
-                                )
-                                VerticalDivider(
-                                    modifier = Modifier
-                                        .fillMaxHeight(0.7f)
-                                        .width(1.dp),
-                                    thickness = 2.dp,
-                                    color = Color.LightGray
-                                )
-                                ProfileInfoCount(
-                                    name = stringResource(id = R.string.following_header_name),
-                                    count = user.count.following,
-                                    onClick = {
-                                        navigateToAuthorFollowerFollowingScreen(
-                                            user.userId,
-                                            Constants.FOLLOWING
-                                        )
-                                    }
-                                )
-                            }
-                        }
-
-                        if (uiState.isUserLoggedIn) {
-                            item {
-                                FollowButtonSection(
-                                    followUser = followUser,
-                                    unfollowUser = unfollowUser,
-                                    isFollowingMe = uiState.isFollowingMe,
-                                    isAuthUserFollowingBack = uiState.isAuthUserFollowingBack
-                                )
-                            }
-                        }
-                        if (posts.itemCount == 0) {
-                            item {
-                                Box(modifier = Modifier.fillMaxSize()) {
-                                    Text(
-                                        modifier = Modifier.align(Alignment.Center),
-                                        text = stringResource(id = R.string.empty_posts_message)
-                                    )
-                                }
-                            }
-                        } else {
-                            items(count = posts.itemCount) { position ->
-                                val post = posts[position]
-                                AnimatedVisibility (visible = post.isNotNull()) {
-                                    ArticleCard(
-                                        post = post!!,
-                                        isLiked = likedPostIds.contains(post.postId),
-                                        isSaved = savedPostIds.contains(post.postId),
-                                        isProfile = false,
-                                        onItemClick = {
-                                            navigateToPostScreen(post.postId)
-                                        },
-                                        onProfileNavigate = {},
-                                        onDeletePost = {},
-                                        onBookmarkPost = bookmarkPost,
-                                        onUnBookmarkPost = unBookmarkPost,
-                                        onLikePost = likePost,
-                                        onUnlikePost = unLikePost
-
-                                    )
-                                }
-                                Spacer(modifier = Modifier.padding(5.dp))
-                            }
-                        }
-                        if (posts.loadState.prepend is LoadState.Loading) {
-                            item {
-                                PagingLoader()
                             }
                         }
                     }
+                    item {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(70.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            ProfileInfoCount(
+                                name = stringResource(id = R.string.post_header_name),
+                                count = user.count.post,
+                                onClick = {
 
+                                }
+                            )
+                            VerticalDivider(
+                                modifier = Modifier
+                                    .fillMaxHeight(0.7f)
+                                    .width(1.dp),
+                                thickness = 2.dp,
+                                color = Color.LightGray
+                            )
+                            ProfileInfoCount(
+                                name = stringResource(id = R.string.followers_header_name),
+                                count = user.count.followers,
+                                onClick = {
+                                    navigateToAuthorFollowerFollowingScreen(
+                                        user.userId,
+                                        Constants.FOLLOWER
+                                    )
+                                }
+                            )
+                            VerticalDivider(
+                                modifier = Modifier
+                                    .fillMaxHeight(0.7f)
+                                    .width(1.dp),
+                                thickness = 2.dp,
+                                color = Color.LightGray
+                            )
+                            ProfileInfoCount(
+                                name = stringResource(id = R.string.following_header_name),
+                                count = user.count.following,
+                                onClick = {
+                                    navigateToAuthorFollowerFollowingScreen(
+                                        user.userId,
+                                        Constants.FOLLOWING
+                                    )
+                                }
+                            )
+                        }
+                    }
+
+                    if (uiState.isUserLoggedIn) {
+                        item {
+                            FollowButtonSection(
+                                followUser = followUser,
+                                unfollowUser = unfollowUser,
+                                isFollowingMe = uiState.isFollowingMe,
+                                isAuthUserFollowingBack = uiState.isAuthUserFollowingBack
+                            )
+                        }
+                    }
+                    if (posts.itemCount == 0) {
+                        item {
+                            Box(modifier = Modifier.fillMaxSize()) {
+                                Text(
+                                    modifier = Modifier.align(Alignment.Center),
+                                    text = stringResource(id = R.string.empty_posts_message)
+                                )
+                            }
+                        }
+                    } else {
+                        items(count = posts.itemCount) { position ->
+                            val post = posts[position]
+                            AnimatedVisibility (visible = post.isNotNull()) {
+                                ArticleCard(
+                                    post = post!!,
+                                    isLiked = likedPostIds.contains(post.postId),
+                                    isSaved = savedPostIds.contains(post.postId),
+                                    isProfile = false,
+                                    onItemClick = {
+                                        navigateToPostScreen(post.postId)
+                                    },
+                                    onProfileNavigate = {},
+                                    onDeletePost = {},
+                                    onBookmarkPost = bookmarkPost,
+                                    onUnBookmarkPost = unBookmarkPost,
+                                    onLikePost = likePost,
+                                    onUnlikePost = unLikePost
+
+                                )
+                            }
+                            Spacer(modifier = Modifier.padding(5.dp))
+                        }
+                    }
+                    if (posts.loadState.prepend is LoadState.Loading) {
+                        item {
+                            PagingLoader()
+                        }
+                    }
                 }
+
             }
         }
 
