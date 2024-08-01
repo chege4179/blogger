@@ -54,9 +54,7 @@ fun CommentDialog(
                     modifier = Modifier
                         .fillMaxWidth(),
                     value = commentUiState.newComment,
-                    onValueChange = {
-                        onChangeNewComment(it)
-                    },
+                    onValueChange = onChangeNewComment,
                     singleLine = false,
                     textStyle = MaterialTheme.typography.bodySmall.copy(textAlign = TextAlign.Start),
                     keyboardOptions = KeyboardOptions(
@@ -75,21 +73,13 @@ fun CommentDialog(
         },
         confirmButton = {
             if (isUserLoggedIn){
-                TextButton(
-                    onClick = {
-                        postComment()
-                    }
-                ) {
+                TextButton(onClick = postComment) {
                     Text(text = stringResource(id = R.string.comment))
                 }
             }
         },
         dismissButton = {
-            TextButton(
-                onClick = {
-                    closeCommentDialog()
-                }
-            ) {
+            TextButton(onClick = closeCommentDialog) {
                 Text(text = stringResource(id = R.string.cancel))
             }
         }

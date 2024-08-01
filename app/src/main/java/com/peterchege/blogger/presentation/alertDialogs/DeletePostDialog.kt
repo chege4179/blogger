@@ -49,11 +49,7 @@ fun DeletePostDialog(
             }
         },
         dismissButton = {
-            TextButton(
-                onClick = {
-                    closeDeleteDialog()
-                }
-            ) {
+            TextButton(onClick = closeDeleteDialog) {
                 Text(text = stringResource(id = R.string.cancel))
             }
         }

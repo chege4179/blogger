@@ -60,19 +60,13 @@ fun ReplyCommentDialog(
         },
         confirmButton = {
             TextButton(
-                onClick = {
-                    replyToComment()
-                }
+                onClick = replyToComment
             ) {
                 Text(text = stringResource(id = R.string.comment))
             }
         },
         dismissButton = {
-            TextButton(
-                onClick = {
-                    closeCommentDialog()
-                }
-            ) {
+            TextButton(onClick = closeCommentDialog) {
                 Text(text = stringResource(id = R.string.cancel))
             }
         }

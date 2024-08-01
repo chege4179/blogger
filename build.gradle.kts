@@ -1,8 +1,8 @@
 plugins {
     id("com.diffplug.spotless") version "5.3.0"
-    id ("com.android.application") version "8.2.0" apply false
+    id ("com.android.application") version "8.4.0" apply false
     id( "com.android.library") version "8.1.1" apply false
-    id("org.jetbrains.kotlin.plugin.compose") version "2.0.0"
+    kotlin("plugin.compose") version "2.0.0"
     kotlin("android") version "2.0.0" apply false
     kotlin("jvm") version "2.0.0" apply false
     kotlin("plugin.parcelize") version "2.0.0" apply false
@@ -12,8 +12,9 @@ plugins {
     id("com.google.gms.google-services") version "4.4.0" apply false
     id("com.google.firebase.crashlytics") version "2.9.9" apply false
     id("com.google.firebase.firebase-perf") version "1.4.2" apply false
-    id("com.android.test") version "8.2.0" apply false
-    id("androidx.baselineprofile") version "1.2.1" apply false
+    id("com.android.test") version "8.4.0" apply false
+    id("androidx.baselineprofile") version "1.2.4" apply false
+//    id("com.android.compose.screenshot") version "0.0.1-alpha01" apply false
 }
 
 

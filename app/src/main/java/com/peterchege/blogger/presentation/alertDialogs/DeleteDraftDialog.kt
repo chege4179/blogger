@@ -24,9 +24,7 @@ fun DeleteDraftDialog(
 
     AlertDialog(
         modifier = modifier,
-        onDismissRequest = {
-            onDismiss()
-        },
+        onDismissRequest = onDismiss,
         title = {
             Text(
                 modifier = Modifier.fillMaxWidth(),
@@ -43,20 +41,13 @@ fun DeleteDraftDialog(
             )
         },
         confirmButton = {
-            TextButton(
-
-                onClick = {
-                    onDeleteDraftConfirm()
-                }
-            ) {
+            TextButton(onClick = onDeleteDraftConfirm) {
                 Text(text = stringResource(id = R.string.delete).uppercase())
             }
         },
         dismissButton = {
             TextButton(
-                onClick = {
-                    onDismiss()
-                },
+                onClick = onDismiss,
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = MaterialTheme.colorScheme.onSurface
                 )

@@ -3,6 +3,7 @@ plugins {
     kotlin("android")
     kotlin("plugin.serialization")
     kotlin("plugin.parcelize")
+    kotlin("plugin.compose")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
     id("com.google.devtools.ksp")
@@ -10,7 +11,8 @@ plugins {
     id("com.google.firebase.firebase-perf")
     id("com.google.android.gms.oss-licenses-plugin")
     id("androidx.baselineprofile")
-    id("org.jetbrains.kotlin.plugin.compose")
+//    id("com.android.compose.screenshot")
+
 }
 
 android {
@@ -66,6 +68,7 @@ android {
         jvmTarget = "17"
 
     }
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
     buildFeatures {
         compose = true
         buildConfig = true
@@ -94,18 +97,19 @@ dependencies {
     baselineProfile(project(":benchmark"))
 
     implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.compose.ui:ui:1.7.0-beta01")
-    implementation("androidx.compose.animation:animation:1.7.0-beta01")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.6.7")
-    implementation("androidx.activity:activity-compose:1.9.0")
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("androidx.compose.ui:ui:1.7.0-beta06")
+    implementation("androidx.compose.animation:animation:1.7.0-beta06")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.6.8")
+    //screenshotTestImplementation("androidx.compose.ui:ui-tooling:1.6.8")
+    implementation("androidx.activity:activity-compose:1.9.1")
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.7")
-    debugImplementation("androidx.compose.ui:ui-tooling:1.6.7")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.8")
+    debugImplementation("androidx.compose.ui:ui-tooling:1.6.8")
 
-    implementation("androidx.compose.material:material-icons-extended:1.6.7")
+    implementation("androidx.compose.material:material-icons-extended:1.6.8")
     implementation("androidx.compose.material3:material3:1.2.1")
     implementation("androidx.compose.material3:material3-window-size-class:1.2.1")
 
@@ -113,24 +117,24 @@ dependencies {
     // retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
-    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.12")
-    implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.12")
+    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.14")
+    implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.14")
     implementation("com.squareup.retrofit2:retrofit-mock:2.9.0")
     implementation("com.squareup.okhttp3:mockwebserver:4.12.0")
 
     // view model
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.0")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.4")
 
     //coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
 
     // dagger hilt
-    implementation ("com.google.dagger:hilt-android:2.51")
-    ksp ("com.google.dagger:hilt-compiler:2.51")
+    implementation ("com.google.dagger:hilt-android:2.51.1")
+    ksp ("com.google.dagger:hilt-compiler:2.51.1")
 
     implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation ("androidx.navigation:navigation-compose:2.7.7")
@@ -146,8 +150,8 @@ dependencies {
     implementation("androidx.room:room-paging:2.6.1")
 
     //paging 3 compose
-    implementation("androidx.paging:paging-compose:3.3.0")
-    implementation("androidx.paging:paging-runtime-ktx:3.3.0")
+    implementation("androidx.paging:paging-compose:3.3.1")
+    implementation("androidx.paging:paging-runtime-ktx:3.3.1")
 
     // coil
     implementation("io.coil-kt:coil-compose:2.6.0")
@@ -164,14 +168,14 @@ dependencies {
     implementation("androidx.work:work-runtime-ktx:2.9.0")
 
     // Play services OSS
-    implementation("com.google.android.gms:play-services-oss-licenses:17.0.1")
+    implementation("com.google.android.gms:play-services-oss-licenses:17.1.0")
     implementation ("com.google.android.play:review-ktx:2.0.1")
     implementation ("com.google.android.play:app-update-ktx:2.1.0")
 
 
     implementation("androidx.profileinstaller:profileinstaller:1.3.1")
 
-    implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-messaging-ktx")
@@ -191,9 +195,9 @@ dependencies {
 
     implementation("androidx.core:core-splashscreen:1.0.1")
 
-    testImplementation("io.mockk:mockk:1.13.9")
-    testImplementation("org.robolectric:robolectric:4.11.1")
-    androidTestImplementation("io.mockk:mockk-android:1.13.9")
+    testImplementation("io.mockk:mockk:1.13.12")
+    testImplementation("org.robolectric:robolectric:4.13")
+    androidTestImplementation("io.mockk:mockk-android:1.13.12")
 
 }
 

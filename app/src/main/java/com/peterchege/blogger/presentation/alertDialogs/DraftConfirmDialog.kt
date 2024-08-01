@@ -56,20 +56,13 @@ fun DraftConfirmDialog(
             )
         },
         confirmButton = {
-            TextButton(
-
-                onClick = {
-                    onSaveDraftConfirm()
-                }
-            ) {
+            TextButton(onClick = onSaveDraftConfirm) {
                 Text(text = stringResource(id = R.string.save).uppercase())
             }
         },
         dismissButton = {
             TextButton(
-                onClick = {
-                    onSaveDraftDismiss()
-                },
+                onClick = onSaveDraftDismiss,
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = MaterialTheme.colorScheme.onSurface
                 )

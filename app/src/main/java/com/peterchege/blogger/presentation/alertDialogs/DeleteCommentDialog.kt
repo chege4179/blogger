@@ -41,19 +41,13 @@ fun DeleteCommentDialog(
         },
         confirmButton = {
             TextButton(
-                onClick = {
-                    deleteComment()
-                }
+                onClick = deleteComment
             ) {
                 Text(text = stringResource(id = R.string.delete))
             }
         },
         dismissButton = {
-            TextButton(
-                onClick = {
-                    closeDeleteDialog()
-                }
-            ) {
+            TextButton(onClick = closeDeleteDialog) {
                 Text(stringResource(id = R.string.cancel))
             }
         }
