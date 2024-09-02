@@ -272,7 +272,7 @@ fun FeedScreenContent(
                 when (uiState) {
                     is FeedScreenUiState.Empty -> {
                         ErrorComponent(
-                            retryCallback = { retryCallback() },
+                            retryCallback = retryCallback,
                             errorMessage = stringResource(id = R.string.no_posts_found)
                         )
                     }
@@ -291,12 +291,10 @@ fun FeedScreenContent(
                     is FeedScreenUiState.Success -> {
                         LazyColumn(
                             modifier = Modifier
-
                                 .setTagAndId("feed")
                                 .fillMaxSize()
                                 .padding(defaultPadding)
                         ) {
-
                             items(items = uiState.posts, key = { it.postId }) { post ->
                                 ArticleCard(
                                     post = post.toPost(),

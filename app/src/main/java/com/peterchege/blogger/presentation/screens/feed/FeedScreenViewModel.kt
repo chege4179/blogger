@@ -31,12 +31,14 @@ import com.peterchege.blogger.domain.repository.NetworkInfoRepository
 import com.peterchege.blogger.domain.repository.NetworkStatus
 import com.peterchege.blogger.domain.repository.PostRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
@@ -48,7 +50,7 @@ sealed interface FeedScreenUiState {
 
     object Loading : FeedScreenUiState
 
-    data class Success(val posts:List<PostUI>) : FeedScreenUiState
+    data class Success(val posts: List<PostUI>) : FeedScreenUiState
 
     data class Error(val message: String) : FeedScreenUiState
 
@@ -65,20 +67,21 @@ class FeedScreenViewModel @Inject constructor(
     private val remoteFeatureToggle: RemoteFeatureToggle,
 
 
-) : ViewModel() {
+    ) : ViewModel() {
     val tag = FeedScreenViewModel::class.java.simpleName
 
-    init {
-        val BASE_URL = remoteFeatureToggle.getString("BASE_URL")
-        Timber.tag(tag).i("Base URL $BASE_URL")
-    }
+    private val reloadTrigger = MutableSharedFlow<Unit>(replay = 1)
 
     private val _isSyncing = MutableStateFlow(false)
     val isSyncing = _isSyncing.asStateFlow()
 
-    val feedScreenUiState = postRepository.getAllPosts()
-        .map<List<PostUI>, FeedScreenUiState> {
-            FeedScreenUiState.Success(posts = it)
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val feedScreenUiState = reloadTrigger.flatMapLatest {
+        postRepository.getAllPosts()
+            .map<List<PostUI>, FeedScreenUiState> {
+                Timber.tag("Here").i("Here")
+                FeedScreenUiState.Success(posts = it)
+            }
         }
         .onStart {
             emit(FeedScreenUiState.Loading)
@@ -116,48 +119,55 @@ class FeedScreenViewModel @Inject constructor(
         }
     }
 
-    fun bookmarkPost(post: Post){
+    fun bookmarkPost(post: Post) {
         viewModelScope.launch {
             postRepository.insertSavedPost(post)
             _eventFlow.emit(UiEvent.ShowSnackbar(message = "Post added to bookmarks"))
         }
     }
-    fun unBookmarkPost(post: Post){
+
+    fun unBookmarkPost(post: Post) {
         viewModelScope.launch {
             postRepository.deleteSavedPostById(post.postId)
             _eventFlow.emit(UiEvent.ShowSnackbar(message = "Post removed from bookmarks"))
         }
     }
-    fun likePost(post: Post,user:User){
+
+    fun likePost(post: Post, user: User) {
         viewModelScope.launch {
-            val likePost = LikePost(userId = user.userId,postId = post.postId)
+            val likePost = LikePost(userId = user.userId, postId = post.postId)
             val response = postRepository.likePost(likePost)
-            when(response){
+            when (response) {
                 is NetworkResult.Success -> {
                     response.data.like?.let {
                         likesLocalDataSource.insertLike(like = it.toEntity())
                     }
                 }
+
                 is NetworkResult.Error -> {
 
                 }
+
                 is NetworkResult.Exception -> {
 
                 }
             }
         }
     }
-    fun unLikePost(post: Post,user:User){
+
+    fun unLikePost(post: Post, user: User) {
         viewModelScope.launch {
-            val likePost = LikePost(userId = user.userId,postId = post.postId)
+            val likePost = LikePost(userId = user.userId, postId = post.postId)
             val response = postRepository.unlikePost(likePost)
-            when(response){
+            when (response) {
                 is NetworkResult.Success -> {
                     likesLocalDataSource.deleteLike(postId = post.postId)
                 }
+
                 is NetworkResult.Error -> {
 
                 }
+
                 is NetworkResult.Exception -> {
 
                 }
