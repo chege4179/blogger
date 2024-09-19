@@ -24,5 +24,4 @@ data class AllPostsResponse(
     val msg: String,
     val success: Boolean,
     val posts: List<Post>,
-
 )

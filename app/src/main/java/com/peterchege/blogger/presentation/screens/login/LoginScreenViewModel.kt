@@ -114,8 +114,8 @@ class LoginScreenViewModel @Inject constructor(
                                     Timber.tag(TAG).i("Device Token : ${it}")
                                     defaultFCMTokenProvider.setFcmToken(it)
                                 }
-                                response.data.jwtToken?.let {
-                                    Timber.tag(TAG).i("JWT Token : ${it}")
+                                response.data.accessToken?.let {
+                                    Timber.tag(TAG).i("JWT Token : $it")
                                     defaultAuthTokenProvider.setAuthToken(it)
                                 }
                                 navigateToDashBoard()

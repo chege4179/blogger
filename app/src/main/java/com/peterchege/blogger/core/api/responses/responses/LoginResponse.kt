@@ -24,5 +24,5 @@ data class LoginResponse(
     val success: Boolean,
     val user: User? = null,
     val deviceToken: String?,
-    val jwtToken:String?,
+    val accessToken:String?,
 )
