@@ -70,18 +70,14 @@ class FeedScreenViewModel @Inject constructor(
     ) : ViewModel() {
     val tag = FeedScreenViewModel::class.java.simpleName
 
-    private val reloadTrigger = MutableSharedFlow<Unit>(replay = 1)
 
     private val _isSyncing = MutableStateFlow(false)
     val isSyncing = _isSyncing.asStateFlow()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val feedScreenUiState = reloadTrigger.flatMapLatest {
-        postRepository.getAllPosts()
-            .map<List<PostUI>, FeedScreenUiState> {
-                Timber.tag("Here").i("Here")
-                FeedScreenUiState.Success(posts = it)
-            }
+    val feedScreenUiState =postRepository.getAllPosts()
+        .map<List<PostUI>, FeedScreenUiState> {
+            Timber.tag("Here").i("Here")
+            (FeedScreenUiState.Success(posts = it))
         }
         .onStart {
             emit(FeedScreenUiState.Loading)
@@ -92,6 +88,7 @@ class FeedScreenViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000L),
             initialValue = FeedScreenUiState.Empty
         )
+
 
     val networkStatus = networkInfoRepository.networkStatus
         .stateIn(

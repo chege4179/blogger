@@ -72,7 +72,7 @@ import com.peterchege.blogger.presentation.theme.BloggerTheme
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @ExperimentalCoilApi
 fun FeedScreen(
@@ -84,7 +84,7 @@ fun FeedScreen(
     navigateToCategoryScreen: (String) -> Unit,
     viewModel: FeedScreenViewModel = hiltViewModel()
 ) {
-//    val wakeLockPermissionState = rememberPermissionState(permission = android.Manifest.permission.WAKE_LOCK)
+
     val authUser by viewModel.authUser.collectAsStateWithLifecycle()
     val networkStatus by viewModel.networkStatus.collectAsStateWithLifecycle()
     val isSyncing by viewModel.isSyncing.collectAsStateWithLifecycle()
