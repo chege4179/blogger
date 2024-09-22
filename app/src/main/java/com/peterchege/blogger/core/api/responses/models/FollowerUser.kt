@@ -25,7 +25,6 @@ data class FollowerUser(
     val email: String,
     val fullName: String,
     val imageUrl: String,
-    val password: String,
     val username: String,
     val createdAt:String,
     val updatedAt:String,

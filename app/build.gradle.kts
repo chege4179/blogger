@@ -185,7 +185,7 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
     implementation("com.jakewharton.timber:timber:5.0.1")
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.13")
+//    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.13")
 
     implementation ("com.airbnb.android:lottie-compose:6.3.0")
 

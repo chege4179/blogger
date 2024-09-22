@@ -26,7 +26,6 @@ val dummyPostList = listOf(
             imageUrl = "https://ui-avatars.com/api/?background=719974&color=fff&name=Peter+Chege&bold=true&fontsize=0.6",
             createdAt = "2023-12-02T18:55:36.935Z",
             updatedAt = "2023-12-02T18:55:36.935Z",
-            password = "2023-12-02T18:55:36.935Z",
         ),
         count = PostCount(likes = 5, comments = 2, views = 3),
         isLiked = true
@@ -47,7 +46,6 @@ val dummyPostList = listOf(
             imageUrl = "https://ui-avatars.com/api/?background=719974&color=fff&name=Peter+Chege&bold=true&fontsize=0.6",
             createdAt = "2023-12-02T18:55:36.935Z",
             updatedAt = "2023-12-02T18:55:36.935Z",
-            password = "2023-12-02T18:55:36.935Z",
         ),
         count = PostCount(likes = 10, comments = 4, views = 2),
         isSaved = true

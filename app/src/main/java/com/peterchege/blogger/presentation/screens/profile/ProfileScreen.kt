@@ -407,7 +407,6 @@ fun ProfileScreenPreview1() {
                 imageUrl = "https://ui-avatars.com/api/?background=719974&color=fff&name=Peter+Chege&bold=true&fontsize=0.6",
                 createdAt = "2023-12-02T18:55:36.935Z",
                 updatedAt = "2023-12-02T18:55:36.935Z",
-                password = "2023-12-02T18:55:36.935Z",
                 count = UserCount(
                     followers = 10,
                     post = dummyPostList.size,
@@ -453,7 +452,6 @@ fun ProfileScreenPreview2() {
                 imageUrl = "https://ui-avatars.com/api/?background=719974&color=fff&name=Peter+Chege&bold=true&fontsize=0.6",
                 createdAt = "2023-12-02T18:55:36.935Z",
                 updatedAt = "2023-12-02T18:55:36.935Z",
-                password = "2023-12-02T18:55:36.935Z",
                 count = UserCount(
                     followers = 10,
                     post = dummyPostList.size,

@@ -49,7 +49,6 @@ object UserInfoSerializer : Serializer<User?> {
                     userId = "",
                     fullName = "",
                     email = "",
-                    password = "",
                     username = "",
                     imageUrl = "",
                     deviceTokens = emptyList(),

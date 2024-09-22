@@ -82,7 +82,6 @@ fun ArticleCardPreview() {
                 userId = "",
                 email = "",
                 username = "",
-                password = "",
                 createdAt = "",
                 updatedAt = "",
                 imageUrl = "",

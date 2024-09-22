@@ -19,7 +19,7 @@ val dummyNotifications = (1..20).map {
             imageUrl = "https://ui-avatars.com/api/?background=719974&color=fff&name=Peter+Chege&bold=true&fontsize=0.6",
             createdAt = "2023-12-02T18:55:36.935Z",
             updatedAt = "2023-12-02T18:55:36.935Z",
-            password = "2023-12-02T18:55:36.935Z",
+
         ),
         notificationReceiver = PostAuthor(
             userId = "1234567",
@@ -29,7 +29,6 @@ val dummyNotifications = (1..20).map {
             imageUrl = "https://ui-avatars.com/api/?background=719974&color=fff&name=Peter+Chege&bold=true&fontsize=0.6",
             createdAt = "2023-12-02T18:55:36.935Z",
             updatedAt = "2023-12-02T18:55:36.935Z",
-            password = "2023-12-02T18:55:36.935Z",
         ),
         notificationPostId = UUID.randomUUID().toString(),
         notificationCommentId = null,

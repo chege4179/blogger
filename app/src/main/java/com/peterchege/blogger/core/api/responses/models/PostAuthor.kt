@@ -26,7 +26,6 @@ data class PostAuthor(
     val userId: String,
     val email: String,
     val username: String,
-    val password: String,
     val fullName: String,
     val imageUrl: String,
     val createdAt: String,

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "0f7ac3e7a64cca8217499c7bc54968e7",
+    "identityHash": "4708ea216b6d29847b0133dbc574f806",
     "entities": [
       {
         "tableName": "draftPost",
@@ -180,7 +180,7 @@
       },
       {
         "tableName": "followers",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`userId` TEXT NOT NULL, `email` TEXT NOT NULL, `fullName` TEXT NOT NULL, `imageUrl` TEXT NOT NULL, `password` TEXT NOT NULL, `username` TEXT NOT NULL, `createdAt` TEXT NOT NULL, `updatedAt` TEXT NOT NULL, `_count` TEXT NOT NULL, PRIMARY KEY(`userId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`userId` TEXT NOT NULL, `email` TEXT NOT NULL, `fullName` TEXT NOT NULL, `imageUrl` TEXT NOT NULL, `username` TEXT NOT NULL, `createdAt` TEXT NOT NULL, `updatedAt` TEXT NOT NULL, `_count` TEXT NOT NULL, PRIMARY KEY(`userId`))",
         "fields": [
           {
             "fieldPath": "userId",
@@ -203,12 +203,6 @@
           {
             "fieldPath": "imageUrl",
             "columnName": "imageUrl",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "password",
-            "columnName": "password",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -280,7 +274,7 @@
       },
       {
         "tableName": "followings",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`userId` TEXT NOT NULL, `email` TEXT NOT NULL, `fullName` TEXT NOT NULL, `imageUrl` TEXT NOT NULL, `password` TEXT NOT NULL, `username` TEXT NOT NULL, `createdAt` TEXT NOT NULL, `updatedAt` TEXT NOT NULL, `_count` TEXT NOT NULL, PRIMARY KEY(`userId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`userId` TEXT NOT NULL, `email` TEXT NOT NULL, `fullName` TEXT NOT NULL, `imageUrl` TEXT NOT NULL, `username` TEXT NOT NULL, `createdAt` TEXT NOT NULL, `updatedAt` TEXT NOT NULL, `_count` TEXT NOT NULL, PRIMARY KEY(`userId`))",
         "fields": [
           {
             "fieldPath": "userId",
@@ -303,12 +297,6 @@
           {
             "fieldPath": "imageUrl",
             "columnName": "imageUrl",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "password",
-            "columnName": "password",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -350,7 +338,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0f7ac3e7a64cca8217499c7bc54968e7')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4708ea216b6d29847b0133dbc574f806')"
     ]
   }
 }
