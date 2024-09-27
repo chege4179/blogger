@@ -26,10 +26,7 @@ class NotificationRepositoryImpl @Inject constructor(
     private val api:BloggerApi
 ) :NotificationRepository{
 
-    override suspend fun getUserNotifications(
-        userId: String,
-        page: Int
-    ): NetworkResult<GetUserNotificationsResponse> {
-        return safeApiCall{ api.getUserNotifications(userId = userId, page = page) }
+    override suspend fun getUserNotifications(page: Int): NetworkResult<GetUserNotificationsResponse> {
+        return safeApiCall{ api.getUserNotifications( page = page) }
     }
 }

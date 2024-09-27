@@ -77,7 +77,7 @@ class NotificationScreenViewModel @Inject constructor(
 
     val uiState = combine(flow = isUserLoggedIn,flow2 = authUser){ isLoggedIn,user ->
         if (isLoggedIn){
-            val notificationsPagingData = getNotificationByUserId(userId = user?.userId ?:"")
+            val notificationsPagingData = getNotificationByUserId()
             NotificationScreenUiState.Success(notifications = notificationsPagingData)
         }else{
             NotificationScreenUiState.UserNotLoggedIn
@@ -92,7 +92,7 @@ class NotificationScreenViewModel @Inject constructor(
     )
 
     @OptIn(ExperimentalPagingApi::class)
-    fun getNotificationByUserId(userId:String): Flow<PagingData<Notification>> {
+    fun getNotificationByUserId(): Flow<PagingData<Notification>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 20,
@@ -101,7 +101,6 @@ class NotificationScreenViewModel @Inject constructor(
             pagingSourceFactory = {
                 NotificationsPagingSource(
                     notificationRepository = notificationRepository,
-                    userId = userId
                 )
             }
         ).flow.cachedIn(viewModelScope)

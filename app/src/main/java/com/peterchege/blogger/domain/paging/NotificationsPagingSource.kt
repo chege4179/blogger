@@ -25,7 +25,6 @@ import timber.log.Timber
 
 @ExperimentalPagingApi
 class NotificationsPagingSource(
-    val userId: String,
     private val notificationRepository: NotificationRepository
 ) : PagingSource<Int, Notification>() {
 
@@ -35,8 +34,7 @@ class NotificationsPagingSource(
         val pageNumber = params.key ?: 1
         Timber.tag(TAG).i("Page Number $pageNumber")
         Timber.tag(TAG).i("Params Key ${params.key}")
-        val response =
-            notificationRepository.getUserNotifications(page = pageNumber, userId = userId)
+        val response = notificationRepository.getUserNotifications(page = pageNumber)
         when (response) {
             is NetworkResult.Success -> {
                 val prevKey = if (pageNumber == 1) null else pageNumber

@@ -45,6 +45,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -63,13 +64,13 @@ fun BottomNavBar(
     navController: NavController,
     modifier: Modifier = Modifier,
     onItemClick: (BottomNavItem) -> Unit,
-    shouldShowNavRail:Boolean,
-    shouldShowBottomBar:Boolean
+    shouldShowNavRail: Boolean,
+    shouldShowBottomBar: Boolean
 ) {
 
     val backStackEntry = navController.currentBackStackEntryAsState()
-    if (shouldShowNavRail){
-        NavigationRail{
+    if (shouldShowNavRail) {
+        NavigationRail {
             Spacer(modifier = Modifier.weight(1f))
             items.forEachIndexed { index, item ->
                 val selected = item.route == backStackEntry.value?.destination?.route
@@ -89,7 +90,7 @@ fun BottomNavBar(
             Spacer(modifier = Modifier.weight(1f))
         }
     }
-    if (shouldShowBottomBar){
+    if (shouldShowBottomBar) {
         NavigationBar {
             items.forEachIndexed { index, item ->
                 val selected = item.route == backStackEntry.value?.destination?.route
@@ -100,7 +101,12 @@ fun BottomNavBar(
                             contentDescription = item.name
                         )
                     },
-                    label = { Text(text = item.name) },
+                    label = {
+                        Text(
+                            text = item.name,
+                            fontSize = 11.5.sp
+                        )
+                    },
 
                     selected = selected,
                     onClick = { onItemClick(item) }
@@ -108,7 +114,6 @@ fun BottomNavBar(
             }
         }
     }
-
 
 
 }
@@ -151,7 +156,8 @@ fun DashBoardScreen(
     )
     val context = LocalContext.current
     val windowSizeClass = calculateWindowSizeClass(activity = context.findActivity())
-    val shouldShowBottomBar: Boolean = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact
+    val shouldShowBottomBar: Boolean =
+        windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact
     val shouldShowNavRail: Boolean = !shouldShowBottomBar
     Scaffold(
         bottomBar = {

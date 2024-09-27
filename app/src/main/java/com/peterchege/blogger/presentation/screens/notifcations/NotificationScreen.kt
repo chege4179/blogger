@@ -44,6 +44,7 @@ import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.peterchege.blogger.R
 import com.peterchege.blogger.core.fake.dummyNotifications
+import com.peterchege.blogger.core.util.isNotNull
 import com.peterchege.blogger.presentation.components.ErrorComponent
 import com.peterchege.blogger.presentation.components.LoadingComponent
 import com.peterchege.blogger.presentation.components.NotificationCard
@@ -165,21 +166,19 @@ fun NotificationScreenContent(
                     } else {
                         items(count = notifications.itemCount) { position ->
                             val notification = notifications[position]
-                            if (notification != null) {
-                                val shouldShowNotification =
-                                    remember(key1 = notificationFilter,key2 = notification) {
+                            val shouldShowNotification =
+                                remember(key1 = notificationFilter,key2 = notification) {
                                     if (notificationFilter == "All")
                                         true
-                                    else (notification.notificationType == notificationFilter)
+                                    else (notification?.notificationType == notificationFilter)
                                 }
-                                AnimatedVisibility(visible = shouldShowNotification) {
-                                    NotificationCard(
-                                        notification = notification,
-                                        navigateToPostScreen = navigateToPostScreen,
-                                        navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
-                                    )
-                                    Spacer(modifier = Modifier.padding(10.dp))
-                                }
+                            if(shouldShowNotification && notification.isNotNull()) {
+                                NotificationCard(
+                                    notification = notification!!,
+                                    navigateToPostScreen = navigateToPostScreen,
+                                    navigateToAuthorProfileScreen = navigateToAuthorProfileScreen,
+                                )
+                                Spacer(modifier = Modifier.padding(10.dp))
                             }
 
                         }

@@ -19,5 +19,5 @@ import com.peterchege.blogger.core.api.responses.responses.GetUserNotificationsR
 import com.peterchege.blogger.core.util.NetworkResult
 
 interface NotificationRepository {
-    suspend fun getUserNotifications(userId:String,page:Int):NetworkResult<GetUserNotificationsResponse>
+    suspend fun getUserNotifications(page:Int):NetworkResult<GetUserNotificationsResponse>
 }
