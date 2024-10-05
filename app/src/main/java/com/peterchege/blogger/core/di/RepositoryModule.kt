@@ -16,6 +16,7 @@
 package com.peterchege.blogger.core.di
 
 import android.content.Context
+import com.google.firebase.messaging.FirebaseMessaging
 import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.datastore.preferences.DefaultAuthTokenProvider
 import com.peterchege.blogger.core.datastore.preferences.DefaultFCMTokenProvider
@@ -34,6 +35,7 @@ import com.peterchege.blogger.data.local.users.following.FollowingLocalDataSourc
 import com.peterchege.blogger.data.local.users.following.FollowingLocalDataSourceImpl
 import com.peterchege.blogger.data.remote.posts.RemotePostsDataSource
 import com.peterchege.blogger.data.remote.posts.RemotePostsDataSourceImpl
+import com.peterchege.blogger.domain.FcmTokenRepository
 import com.peterchege.blogger.domain.repository.*
 import dagger.Module
 import dagger.Provides
@@ -217,6 +219,22 @@ object RepositoryModule {
         api: BloggerApi
     ): NotificationRepository {
         return NotificationRepositoryImpl(api = api)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDeviceInfoRepository(
+        api: BloggerApi
+    ): DeviceInfoRepository {
+        return DeviceInfoRepositoryImpl(api = api)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFcmTokenRepository(
+        messaging: FirebaseMessaging,
+    ): FcmTokenRepository {
+        return FcmTokenRepositoryImpl(messaging)
     }
 
 }

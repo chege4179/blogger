@@ -49,8 +49,13 @@ class ProfileRepositoryImpl @Inject constructor(
     private val api: BloggerApi,
     @ApplicationContext private val appContext: Context,
     ):ProfileRepository {
+
     override suspend fun getProfile(userId: String): NetworkResult<ProfileResponse> {
         return safeApiCall{ api.getUserProfile(userId = userId) }
+    }
+
+    override suspend fun getMyProfile(): NetworkResult<ProfileResponse> {
+        return safeApiCall{ api.getMyProfile() }
     }
 
     override suspend fun getPostsByUserId(userId: String,page:Int): NetworkResult<GetPostsByUserIdResponse> {

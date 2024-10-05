@@ -33,6 +33,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface ProfileRepository {
 
+    suspend fun getMyProfile():NetworkResult<ProfileResponse>
+
     suspend fun getProfile(userId: String):NetworkResult<ProfileResponse>
 
     suspend fun getPostsByUserId(userId: String,page:Int):NetworkResult<GetPostsByUserIdResponse>

@@ -24,6 +24,7 @@ import com.peterchege.blogger.core.api.requests.LoginUser
 import com.peterchege.blogger.core.datastore.preferences.DefaultAuthTokenProvider
 import com.peterchege.blogger.core.datastore.preferences.DefaultFCMTokenProvider
 import com.peterchege.blogger.core.util.*
+import com.peterchege.blogger.domain.FcmTokenRepository
 import com.peterchege.blogger.domain.repository.AuthRepository
 import com.peterchege.blogger.domain.repository.NetworkInfoRepository
 import com.peterchege.blogger.domain.repository.NetworkStatus
@@ -51,6 +52,7 @@ class LoginScreenViewModel @Inject constructor(
     private val repository: AuthRepository,
     private val defaultAuthTokenProvider: DefaultAuthTokenProvider,
     private val defaultFCMTokenProvider: DefaultFCMTokenProvider,
+    private val fcmTokenRepository: FcmTokenRepository,
     private val networkInfoRepository: NetworkInfoRepository,
     private val analyticsHelper: AnalyticsHelper,
 ) : ViewModel() {
@@ -86,7 +88,7 @@ class LoginScreenViewModel @Inject constructor(
     fun initiateLogin(navigateToDashBoard:() ->Unit) {
         viewModelScope.launch {
             try {
-                val token = FirebaseMessaging.getInstance().token.await()
+                val token = fcmTokenRepository.getFcmToken()
                 _uiState.value = _uiState.value.copy(isLoading = true)
                 val email = _uiState.value.email
                 val password = _uiState.value.password

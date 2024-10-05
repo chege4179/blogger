@@ -21,6 +21,7 @@ import com.peterchege.blogger.core.api.responses.*
 import com.peterchege.blogger.core.api.responses.models.User
 import com.peterchege.blogger.core.api.responses.responses.AllPostsResponse
 import com.peterchege.blogger.core.api.responses.responses.AddCommentResponse
+import com.peterchege.blogger.core.api.responses.responses.CaptureDeviceInfoResponse
 import com.peterchege.blogger.core.api.responses.responses.DeleteCommentResponse
 import com.peterchege.blogger.core.api.responses.responses.DeleteResponse
 import com.peterchege.blogger.core.api.responses.responses.FollowResponse
@@ -103,6 +104,9 @@ interface BloggerApi {
 
     @GET("/user/single/{userId}")
     suspend fun getUserProfile(@Path("userId") userId: String): Response<ProfileResponse>
+
+    @GET("/user/myProfile")
+    suspend fun getMyProfile(): Response<ProfileResponse>
 
     @PUT("/auth/updateDeviceToken")
     suspend fun updateToken(@Body updateToken: UpdateToken): Response<UpdateTokenResponse>
@@ -225,7 +229,10 @@ interface BloggerApi {
         @Body body: RequestBody
     ): Response<UpdateUserResponse>
 
-
+    @POST("/deviceInfo/captureDeviceInfo")
+    suspend fun captureDeviceDetails(
+        @Body body:CaptureDeviceInfoDto
+    ):Response<CaptureDeviceInfoResponse>
 
 
 }

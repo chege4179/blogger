@@ -123,9 +123,9 @@ class ProfileScreenViewModel @Inject constructor(
 
     val uiState = combine(authUser, isUserLoggedIn) { user, loggedIn ->
         if (loggedIn) {
-            val response = profileUseCase(userId = user?.userId ?: "").last()
+            val response = profileRepository.getMyProfile()
             when (response) {
-                is Resource.Success -> {
+                is NetworkResult.Success -> {
                     if (response.data?.user != null) {
                         ProfileScreenUiState.Success(
                             posts = getPaginatedPostsByUserId(userId = response.data.user.userId),
@@ -136,13 +136,8 @@ class ProfileScreenViewModel @Inject constructor(
                     }
 
                 }
-
-                is Resource.Error -> {
+                else -> {
                     ProfileScreenUiState.Error(message = "Error")
-                }
-
-                is Resource.Loading -> {
-                    ProfileScreenUiState.Loading
                 }
             }
         } else {

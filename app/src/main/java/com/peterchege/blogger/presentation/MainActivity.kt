@@ -30,9 +30,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -54,8 +56,14 @@ import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.android.play.core.ktx.installStatus
 import com.peterchege.blogger.R
+import com.peterchege.blogger.core.api.requests.CaptureDeviceInfoDto
+import com.peterchege.blogger.core.datastore.repository.UserDataStoreRepository
+import com.peterchege.blogger.core.device.DeviceInfo
 import com.peterchege.blogger.core.services.UploadPostService
 import com.peterchege.blogger.core.util.ThemeConfig
+import com.peterchege.blogger.core.util.isNotNull
+import com.peterchege.blogger.domain.FcmTokenRepository
+import com.peterchege.blogger.domain.repository.DeviceInfoRepository
 import com.peterchege.blogger.presentation.components.AppBackgroundImage
 import com.peterchege.blogger.presentation.navigation.AppNavigation
 import com.peterchege.blogger.presentation.theme.BloggerTheme
@@ -72,6 +80,14 @@ class MainActivity : ComponentActivity() {
 
     val tag = MainActivity::class.java.simpleName
 
+    @Inject
+    lateinit var deviceInfoRepository: DeviceInfoRepository
+
+    @Inject
+    lateinit var userDataStoreRepository: UserDataStoreRepository
+
+    @Inject
+    lateinit var fcmTokenRepository: FcmTokenRepository
 
     @Inject
     lateinit var lazyStats: dagger.Lazy<JankStats>
@@ -112,6 +128,36 @@ class MainActivity : ComponentActivity() {
             Timber.tag(tag).e("Try check update info exception: ${e.message}")
         }
         setContent {
+            val context = LocalContext.current
+            val deviceInfo = DeviceInfo(context)
+            val authUser by userDataStoreRepository.getLoggedInUser()
+                .collectAsStateWithLifecycle(initialValue = null)
+
+
+
+            LaunchedEffect(key1 = authUser) {
+                val token = fcmTokenRepository.getFcmToken()
+                Timber.tag(tag).i("Auth User $authUser",)
+                Timber.tag(tag).i("Auth User ${authUser.isNotNull()}",)
+                Timber.tag(tag).i("Auth User ${authUser?.userId?.isNotBlank() == true}")
+
+                if (authUser.isNotNull() && authUser?.userId?.isNotBlank() == true){
+
+                    deviceInfoRepository.captureDeviceInfo(
+                        payload = CaptureDeviceInfoDto(
+                            deviceId = deviceInfo.androidId,
+                            deviceName = deviceInfo.deviceName,
+                            osVersion = deviceInfo.osVersion,
+                            apkVersion = deviceInfo.versionCode.toString(),
+                            deviceType = deviceInfo.phoneType,
+                            platform = "Android",
+                            fcmToken = token,
+                            deviceTokenUserId = authUser?.userId ?:"",
+                        )
+                    )
+                }
+
+            }
             val viewModel: MainActivityViewModel = hiltViewModel()
             val theme by viewModel.theme.collectAsStateWithLifecycle()
             val navController = rememberNavController()
@@ -152,6 +198,7 @@ class MainActivity : ComponentActivity() {
         super.onPause()
         lazyStats.get().isTrackingEnabled = false
     }
+
     private fun removeInstallStateUpdateListener() {
         appUpdateManager.unregisterListener(updateListener)
     }
