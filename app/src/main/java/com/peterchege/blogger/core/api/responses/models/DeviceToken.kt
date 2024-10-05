@@ -19,7 +19,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DeviceToken(
-    val deviceId:String,
-    val deviceToken:String,
-    val deviceTokenUserId:String,
+    val deviceId: String,
+    val deviceTokenUserId: String,
+    val deviceName: String,
+    val osVersion: String,
+    val platform: String,
+    val deviceType: String,
+    val fcmToken:String,
+
 )
