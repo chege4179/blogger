@@ -34,6 +34,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -51,6 +52,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.peterchege.blogger.R
+import com.peterchege.blogger.core.api.requests.CaptureDeviceInfoDto
+import com.peterchege.blogger.core.device.DeviceInfo
 import com.peterchege.blogger.core.util.UiEvent
 import com.peterchege.blogger.domain.repository.NetworkStatus
 import com.peterchege.blogger.presentation.components.AppBackgroundImage
@@ -69,9 +72,12 @@ fun LoginScreen(
     viewModel: LoginScreenViewModel = hiltViewModel()
 
 ) {
+    val context = LocalContext.current
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     val networkStatus = viewModel.networkStatus.collectAsStateWithLifecycle()
-
+    val deviceInfo = remember {
+        DeviceInfo(context = context)
+    }
 
     LoginScreenContent(
         uiState = uiState.value,
@@ -80,7 +86,20 @@ fun LoginScreen(
         onChangeEmail = { viewModel.onChangeEmail(it) },
         onChangePassword = { viewModel.onChangePassword(it) },
         onChangePasswordVisibility = { viewModel.onChangePasswordVisibility() },
-        onSubmit = { viewModel.initiateLogin(navigateToDashBoard = navigateToDashBoard) },
+        onSubmit = {
+            viewModel.initiateLogin(
+                deviceInfo = CaptureDeviceInfoDto(
+                    deviceId = deviceInfo.androidId,
+                    deviceName = deviceInfo.deviceName,
+                    osVersion = deviceInfo.osVersion,
+                    apkVersion = deviceInfo.versionCode.toString(),
+                    deviceType = deviceInfo.phoneType,
+                    platform = "Android",
+                    fcmToken = "",
+                ),
+                navigateToDashBoard = navigateToDashBoard
+            )
+        },
         navigateToSignUpScreen = navigateToSignUpScreen,
     )
 
@@ -177,8 +196,7 @@ fun LoginScreenContent(
                 modifier = Modifier
                     .width(80.dp)
                     .height(80.dp)
-                    .clip(RoundedCornerShape(20.dp))
-                ,
+                    .clip(RoundedCornerShape(20.dp)),
                 contentDescription = stringResource(id = R.string.app_name)
             )
             Text(
@@ -277,7 +295,7 @@ fun LoginScreenContent(
 @Preview
 @Composable
 fun LoginScreenPreview1() {
-    BloggerTheme(darkTheme = true){
+    BloggerTheme(darkTheme = true) {
         LoginScreenContent(
             uiState = LoginFormState(isLoading = true),
             networkStatus = NetworkStatus.Connected,
@@ -297,7 +315,7 @@ fun LoginScreenPreview1() {
 @Preview
 @Composable
 fun LoginScreenPreview2() {
-    BloggerTheme(darkTheme = false){
+    BloggerTheme(darkTheme = false) {
         LoginScreenContent(
             uiState = LoginFormState(isLoading = true),
             networkStatus = NetworkStatus.Connected,

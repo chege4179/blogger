@@ -18,6 +18,7 @@ package com.peterchege.blogger.presentation.screens.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.messaging.FirebaseMessaging
+import com.peterchege.blogger.core.api.requests.CaptureDeviceInfoDto
 import com.peterchege.blogger.core.firebase.analytics.AnalyticsHelper
 import com.peterchege.blogger.core.firebase.analytics.logLoginEvent
 import com.peterchege.blogger.core.api.requests.LoginUser
@@ -35,6 +36,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
@@ -85,21 +87,23 @@ class LoginScreenViewModel @Inject constructor(
 
     }
 
-    fun initiateLogin(navigateToDashBoard:() ->Unit) {
+    fun initiateLogin(deviceInfo: CaptureDeviceInfoDto, navigateToDashBoard: () -> Unit) {
         viewModelScope.launch {
             try {
                 val token = fcmTokenRepository.getFcmToken()
-                _uiState.value = _uiState.value.copy(isLoading = true)
+                deviceInfo.fcmToken = token
+
+                _uiState.update { it.copy(isLoading = true) }
                 val email = _uiState.value.email
                 val password = _uiState.value.password
                 if (email.length < 5 || password.length < 5) {
-                    _uiState.value = _uiState.value.copy(isLoading = false)
+                    _uiState.update { it.copy(isLoading = false) }
                     _eventFlow.emit(UiEvent.ShowSnackbar(message = "Credentials should be at least 5 characters long"))
                 } else {
                     val loginUser = LoginUser(
                         email = email.trim(),
                         password = password.trim(),
-                        deviceToken = token!!
+                        deviceInfo = deviceInfo
                     )
                     val response = repository.loginUser(loginUser)
                     Timber.tag(TAG).i("Login Response --> ${response}")
@@ -121,7 +125,7 @@ class LoginScreenViewModel @Inject constructor(
                                     defaultAuthTokenProvider.setAuthToken(it)
                                 }
                                 navigateToDashBoard()
-                            }else{
+                            } else {
                                 _eventFlow.emit(UiEvent.ShowSnackbar(message = response.data.msg))
                             }
                         }
@@ -130,7 +134,7 @@ class LoginScreenViewModel @Inject constructor(
                             _uiState.value = _uiState.value.copy(isLoading = false)
                             _eventFlow.emit(
                                 UiEvent.ShowSnackbar(
-                                    message =  "An unexpected error occurred"
+                                    message = "An unexpected error occurred"
                                 )
                             )
                         }
@@ -139,7 +143,7 @@ class LoginScreenViewModel @Inject constructor(
                             _uiState.value = _uiState.value.copy(isLoading = false)
                             _eventFlow.emit(
                                 UiEvent.ShowSnackbar(
-                                    message =  "An unexpected exception occurred"
+                                    message = "An unexpected exception occurred"
                                 )
                             )
                         }
@@ -153,6 +157,7 @@ class LoginScreenViewModel @Inject constructor(
             }
         }
     }
+
     companion object {
         val TAG = LoginScreenViewModel::class.java.simpleName
 

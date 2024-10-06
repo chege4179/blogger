@@ -19,6 +19,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UpdateToken(
+    val deviceId:String,
     val newToken:String,
     val oldToken:String,
     val userId:String,

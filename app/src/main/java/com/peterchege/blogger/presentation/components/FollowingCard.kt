@@ -102,7 +102,8 @@ fun FollowingCard(
                     Button(
                         onClick = {
                             unFollowUser(following)
-                        }) {
+                        }
+                    ) {
                         Text(text = stringResource(id = R.string.unfollow_button_text))
                     }
                 }

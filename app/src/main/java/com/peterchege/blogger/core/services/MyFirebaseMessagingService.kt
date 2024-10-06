@@ -31,6 +31,7 @@ import com.peterchege.blogger.core.api.BloggerApi
 import com.peterchege.blogger.core.api.requests.UpdateToken
 import com.peterchege.blogger.core.datastore.preferences.DefaultFCMTokenProvider
 import com.peterchege.blogger.core.datastore.repository.UserDataStoreRepository
+import com.peterchege.blogger.core.device.DeviceInfo
 import com.peterchege.blogger.core.di.IoDispatcher
 import com.peterchege.blogger.core.util.Constants
 import com.peterchege.blogger.presentation.MainActivity
@@ -79,6 +80,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             updateTokenToApi(newToken = newToken, oldToken = token)
             token = newToken
         }
+
     }
 
 
@@ -96,7 +98,9 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
 
     private fun updateTokenToApi(newToken: String,oldToken:String){
+        val deviceInfo = DeviceInfo(this.applicationContext)
         CoroutineScope(ioDispatcher).launch {
+
             userDataStoreRepository.getLoggedInUser().collectLatest { user ->
                 user?.let {
                     try {
@@ -104,7 +108,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                             val updateToken = UpdateToken(
                                 newToken = newToken,
                                 oldToken = oldToken,
-                                userId = it.userId
+                                userId = it.userId,
+                                deviceId = deviceInfo.androidId
                             )
                             api.updateToken(updateToken = updateToken)
                         }

@@ -11,6 +11,5 @@ data class CaptureDeviceInfoDto(
     val osVersion: String,
     val platform: String,
     val apkVersion: String,
-    val fcmToken: String,
-    val deviceTokenUserId: String
+    var fcmToken: String,
 )

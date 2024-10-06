@@ -128,36 +128,7 @@ class MainActivity : ComponentActivity() {
             Timber.tag(tag).e("Try check update info exception: ${e.message}")
         }
         setContent {
-            val context = LocalContext.current
-            val deviceInfo = DeviceInfo(context)
-            val authUser by userDataStoreRepository.getLoggedInUser()
-                .collectAsStateWithLifecycle(initialValue = null)
 
-
-
-            LaunchedEffect(key1 = authUser) {
-                val token = fcmTokenRepository.getFcmToken()
-                Timber.tag(tag).i("Auth User $authUser",)
-                Timber.tag(tag).i("Auth User ${authUser.isNotNull()}",)
-                Timber.tag(tag).i("Auth User ${authUser?.userId?.isNotBlank() == true}")
-
-                if (authUser.isNotNull() && authUser?.userId?.isNotBlank() == true){
-
-                    deviceInfoRepository.captureDeviceInfo(
-                        payload = CaptureDeviceInfoDto(
-                            deviceId = deviceInfo.androidId,
-                            deviceName = deviceInfo.deviceName,
-                            osVersion = deviceInfo.osVersion,
-                            apkVersion = deviceInfo.versionCode.toString(),
-                            deviceType = deviceInfo.phoneType,
-                            platform = "Android",
-                            fcmToken = token,
-                            deviceTokenUserId = authUser?.userId ?:"",
-                        )
-                    )
-                }
-
-            }
             val viewModel: MainActivityViewModel = hiltViewModel()
             val theme by viewModel.theme.collectAsStateWithLifecycle()
             val navController = rememberNavController()
